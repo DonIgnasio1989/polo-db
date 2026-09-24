@@ -3701,25 +3701,27 @@
 
   <script>
     /* ============ СПРАВОЧНИКИ ============ */
-    const BASE_CATS = [
-      { id: 'All', label: 'Все системы', icon: '📦' },
-      { id: 'Maintenance', label: 'Регламент ТО', icon: '🔧' },
-      { id: 'RoadKit', label: 'С собой в дорогу', icon: '🎒' },
-      { id: 'Engine', label: '1. Двигатель', icon: '⚙️' },
-      { id: 'Cooling', label: '1.1 Охлаждение', icon: '❄️' },
-      { id: 'Ignition', label: '1.2 Зажигание', icon: '🔥' },
-      { id: 'Fluids', label: '1.3 Жидкости', icon: '🛢️' },
-      { id: 'Fuel', label: '2. Топливная система', icon: '⛽' },
-      { id: 'Exhaust', label: '2.1 Выпуск ОГ', icon: '💨' },
-      { id: 'Heating', label: '2.2 Отопитель', icon: '🌡️' },
-      { id: 'Transmission', label: '3. Трансмиссия', icon: '🔄' },
-      { id: 'Suspension', label: '4. Передняя ось, Рулевое', icon: '🛞' },
-      { id: 'Brakes', label: '5. Колёса, Тормозная система', icon: '🛑' },
-      { id: 'Body', label: '6. Кузов', icon: '🚗' },
-      { id: 'Electrical', label: '7. Электрика', icon: '💡' },
-      { id: 'Bulbs', label: '8. Лампы', icon: '🔆' },
-      { id: 'Interior', label: '9. Аксессуары, Салон', icon: '🪑' }
-    ];
+const BASE_CATS = [
+  { id: 'All', label: 'Все системы', icon: '📦' },
+  { id: 'Maintenance', label: '🔧 Регламент ТО', icon: '🔧' },
+  { id: 'RoadKit', label: '🎒 С собой в дорогу', icon: '🎒' },
+  { id: 'Engine', label: '1. Двигатель, Сцепление', icon: '⚙️' },
+  { id: 'Cooling', label: '1.1 Охлаждение', icon: '❄️' },
+  { id: 'Ignition', label: '1.2 Зажигание', icon: '🔥' },
+  { id: 'Fluids', label: '1.3 Жидкости', icon: '🛢️' },
+  { id: 'Fuel', label: '2. Топливная система', icon: '⛽' },
+  { id: 'Exhaust', label: '2.1 Система выпуска ОГ', icon: '💨' },
+  { id: 'Heating', label: '2.2 Отопитель', icon: '🌡️' },
+  { id: 'Transmission', label: '3. Трансмиссия', icon: '🔄' },
+  { id: 'Suspension', label: '4. Передняя ось, Дифференциал, Рулевое', icon: '🛞' },
+  { id: 'RearAxle', label: '5. Задняя ось', icon: '🔩' },
+  { id: 'Brakes', label: '6. Колёса, Тормозная система', icon: '🛑' },
+  { id: 'Controls', label: '7. Механизмы управления, Педальный узел', icon: '🎛️' },
+  { id: 'Body', label: '8. Кузов', icon: '🚗' },
+  { id: 'Electrical', label: '9. Электрика', icon: '💡' },
+  { id: 'Bulbs', label: '9.1 Освещение, Лампы', icon: '🔆' },
+  { id: 'Interior', label: '0. Аксессуары, Салон', icon: '🪑' }
+];
     let CATS = BASE_CATS.slice();
     const ENGINES = {
       'AER': { v: '1.0', hp: 50, f: 'P' }, 'ALL': { v: '1.0', hp: 50, f: 'P' }, 'AEV': { v: '1.0', hp: 50, f: 'P' },
@@ -5249,7 +5251,5 @@
     });
   </script>
 </body>
-
-</html>
 
 </html>
