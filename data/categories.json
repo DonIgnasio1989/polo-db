@@ -1,0 +1,5 @@
+[
+  {"id":"Steering","label":"Рулевое управление","icon":"🎯"},
+  {"id":"Diagnostics","label":"Диагностика (OBD)","icon":"🩺"},
+  {"id":"Torque","label":"Моменты затяжки","icon":"🔩"}
+]
