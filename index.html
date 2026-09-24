@@ -393,6 +393,26 @@
       color: #fff
     }
 
+    .ni.sub {
+      padding-left: 32px;
+      font-size: .8rem;
+      opacity: .88;
+    }
+
+    .ni.sub:hover {
+      padding-left: 36px;
+    }
+
+    .ni.sub::before {
+      content: '└ ';
+      opacity: .35;
+      margin-right: 2px;
+    }
+
+    .ni.folder {
+      font-weight: 700;
+    }
+
     .nd {
       height: 1px;
       background: rgba(255, 255, 255, .1);
@@ -3188,9 +3208,10 @@
   <div class="mw">
     <button id="mob" title="Меню">☰</button>
     <header class="tb">
-      <div class="sc"><span class="si">🔍</span><input type="text" class="sr" id="sr"
-          placeholder="OEM, деталь, аналог, заметка…"><button class="scl" id="scl" onclick="cS()"
-          title="Очистить">✕</button></div>
+      <div class="sc"><span class="si">🔍</span>
+        <input type="text" class="sr" id="sr" list="searchSuggest" placeholder="OEM, деталь, аналог, заметка…">
+        <datalist id="searchSuggest"></datalist><button class="scl" id="scl" onclick="cS()" title="Очистить">✕</button>
+      </div>
       <div class="to-chip unset" id="toChip" onclick="oTO()" title="Настройки ТО — клик для редактирования"
         style="display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:4px;font-size:.78rem;font-weight:700;cursor:pointer;border:1px solid var(--bd);background:var(--cd);color:var(--tx);white-space:nowrap">
         <span>🛠</span><span class="to-lb" id="toLbl">Настроить ТО</span><span
@@ -3701,27 +3722,27 @@
 
   <script>
     /* ============ СПРАВОЧНИКИ ============ */
-const BASE_CATS = [
-  { id: 'All', label: 'Все системы', icon: '📦' },
-  { id: 'Maintenance', label: '🔧 Регламент ТО', icon: '🔧' },
-  { id: 'RoadKit', label: '🎒 С собой в дорогу', icon: '🎒' },
-  { id: 'Engine', label: '1. Двигатель, Сцепление', icon: '⚙️' },
-  { id: 'Cooling', label: '1.1 Охлаждение', icon: '❄️' },
-  { id: 'Ignition', label: '1.2 Зажигание', icon: '🔥' },
-  { id: 'Fluids', label: '1.3 Жидкости', icon: '🛢️' },
-  { id: 'Fuel', label: '2. Топливная система', icon: '⛽' },
-  { id: 'Exhaust', label: '2.1 Система выпуска ОГ', icon: '💨' },
-  { id: 'Heating', label: '2.2 Отопитель', icon: '🌡️' },
-  { id: 'Transmission', label: '3. Трансмиссия', icon: '🔄' },
-  { id: 'Suspension', label: '4. Передняя ось, Дифференциал, Рулевое', icon: '🛞' },
-  { id: 'RearAxle', label: '5. Задняя ось', icon: '🔩' },
-  { id: 'Brakes', label: '6. Колёса, Тормозная система', icon: '🛑' },
-  { id: 'Controls', label: '7. Механизмы управления, Педальный узел', icon: '🎛️' },
-  { id: 'Body', label: '8. Кузов', icon: '🚗' },
-  { id: 'Electrical', label: '9. Электрика', icon: '💡' },
-  { id: 'Bulbs', label: '9.1 Освещение, Лампы', icon: '🔆' },
-  { id: 'Interior', label: '0. Аксессуары, Салон', icon: '🪑' }
-];
+    const BASE_CATS = [
+      { id: 'All', label: 'Все системы', icon: '📦' },
+      { id: 'Maintenance', label: '🔧 Регламент ТО', icon: '🔧' },
+      { id: 'RoadKit', label: '🎒 С собой в дорогу', icon: '🎒' },
+      { id: 'Engine', label: '1. Двигатель, Сцепление', icon: '⚙️' },
+      { id: 'Cooling', label: '1.1 Охлаждение', icon: '❄️', parent: 'Engine' },
+      { id: 'Ignition', label: '1.2 Зажигание', icon: '🔥', parent: 'Engine' },
+      { id: 'Fluids', label: '1.3 Жидкости', icon: '🛢️', parent: 'Engine' },
+      { id: 'Fuel', label: '2. Топливная система', icon: '⛽' },
+      { id: 'Exhaust', label: '2.1 Система выпуска ОГ', icon: '💨', parent: 'Fuel' },
+      { id: 'Heating', label: '2.2 Отопитель', icon: '🌡️', parent: 'Fuel' },
+      { id: 'Transmission', label: '3. Трансмиссия', icon: '🔄' },
+      { id: 'Suspension', label: '4. Передняя ось, Дифференциал, Рулевое', icon: '🛞' },
+      { id: 'RearAxle', label: '5. Задняя ось', icon: '🔩' },
+      { id: 'Brakes', label: '6. Колёса, Тормозная система', icon: '🛑' },
+      { id: 'Controls', label: '7. Механизмы управления, Педальный узел', icon: '🎛️' },
+      { id: 'Body', label: '8. Кузов', icon: '🚗' },
+      { id: 'Electrical', label: '9. Электрика', icon: '💡' },
+      { id: 'Bulbs', label: '9.1 Освещение, Лампы', icon: '🔆', parent: 'Electrical' },
+      { id: 'Interior', label: '0. Аксессуары, Салон', icon: '🪑' }
+    ];
     let CATS = BASE_CATS.slice();
     const ENGINES = {
       'AER': { v: '1.0', hp: 50, f: 'P' }, 'ALL': { v: '1.0', hp: 50, f: 'P' }, 'AEV': { v: '1.0', hp: 50, f: 'P' },
@@ -4220,7 +4241,8 @@ const BASE_CATS = [
         'data/parts-01-engine-fuel-ignition.json',
         'data/parts-02-cooling-heating-brakes-suspension.json',
         'data/parts-03-trans-exh-elec-bulbs.json',
-        'data/parts-04-body-interior-maint-fluids-roadkit.json'
+        'data/parts-04-body-interior-maint-fluids-roadkit.json',
+        'data/parts-05-rear-axle-controls.json'
       ];
       let all = [], anyOk = false;
       for (const f of files) {
@@ -4263,7 +4285,8 @@ const BASE_CATS = [
         'data/parts-01-engine-fuel-ignition.json',
         'data/parts-02-cooling-heating-brakes-suspension.json',
         'data/parts-03-trans-exh-elec-bulbs.json',
-        'data/parts-04-body-interior-maint-fluids-roadkit.json'
+        'data/parts-04-body-interior-maint-fluids-roadkit.json',
+        'data/parts-05-rear-axle-controls.json'
       ];
       let serverParts = [], anyOk = false;
       for (const f of files) {
@@ -4428,10 +4451,21 @@ const BASE_CATS = [
         const f = () => { const r = gv.value, c = r.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '').slice(0, vm); if (c !== r) gv.value = c; };
         if (ev === 'paste') setTimeout(f, 0); else f();
       }));
+      updSearchSuggest();
       rTOWidget();
       iPWA();
     }
-
+    function updSearchSuggest() {
+      const dl = $('searchSuggest'); if (!dl) return;
+      const items = [], seen = new Set();
+      const push = (v, k) => { if (v && !seen.has(k)) { items.push(v); seen.add(k); } };
+      for (const p of D) {
+        push(p.oem, 'o:' + p.oem);
+        push(p.name, 'n:' + p.name);
+        for (const a of (p.analogs || [])) push(a, 'a:' + a);
+      }
+      dl.innerHTML = items.slice(0, 500).map(x => '<option value="' + escA(x) + '">').join('');
+    }
     function updateFilterStyling() {
       ['fmtr', 'fbdy', 'ftr'].forEach(id => { const el = $(id); if (!el) return; el.classList.toggle('act', el.value && el.value !== 'all'); });
     }
@@ -4447,18 +4481,29 @@ const BASE_CATS = [
 
     function rSB() {
       const n = $('nl'); n.innerHTML = '';
-      const baseArr = D;
-      const fc = baseArr.filter(p => p.favorite).length;
-      n.appendChild(nI('All', '📦', 'Все системы', baseArr.length, ''));
-      n.appendChild(nI('Favorites', '⭐', 'Избранное', fc, 'fav', ''));
+      const cnt = id => D.filter(p => p.cat === id).length;
+      const add = (id, ic, lb, count, cls, sub) => {
+        const li = document.createElement('li');
+        li.className = 'ni ' + (SV.activeCat === id ? 'active ' : '') + (cls || '') + (sub ? ' sub' : '');
+        li.setAttribute('tabindex', '-1');
+        li.onclick = () => { SV.activeCat = id; sU(); rSB(); rC(); if (window.innerWidth <= 900) cMM(); $('ca').scrollTop = 0; };
+        li.innerHTML = '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ic + ' ' + esc(lb) + '</span><span class="bdg">' + count + '</span>';
+        n.appendChild(li);
+      };
+      add('All', '📦', 'Все системы', D.length);
+      add('Favorites', '⭐', 'Избранное', D.filter(p => p.favorite).length, 'fav');
       const dv = document.createElement('li'); dv.className = 'nd'; n.appendChild(dv);
-      CATS.filter(c => c.id !== 'All').forEach(c => {
-        const cnt = baseArr.filter(p => p.cat === c.id).length;
-        n.appendChild(nI(c.id, c.icon, c.label, cnt, ''));
+      // Верхние уровни — категории без parent
+      CATS.filter(c => c.id !== 'All' && !c.parent).forEach(c => {
+        const kids = CATS.filter(k => k.parent === c.id);
+        const own = cnt(c.id);
+        const total = own + kids.reduce((s, k) => s + cnt(k.id), 0);
+        add(c.id, c.icon, c.label, total, kids.length ? 'folder' : '');
+        kids.forEach(k => add(k.id, k.icon, k.label, cnt(k.id), '', true));
       });
       const dv2 = document.createElement('li'); dv2.className = 'nd'; n.appendChild(dv2);
-      n.appendChild(nI('Workshops', '🔧', 'Мастерские', W.length, ''));
-      n.appendChild(nI('Log', '📖', 'Журнал обслуживания', LOG.length, ''));
+      add('Workshops', '🔧', 'Мастерские', W.length);
+      add('Log', '📖', 'Журнал обслуживания', LOG.length);
     }
     function nI(id, ic, lb, ct, ex) {
       const li = document.createElement('li');
