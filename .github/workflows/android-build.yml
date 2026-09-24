@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   push:
     branches: ["main"]
-  workflow_dispatch: # Позволяет запускать сборку вручную со вкладки Actions
+  workflow_dispatch:
 
 jobs:
   build:
@@ -19,8 +19,11 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Generate Gradle wrapper
+        run: gradle wrapper
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug
