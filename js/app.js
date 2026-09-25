@@ -746,19 +746,22 @@ async function init() {
         const i = e.target.closest('.gi'); if (i && i.dataset.gid) setAV(i.dataset.gid);
     });
     $('gab').addEventListener('click', oGM);
-    ['mo', 'wmo', 'gmo', 'smo', 'aboutmo', 'bugmo', 'donmo', 'profmo', 'upmo'].forEach(id => {
+    ['mo', 'wmo', 'gmo', 'smo', 'aboutmo', 'bugmo', 'donmo', 'profmo', 'upmo', 'partmo'].forEach(id => {
         $(id).addEventListener('click', e => {
             if (e.target.id === id) {
                 if (id === 'mo') cM(); else if (id === 'wmo') cWM(); else if (id === 'gmo') cGM(); else if (id === 'smo') cSM();
+                else if (id === 'partmo') cPC();
                 else if (id === 'aboutmo') cAbout(); else if (id === 'bugmo') cBug(); else if (id === 'donmo') cDonate();
                 else if (id === 'profmo') cProfile(); else if (id === 'upmo') cUp();
                 else if (id === 'logmo') cLog(); else if (id === 'tomo') cTO(); else if (id === 'shopmo') cShop();
+                else if (id === 'partmo') cPC();
             }
         });
     });
     document.addEventListener('click', e => { const m = $('em'); if (m.classList.contains('show') && !e.target.closest('.ew')) cEM(); });
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
+            if ($('partmo') && $('partmo').classList.contains('show')) return cPC();
             if ($('lbt').classList.contains('show')) return cL();
             if ($('aboutmo').classList.contains('show')) return cAbout();
             if ($('bugmo').classList.contains('show')) return cBug();
@@ -1051,6 +1054,24 @@ function cH(p) {
         + '</div></details>'
         + '</div>';
 }
+function oPC(id) {
+  const p = D.find(x => x.id === id);
+  if (!p) return;
+  $('partmo_title').textContent = p.name || p.oem || 'Деталь';
+  // Рендерим карточку без кнопок редактирования/удаления
+  let html = cH(p);
+  // Убираем кнопки ✎ и ✕ из верхнего правого угла
+  html = html.replace(/<button class="ctb" data-action="edit"[^>]*>✎<\/button>/, '');
+  html = html.replace(/<button class="ctb dg" data-action="delete"[^>]*>✕<\/button>/, '');
+  // Снимаем фиксированную позицию — карточка внутри модалки
+  html = html.replace('class="cd', 'class="cd" style="border:none;box-shadow:none" data-old');
+  $('partmo_body').innerHTML = '<div style="margin:-4px">' + html + '</div>';
+  // Автооткрываем "Подробности"
+  const det = $('partmo_body').querySelector('.cd-body');
+  if (det) det.setAttribute('open', '');
+  openM('partmo');
+}
+const cPC = () => closeM('partmo');
 function rSec(sid) {
     const ar = $('ca');
     const s = CUSTOM.sections[sid] || {};
@@ -1159,7 +1180,7 @@ function oCC(e) {
     }
     const la = e.target.closest('[data-lac]');
     if (la) { const c = la.closest('.log-entry'); const id = c ? c.dataset.lid : null; if (!id) return; if (la.dataset.lac === 'edit') oLogEdit(id); else dLog(id); return; }
-    const tp = e.target.closest('.ep'); if (tp && tp.dataset.id) oEM(tp.dataset.id);
+    const tp = e.target.closest('.ep'); if (tp && tp.dataset.id) oPC(tp.dataset.id);
 }
 function tF(id) { const p = D.find(x => x.id === id); if (!p) return; p.favorite = !p.favorite; if (useIDB) iPut(SP, p).catch(() => { }); else sD(); rSB(); rC(); toast(p.favorite ? '⭐ Добавлено' : 'Убрано'); }
 function sPS(id, st) { const p = D.find(x => x.id === id); if (!p || !['want', 'bought', 'installed'].includes(st)) return; const same = p.status === st; p.status = same ? '' : st; useIDB ? iPut(SP, p).catch(() => { }) : sD(); rSB(); rC(); const L = { want: '🛒 Хочу', bought: '📦 Куплено', installed: '✅ Установлено' }; toast(same ? 'Статус снят' : L[st], same ? '' : 'success'); }
