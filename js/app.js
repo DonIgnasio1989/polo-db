@@ -103,7 +103,7 @@ const getPurchaseHtml = p => {
 const DB = []; /* данные грузятся из data/parts.json */
 
 const UK = 'vw_polo_ui_v185', PK = 'vw_polo_db_v181', WK = 'vw_polo_workshops_v181', VK = 'vw_polo_vincario_key_v18', GK = 'vw_polo_garage_v181', DN = 'vw_polo_v181', DV = 2, SP = 'parts', SW = 'workshops';
-let APP_VERSION = '19.1'; // fallback, если update.json не загрузится
+let APP_VERSION = '19.2'; // fallback, если update.json не загрузится
 const LICKEY = 'vw_polo_license_v1';
 const UPKEY = 'vw_polo_update_url_v1';
 const PROFKEY = 'vw_polo_profile_v1';
