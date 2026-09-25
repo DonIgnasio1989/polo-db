@@ -3055,9 +3055,7 @@ body.theme-dark .prof-name {
         display: flex;
     }
 
-    .tbd {
-        display: none;
-    }
+    .tbd { display: none !important; }
 
     .tb {
         padding: 10px 12px 10px 60px;
