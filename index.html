@@ -3193,7 +3193,7 @@
         <span class="sft-username" id="sft_username">Гость</span>
       </button>
       <div class="sft-btns">
-        <a class="sft-btn vk" href="https://vk.ru/donignasio" target="_blank" rel="noopener noreferrer"
+        <a class="sft-btn vk" href="https://vk.com/donignasio" target="_blank" rel="noopener noreferrer"
           title="VK автора">💬</a>
         <a class="sft-btn" href="mailto:donignasio@vk.com?subject=База%20Мастера" title="Email">✉️</a>
         <button class="sft-btn don" onclick="oDonate()" title="Поддержать проект">❤️</button>
@@ -4221,10 +4221,30 @@
       st.innerHTML = h;
     }
 
-    function doFullUpdate() {
-      toast('Загружаем свежую версию…', 'success');
-      setTimeout(() => location.replace(location.pathname + '?v=' + Date.now()), 300);
+    async function doFullUpdate() {
+  if (!confirm('Обновить базу?\n\nВаши правки (статус, избранное, заметки, цены) сохранятся.')) return;
+  toast('Обновляем…', 'success');
+  try {
+    const backup = new Map();
+    for (const p of D) backup.set((p.oem || '') + '||' + (p.name || ''), {
+      status: p.status, favorite: p.favorite, notes: p.notes,
+      price: p.price, currency: p.currency,
+      priceHistory: p.priceHistory, photo: p.photo, shopUrl: p.shopUrl
+    });
+    if (useIDB) await iClr(SP);
+    D = [];
+    await lAll();
+    for (const p of D) {
+      const b = backup.get((p.oem || '') + '||' + (p.name || ''));
+      if (b) Object.assign(p, b);
     }
+    if (useIDB) await iMany(SP, D);
+    rSB(); rC(); cUp();
+    toast('База обновлена: ' + D.length + ' поз.', 'success');
+  } catch (e) {
+    toast('Ошибка: ' + e.message, 'danger');
+  }
+}
 
     function applyUpMerge() {
       const parts = window._upParts; if (!parts) { toast('Нет данных', 'danger'); return; }
