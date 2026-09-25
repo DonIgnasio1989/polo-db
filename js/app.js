@@ -1689,26 +1689,4 @@ window.addEventListener('DOMContentLoaded', async () => {
     fCS();
     checkLicense();
     // Автопроверка "доступна новая версия" УБРАНА — она теперь не нужна
-});() => {
-    // Подставляем актуальную версию во все места UI
-    ['ver_gate', 'ver_footer', 'ver_about', 'ver_bug'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = APP_VERSION;
-    });
-    fCS();
-    checkLicense();
-
-    // АВТОПРОВЕРКА ОБНОВЛЕНИЙ — через 2 секунды после старта
-    setTimeout(async () => {
-        try {
-            const base = location.origin + location.pathname.replace(/[^/]*$/, '');
-            const r = await fetch(base + 'data/update.json?t=' + Date.now(), { cache: 'no-store' });
-            if (!r.ok) return;
-            const m = await r.json();
-            if (m.appVersion && typeof APP_VERSION !== 'undefined' && m.appVersion !== APP_VERSION) {
-                toast('📦 Доступна новая версия ' + m.appVersion, 'success');
-            }
-        } catch (e) { }
-    
-    });
-}
+});
