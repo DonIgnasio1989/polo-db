@@ -133,6 +133,10 @@ async function lLogs() {
 }
 let CUSTOM = { categories: [], sections: {} };
 const $ = id => document.getElementById(id);
+// Ранняя заглушка, чтобы inline onclick не падал, если app.js ещё не дочитан
+if (typeof window.tMMenu !== 'function') {
+    window.tMMenu = function () { };
+}
 const uid = () => 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
 const nz = s => (s == null ? '' : String(s)).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 const esc = t => { if (t == null) return ''; const d = document.createElement('div'); d.textContent = String(t); return d.innerHTML; };
@@ -781,29 +785,21 @@ async function init() {
     let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(rSz, 120); });
     const dt = $('dtgl'); if (dt) dt.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tSB(); });
     const mt = $('mob'); if (mt) mt.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tMM(); });
-    const gv = $('g_vi'), vv = /[A-HJ-NPR-Z0-9]/, vm = 17;
+    const vtg = $('viewToggle'); if (vtg) vtg.addEventListener('change', () => setV(vtg.checked ? 'tree' : 'grid'));
+    const gv = $('g_vi'), vm = 17;
+    gv.setAttribute('autocapitalize', 'off');
+    gv.setAttribute('autocomplete', 'off');
+    gv.setAttribute('autocorrect', 'off');
+    gv.setAttribute('spellcheck', 'false');
     gv.addEventListener('keydown', e => {
-        if (e.key === 'Enter') { e.preventDefault(); decG(); return; }
-        if (e.ctrlKey || e.metaKey || e.altKey) return;
-        if (e.key.length > 1) return;
-        const ch = e.key.toUpperCase();
-        if (!vv.test(ch)) { e.preventDefault(); return; }
-        const s = gv.selectionStart ?? gv.value.length, en = gv.selectionEnd ?? gv.value.length, l = gv.value.length;
-        const wb = (s !== en) ? l - (en - s) + 1 : l + 1;
-        if (wb > vm) e.preventDefault();
+        if (e.key === 'Enter') { e.preventDefault(); decG(); }
     });
-    gv.addEventListener('input', () => {
-        if (gv.isComposing) return;
-        const r = gv.value, u = r.toUpperCase();
-        if (u === r) return;
-        const s = gv.selectionStart, e2 = gv.selectionEnd;
-        gv.value = u;
-        try { gv.setSelectionRange(s, e2); } catch (err) { }
-    });
+
     ['paste', 'blur'].forEach(ev => gv.addEventListener(ev, () => {
         const f = () => { const r = gv.value, c = r.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '').slice(0, vm); if (c !== r) gv.value = c; };
         if (ev === 'paste') setTimeout(f, 0); else f();
     }));
+
     updSearchSuggest();
     rTOWidget();
     iPWA();
@@ -822,9 +818,16 @@ function updSearchSuggest() {
 function updateFilterStyling() {
     ['fmtr', 'fbdy', 'ftr'].forEach(id => { const el = $(id); if (!el) return; el.classList.toggle('act', el.value && el.value !== 'all'); });
 }
-function aTh() { document.body.classList.toggle('theme-dark', SV.theme !== 'light'); $('tb2').textContent = SV.theme === 'light' ? '🌙' : '☀️'; }
+function aTh() { document.body.classList.toggle('theme-dark', SV.theme !== 'light'); const t2 = $('tb2'); if (t2) t2.textContent = SV.theme === 'light' ? '🌙' : '☀️'; }
 function tTh() { SV.theme = SV.theme === 'light' ? 'dark' : 'light'; aTh(); sU(); }
-function setV(v, s) { SV.view = v; if (!s) sU(); $('vg').classList.toggle('active', v === 'grid'); $('vt').classList.toggle('active', v === 'tree'); rC(); }
+function setV(v, s) {
+    SV.view = v;
+    if (!s) sU();
+    const tg = $('viewToggle'), lb = $('vtLbl');
+    if (tg) tg.checked = v === 'tree';
+    if (lb) lb.textContent = v === 'tree' ? '🗂 Дерево' : '▦ Плитка';
+    rC();
+}
 function aSS() { const m = window.innerWidth <= 900, sb = $('sb'), bd = document.body; if (!m && SV.sidebarCollapsed) { sb.classList.add('collapsed'); bd.classList.add('sidebar-collapsed'); } else { sb.classList.remove('collapsed'); bd.classList.remove('sidebar-collapsed'); } }
 function rSz() { aSS(); const m = window.innerWidth <= 900; const mb = $('mob'); if (mb) mb.style.display = m ? 'flex' : ''; if (!m) cMM(); }
 function tSB() { if (window.innerWidth <= 900) return; SV.sidebarCollapsed = !SV.sidebarCollapsed; aSS(); sU(); }
@@ -1333,7 +1336,48 @@ const cSM = () => { $('smo').classList.remove('show'); };
 const sSet = () => { vk = $('s_vk').value.trim(); try { localStorage.setItem(VK, vk); } catch (e) { } toast('Сохранено', 'success'); cSM(); };
 
 const cEM = () => $('em').classList.remove('show');
-const tMMenu = e => { if (e) e.stopPropagation(); const m = $('em'); const em_t = $('em_theme'); if (em_t) em_t.textContent = (SV.theme === 'light' ? '🌙 Тёмная тема' : '☀️ Светлая тема'); m.classList.toggle('show'); };
+window.tMMenu = function (e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    const m = document.getElementById('em');
+    if (!m) return;
+    const em_t = document.getElementById('em_theme');
+    if (em_t) em_t.textContent = (SV.theme === 'light' ? '🌙 Тёмная тема' : '☀️ Светлая тема');
+
+    if (window.innerWidth > 900) {
+        const btn = document.getElementById('btnSettings');
+        const edge = 8;
+        // Жёстко: fixed + правый край окна, inline !important бьёт любой CSS
+        m.style.setProperty('position', 'fixed', 'important');
+        m.style.setProperty('right', edge + 'px', 'important');
+        m.style.setProperty('left', 'auto', 'important');
+        m.style.setProperty('bottom', 'auto', 'important');
+        m.style.setProperty('transform', 'none', 'important');
+
+        // Верх — под кнопкой, с проверкой низа
+        let topPx = 60;
+        if (btn) {
+            const r = btn.getBoundingClientRect();
+            topPx = r.bottom + 6;
+        }
+        const mh = m.offsetHeight || 300;
+        if (topPx + mh > window.innerHeight - 8) {
+            topPx = Math.max(8, window.innerHeight - mh - 8);
+        }
+        m.style.setProperty('top', topPx + 'px', 'important');
+    } else {
+        // На мобилке — сбрасываем inline-стили, работает bottom-sheet из CSS
+        m.style.removeProperty('position');
+        m.style.removeProperty('top');
+        m.style.removeProperty('right');
+        m.style.removeProperty('left');
+        m.style.removeProperty('bottom');
+        m.style.removeProperty('transform');
+    }
+
+    m.classList.toggle('show');
+};
+const tMMenu = window.tMMenu;
+
 function dl(f, c, m) { const b = new Blob([c], { type: m }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = f; document.body.appendChild(a); a.click(); setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(u); }, 100); }
 function eD() {
     try {
@@ -1706,80 +1750,79 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 });
 /* ============ КОНФЕТТИ ============ */
-    function confetti() {
-        const canvas = $('confetti-canvas');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        canvas.classList.add('show');
+function confetti() {
+    const canvas = $('confetti-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.classList.add('show');
 
-        const colors = ['#00a8e8', '#38bdf8', '#3ecf7e', '#fbbf24', '#e63946', '#8b5cf6', '#ec4899'];
-        const pieces = [];
-        const count = 120;
-        for (let i = 0; i < count; i++) {
-            pieces.push({
-                x: canvas.width / 2 + (Math.random() - .5) * 200,
-                y: canvas.height * 0.35,
-                vx: (Math.random() - .5) * 12,
-                vy: -Math.random() * 14 - 4,
-                g: 0.4,
-                w: 6 + Math.random() * 6,
-                h: 8 + Math.random() * 6,
-                color: colors[(Math.random() * colors.length) | 0],
-                rot: Math.random() * Math.PI * 2,
-                vrot: (Math.random() - .5) * .3,
-                life: 1
-            });
+    const colors = ['#00a8e8', '#38bdf8', '#3ecf7e', '#fbbf24', '#e63946', '#8b5cf6', '#ec4899'];
+    const pieces = [];
+    const count = 120;
+    for (let i = 0; i < count; i++) {
+        pieces.push({
+            x: canvas.width / 2 + (Math.random() - .5) * 200,
+            y: canvas.height * 0.35,
+            vx: (Math.random() - .5) * 12,
+            vy: -Math.random() * 14 - 4,
+            g: 0.4,
+            w: 6 + Math.random() * 6,
+            h: 8 + Math.random() * 6,
+            color: colors[(Math.random() * colors.length) | 0],
+            rot: Math.random() * Math.PI * 2,
+            vrot: (Math.random() - .5) * .3,
+            life: 1
+        });
+    }
+
+    let frame = 0;
+    function tick() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = 0;
+        for (const p of pieces) {
+            if (p.life <= 0) continue;
+            alive++;
+            p.vy += p.g;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vx *= .99;
+            p.rot += p.vrot;
+            if (p.y > canvas.height * 0.9) p.life -= .04;
+
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rot);
+            ctx.globalAlpha = Math.max(0, p.life);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
         }
-
-        let frame = 0;
-        function tick() {
+        frame++;
+        if (alive > 0 && frame < 180) requestAnimationFrame(tick);
+        else {
+            canvas.classList.remove('show');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let alive = 0;
-            for (const p of pieces) {
-                if (p.life <= 0) continue;
-                alive++;
-                p.vy += p.g;
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vx *= .99;
-                p.rot += p.vrot;
-                if (p.y > canvas.height * 0.9) p.life -= .04;
-
-                ctx.save();
-                ctx.translate(p.x, p.y);
-                ctx.rotate(p.rot);
-                ctx.globalAlpha = Math.max(0, p.life);
-                ctx.fillStyle = p.color;
-                ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-                ctx.restore();
-            }
-            frame++;
-            if (alive > 0 && frame < 180) requestAnimationFrame(tick);
-            else {
-                canvas.classList.remove('show');
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }
         }
-        tick();
-
     }
+    tick();
 
-    /* ============ SKELETON ============ */
-    function showSkeleton() {
-        const ar = $('ca');
-        if (!ar) return;
-        let h = '<div class="gr">';
-        for (let i = 0; i < 6; i++) {
-            h += '<div class="sk-card">' +
-                '<div class="skeleton sk-line w70"></div>' +
-                '<div class="skeleton sk-line w40"></div>' +
-                '<div class="skeleton sk-line w90"></div>' +
-                '<div class="skeleton sk-line w40"></div>' +
-                '</div>';
-        }
-        h += '</div>';
-        ar.innerHTML = h;
+}
+
+/* ============ SKELETON ============ */
+function showSkeleton() {
+    const ar = $('ca');
+    if (!ar) return;
+    let h = '<div class="gr">';
+    for (let i = 0; i < 6; i++) {
+        h += '<div class="sk-card">' +
+            '<div class="skeleton sk-line w70"></div>' +
+            '<div class="skeleton sk-line w40"></div>' +
+            '<div class="skeleton sk-line w90"></div>' +
+            '<div class="skeleton sk-line w40"></div>' +
+            '</div>';
     }
-    
+    h += '</div>';
+    ar.innerHTML = h;
+}

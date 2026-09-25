@@ -58,9 +58,9 @@
     </div>
   </div>
 
-<button class="tbd" id="dtgl" title="Меню">☰</button>
+  <button class="tbd" id="dtgl" title="Меню">☰</button>
   <nav class="sb" id="sb">
-    
+
     <div class="brand">
       <h2>VW Polo / Caddy</h2>
       <p>6N1 · 6N2 · Classic · Estate · Caddy<br>1995–2003 · ALL engines</p>
@@ -96,134 +96,137 @@
         <input type="text" class="sr" id="sr" list="searchSuggest" placeholder="OEM, деталь, аналог, заметка…">
         <datalist id="searchSuggest"></datalist><button class="scl" id="scl" onclick="cS()" title="Очистить">✕</button>
       </div>
-      <div class="to-chip unset" id="toChip" onclick="oTO()" title="Настройки ТО — клик для редактирования"
-        style="display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:4px;font-size:.78rem;font-weight:700;cursor:pointer;border:1px solid var(--bd);background:var(--cd);color:var(--tx);white-space:nowrap">
-        <span>🛠</span><span class="to-lb" id="toLbl">Настроить ТО</span><span
-          style="opacity:.5;font-size:.7rem">✏️</span>
-      </div>
-      <select class="fs flt mtr" id="fmtr" title="Фильтр по мотору">
-        <option value="all">⚙️ Все моторы</option>
-        <optgroup label="Бензин 1.0">
-          <option value="AER">AER 1.0 50</option>
-          <option value="ALL">ALL 1.0 50</option>
-          <option value="AEV">AEV 1.0 50</option>
-          <option value="ALD">ALD 1.0 50</option>
-          <option value="ANV">ANV 1.0 50</option>
-          <option value="AUC">AUC 1.0 50</option>
-        </optgroup>
-        <optgroup label="Бензин 1.4">
-          <option value="AEX">AEX 1.4 60</option>
-          <option value="APQ">APQ 1.4 60</option>
-          <option value="AKV">AKV 1.4 60</option>
-          <option value="ANX">ANX 1.4 60</option>
-          <option value="AKK">AKK 1.4 60</option>
-          <option value="ANW">ANW 1.4 60</option>
-          <option value="AUD">AUD 1.4 60</option>
-          <option value="APE">APE 1.4 16V 75</option>
-          <option value="AUA">AUA 1.4 16V 75</option>
-        </optgroup>
-        <optgroup label="Бензин 1.6 / 1.8">
-          <option value="AEE">AEE 1.6 75</option>
-          <option value="ALM">ALM 1.6 75</option>
-          <option value="AUR">AUR 1.6 75</option>
-          <option value="AFT">AFT 1.6 100</option>
-          <option value="1F">1F 1.6 75</option>
-          <option value="ADZ">ADZ 1.8 90</option>
-        </optgroup>
-        <optgroup label="Дизель">
-          <option value="AKW">AKW 1.7 SDI 60</option>
-          <option value="AHB">AHB 1.7 SDI 60</option>
-          <option value="AEY">AEY 1.9 SDI 64</option>
-          <option value="AGP">AGP 1.9 D 68</option>
-          <option value="AQM">AQM 1.9 SDI 68</option>
-          <option value="AYQ">AYQ 1.9 SDI 64</option>
-          <option value="ASV">ASV 1.9 SDI 110</option>
-          <option value="1Y">1Y 1.9 D 64</option>
-          <option value="AFN">AFN 1.9 TDI 110</option>
-          <option value="AHU">AHU 1.9 TDI 90</option>
-          <option value="ALE">ALE 1.9 TDI 90</option>
-          <option value="AGR">AGR 1.9 TDI 90</option>
-          <option value="ALH">ALH 1.9 TDI 90</option>
-        </optgroup>
-      </select>
-      <select class="fs flt bdy" id="fbdy" title="Фильтр по кузову">
-        <option value="all">🚗 Все кузова</option>
-        <option value="3d">Hatchback 3д (6N1)</option>
-        <option value="5d">Hatchback 5д (6N2)</option>
-        <option value="classic">Polo Classic</option>
-        <option value="estate">Polo Estate</option>
-        <option value="caddy-van">Caddy Van</option>
-        <option value="caddy-kombi">Caddy Kombi</option>
-        <option value="caddy-pickup">Caddy Pickup</option>
-      </select>
-      <select class="fs flt trn" id="ftr" title="Фильтр по КПП">
-        <option value="all">🔄 Все КПП</option>
-        <optgroup label="Механика">
-          <option value="085">085 (5-ст МКПП)</option>
-          <option value="020">020 (4/5-ст МКПП)</option>
-          <option value="02K">02K (5-ст МКПП)</option>
-        </optgroup>
-        <optgroup label="Автомат">
-          <option value="01M">01M (4-ст АКПП)</option>
-          <option value="01N">01N (4-ст АКПП)</option>
-          <option value="AG4">AG4 (4-ст АКПП)</option>
-        </optgroup>
-      </select>
-      <select class="fs" id="sf" title="Фильтр по статусу">
-        <option value="all">Все статусы</option>
-        <option value="">Без статуса</option>
-        <option value="want">🛒 Хочу купить</option>
-        <option value="bought">📦 Куплено</option>
-        <option value="installed">✅ Установлено</option>
-      </select>
-      <select class="fs" id="ss" title="Сортировка">
-        <option value="default">Сортировка</option>
-        <option value="oem">по OEM</option>
-        <option value="name">по названию</option>
-        <option value="priceAsc">цена ↑</option>
-        <option value="priceDesc">цена ↓</option>
-        <option value="favorite">⭐ вверху</option>
-      </select>
-      <div class="vt" title="Вид">
-        <button id="vg" class="active" onclick="setV('grid')"><span class="vt-ic">▦</span><span
-            class="vt-lb">Плитка</span></button>
-        <button id="vt" onclick="setV('tree')"><span class="vt-ic">🗂</span><span class="vt-lb">Дерево</span></button>
-      </div>
-      <div class="ac">
-        <button class="bn" onclick="oLogNew()" title="Запись в журнал обслуживания"><span>📖</span><span
-            class="bl">Журнал</span></button>
-        <button class="bn p" onclick="oAM()"><span>➕</span><span class="bl">Добавить</span></button>
-        <button class="bn" onclick="toggleAllDetails()" title="Развернуть/свернуть все карточки" id="tb3">⇕</button>
-        <div class="ew">
-          <button class="bn" onclick="tMMenu(event)" title="Меню">⚙️</button>
-          <div class="em" id="em">
-            <button onclick="oAM();cEM()">➕ Добавить деталь</button>
-            <button onclick="oLogNew();cEM()">📖 Запись в журнал</button>
-            <button onclick="oShopList();cEM()">🛒 Список покупок на ТО</button>
-            <button onclick="oTO();cEM()">🛠 Настройки ТО</button>
-            <div class="ms"></div>
-            <button onclick="tI();cEM()">📥 Импорт JSON</button>
-            <button onclick="eD();cEM()">📄 Экспорт — JSON</button>
-            <button onclick="eCSV(false);cEM()">📊 CSV — все позиции</button>
-            <button onclick="eCSV(true);cEM()">⭐ CSV — избранное</button>
-            <button onclick="eET();cEM()">🗂 CSV — ETKA</button>
-            <button onclick="eWCSV();cEM()">🔧 CSV — мастерские</button>
-            <div class="ms"></div>
-            <button onclick="oUp();cEM()">🌐 Обновление базы</button>
-            <button onclick="resetFilters();cEM()">🔄 Сбросить фильтры</button>
-            <button onclick="rD() ;cEM()">♻️ Пересобрать БД (сброс)</button>
-            <div class="ms"></div>
-            <button onclick="oProfile();cEM()">👤 Профиль</button>
-            <button onclick="oDonate();cEM()">❤️ Поддержать</button>
-            <button onclick="tTh();cEM()" id="em_theme">🌓 Сменить тему</button>
-            <button onclick="oSM();cEM()">⚙️ VIN-API ключ</button>
-            <button onclick="oWM();cEM()">🔧 Добавить мастерскую</button>
-            <div class="ms"></div>
-            <button onclick="oAbout();cEM()">ℹ️ О программе / Лицензия</button>
-            <button onclick="oBug();cEM()">🐛 Сообщить о баге</button>
-          </div>
+      <div class="tb-filters">
+        <div class="to-chip unset" id="toChip" onclick="oTO()" title="Настройки ТО — клик для редактирования"
+          style="display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:4px;font-size:.78rem;font-weight:700;cursor:pointer;border:1px solid var(--bd);background:var(--cd);color:var(--tx);white-space:nowrap">
+          <span>🛠</span><span class="to-lb" id="toLbl">Настроить ТО</span><span
+            style="opacity:.5;font-size:.7rem">✏️</span>
         </div>
-        <button class="bn ic" onclick="tTh()" id="tb2" title="Тема">☀️</button>
+        <select class="fs flt mtr" id="fmtr" title="Фильтр по мотору">
+          <option value="all">⚙️ Все моторы</option>
+          <optgroup label="Бензин 1.0">
+            <option value="AER">AER 1.0 50</option>
+            <option value="ALL">ALL 1.0 50</option>
+            <option value="AEV">AEV 1.0 50</option>
+            <option value="ALD">ALD 1.0 50</option>
+            <option value="ANV">ANV 1.0 50</option>
+            <option value="AUC">AUC 1.0 50</option>
+          </optgroup>
+          <optgroup label="Бензин 1.4">
+            <option value="AEX">AEX 1.4 60</option>
+            <option value="APQ">APQ 1.4 60</option>
+            <option value="AKV">AKV 1.4 60</option>
+            <option value="ANX">ANX 1.4 60</option>
+            <option value="AKK">AKK 1.4 60</option>
+            <option value="ANW">ANW 1.4 60</option>
+            <option value="AUD">AUD 1.4 60</option>
+            <option value="APE">APE 1.4 16V 75</option>
+            <option value="AUA">AUA 1.4 16V 75</option>
+          </optgroup>
+          <optgroup label="Бензин 1.6 / 1.8">
+            <option value="AEE">AEE 1.6 75</option>
+            <option value="ALM">ALM 1.6 75</option>
+            <option value="AUR">AUR 1.6 75</option>
+            <option value="AFT">AFT 1.6 100</option>
+            <option value="1F">1F 1.6 75</option>
+            <option value="ADZ">ADZ 1.8 90</option>
+          </optgroup>
+          <optgroup label="Дизель">
+            <option value="AKW">AKW 1.7 SDI 60</option>
+            <option value="AHB">AHB 1.7 SDI 60</option>
+            <option value="AEY">AEY 1.9 SDI 64</option>
+            <option value="AGP">AGP 1.9 D 68</option>
+            <option value="AQM">AQM 1.9 SDI 68</option>
+            <option value="AYQ">AYQ 1.9 SDI 64</option>
+            <option value="ASV">ASV 1.9 SDI 110</option>
+            <option value="1Y">1Y 1.9 D 64</option>
+            <option value="AFN">AFN 1.9 TDI 110</option>
+            <option value="AHU">AHU 1.9 TDI 90</option>
+            <option value="ALE">ALE 1.9 TDI 90</option>
+            <option value="AGR">AGR 1.9 TDI 90</option>
+            <option value="ALH">ALH 1.9 TDI 90</option>
+          </optgroup>
+        </select>
+        <select class="fs flt bdy" id="fbdy" title="Фильтр по кузову">
+          <option value="all">🚗 Все кузова</option>
+          <option value="3d">Hatchback 3д (6N1)</option>
+          <option value="5d">Hatchback 5д (6N2)</option>
+          <option value="classic">Polo Classic</option>
+          <option value="estate">Polo Estate</option>
+          <option value="caddy-van">Caddy Van</option>
+          <option value="caddy-kombi">Caddy Kombi</option>
+          <option value="caddy-pickup">Caddy Pickup</option>
+        </select>
+        <select class="fs flt trn" id="ftr" title="Фильтр по КПП">
+          <option value="all">🔄 Все КПП</option>
+          <optgroup label="Механика">
+            <option value="085">085 (5-ст МКПП)</option>
+            <option value="020">020 (4/5-ст МКПП)</option>
+            <option value="02K">02K (5-ст МКПП)</option>
+          </optgroup>
+          <optgroup label="Автомат">
+            <option value="01M">01M (4-ст АКПП)</option>
+            <option value="01N">01N (4-ст АКПП)</option>
+            <option value="AG4">AG4 (4-ст АКПП)</option>
+          </optgroup>
+        </select>
+        <select class="fs" id="sf" title="Фильтр по статусу">
+          <option value="all">Все статусы</option>
+          <option value="">Без статуса</option>
+          <option value="want">🛒 Хочу купить</option>
+          <option value="bought">📦 Куплено</option>
+          <option value="installed">✅ Установлено</option>
+        </select>
+        <select class="fs" id="ss" title="Сортировка">
+          <option value="default">Сортировка</option>
+          <option value="oem">по OEM</option>
+          <option value="name">по названию</option>
+          <option value="priceAsc">цена ↑</option>
+          <option value="priceDesc">цена ↓</option>
+          <option value="favorite">⭐ вверху</option>
+        </select>
+        <label class="vt-switch" title="Плитка / Дерево">
+          <input type="checkbox" id="viewToggle">
+          <span class="vt-track"><span class="vt-thumb"></span></span>
+          <span class="vt-lbl" id="vtLbl">▦ Плитка</span>
+        </label>
+        <div class="ac">
+          <button class="bn" onclick="oLogNew()" title="Запись в журнал обслуживания"><span>📖</span><span
+              class="bl">Журнал</span></button>
+          <button class="bn p" onclick="oAM()" title="Добавить деталь по OEM"><span>➕</span><span
+              class="bl">OEM</span></button>
+          <button class="bn" onclick="toggleAllDetails()" title="Развернуть/свернуть все карточки" id="tb3">⇕</button>
+          <div class="ew">
+            <button class="bn" type="button" id="btnSettings" onclick="tMMenu(event)" title="Меню">⚙️</button>
+            <div class="em" id="em">
+              <button onclick="oAM();cEM()">➕ Добавить деталь</button>
+              <button onclick="oLogNew();cEM()">📖 Запись в журнал</button>
+              <button onclick="oShopList();cEM()">🛒 Список покупок на ТО</button>
+              <button onclick="oTO();cEM()">🛠 Настройки ТО</button>
+              <div class="ms"></div>
+              <button onclick="tI();cEM()">📥 Импорт JSON</button>
+              <button onclick="eD();cEM()">📄 Экспорт — JSON</button>
+              <button onclick="eCSV(false);cEM()">📊 CSV — все позиции</button>
+              <button onclick="eCSV(true);cEM()">⭐ CSV — избранное</button>
+              <button onclick="eET();cEM()">🗂 CSV — ETKA</button>
+              <button onclick="eWCSV();cEM()">🔧 CSV — мастерские</button>
+              <div class="ms"></div>
+              <button onclick="oUp();cEM()">🌐 Обновление базы</button>
+              <button onclick="resetFilters();cEM()">🔄 Сбросить фильтры</button>
+              <button onclick="rD() ;cEM()">♻️ Пересобрать БД (сброс)</button>
+              <div class="ms"></div>
+              <button onclick="oProfile();cEM()">👤 Профиль</button>
+              <button onclick="oDonate();cEM()">❤️ Поддержать</button>
+              <button onclick="tTh();cEM()" id="em_theme">🌓 Сменить тему</button>
+              <button onclick="oSM();cEM()">⚙️ VIN-API ключ</button>
+              <button onclick="oWM();cEM()">🔧 Добавить мастерскую</button>
+              <div class="ms"></div>
+              <button onclick="oAbout();cEM()">ℹ️ О программе / Лицензия</button>
+              <button onclick="oBug();cEM()">🐛 Сообщить о баге</button>
+            </div>
+          </div>
+
+        </div>
       </div>
     </header>
     <div class="ca" id="ca"></div>
@@ -612,6 +615,7 @@
   <div class="tst" id="tt"></div>
   <canvas id="confetti-canvas"></canvas>
   <script src="js/app.js"></script>
+
 
 </body>
 

@@ -1,5 +1,5 @@
 /* ============================================================
-   VW Polo / Caddy 6N — База Мастера · Redesign v20
+   VW Polo / Caddy 6N — База Мастера · Redesign v21
    ============================================================ */
 
 :root {
@@ -462,9 +462,9 @@ body.theme-dark select option:focus {
     background: rgba(255, 255, 255, .12);
     padding: 2px 9px;
     border-radius: var(--r-pill);
-    font-size: .68rem;
-    font-weight: 700;
-    min-width: 24px;
+    font-size: .66rem;
+    font-weight: 800;
+    min-width: 26px;
     text-align: center;
     transition: all var(--tr);
 }
@@ -676,16 +676,105 @@ body.sidebar-collapsed .mw {
 
 /* Поиск */
 .sc {
-    flex-grow: 1;
+    flex: 0 0 auto;
     position: relative;
     min-width: 200px;
-    max-width: 560px;
+    max-width: 320px;
     margin-left: 45px;
 }
 
-@media (min-width: 1001px) {
+/* На десктопе (сайдбар показан) — фиксированная ширина, никаких margin */
+/* ============================================================
+   ДЕСКТОП — всё в одну строку
+   ============================================================ */
+@media (min-width: 901px) {
+    .tb {
+        flex-wrap: nowrap !important;
+        padding: 8px 14px !important;
+        gap: 6px !important;
+        min-height: 52px !important;
+    }
+
     .sc {
-        margin-left: 0;
+        flex: 0 0 220px !important;
+        max-width: 220px !important;
+        min-width: 0 !important;
+        margin-left: 0 !important;
+    }
+
+    .sr {
+        padding: 8px 32px 8px 34px !important;
+        font-size: .86rem !important;
+    }
+
+    .si {
+        left: 10px !important;
+        font-size: .85rem !important;
+    }
+
+    .tb-filters {
+        flex-wrap: nowrap !important;
+        gap: 5px !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        scrollbar-width: none;
+        padding-bottom: 0 !important;
+    }
+
+    .tb-filters::-webkit-scrollbar {
+        display: none;
+    }
+
+    .fs {
+        padding: 6px 8px !important;
+        font-size: .72rem !important;
+        max-width: 130px !important;
+        min-width: 0 !important;
+        flex-shrink: 1 !important;
+    }
+
+    .to-chip {
+        padding: 6px 9px !important;
+        font-size: .72rem !important;
+    }
+
+    /* Текст "До ТО: …" обрезаем, если он слишком длинный */
+    .to-chip .to-lb {
+        max-width: 130px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .vt button {
+        padding: 6px 9px !important;
+        font-size: .72rem !important;
+    }
+
+    .bn {
+        padding: 6px 10px !important;
+        font-size: .76rem !important;
+    }
+
+    .bn.ic {
+        padding: 6px 8px !important;
+    }
+
+    /* На десктопе тоже прячем текст у кнопок внутри шапки,
+       чтобы всё влезло в одну строку. Текст остаётся только у «Добавить». */
+    .ac {
+        gap: 4px !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .ac .bn .bl {
+        display: none !important;
+    }
+
+    .ac .bn.p .bl {
+        display: inline !important;
     }
 }
 
@@ -751,6 +840,16 @@ body.sidebar-collapsed .mw {
     background: var(--dg);
     color: #fff;
     transform: translateY(-50%) scale(1.1);
+}
+
+/* Обёртка фильтров */
+.tb-filters {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    flex: 1;
+    min-width: 0;
 }
 
 /* Виджет ТО */
@@ -927,6 +1026,9 @@ body.sidebar-collapsed .mw {
 .bn.ic {
     padding: 9px 11px;
     font-size: .95rem;
+    background: var(--cd-2);
+    color: var(--tx);
+    font-weight: 700;
 }
 
 .bn.ok-btn {
@@ -1038,6 +1140,11 @@ body.sidebar-collapsed .mw {
     overflow-y: auto;
     flex-grow: 1;
     scroll-behavior: smooth;
+    transition: opacity .2s;
+}
+
+.ca.switching {
+    opacity: .5;
 }
 
 .sh {
@@ -1087,6 +1194,10 @@ body.theme-dark .sh {
     border-color: var(--a);
     color: var(--a);
     background: color-mix(in srgb, var(--a) 8%, var(--cd));
+}
+
+.chip[data-chip="vinStrict"][style*="rgba(220"] {
+    color: var(--dg) !important;
 }
 
 /* Сетка карточек */
@@ -1403,6 +1514,11 @@ body.theme-dark .cd-purchase .price-tag {
     font-weight: 700;
 }
 
+.psl.ex::before {
+    content: '🟠';
+    margin-right: 2px;
+}
+
 .psl.ex:hover {
     box-shadow: 0 6px 14px rgba(255, 107, 0, .45);
     color: #fff;
@@ -1415,6 +1531,11 @@ body.theme-dark .cd-purchase .price-tag {
     font-weight: 700;
 }
 
+.psl.ad::before {
+    content: '🔵';
+    margin-right: 2px;
+}
+
 .psl.ad:hover {
     box-shadow: var(--sh-glow);
     color: #fff;
@@ -1425,6 +1546,11 @@ body.theme-dark .cd-purchase .price-tag {
     color: #fff;
     border-color: transparent;
     font-weight: 700;
+}
+
+.psl.av::before {
+    content: '🟣';
+    margin-right: 2px;
 }
 
 .psl.av:hover {
@@ -1892,7 +2018,7 @@ body.theme-dark .tg.tm {
 
 .et summary {
     cursor: pointer;
-    padding: 8px 6px;
+    padding: 8px 6px 8px 4px;
     font-weight: 700;
     color: var(--b);
     user-select: none;
@@ -1917,15 +2043,17 @@ body.theme-dark .et summary {
 }
 
 .et summary::before {
-    content: '▶';
-    font-size: .68rem;
+    content: '';
+    width: 16px;
+    height: 16px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300a8e8'><path d='M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z'/></svg>") center/contain no-repeat;
+    transform: none;
     transition: transform var(--tr);
-    display: inline-block;
-    color: var(--mu);
+    flex-shrink: 0;
 }
 
 .et details[open]>summary::before {
-    transform: rotate(90deg);
+    transform: rotate(-8deg) scale(1.1);
 }
 
 .et .gc {
@@ -1939,9 +2067,10 @@ body.theme-dark .et summary {
 }
 
 .et .sg {
-    padding-left: 18px;
-    border-left: 1px dashed var(--bd);
-    margin-left: 8px;
+    border-left: 2px solid color-mix(in srgb, var(--a) 20%, transparent);
+    padding-left: 20px;
+    margin-left: 10px;
+    position: relative;
 }
 
 .et .ep {
@@ -1954,6 +2083,14 @@ body.theme-dark .et summary {
     align-items: baseline;
     border-left: 2px solid transparent;
     transition: all var(--tr);
+}
+
+.et .ep::before {
+    content: '📄';
+    font-size: .7rem;
+    opacity: .5;
+    flex-shrink: 0;
+    margin-right: 2px;
 }
 
 .et .ep:hover {
@@ -2301,11 +2438,37 @@ body.theme-dark .mh h3 {
     text-transform: uppercase;
     transition: all var(--tr);
     font-weight: 600;
+    min-width: 0;
 }
 
 .vi:focus {
     border-color: var(--a);
     box-shadow: 0 0 0 4px rgba(56, 189, 248, .12);
+}
+
+/* Flex для VIN + кнопка «Декодировать» */
+#g_vi {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+}
+
+#g_db {
+    flex: 0 0 auto;
+    width: auto;
+    white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+    #g_db {
+        padding: 12px 14px;
+        font-size: 0;
+    }
+
+    #g_db::before {
+        content: '🔍';
+        font-size: 1.15rem;
+    }
 }
 
 /* Результат декодирования VIN */
@@ -3037,10 +3200,150 @@ body.theme-dark .prof-name {
 }
 
 /* ============================================================
-   Медиа-запросы
+   Микроанимации
+   ============================================================ */
+
+.ca.switching {
+    opacity: .5;
+}
+
+.bdg.updating {
+    animation: bdgPulse .4s;
+}
+
+@keyframes bdgPulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.25);
+        background: var(--a);
+        color: #fff;
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, var(--hv) 25%, color-mix(in srgb, var(--bd) 40%, transparent) 50%, var(--hv) 75%);
+    background-size: 200% 100%;
+    animation: skel 1.4s ease-in-out infinite;
+    border-radius: var(--r-sm);
+}
+
+@keyframes skel {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.sk-card {
+    background: var(--cd);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-lg);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sk-line {
+    height: 14px;
+}
+
+.sk-line.w40 {
+    width: 40%;
+}
+
+.sk-line.w70 {
+    width: 70%;
+}
+
+.sk-line.w90 {
+    width: 90%;
+}
+
+/* Confetti */
+#confetti-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5000;
+    display: none;
+}
+
+#confetti-canvas.show {
+    display: block;
+}
+
+/* Плавное появление карточек */
+.gr>.cd:nth-child(1) {
+    animation-delay: 0ms;
+}
+
+.gr>.cd:nth-child(2) {
+    animation-delay: 30ms;
+}
+
+.gr>.cd:nth-child(3) {
+    animation-delay: 60ms;
+}
+
+.gr>.cd:nth-child(4) {
+    animation-delay: 90ms;
+}
+
+.gr>.cd:nth-child(5) {
+    animation-delay: 120ms;
+}
+
+.gr>.cd:nth-child(6) {
+    animation-delay: 150ms;
+}
+
+.gr>.cd:nth-child(n+7) {
+    animation-delay: 180ms;
+}
+
+/* Focus */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+}
+
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--a);
+    outline-offset: 2px;
+    border-radius: var(--r-xs);
+}
+
+/* ============================================================
+   Планшет — от 901px до 1100px
+   ============================================================ */
+
+@media (max-width: 1100px) and (min-width: 901px) {
+    .fs {
+        max-width: 150px;
+    }
+}
+
+/* ============================================================
+   Мобильный — до 900px (единый блок, без конфликтов)
    ============================================================ */
 
 @media (max-width: 900px) {
+
+    /* Сайдбар */
     .sb {
         width: 300px;
         transform: translateX(-100%);
@@ -3062,66 +3365,188 @@ body.theme-dark .prof-name {
         display: none !important;
     }
 
+    /* Топбар — компактный, 3 короткие строки */
     .tb {
-        padding: 10px 12px 10px 60px;
-        gap: 8px;
-        min-height: auto;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 6px 8px 8px 50px !important;
+        gap: 5px !important;
+        min-height: auto !important;
     }
 
+    /* Поиск — вся ширина, первым */
     .sc {
-        margin-left: 0;
-        max-width: 100%;
-        flex-basis: 100%;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
         order: -1;
     }
 
     .sr {
-        font-size: 16px;
-        padding: 12px 36px 12px 42px;
+        font-size: 15px !important;
+        padding: 8px 32px 8px 36px !important;
+    }
+
+    .si {
+        left: 10px !important;
+        font-size: .85rem !important;
+    }
+
+    .scl {
+        right: 4px !important;
+        padding: 4px 6px !important;
+    }
+
+    /* Фильтры — обычный wrap */
+    .tb-filters {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+        width: 100% !important;
+        overflow: visible !important;
     }
 
     .fs {
-        font-size: .74rem;
-        padding: 7px 10px;
-        flex: 1 1 auto;
-        min-width: 0;
-        max-width: 100%;
+        font-size: .68rem !important;
+        padding: 5px 7px !important;
+        max-width: none !important;
+    }
+
+    .to-chip {
+        padding: 5px 8px !important;
+        font-size: .68rem !important;
+    }
+
+    /* Прячем текст «До ТО: …» — оставляем только 🛠, чтобы не растягивало */
+    .to-lb {
+        display: none !important;
     }
 
     .vt {
-        flex-shrink: 0;
+        padding: 1px !important;
     }
 
+    .vt button {
+        padding: 5px 7px !important;
+        font-size: .72rem !important;
+    }
+
+    .vt button .vt-lb {
+        display: none !important;
+    }
+
+    /* Кнопки — своя строка, компактные */
     .ac {
-        margin-left: 0;
-        flex-basis: 100%;
-        justify-content: flex-start;
-        flex-wrap: wrap;
-        gap: 8px;
+        flex-basis: 100% !important;
+        margin-left: 0 !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+        align-items: center !important;
+    }
+
+    /* Порядок: 📖 Журнал → ⇕ → ⚙️ → ➕ Добавить */
+    .ac>*:nth-child(1) {
+        order: 1 !important;
+    }
+
+    /* 📖 Журнал    */
+    .ac>*:nth-child(3) {
+        order: 2 !important;
+    }
+
+    /* ⇕            */
+    .ac>*:nth-child(4) {
+        order: 3 !important;
+    }
+
+    /* ⚙️ (ew)      */
+    .ac>*:nth-child(2) {
+        order: 4 !important;
+    }
+
+    /* ➕ Добавить  */
+
+    /* Не даём «Добавить» растягиваться — иначе снова всё поедет */
+    .ac>.bn.p {
+        flex: 0 0 auto !important;
+        width: auto !important;
+        padding: 6px 12px !important;
     }
 
     .bn {
-        padding: 10px 12px;
-        font-size: .82rem;
+        padding: 6px 9px !important;
+        font-size: .72rem !important;
+    }
+
+    .bn.ic {
+        padding: 6px 8px !important;
     }
 
     .bn .bl {
-        display: none;
-    }
-
-    .bn.p {
-        padding: 10px 18px;
+        display: none !important;
     }
 
     .bn.p .bl {
-        display: inline;
+        display: inline !important;
     }
 
+    /* --- МЕНЮ ⚙️ — bottom sheet, никогда не уходит за экран --- */
+    .em {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        border-radius: 20px 20px 0 0 !important;
+        max-height: 85vh !important;
+        overflow-y: auto !important;
+        padding: 12px 10px max(14px, env(safe-area-inset-bottom)) !important;
+        z-index: 2500 !important;
+        animation: emSheet .25s cubic-bezier(.4, 0, .2, 1) !important;
+    }
+
+    .em::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        background: var(--bd);
+        border-radius: 999px;
+        margin: 0 auto 10px;
+        flex-shrink: 0;
+    }
+
+    .em button {
+        padding: 11px 12px !important;
+        font-size: .85rem !important;
+    }
+
+    .em button:hover {
+        padding-left: 12px !important;
+    }
+
+    @keyframes emSheet {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Сетка карточек */
     .gr {
         grid-template-columns: 1fr;
         gap: 12px;
     }
 
+    /* Форма */
     .fr {
         grid-template-columns: 1fr;
     }
@@ -3141,23 +3566,6 @@ body.theme-dark .prof-name {
         font-size: .7rem;
     }
 
-    .mdl {
-        max-height: calc(100vh - 16px);
-        margin: 8px;
-        border-radius: var(--r-md);
-    }
-
-    .mo {
-        padding: 8px;
-    }
-
-    .mh,
-    .mb,
-    .mf {
-        padding-left: 16px;
-        padding-right: 16px;
-    }
-
     .sh {
         font-size: 1.1rem;
         position: static;
@@ -3169,12 +3577,7 @@ body.theme-dark .prof-name {
         padding: 12px 14px;
     }
 
-    .em {
-        min-width: 240px;
-        max-width: calc(100vw - 16px);
-        right: -4px;
-    }
-
+    /* Карточка */
     .cd {
         border-radius: var(--r-md);
     }
@@ -3190,6 +3593,7 @@ body.theme-dark .prof-name {
         padding-right: 14px;
     }
 
+    /* Тост */
     .tst {
         bottom: 16px;
         padding: 10px 16px;
@@ -3200,7 +3604,67 @@ body.theme-dark .prof-name {
         padding: 5px 10px;
         font-size: .76rem;
     }
+
+    /* Модалки — bottom sheet */
+    .mo {
+        padding: 0;
+        align-items: flex-end;
+        background: rgba(10, 20, 40, .65);
+    }
+
+    .mdl {
+        max-width: 100%;
+        max-height: 92vh;
+        border-radius: var(--r-xl) var(--r-xl) 0 0;
+        margin: 0;
+        animation: bsIn .3s cubic-bezier(.4, 0, .2, 1);
+        transform-origin: bottom center;
+    }
+
+    @keyframes bsIn {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .mdl::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        background: var(--bd);
+        border-radius: var(--r-pill);
+        margin: 10px auto 0;
+        flex-shrink: 0;
+    }
+
+    .mh {
+        padding-top: 12px;
+        border-bottom: none;
+        padding-bottom: 8px;
+    }
+
+    .mh,
+    .mb,
+    .mf {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .mf {
+        padding-bottom: max(14px, env(safe-area-inset-bottom));
+    }
 }
+
+/* ============================================================
+   Очень узкий мобильный — до 480px
+   ============================================================ */
 
 @media (max-width: 480px) {
     .fr {
@@ -3212,15 +3676,22 @@ body.theme-dark .prof-name {
         height: 28px;
     }
 
-    .bn.p {
+    /* Только внутри модалок кнопка Сохранить растягивается */
+    .mdl .bn.p {
         width: 100%;
         justify-content: center;
+    }
+
+    #g_vi {
+        font-size: .9rem;
+        letter-spacing: 1px;
     }
 }
 
 /* ============================================================
    Печать
    ============================================================ */
+
 @media print {
 
     .sb,
@@ -3240,7 +3711,8 @@ body.theme-dark .prof-name {
     #declined,
     .cd-btns,
     .cd-purchase .prow:first-child,
-    .cd-st {
+    .cd-st,
+    #confetti-canvas {
         display: none !important;
     }
 
@@ -3297,487 +3769,107 @@ body.theme-dark .prof-name {
 }
 
 /* ============================================================
-   Финальные штрихи
+   Переключатель вида — ползунок
    ============================================================ */
-
-/* Плавное появление контента при смене категории */
-.gr>.cd:nth-child(1) {
-    animation-delay: 0ms;
+.vt-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px 5px 6px;
+    border: 1.5px solid var(--bd);
+    border-radius: var(--r-sm);
+    background: var(--in);
+    cursor: pointer;
+    user-select: none;
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--tx);
+    transition: all var(--tr);
+    white-space: nowrap;
+    position: relative;
+    flex-shrink: 0;
 }
 
-.gr>.cd:nth-child(2) {
-    animation-delay: 30ms;
+.vt-switch:hover {
+    border-color: var(--a);
 }
 
-.gr>.cd:nth-child(3) {
-    animation-delay: 60ms;
+.vt-switch input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
 }
 
-.gr>.cd:nth-child(4) {
-    animation-delay: 90ms;
+.vt-track {
+    position: relative;
+    width: 32px;
+    height: 16px;
+    background: var(--bd);
+    border-radius: 999px;
+    transition: background var(--tr);
+    flex-shrink: 0;
+    display: inline-block;
 }
 
-.gr>.cd:nth-child(5) {
-    animation-delay: 120ms;
+.vt-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform var(--tr);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
 }
 
-.gr>.cd:nth-child(6) {
-    animation-delay: 150ms;
+.vt-switch input:checked~.vt-track {
+    background: linear-gradient(135deg, var(--a), var(--a-h));
 }
 
-.gr>.cd:nth-child(n+7) {
-    animation-delay: 180ms;
+.vt-switch input:checked~.vt-track .vt-thumb {
+    transform: translateX(16px);
 }
 
-/* Убираем подсветку фокуса по умолчанию (оставляем :focus-visible) */
-button:focus,
-input:focus,
-select:focus,
-textarea:focus {
-    outline: none;
+.vt-lbl {
+    min-width: 58px;
+    text-align: left;
+    font-size: .72rem;
+    color: var(--mu);
+    transition: color var(--tr);
 }
 
-button:focus-visible,
-a:focus-visible {
-    outline: 2px solid var(--a);
-    outline-offset: 2px;
-    border-radius: var(--r-xs);
+.vt-switch input:checked~.vt-lbl {
+    color: var(--a);
+}
+
+@media (max-width: 900px) {
+    .vt-switch {
+        padding: 4px 6px 4px 5px;
+        font-size: .68rem;
+    }
+
+    .vt-lbl {
+        min-width: 50px;
+        font-size: .68rem;
+    }
 }
 
 /* ============================================================
-   v20.1 — Доработки: мелкие правки, дерево, bottom sheet, confetti
+   Меню настроек ⚙️ на десктопе — position: fixed
+   (иначе .tb-filters c overflow обрезает меню)
    ============================================================ */
-
-/* --- 1. Мелкие правки --- */
-.bdg {
-    min-width: 26px;
-    padding: 2px 10px;
-    font-size: .66rem;
-    font-weight: 800;
-}
-
-/* VIN-строго активный — красный */
-.chip[data-chip="vinStrict"] {
-    transition: all var(--tr);
-}
-
-.chip[data-chip="vinStrict"][style*="rgba(220"] {
-    color: var(--dg) !important;
-}
-
-/* Кнопка ⚙️ в топбаре — контрастнее */
-#tb2,
-.bn.ic {
-    background: var(--cd-2);
-    color: var(--tx);
-    font-weight: 700;
-}
-
-/* Иконки магазинов — брендовые цвета */
-.psl.ex::before {
-    content: '🟠';
-    margin-right: 2px;
-}
-
-.psl.ad::before {
-    content: '🔵';
-    margin-right: 2px;
-}
-
-.psl.av::before {
-    content: '🟣';
-    margin-right: 2px;
-}
-
-/* --- 2. Микроанимации --- */
-
-/* Переключение категорий — плавная смена контента */
-.ca {
-    transition: opacity .2s;
-}
-
-.ca.switching {
-    opacity: .5;
-}
-
-/* Пульсация для счётчиков при обновлении */
-.bdg.updating {
-    animation: bdgPulse .4s;
-}
-
-@keyframes bdgPulse {
-    0% {
-        transform: scale(1);
+@media (min-width: 901px) {
+    .em {
+        position: fixed !important;
+        top: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        left: auto !important;
+        max-height: 80vh;
+        overflow-y: auto;
+        z-index: 2500;
     }
-
-    50% {
-        transform: scale(1.25);
-        background: var(--a);
-        color: #fff;
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-/* Skeleton при загрузке */
-.skeleton {
-    background: linear-gradient(90deg, var(--hv) 25%, color-mix(in srgb, var(--bd) 40%, transparent) 50%, var(--hv) 75%);
-    background-size: 200% 100%;
-    animation: skel 1.4s ease-in-out infinite;
-    border-radius: var(--r-sm);
-}
-
-@keyframes skel {
-    0% {
-        background-position: 200% 0;
-    }
-
-    100% {
-        background-position: -200% 0;
-    }
-}
-
-.sk-card {
-    background: var(--cd);
-    border: 1px solid var(--bd);
-    border-radius: var(--r-lg);
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.sk-line {
-    height: 14px;
-}
-
-.sk-line.w40 {
-    width: 40%;
-}
-
-.sk-line.w70 {
-    width: 70%;
-}
-
-.sk-line.w90 {
-    width: 90%;
-}
-
-/* --- 3. Редизайн дерева --- */
-.et summary {
-    padding-left: 4px;
-}
-
-.et summary::before {
-    content: '';
-    width: 16px;
-    height: 16px;
-    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300a8e8'><path d='M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z'/></svg>") center/contain no-repeat;
-    transform: none !important;
-    transition: transform var(--tr);
-}
-
-.et details[open]>summary::before {
-    transform: rotate(-8deg) scale(1.1) !important;
-}
-
-.et .sg {
-    border-left: 2px solid color-mix(in srgb, var(--a) 20%, transparent);
-    padding-left: 20px;
-    margin-left: 10px;
-    position: relative;
-}
-
-.et .ep::before {
-    content: '📄';
-    font-size: .7rem;
-    opacity: .5;
-    flex-shrink: 0;
-    margin-right: 2px;
-}
-
-/* --- 4. Bottom sheet на мобилках --- */
-@media (max-width: 900px) {
-    .mo {
-        padding: 0;
-        align-items: flex-end;
-        background: rgba(10, 20, 40, .65);
-    }
-
-    .mdl {
-        max-width: 100%;
-        max-height: 92vh;
-        border-radius: var(--r-xl) var(--r-xl) 0 0;
-        margin: 0;
-        animation: bsIn .3s cubic-bezier(.4, 0, .2, 1);
-        transform-origin: bottom center;
-    }
-
-    @keyframes bsIn {
-        from {
-            opacity: 0;
-            transform: translateY(40px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* Ручка сверху */
-    .mdl::before {
-        content: '';
-        display: block;
-        width: 40px;
-        height: 4px;
-        background: var(--bd);
-        border-radius: var(--r-pill);
-        margin: 10px auto 0;
-        flex-shrink: 0;
-    }
-
-    .mh {
-        padding-top: 12px;
-        border-bottom: none;
-        padding-bottom: 8px;
-    }
-
-    .mf {
-        padding-bottom: max(14px, env(safe-area-inset-bottom));
-    }
-}
-
-/* --- 5. Confetti --- */
-#confetti-canvas {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 5000;
-    display: none;
-}
-
-#confetti-canvas.show {
-    display: block;
-}
-
-/* ============================================================
-   v20.1 — Доработки: мелкие правки, дерево, bottom sheet, confetti
-   ============================================================ */
-
-/* --- 1. Мелкие правки --- */
-.bdg {
-    min-width: 26px;
-    padding: 2px 10px;
-    font-size: .66rem;
-    font-weight: 800;
-}
-
-/* VIN-строго активный — красный */
-.chip[data-chip="vinStrict"] {
-    transition: all var(--tr);
-}
-
-.chip[data-chip="vinStrict"][style*="rgba(220"] {
-    color: var(--dg) !important;
-}
-
-/* Кнопка ⚙️ в топбаре — контрастнее */
-#tb2,
-.bn.ic {
-    background: var(--cd-2);
-    color: var(--tx);
-    font-weight: 700;
-}
-
-/* Иконки магазинов — брендовые цвета */
-.psl.ex::before {
-    content: '🟠';
-    margin-right: 2px;
-}
-
-.psl.ad::before {
-    content: '🔵';
-    margin-right: 2px;
-}
-
-.psl.av::before {
-    content: '🟣';
-    margin-right: 2px;
-}
-
-/* --- 2. Микроанимации --- */
-
-/* Переключение категорий — плавная смена контента */
-.ca {
-    transition: opacity .2s;
-}
-
-.ca.switching {
-    opacity: .5;
-}
-
-/* Пульсация для счётчиков при обновлении */
-.bdg.updating {
-    animation: bdgPulse .4s;
-}
-
-@keyframes bdgPulse {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.25);
-        background: var(--a);
-        color: #fff;
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-/* Skeleton при загрузке */
-.skeleton {
-    background: linear-gradient(90deg, var(--hv) 25%, color-mix(in srgb, var(--bd) 40%, transparent) 50%, var(--hv) 75%);
-    background-size: 200% 100%;
-    animation: skel 1.4s ease-in-out infinite;
-    border-radius: var(--r-sm);
-}
-
-@keyframes skel {
-    0% {
-        background-position: 200% 0;
-    }
-
-    100% {
-        background-position: -200% 0;
-    }
-}
-
-.sk-card {
-    background: var(--cd);
-    border: 1px solid var(--bd);
-    border-radius: var(--r-lg);
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.sk-line {
-    height: 14px;
-}
-
-.sk-line.w40 {
-    width: 40%;
-}
-
-.sk-line.w70 {
-    width: 70%;
-}
-
-.sk-line.w90 {
-    width: 90%;
-}
-
-/* --- 3. Редизайн дерева --- */
-.et summary {
-    padding-left: 4px;
-}
-
-.et summary::before {
-    content: '';
-    width: 16px;
-    height: 16px;
-    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300a8e8'><path d='M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z'/></svg>") center/contain no-repeat;
-    transform: none !important;
-    transition: transform var(--tr);
-}
-
-.et details[open]>summary::before {
-    transform: rotate(-8deg) scale(1.1) !important;
-}
-
-.et .sg {
-    border-left: 2px solid color-mix(in srgb, var(--a) 20%, transparent);
-    padding-left: 20px;
-    margin-left: 10px;
-    position: relative;
-}
-
-.et .ep::before {
-    content: '📄';
-    font-size: .7rem;
-    opacity: .5;
-    flex-shrink: 0;
-    margin-right: 2px;
-}
-
-/* --- 4. Bottom sheet на мобилках --- */
-@media (max-width: 900px) {
-    .mo {
-        padding: 0;
-        align-items: flex-end;
-        background: rgba(10, 20, 40, .65);
-    }
-
-    .mdl {
-        max-width: 100%;
-        max-height: 92vh;
-        border-radius: var(--r-xl) var(--r-xl) 0 0;
-        margin: 0;
-        animation: bsIn .3s cubic-bezier(.4, 0, .2, 1);
-        transform-origin: bottom center;
-    }
-
-    @keyframes bsIn {
-        from {
-            opacity: 0;
-            transform: translateY(40px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* Ручка сверху */
-    .mdl::before {
-        content: '';
-        display: block;
-        width: 40px;
-        height: 4px;
-        background: var(--bd);
-        border-radius: var(--r-pill);
-        margin: 10px auto 0;
-        flex-shrink: 0;
-    }
-
-    .mh {
-        padding-top: 12px;
-        border-bottom: none;
-        padding-bottom: 8px;
-    }
-
-    .mf {
-        padding-bottom: max(14px, env(safe-area-inset-bottom));
-    }
-}
-
-/* --- 5. Confetti --- */
-#confetti-canvas {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 5000;
-    display: none;
-}
-
-#confetti-canvas.show {
-    display: block;
 }
