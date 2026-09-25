@@ -2469,7 +2469,7 @@ body.theme-dark .gdr b {
     z-index: 4000;
     opacity: 0;
     transition: all .3s;
-    pointer-events: none;
+    pointer-events: auto;
     max-width: 90vw;
     text-align: center
 }
@@ -3115,3 +3115,5 @@ body.theme-dark .prof-name {
         display: block
     }
 }
+#tt_progress{position:absolute;left:0;bottom:0;height:3px;background:#fff;opacity:.6;border-radius:0 0 6px 6px;width:100%;transition:width linear}
+.tst{overflow:hidden}

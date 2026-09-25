@@ -1,5 +1,15 @@
 {
-  "appVersion": "19.1",
+  "appVersion": "19.2",
   "notes": "оптимизация кода",
-  "updatedAt": "2026-09-25"
+  "updatedAt": "2026-09-25",
+  "files": [
+    "data/parts-01-engine-fuel-ignition.json",
+    "data/parts-02-cooling-heating-brakes-suspension.json",
+    "data/parts-03-trans-exh-elec-bulbs.json",
+    "data/parts-04-body-interior-maint-fluids-roadkit.json",
+    "data/parts-05-rear-axle-controls.json",
+    "data/categories.json",
+    "data/sections.json",
+    "data/workshops.json"
+  ]
 }
