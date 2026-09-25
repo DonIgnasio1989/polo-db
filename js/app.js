@@ -1660,7 +1660,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { }
 
     // 2. Подставляем версию во все места UI
-    ['ver_gate', 'ver_footer', 'ver_about'].forEach(id => {
+    ['ver_gate', 'ver_footer', 'ver_about', 'ver_bug'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.textContent = APP_VERSION;
     });
@@ -1670,7 +1670,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Автопроверка "доступна новая версия" УБРАНА — она теперь не нужна
 });() => {
     // Подставляем актуальную версию во все места UI
-    ['ver_gate', 'ver_footer', 'ver_about'].forEach(id => {
+    ['ver_gate', 'ver_footer', 'ver_about', 'ver_bug'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.textContent = APP_VERSION;
     });
