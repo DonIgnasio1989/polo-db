@@ -204,28 +204,31 @@ body.theme-dark select option:focus {
 }
 
 .tbd {
-    position: fixed;
-    top: 14px;
-    left: 14px;
-    width: 40px;
-    height: 40px;
-    background: var(--b);
-    color: #fff;
-    border: none;
-    border-radius: var(--r-md);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.15rem;
-    box-shadow: var(--sh-md);
-    transition: background var(--tr), transform var(--tr);
-    z-index: 200;
+    position: fixed !important;
+    top: 14px !important;
+    left: 14px !important;
+    width: 40px !important;
+    height: 40px !important;
+    background: var(--b) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: var(--r-md) !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.15rem !important;
+    box-shadow: var(--sh-md) !important;
+    z-index: 9999 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: background var(--tr), transform var(--tr) !important;
 }
 
 .tbd:hover {
-    background: var(--a);
-    transform: scale(1.06);
+    background: var(--a) !important;
+    transform: scale(1.06) !important;
 }
 
 .brand {
@@ -3055,7 +3058,9 @@ body.theme-dark .prof-name {
         display: flex;
     }
 
-    .tbd { display: none !important; }
+    .tbd {
+        display: none !important;
+    }
 
     .tb {
         padding: 10px 12px 10px 60px;
