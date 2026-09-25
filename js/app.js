@@ -708,6 +708,7 @@ const dRC = () => { clearTimeout(rcT); rcT = setTimeout(rC, 120); };
 
 async function init() {
     if (licAppReady) return; licAppReady = true;
+    showSkeleton();
     await lAll(); aTh(); aSS(); rGar(); rSB(); rC(); renderProfile();
     const si = $('sr'); si.value = SV.searchQuery || ''; uSC();
     [['sr', 'input', e => { SV.searchQuery = e.target.value; uSC(); sUS(); dRC(); }],
@@ -1055,21 +1056,21 @@ function cH(p) {
         + '</div>';
 }
 function oPC(id) {
-  const p = D.find(x => x.id === id);
-  if (!p) return;
-  $('partmo_title').textContent = p.name || p.oem || 'Деталь';
-  // Рендерим карточку без кнопок редактирования/удаления
-  let html = cH(p);
-  // Убираем кнопки ✎ и ✕ из верхнего правого угла
-  html = html.replace(/<button class="ctb" data-action="edit"[^>]*>✎<\/button>/, '');
-  html = html.replace(/<button class="ctb dg" data-action="delete"[^>]*>✕<\/button>/, '');
-  // Снимаем фиксированную позицию — карточка внутри модалки
-  html = html.replace('class="cd', 'class="cd" style="border:none;box-shadow:none" data-old');
-  $('partmo_body').innerHTML = '<div style="margin:-4px">' + html + '</div>';
-  // Автооткрываем "Подробности"
-  const det = $('partmo_body').querySelector('.cd-body');
-  if (det) det.setAttribute('open', '');
-  openM('partmo');
+    const p = D.find(x => x.id === id);
+    if (!p) return;
+    $('partmo_title').textContent = p.name || p.oem || 'Деталь';
+    // Рендерим карточку без кнопок редактирования/удаления
+    let html = cH(p);
+    // Убираем кнопки ✎ и ✕ из верхнего правого угла
+    html = html.replace(/<button class="ctb" data-action="edit"[^>]*>✎<\/button>/, '');
+    html = html.replace(/<button class="ctb dg" data-action="delete"[^>]*>✕<\/button>/, '');
+    // Снимаем фиксированную позицию — карточка внутри модалки
+    html = html.replace('class="cd', 'class="cd" style="border:none;box-shadow:none" data-old');
+    $('partmo_body').innerHTML = '<div style="margin:-4px">' + html + '</div>';
+    // Автооткрываем "Подробности"
+    const det = $('partmo_body').querySelector('.cd-body');
+    if (det) det.setAttribute('open', '');
+    openM('partmo');
 }
 const cPC = () => closeM('partmo');
 function rSec(sid) {
@@ -1183,7 +1184,19 @@ function oCC(e) {
     const tp = e.target.closest('.ep'); if (tp && tp.dataset.id) oPC(tp.dataset.id);
 }
 function tF(id) { const p = D.find(x => x.id === id); if (!p) return; p.favorite = !p.favorite; if (useIDB) iPut(SP, p).catch(() => { }); else sD(); rSB(); rC(); toast(p.favorite ? '⭐ Добавлено' : 'Убрано'); }
-function sPS(id, st) { const p = D.find(x => x.id === id); if (!p || !['want', 'bought', 'installed'].includes(st)) return; const same = p.status === st; p.status = same ? '' : st; useIDB ? iPut(SP, p).catch(() => { }) : sD(); rSB(); rC(); const L = { want: '🛒 Хочу', bought: '📦 Куплено', installed: '✅ Установлено' }; toast(same ? 'Статус снят' : L[st], same ? '' : 'success'); }
+function sPS(id, st) {
+    const p = D.find(x => x.id === id);
+    if (!p || !['want', 'bought', 'installed'].includes(st)) return;
+    const same = p.status === st;
+    p.status = same ? '' : st;
+    useIDB ? iPut(SP, p).catch(() => { }) : sD();
+    rSB(); rC();
+    const L = { want: '🛒 Хочу', bought: '📦 Куплено', installed: '✅ Установлено' };
+    toast(same ? 'Статус снят' : L[st], same ? '' : 'success');
+    // 🎉 Праздник при «Установлено»
+    if (!same && st === 'installed' && typeof confetti === 'function') confetti();
+}
+
 const oL = s => { $('lbi').src = s; $('lbt').classList.add('show'); };
 const cL = () => { $('lbt').classList.remove('show'); $('lbi').src = ''; };
 
@@ -1689,4 +1702,84 @@ window.addEventListener('DOMContentLoaded', async () => {
     fCS();
     checkLicense();
     // Автопроверка "доступна новая версия" УБРАНА — она теперь не нужна
+
+
 });
+/* ============ КОНФЕТТИ ============ */
+    function confetti() {
+        const canvas = $('confetti-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        canvas.classList.add('show');
+
+        const colors = ['#00a8e8', '#38bdf8', '#3ecf7e', '#fbbf24', '#e63946', '#8b5cf6', '#ec4899'];
+        const pieces = [];
+        const count = 120;
+        for (let i = 0; i < count; i++) {
+            pieces.push({
+                x: canvas.width / 2 + (Math.random() - .5) * 200,
+                y: canvas.height * 0.35,
+                vx: (Math.random() - .5) * 12,
+                vy: -Math.random() * 14 - 4,
+                g: 0.4,
+                w: 6 + Math.random() * 6,
+                h: 8 + Math.random() * 6,
+                color: colors[(Math.random() * colors.length) | 0],
+                rot: Math.random() * Math.PI * 2,
+                vrot: (Math.random() - .5) * .3,
+                life: 1
+            });
+        }
+
+        let frame = 0;
+        function tick() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let alive = 0;
+            for (const p of pieces) {
+                if (p.life <= 0) continue;
+                alive++;
+                p.vy += p.g;
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vx *= .99;
+                p.rot += p.vrot;
+                if (p.y > canvas.height * 0.9) p.life -= .04;
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rot);
+                ctx.globalAlpha = Math.max(0, p.life);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                ctx.restore();
+            }
+            frame++;
+            if (alive > 0 && frame < 180) requestAnimationFrame(tick);
+            else {
+                canvas.classList.remove('show');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+        tick();
+
+    }
+
+    /* ============ SKELETON ============ */
+    function showSkeleton() {
+        const ar = $('ca');
+        if (!ar) return;
+        let h = '<div class="gr">';
+        for (let i = 0; i < 6; i++) {
+            h += '<div class="sk-card">' +
+                '<div class="skeleton sk-line w70"></div>' +
+                '<div class="skeleton sk-line w40"></div>' +
+                '<div class="skeleton sk-line w90"></div>' +
+                '<div class="skeleton sk-line w40"></div>' +
+                '</div>';
+        }
+        h += '</div>';
+        ar.innerHTML = h;
+    }
+    
