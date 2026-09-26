@@ -4,27 +4,27 @@
 
 :root {
     /* Цвета — светлая тема */
-    --b: #0a2a5e;
-    --a: #00a8e8;
-    --a-h: #0088c4;
-    --bg: #f3f5f9;
-    --cd: #ffffff;
-    --cd-2: #fafbfd;
-    --tx: #1a2332;
-    --mu: #6b7684;
-    --bd: #e4e8ef;
-    --in: #ffffff;
-    --hv: rgba(10, 42, 94, .04);
-    --dg: #e63946;
-    --ok: #2a9d5c;
-    --sr: #f4a62a;
-    --wn: #f97316;
+    --b: #22303f;              /* графит с синим подтоном (сайдбар, заголовки) */
+    --a: #4a6d96;              /* приглушённый карандашно-синий */
+    --a-h: #365577;            /* темнее для hover */
+    --bg: #e8e6df;             /* тёплая серая бумага */
+    --cd: #f2efe8;             /* карточка — чуть светлее фона, не белая */
+    --cd-2: #e4e1d8;           /* вторичный слой — на тон темнее */
+    --tx: #2a2a28;             /* мягкий графит, не чёрный */
+    --mu: #6e6c63;             /* серо-оливковый */
+    --bd: #cfccc2;             /* карандашная линия */
+    --in: #f2efe8;
+    --hv: rgba(40, 40, 38, .055);
+    --dg: #a94a4a;
+    --ok: #5a8050;
+    --sr: #c89838;
+    --wn: #c9702a;
 
     /* Тени */
-    --sh-sm: 0 1px 2px rgba(10, 42, 94, .06);
-    --sh-md: 0 4px 14px rgba(10, 42, 94, .08);
-    --sh-lg: 0 12px 32px rgba(10, 42, 94, .12);
-    --sh-glow: 0 8px 24px rgba(0, 168, 232, .25);
+    --sh-sm: 0 1px 2px rgba(40, 40, 38, .07);
+    --sh-md: 0 4px 14px rgba(40, 40, 38, .10);
+    --sh-lg: 0 12px 32px rgba(40, 40, 38, .14);
+    --sh-glow: 0 8px 24px rgba(74, 109, 150, .22);
 
     /* Радиусы */
     --r-xs: 4px;
@@ -46,26 +46,172 @@
     --ff-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
 }
 
+/* ============================================================
+   ТЁМНЫЕ ТЕМЫ — 5 вариантов + светлая
+   Каждая переопределяет переменные + свой градиент фона
+   ============================================================ */
+
+/* --- Светлая (базовая, = :root) --- */
+body.theme-light {
+    color-scheme: light;
+    background:
+        /* Лёгкое карандашное зерно */
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch' seed='5'/><feColorMatrix values='0 0 0 0 0.22  0 0 0 0 0.22  0 0 0 0 0.20  0 0 0 0.07 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>"),
+        /* Мягкие тёплые подсветы */
+        radial-gradient(1400px 900px at 8% -15%, rgba(74, 109, 150, .07), transparent 60%),
+        radial-gradient(1200px 800px at 100% 115%, rgba(40, 40, 38, .06), transparent 60%),
+        /* База */
+        linear-gradient(180deg, #eae8e1 0%, #e3e0d8 55%, #dbd8cf 100%);
+    background-size: 200px 200px, auto, auto, auto;
+}
+/* --- Тёмная (по умолчанию) --- */
 body.theme-dark {
-    --b: #0b1220;
+    --b: #070b14;
     --a: #38bdf8;
     --a-h: #0ea5e9;
-    --bg: #0a0f1a;
-    --cd: #131a28;
-    --cd-2: #182233;
-    --tx: #e8edf5;
-    --mu: #8b96a8;
-    --bd: #263045;
-    --in: #1a2333;
-    --hv: rgba(255, 255, 255, .035);
+    --bg: #070b14;
+    --cd: #121a2a;
+    --cd-2: #1a2334;
+    --tx: #eef2f9;
+    --mu: #98a4b7;
+    --bd: #2e3b53;
+    --in: #1a2334;
+    --hv: rgba(255, 255, 255, .055);
     --dg: #f25c69;
     --ok: #3ecf7e;
     --sr: #fbbf24;
 
-    --sh-sm: 0 1px 2px rgba(0, 0, 0, .3);
-    --sh-md: 0 4px 14px rgba(0, 0, 0, .35);
-    --sh-lg: 0 12px 32px rgba(0, 0, 0, .5);
-    --sh-glow: 0 8px 28px rgba(56, 189, 248, .3);
+    --sh-sm: 0 1px 2px rgba(0, 0, 0, .5);
+    --sh-md: 0 4px 16px rgba(0, 0, 0, .5);
+    --sh-lg: 0 14px 40px rgba(0, 0, 0, .6);
+    --sh-glow: 0 8px 30px rgba(56, 189, 248, .35);
+
+    color-scheme: dark;
+    background:
+        radial-gradient(1700px 1100px at 8% -25%, rgba(56, 189, 248, .22), transparent 65%),
+        radial-gradient(1500px 1000px at 100% 125%, rgba(99, 102, 241, .18), transparent 65%),
+        radial-gradient(1100px 800px at 55% 50%, rgba(56, 189, 248, .06), transparent 70%),
+        linear-gradient(180deg, #0b1220 0%, #050810 55%, #02040a 100%);
+}
+
+/* --- 🟢 Аврора (бирюза + фиолет) --- */
+body.theme-aurora {
+    --b: #061118;
+    --a: #2dd4bf;
+    --a-h: #14b8a6;
+    --bg: #061118;
+    --cd: #12202a;
+    --cd-2: #1a2c38;
+    --tx: #eef7f6;
+    --mu: #9bb0ad;
+    --bd: #2c4650;
+    --in: #1a2c38;
+    --hv: rgba(45, 212, 191, .08);
+    --dg: #f25c69;
+    --ok: #4ade80;
+    --sr: #fbbf24;
+
+    --sh-sm: 0 1px 2px rgba(0, 0, 0, .5);
+    --sh-md: 0 4px 16px rgba(0, 0, 0, .5);
+    --sh-lg: 0 14px 40px rgba(0, 0, 0, .6);
+    --sh-glow: 0 8px 30px rgba(45, 212, 191, .40);
+
+    color-scheme: dark;
+    background:
+        radial-gradient(1600px 1100px at 5% -20%, rgba(45, 212, 191, .30), transparent 65%),
+        radial-gradient(1500px 1000px at 100% 120%, rgba(139, 92, 246, .32), transparent 65%),
+        radial-gradient(1000px 700px at 50% 45%, rgba(20, 184, 166, .10), transparent 70%),
+        linear-gradient(180deg, #081420 0%, #040a12 55%, #01050a 100%);
+}
+
+/* --- 🌸 Киберпанк (неон-розовый + циан) --- */
+body.theme-cyberpunk {
+    --b: #0a0616;
+    --a: #ec4899;
+    --a-h: #db2777;
+    --bg: #0a0616;
+    --cd: #1c0e2e;
+    --cd-2: #271540;
+    --tx: #f7ecff;
+    --mu: #b19bc9;
+    --bd: #3d2560;
+    --in: #271540;
+    --hv: rgba(236, 72, 153, .09);
+    --dg: #ef4444;
+    --ok: #22d3ee;
+    --sr: #fbbf24;
+
+    --sh-sm: 0 1px 2px rgba(0, 0, 0, .55);
+    --sh-md: 0 4px 16px rgba(0, 0, 0, .55);
+    --sh-lg: 0 14px 40px rgba(0, 0, 0, .7);
+    --sh-glow: 0 8px 32px rgba(236, 72, 153, .50);
+
+    color-scheme: dark;
+    background:
+        radial-gradient(1600px 1000px at 12% -18%, rgba(236, 72, 153, .32), transparent 62%),
+        radial-gradient(1500px 1000px at 95% 118%, rgba(34, 211, 238, .30), transparent 62%),
+        radial-gradient(900px 700px at 50% 45%, rgba(168, 85, 247, .16), transparent 70%),
+        linear-gradient(180deg, #0d071b 0%, #07030e 55%, #02000a 100%);
+}
+
+/* --- 🌅 Закат (малиновый + золотой) --- */
+body.theme-sunset {
+    --b: #1c0814;
+    --a: #f59e0b;
+    --a-h: #d97706;
+    --bg: #140610;
+    --cd: #280f22;
+    --cd-2: #35172d;
+    --tx: #fceee6;
+    --mu: #c094a0;
+    --bd: #4a2340;
+    --in: #35172d;
+    --hv: rgba(245, 158, 11, .09);
+    --dg: #ef4444;
+    --ok: #4ade80;
+    --sr: #fb7185;
+
+    --sh-sm: 0 1px 2px rgba(0, 0, 0, .5);
+    --sh-md: 0 4px 16px rgba(0, 0, 0, .5);
+    --sh-lg: 0 14px 40px rgba(0, 0, 0, .6);
+    --sh-glow: 0 8px 30px rgba(245, 158, 11, .45);
+
+    color-scheme: dark;
+    background:
+        radial-gradient(1600px 1000px at 15% -15%, rgba(236, 72, 153, .32), transparent 60%),
+        radial-gradient(1500px 1000px at 90% 120%, rgba(245, 158, 11, .30), transparent 60%),
+        radial-gradient(1200px 800px at 100% 25%, rgba(59, 130, 246, .16), transparent 65%),
+        linear-gradient(180deg, #190a14 0%, #0b050c 55%, #040105 100%);
+}
+
+/* --- 🌌 Космос (индиго + голубой) --- */
+body.theme-cosmos {
+    --b: #070524;
+    --a: #818cf8;
+    --a-h: #6366f1;
+    --bg: #070524;
+    --cd: #141138;
+    --cd-2: #1c1848;
+    --tx: #eeecff;
+    --mu: #9d98c9;
+    --bd: #2e2870;
+    --in: #1c1848;
+    --hv: rgba(129, 140, 248, .09);
+    --dg: #f43f5e;
+    --ok: #34d399;
+    --sr: #fbbf24;
+
+    --sh-sm: 0 1px 2px rgba(0, 0, 0, .5);
+    --sh-md: 0 4px 16px rgba(0, 0, 0, .5);
+    --sh-lg: 0 14px 40px rgba(0, 0, 0, .65);
+    --sh-glow: 0 8px 32px rgba(129, 140, 248, .50);
+
+    color-scheme: dark;
+    background:
+        radial-gradient(1600px 1100px at 8% -20%, rgba(129, 140, 248, .32), transparent 62%),
+        radial-gradient(1500px 1000px at 95% 120%, rgba(56, 189, 248, .24), transparent 62%),
+        radial-gradient(900px 700px at 50% 50%, rgba(168, 85, 247, .14), transparent 70%),
+        linear-gradient(180deg, #0a0828 0%, #05030f 55%, #01000a 100%);
 }
 
 /* ---------- База ---------- */
@@ -93,10 +239,6 @@ body {
     text-rendering: optimizeLegibility;
     transition: background var(--tr), color var(--tr);
     color-scheme: light;
-}
-
-body.theme-dark {
-    color-scheme: dark;
 }
 
 ::selection {
@@ -209,7 +351,7 @@ body.theme-dark select option:focus {
     left: 14px !important;
     width: 40px !important;
     height: 40px !important;
-    background: var(--b) !important;
+    background: linear-gradient(135deg, var(--a), var(--a-h)) !important;
     color: #fff !important;
     border: none !important;
     border-radius: var(--r-md) !important;
@@ -218,7 +360,7 @@ body.theme-dark select option:focus {
     align-items: center !important;
     justify-content: center !important;
     font-size: 1.15rem !important;
-    box-shadow: var(--sh-md) !important;
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--a) 45%, transparent) !important;
     z-index: 9999 !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -777,7 +919,7 @@ body.sidebar-collapsed .mw {
     left: 12px;
     top: 12px;
     z-index: 1000;
-    background: var(--b);
+    background: linear-gradient(135deg, var(--a), var(--a-h));
     color: #fff;
     border: none;
     width: 38px;
@@ -926,7 +1068,14 @@ body.sidebar-collapsed .mw {
 
 .sr::placeholder {
     color: var(--mu);
-    opacity: .7;
+    opacity: .9;
+}
+
+.fg input::placeholder,
+.fg textarea::placeholder,
+.cn::placeholder {
+    color: var(--mu);
+    opacity: .85;
 }
 
 .sr:focus {
@@ -985,7 +1134,7 @@ body.sidebar-collapsed .mw {
     font-weight: 700;
     cursor: pointer;
     border: 1.5px solid var(--bd);
-    background: var(--cd);
+    background: var(--cd-2);
     color: var(--tx);
     white-space: nowrap;
     transition: all var(--tr);
@@ -1115,7 +1264,7 @@ body.sidebar-collapsed .mw {
     align-items: center;
     gap: 6px;
     white-space: nowrap;
-    background: var(--cd);
+    background: var(--cd-2);
     color: var(--tx);
     transition: all var(--tr);
 }
@@ -1398,9 +1547,9 @@ body.theme-dark .cd-nm {
 }
 
 .ctb {
-    background: var(--cd);
+    background: var(--cd-2);
     border: 1.5px solid var(--bd);
-    color: var(--mu);
+    color: var(--tx);
     cursor: pointer;
     border-radius: var(--r-sm);
     width: 30px;
@@ -1790,8 +1939,8 @@ body.theme-dark .cd-purchase .price-tag {
     border-radius: var(--r-pill);
     cursor: pointer;
     border: 1.5px solid var(--bd);
-    background: var(--cd);
-    color: var(--mu);
+    background: var(--cd-2);
+    color: var(--tx);
     letter-spacing: .2px;
     white-space: nowrap;
     transition: all var(--tr);
@@ -4198,4 +4347,1190 @@ a:focus-visible {
     text-transform: uppercase;
     letter-spacing: .3px;
     line-height: 1.2;
+}
+
+/* ============================================================
+   Выбор темы — модалка
+   ============================================================ */
+.th-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+@media (min-width: 600px) {
+    .th-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.th-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    background: var(--cd);
+    border: 2px solid var(--bd);
+    border-radius: var(--r-md);
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--tx);
+    transition: all var(--tr);
+    text-align: left;
+}
+
+.th-card:hover {
+    border-color: var(--a);
+    transform: translateY(-2px);
+    box-shadow: var(--sh-md);
+}
+
+.th-card.on {
+    border-color: var(--a);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--a) 25%, transparent);
+}
+
+.th-preview {
+    height: 64px;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--bd);
+    position: relative;
+    overflow: hidden;
+}
+
+.th-preview::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    right: 8px;
+    height: 6px;
+    background: rgba(255, 255, 255, .25);
+    border-radius: 3px;
+    box-shadow: 0 12px 0 rgba(255, 255, 255, .15);
+}
+
+.th-label {
+    font-size: .84rem;
+    font-weight: 700;
+    color: var(--tx);
+}
+/* ============================================================
+   ФИКС #1: Читаемость текста во ВСЕХ тёмных темах
+   (Аврора, Киберпанк, Закат, Космос — кроме чистой «Тёмной»)
+   Заголовки карточек, названия, OEM, заголовки секций,
+   модалки, VIN-декодер, дерево ETKA, профиль, донат, лицензия.
+   ============================================================ */
+body:not(.theme-light) .sh,
+body:not(.theme-light) .cd-nm,
+body:not(.theme-light) .mh h3,
+body:not(.theme-light) .wn,
+body:not(.theme-light) .et summary,
+body:not(.theme-light) .lic-box h4,
+body:not(.theme-light) .don-info b,
+body:not(.theme-light) .prof-name,
+body:not(.theme-light) .gdr b,
+body:not(.theme-light) #licgate .gate-head h2,
+body:not(.theme-light) #licgate .gate-body h4 {
+    color: var(--a);
+}
+
+/* OEM-коды и номера в дереве — голубые, читаемые на тёмном */
+body:not(.theme-light) .cd-oem-v,
+body:not(.theme-light) .et .ep .om {
+    color: #7dd3fc;
+}
+
+/* Плашка OEM — мягкий фон + граница, чтобы точно читалась */
+body:not(.theme-light) .cd-oem-v {
+    background: rgba(125, 211, 252, .10);
+    border-color: rgba(125, 211, 252, .22);
+}
+
+/* Жёлтый бейдж «⚠ не подтверждено» и «скоро» — оставляем акценты */
+body:not(.theme-light) .vb.f,
+body:not(.theme-light) .don-test,
+body:not(.theme-light) .em .em-soon {
+    color: #fbbf24;
+}
+
+/* Плашка фиолетовых тэгов комплектаций */
+body:not(.theme-light) .tg.tm {
+    color: #ce93d8;
+}
+
+/* Цена в блоке покупки — акцент */
+body:not(.theme-light) .cd-purchase .price-tag {
+    color: var(--a);
+    background: color-mix(in srgb, var(--a) 22%, transparent);
+}
+
+/* ============================================================
+   ФИКС #2: Гамбургеры — всегда акцентные, никакого чёрного
+   ============================================================ */
+
+/* Десктопная кнопка (ID dtgl + класс tbd = максимальная специфичность) */
+#dtgl.tbd {
+    background: linear-gradient(135deg, var(--a), var(--a-h)) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--a) 50%, transparent),
+                0 0 0 1px color-mix(in srgb, var(--a) 35%, transparent) !important;
+}
+
+#dtgl.tbd:hover {
+    background: linear-gradient(135deg, var(--a-h), var(--a)) !important;
+    transform: scale(1.06) !important;
+    filter: brightness(1.08);
+}
+
+/* Мобильная кнопка */
+#mob {
+    background: linear-gradient(135deg, var(--a), var(--a-h)) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--a) 50%, transparent),
+                0 0 0 1px color-mix(in srgb, var(--a) 35%, transparent) !important;
+}
+
+#mob:hover {
+    background: linear-gradient(135deg, var(--a-h), var(--a)) !important;
+    transform: scale(1.06) !important;
+    filter: brightness(1.08);
+}
+/* ============================================================
+   ФИКС: Шапка раздела .sh — НАСТОЯЩЕЕ стекло
+   Никакого --bg. Только очень лёгкий нейтральный подсвет + blur.
+   В тёмных темах — тонкая белая дымка (4-6%).
+   В светлой — мягкая белая плашка (55-70%), чтобы текст читался.
+   ============================================================ */
+.sh {
+    background: rgba(255, 255, 255, .045);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    backdrop-filter: blur(14px) saturate(160%);
+    border-radius: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
+    /* Тонкая нижняя кромка — как у настоящего стекла */
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, .06);
+}
+
+body.theme-light .sh {
+    background:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch' seed='5'/><feColorMatrix values='0 0 0 0 0.22  0 0 0 0 0.22  0 0 0 0 0.20  0 0 0 0.06 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>"),
+        rgba(186, 184, 181, 0.82);
+    background-size: 200px 200px, auto;
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    box-shadow:
+        inset 0 -1px 0 rgba(40, 40, 38, .08),
+        0 4px 14px rgba(40, 40, 38, .05);
+}
+
+/* ============================================================
+   ФИКС #2: Бренд в сайдбаре — сдвинуть вправо от гамбургера
+   Только на десктопе (на мобилке .tbd скрыт, а #mob вне сайдбара)
+   .tbd стоит на left:14px, ширина 40px → занимает 14–54px.
+   Ставим padding-left 62px → текст начинается с 62px.
+   ============================================================ */
+@media (min-width: 901px) {
+    .brand {
+        padding-left: 62px;
+    }
+}
+/* ============================================================
+   Меню ⚙️ (.em) — настоящее стекло, как у шапки раздела
+   ============================================================ */
+.em {
+    background: rgba(255, 255, 255, .055);
+    -webkit-backdrop-filter: blur(18px) saturate(170%);
+    backdrop-filter: blur(18px) saturate(170%);
+    border: 1px solid rgba(255, 255, 255, .10);
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, .35),
+        inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
+body.theme-light .em {
+    background: rgba(242, 239, 232, .93);
+    border-color: rgba(40, 40, 38, .12);
+    box-shadow:
+        0 12px 40px rgba(40, 40, 38, .18),
+        inset 0 1px 0 rgba(255, 255, 255, .75);
+}
+/* Внутренние кнопки — прозрачные, чтобы стекло просвечивало */
+.em button {
+    background: transparent;
+}
+
+.em button:hover {
+    background: color-mix(in srgb, var(--a) 14%, transparent);
+}
+
+/* Разделительные линии внутри стекла — полупрозрачные */
+.em .ms,
+.em .em-sec > summary::after {
+    background: rgba(255, 255, 255, .10);
+}
+
+body.theme-light .em .ms,
+body.theme-light .em .em-sec > summary::after {
+    background: rgba(40, 40, 38, .10);
+}
+
+
+.em::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, .08) 0%,
+        rgba(255, 255, 255, 0) 40%);
+    z-index: 0;
+}
+
+.em > * {
+    position: relative;
+    z-index: 1;
+}
+/* ============================================================
+   ТЕМА: 📜 Крафт (крафтовая бумага)
+   Тёплая бежевая палитра, тёмно-коричневые чернила, терракота.
+   Лёгкая тема — color-scheme: light.
+   ============================================================ */
+body.theme-paper {
+    --b: #3a2a18;              /* кожаный переплёт сайдбара */
+    --a: #b45f2e;              /* терракота — как штамп */
+    --a-h: #8f4a20;            /* тёмнее — для hover */
+    --bg: #e8ddc8;             /* крафтовая бумага */
+    --cd: #f4ecd9;             /* карточка — кремовая, светлее фона */
+    --cd-2: #ece1c9;           /* вторичный слой — чуть темнее */
+    --tx: #3a2c1c;             /* чернила */
+    --mu: #7d6b4e;             /* выцветшие чернила */
+    --bd: #cebda0;             /* контур рисунка */
+    --in: #f4ecd9;             /* поле ввода */
+    --hv: rgba(58, 42, 24, .05);
+    --dg: #a13d2d;             /* сургучная печать */
+    --ok: #5a7d4a;             /* мох */
+    --sr: #c98a2b;             /* охра */
+    --wn: #c9702a;             /* рыжий */
+
+    --sh-sm: 0 1px 2px rgba(58, 42, 24, .10);
+    --sh-md: 0 4px 14px rgba(58, 42, 24, .14);
+    --sh-lg: 0 14px 34px rgba(58, 42, 24, .20);
+    --sh-glow: 0 6px 20px rgba(180, 95, 46, .35);
+
+    color-scheme: light;
+    background:
+        radial-gradient(1400px 900px at 8% -12%, rgba(180, 95, 46, .08), transparent 60%),
+        radial-gradient(1200px 800px at 100% 115%, rgba(58, 42, 24, .07), transparent 60%),
+        radial-gradient(900px 700px at 40% 60%, rgba(201, 138, 43, .05), transparent 70%),
+        linear-gradient(180deg, #ece2cc 0%, #e3d6bd 55%, #d8c8a8 100%);
+}
+
+/* ============================================================
+   Крафт: заголовки — «чернила + красный штамп»
+   (перебиваем общий блок body:not(.theme-light), который
+   рассчитан на тёмные темы и красит всё в --a)
+   ============================================================ */
+body.theme-paper .sh { color: var(--a-h); }
+body.theme-paper .mh h3 { color: var(--a-h); }
+body.theme-paper .wn { color: var(--a-h); }
+body.theme-paper .et summary { color: var(--a-h); }
+body.theme-paper .prof-name { color: var(--a-h); }
+body.theme-paper .don-info b { color: var(--a-h); }
+body.theme-paper .gdr b { color: var(--a-h); }
+body.theme-paper .lic-box h4,
+body.theme-paper #licgate .gate-head h2,
+body.theme-paper #licgate .gate-body h4 { color: var(--a-h); }
+
+/* Название карточки — тёмные чернила (не терракота: так читается лучше) */
+body.theme-paper .cd-nm { color: var(--tx); }
+
+/* OEM-коды — оттиск печати */
+body.theme-paper .cd-oem-v {
+    color: #6d4620;
+    background: rgba(180, 95, 46, .12);
+    border-color: rgba(180, 95, 46, .22);
+}
+body.theme-paper .et .ep .om { color: #6d4620; }
+
+/* ============================================================
+   Крафт: стекло .sh и меню .em — тёплые, а не белые
+   ============================================================ */
+body.theme-paper .sh {
+    background: rgba(244, 236, 217, .72);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    box-shadow:
+        inset 0 -1px 0 rgba(58, 42, 24, .08),
+        0 4px 14px rgba(58, 42, 24, .05);
+}
+
+body.theme-paper .em {
+    background: rgba(244, 236, 217, .86);
+    border-color: rgba(58, 42, 24, .14);
+    box-shadow:
+        0 14px 40px rgba(58, 42, 24, .22),
+        inset 0 1px 0 rgba(255, 255, 255, .55);
+}
+
+body.theme-paper .em .ms,
+body.theme-paper .em .em-sec > summary::after {
+    background: rgba(58, 42, 24, .12);
+}
+
+body.theme-paper .em button:hover {
+    background: rgba(180, 95, 46, .14);
+    color: var(--a-h);
+}
+
+/* ============================================================
+   Крафт: .sh — зернистая крафтовая бумага
+   Шум через SVG feTurbulence (без картинок), поверх — тёплый
+   градиент. Края затемнены, снизу — тонкая кромка «обрыв».
+   ============================================================ */
+body.theme-paper .sh {
+    background:
+        /* Слой 1: зерно — фрактальный шум, красно-коричневый, 35% непрозрачности */
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 0.36  0 0 0 0 0.25  0 0 0 0 0.14  0 0 0 0.35 0'/></filter><rect width='240' height='240' filter='url(%23n)'/></svg>"),
+        /* Слой 2: лёгкая «потёртость» по краям */
+        radial-gradient(120% 140% at 0% 0%, rgba(58, 42, 24, .10), transparent 45%),
+        radial-gradient(120% 140% at 100% 100%, rgba(58, 42, 24, .08), transparent 45%),
+        /* Слой 3: основной тёплый фон */
+        linear-gradient(180deg, rgba(246, 238, 220, .92) 0%, rgba(232, 220, 194, .94) 100%);
+
+    background-blend-mode: normal, multiply, multiply, normal;
+    background-size: 240px 240px, auto, auto, auto;
+
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    backdrop-filter: blur(8px) saturate(120%);
+
+    /* Кромки: светлая сверху + тёмная снизу — как обрывок бумаги */
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .55),
+        inset 0 -1px 0 rgba(58, 42, 24, .18),
+        0 4px 14px rgba(58, 42, 24, .06);
+}
+/* ============================================================
+   Крафт: .sh — ЗАГОЛОВОК РАЗДЕЛА
+   Плотная тёмная бумага с 3 заломами, поверх — зерно.
+   ============================================================ */
+body.theme-paper .sh {
+    background:
+        /* ЗЕРНО */
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 0.36  0 0 0 0 0.25  0 0 0 0 0.14  0 0 0 0.42 0'/></filter><rect width='240' height='240' filter='url(%23n)'/></svg>"),
+
+        /* ЗАЛОМ 1 — длинная диагональ */
+        linear-gradient(115deg,
+            transparent 0%,
+            transparent 32%,
+            rgba(58, 42, 24, .06) 33%,
+            rgba(58, 42, 24, .22) 34%,
+            rgba(255, 255, 255, .18) 34.6%,
+            rgba(255, 255, 255, .04) 35.2%,
+            transparent 36%,
+            transparent 100%),
+
+        /* ЗАЛОМ 2 — короткий, под другим углом */
+        linear-gradient(62deg,
+            transparent 0%,
+            transparent 65%,
+            rgba(58, 42, 24, .05) 66%,
+            rgba(58, 42, 24, .18) 67%,
+            rgba(255, 255, 255, .14) 67.5%,
+            transparent 68.5%,
+            transparent 100%),
+
+        /* ЗАЛОМ 3 — почти горизонтальный сгиб */
+        linear-gradient(175deg,
+            transparent 0%,
+            transparent 76%,
+            rgba(58, 42, 24, .04) 77%,
+            rgba(58, 42, 24, .14) 78%,
+            rgba(255, 255, 255, .12) 78.4%,
+            transparent 79.2%,
+            transparent 100%),
+
+        /* ВИНЬЕТКИ */
+        radial-gradient(130% 160% at 0% 0%, rgba(58, 42, 24, .12), transparent 45%),
+        radial-gradient(130% 160% at 100% 100%, rgba(58, 42, 24, .10), transparent 45%),
+
+        /* ОСНОВА */
+        linear-gradient(180deg,
+            rgba(216, 200, 168, .96) 0%,
+            rgba(190, 172, 136, .97) 100%);
+
+    background-size: 240px 240px, auto, auto, auto, auto, auto, auto;
+
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    backdrop-filter: blur(8px) saturate(120%);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .50),
+        inset 0 -2px 4px rgba(58, 42, 24, .18),
+        inset 0 0 0 1px rgba(58, 42, 24, .07),
+        0 4px 14px rgba(58, 42, 24, .10);
+}
+/* ============================================================
+   Крафт: .ca — РАБОЧАЯ ОБЛАСТЬ (фон под карточками)
+   Один большой лист бумаги: 4 редких длинных залома,
+   мягкие виньетки, тоньше зерно.
+   ============================================================ */
+body.theme-paper .ca {
+    background:
+        /* ЗЕРНО — тоньше, opacity ниже */
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 0.36  0 0 0 0 0.25  0 0 0 0 0.14  0 0 0 0.28 0'/></filter><rect width='240' height='240' filter='url(%23n)'/></svg>"),
+
+        /* ДЛИННЫЙ ЗАЛОМ 1 — диагональ через всю область */
+        linear-gradient(108deg,
+            transparent 0%,
+            transparent 22%,
+            rgba(58, 42, 24, .04) 23%,
+            rgba(58, 42, 24, .16) 24%,
+            rgba(255, 255, 255, .14) 24.5%,
+            rgba(255, 255, 255, .03) 25%,
+            transparent 26%,
+            transparent 100%),
+
+        /* ДЛИННЫЙ ЗАЛОМ 2 — в другую сторону */
+        linear-gradient(72deg,
+            transparent 0%,
+            transparent 58%,
+            rgba(58, 42, 24, .04) 59%,
+            rgba(58, 42, 24, .14) 60%,
+            rgba(255, 255, 255, .12) 60.4%,
+            transparent 61.2%,
+            transparent 100%),
+
+        /* ЗАЛОМ 3 — почти горизонтальный, ниже середины */
+        linear-gradient(178deg,
+            transparent 0%,
+            transparent 62%,
+            rgba(58, 42, 24, .03) 63%,
+            rgba(58, 42, 24, .12) 64%,
+            rgba(255, 255, 255, .10) 64.4%,
+            transparent 65.2%,
+            transparent 100%),
+
+        /* ЗАЛОМ 4 — вертикальный, у правого края */
+        linear-gradient(90deg,
+            transparent 0%,
+            transparent 78%,
+            rgba(58, 42, 24, .04) 79%,
+            rgba(58, 42, 24, .12) 80%,
+            rgba(255, 255, 255, .10) 80.4%,
+            transparent 81.2%,
+            transparent 100%),
+
+        /* ВИНЬЕТКИ по краям */
+        radial-gradient(140% 140% at 0% 0%, rgba(58, 42, 24, .10), transparent 55%),
+        radial-gradient(140% 140% at 100% 100%, rgba(58, 42, 24, .09), transparent 55%),
+        radial-gradient(120% 140% at 50% 0%, rgba(180, 95, 46, .04), transparent 60%),
+
+        /* ОСНОВА — тёмный крафт */
+        linear-gradient(180deg,
+            rgba(206, 190, 156, 1) 0%,
+            rgba(188, 170, 132, 1) 55%,
+            rgba(172, 152, 116, 1) 100%);
+
+    background-size: 240px 240px, auto, auto, auto, auto, auto, auto, auto, auto;
+    background-attachment: scroll, scroll, scroll, scroll, scroll, scroll, scroll, scroll, scroll;
+}
+/* ============================================================
+   Крафт: карточки — темнее и мягче
+   ============================================================ */
+body.theme-paper .cd {
+    background: #e6d8bc;              /* было #f4ecd9 — на 8-10 тонов темнее */
+    border-color: rgba(58, 42, 24, .20);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .55),
+        0 1px 2px rgba(58, 42, 24, .10),
+        0 6px 16px rgba(58, 42, 24, .08);
+}
+
+body.theme-paper .cd:hover {
+    background: #ecdfc4;              /* чуть светлеет при наведении */
+    border-color: var(--a);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .55),
+        0 4px 10px rgba(58, 42, 24, .14),
+        0 14px 28px rgba(58, 42, 24, .12);
+}
+
+/* Внутренние блоки карточки — чуть темнее самой карточки, в тон */
+body.theme-paper .cd-purchase {
+    background: linear-gradient(180deg,
+        rgba(58, 42, 24, .05),
+        transparent);
+}
+
+/* Название карточки — чернила, плотнее для контраста на тёмной карточке */
+body.theme-paper .cd-nm {
+    color: #2c1f10;
+}
+
+/* OEM-плашка — «оттиск» на тёмной бумаге */
+body.theme-paper .cd-oem-v {
+    color: #5a3a1c;
+    background: rgba(180, 95, 46, .16);
+    border-color: rgba(180, 95, 46, .28);
+}
+
+/* Кнопки статусов / избранного — тоже темнее, в тон карточке */
+body.theme-paper .ctb,
+body.theme-paper .tp,
+body.theme-paper .to-chip {
+    background: #e0d0b0;
+}
+
+body.theme-paper .ctb:hover {
+    background: linear-gradient(135deg, var(--a), var(--a-h));
+}
+
+/* Заметки и поля внутри карточки — на тон темнее */
+body.theme-paper .cn,
+body.theme-paper .ins {
+    background: rgba(58, 42, 24, .06);
+    border-color: rgba(58, 42, 24, .18);
+}
+body.theme-light .th-card {
+    box-shadow: inset 0 1px 0 rgba(186, 182, 182, 0.718);
+}
+/* ============================================================
+   СТЕКЛЯННЫЕ КАРТОЧКИ — приподнятые, с бликами
+   Применяется ко всем темам, кроме Крафта (там свой стиль).
+   ============================================================ */
+
+/* 1. Основа: полупрозрачное стекло + размытие фона */
+.cd {
+    position: relative;
+    background: color-mix(in srgb, var(--cd) 72%, transparent);
+    border: 1px solid color-mix(in srgb, var(--bd) 60%, transparent);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(160%);
+
+    /* Многослойная тень: светлая кромка сверху + тёмная снизу + два слоя парения */
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .12),
+        inset 0 -1px 0 rgba(0, 0, 0, .08),
+        0 4px 14px rgba(0, 0, 0, .12),
+        0 14px 32px rgba(0, 0, 0, .14);
+
+    transition:
+        transform var(--tr),
+        box-shadow var(--tr),
+        border-color var(--tr),
+        background var(--tr);
+}
+
+/* 2. Блики поверх стекла — горизонтальный + диагональный */
+.cd::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+        /* Горизонтальный блик сверху — «отражение потолка» */
+        linear-gradient(180deg,
+            rgba(255, 255, 255, .10) 0%,
+            rgba(255, 255, 255, .03) 30%,
+            transparent 50%),
+        /* Диагональная полоса — «отражение окна» */
+        linear-gradient(115deg,
+            transparent 0%,
+            transparent 14%,
+            rgba(255, 255, 255, .07) 19%,
+            rgba(255, 255, 255, .02) 24%,
+            transparent 29%,
+            transparent 100%);
+    z-index: 0;
+}
+
+/* 3. Контент карточки — выше блика */
+.cd > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* 4. Приподнимание при наведении */
+.cd:hover {
+    background: color-mix(in srgb, var(--cd) 82%, transparent);
+    transform: translateY(-4px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .20),
+        inset 0 -1px 0 rgba(0, 0, 0, .08),
+        0 8px 22px rgba(0, 0, 0, .18),
+        0 22px 48px rgba(0, 0, 0, .20);
+}
+
+/* 5. Избранное — сохраняем золотую полосу слева */
+.cd.fav {
+    box-shadow:
+        inset 4px 0 0 var(--sr),
+        inset 0 1px 0 rgba(255, 255, 255, .12),
+        inset 0 -1px 0 rgba(0, 0, 0, .08),
+        0 4px 14px rgba(0, 0, 0, .12),
+        0 14px 32px rgba(0, 0, 0, .14);
+}
+
+.cd.fav:hover {
+    box-shadow:
+        inset 4px 0 0 var(--sr),
+        inset 0 1px 0 rgba(255, 255, 255, .20),
+        0 8px 22px rgba(0, 0, 0, .18),
+        0 22px 48px rgba(0, 0, 0, .20);
+}
+
+/* 6. Кнопки внутри карточки — тоже стекло */
+.cd .ctb {
+    background: color-mix(in srgb, var(--cd-2) 65%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+
+.cd .ctb:hover {
+    background: linear-gradient(135deg, var(--a), var(--a-h));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+/* 7. Блок покупки — тонкий градиент поверх стекла */
+.cd-purchase {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--a) 5%, transparent),
+        transparent);
+}
+
+/* ============================================================
+   Светлая тема — там белый блик не виден, делаем плотнее и с тенью
+   ============================================================ */
+body.theme-light .cd {
+    background: color-mix(in srgb, var(--cd) 84%, transparent);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .95),
+        inset 0 -1px 0 rgba(40, 40, 38, .06),
+        0 4px 14px rgba(40, 40, 38, .10),
+        0 14px 32px rgba(40, 40, 38, .10);
+}
+
+body.theme-light .cd::before {
+    background:
+        linear-gradient(180deg,
+            rgba(255, 255, 255, .40) 0%,
+            rgba(255, 255, 255, .08) 30%,
+            transparent 55%);
+}
+
+body.theme-light .cd:hover {
+    background: color-mix(in srgb, var(--cd) 94%, transparent);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .98),
+        0 8px 22px rgba(40, 40, 38, .14),
+        0 22px 48px rgba(40, 40, 38, .14);
+}
+
+body.theme-light .cd.fav {
+    box-shadow:
+        inset 4px 0 0 var(--sr),
+        inset 0 1px 0 rgba(255, 255, 255, .95),
+        0 4px 14px rgba(40, 40, 38, .10),
+        0 14px 32px rgba(40, 40, 38, .10);
+}
+
+/* ============================================================
+   Крафт — карточки-наклейки, остаются плотными (без стекла)
+   ============================================================ */
+body.theme-paper .cd {
+    background: #e6d8bc;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .55),
+        inset 0 -1px 0 rgba(58, 42, 24, .08),
+        0 2px 6px rgba(58, 42, 24, .14),
+        0 10px 24px rgba(58, 42, 24, .10);
+}
+
+body.theme-paper .cd::before {
+    background:
+        linear-gradient(180deg,
+            rgba(255, 255, 255, .30) 0%,
+            rgba(255, 255, 255, .05) 30%,
+            transparent 55%);
+}
+
+body.theme-paper .cd:hover {
+    background: #ecdfc4;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .55),
+        0 6px 16px rgba(58, 42, 24, .18),
+        0 18px 40px rgba(58, 42, 24, .14);
+}
+
+body.theme-paper .cd .ctb {
+    background: #e0d0b0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+/* ============================================================
+   Мобильный — уменьшаем blur ради производительности
+   ============================================================ */
+@media (max-width: 900px) {
+    .cd {
+        -webkit-backdrop-filter: blur(10px) saturate(150%);
+        backdrop-filter: blur(10px) saturate(150%);
+    }
+}
+/* ============================================================
+   ПРИЗМА — радужное преломление на стеклянных карточках
+   Работает поверх существующих бликов .cd::before.
+   Не применяется в Крафте (там наклейки на бумаге).
+   ============================================================ */
+
+/* 1. Радужная кайма по периметру + призматический градиент поверх */
+.cd:not(.cd-old)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+
+    /* Радужный градиент по диагонали — тонкая кайма */
+    background:
+        linear-gradient(115deg,
+            rgba(255, 0, 128, 0)    0%,
+            rgba(255, 0, 128, .06)  10%,
+            rgba(255, 140, 0, .06)  20%,
+            rgba(255, 230, 0, .05)  30%,
+            rgba(60, 255, 120, .06) 42%,
+            rgba(0, 220, 255, .07)  56%,
+            rgba(120, 90, 255, .07) 70%,
+            rgba(220, 60, 255, .06) 84%,
+            rgba(220, 60, 255, 0)   100%);
+
+    /* Радужное свечение по краям — как ободок призмы */
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, .06),
+        inset 0 1px 0 rgba(120, 220, 255, .18),
+        inset -1px 0 0 rgba(200, 120, 255, .14),
+        inset 0 -1px 0 rgba(255, 140, 200, .10),
+        inset 1px 0 0 rgba(255, 220, 120, .12);
+
+    mix-blend-mode: screen;
+    opacity: .9;
+    transition: opacity var(--tr);
+    z-index: 0;
+}
+
+/* 2. Второй диагональный слой — «второй луч призмы», тоньше и ярче */
+.cd:not(.cd-old)::before {
+    /* дополняем существующий блик дополнительной радужной полосой */
+    background:
+        linear-gradient(180deg,
+            rgba(255, 255, 255, .10) 0%,
+            rgba(255, 255, 255, .03) 30%,
+            transparent 50%),
+        /* Радужная узкая полоса — «отражение окна под углом» */
+        linear-gradient(115deg,
+            transparent 0%,
+            transparent 13%,
+            rgba(180, 240, 255, .10) 17%,
+            rgba(220, 180, 255, .10) 19%,
+            rgba(255, 200, 220, .08) 21%,
+            transparent 25%,
+            transparent 100%);
+}
+
+/* 3. Усиление при наведении — призма «оживает» */
+.cd:not(.cd-old):hover::after {
+    opacity: 1;
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, .10),
+        inset 0 1px 0 rgba(120, 220, 255, .28),
+        inset -1px 0 0 rgba(200, 120, 255, .22),
+        inset 0 -1px 0 rgba(255, 140, 200, .16),
+        inset 1px 0 0 rgba(255, 220, 120, .18);
+}
+
+.cd:not(.cd-old):hover::before {
+    background:
+        linear-gradient(180deg,
+            rgba(255, 255, 255, .16) 0%,
+            rgba(255, 255, 255, .05) 30%,
+            transparent 50%),
+        linear-gradient(115deg,
+            transparent 0%,
+            transparent 13%,
+            rgba(180, 240, 255, .18) 17%,
+            rgba(220, 180, 255, .18) 19%,
+            rgba(255, 200, 220, .14) 21%,
+            transparent 25%,
+            transparent 100%);
+}
+
+/* ============================================================
+   СВЕТЛАЯ ТЕМА — призма видна слабее, усиливаем контраст
+   ============================================================ */
+body.theme-light .cd:not(.cd-old)::after {
+    background:
+        linear-gradient(115deg,
+            rgba(255, 0, 128, 0)     0%,
+            rgba(255, 0, 128, .10)   10%,
+            rgba(255, 140, 0, .10)   20%,
+            rgba(230, 200, 0, .08)   30%,
+            rgba(40, 200, 100, .10)  42%,
+            rgba(0, 180, 240, .11)   56%,
+            rgba(100, 80, 240, .11)  70%,
+            rgba(180, 40, 240, .10)  84%,
+            rgba(180, 40, 240, 0)    100%);
+    mix-blend-mode: multiply;
+    opacity: .55;
+}
+
+body.theme-light .cd:not(.cd-old):hover::after {
+    opacity: .75;
+}
+
+body.theme-light .cd:not(.cd-old)::before {
+    background:
+        linear-gradient(180deg,
+            rgba(255, 255, 255, .40) 0%,
+            rgba(255, 255, 255, .08) 30%,
+            transparent 55%),
+        linear-gradient(115deg,
+            transparent 0%,
+            transparent 13%,
+            rgba(120, 200, 255, .18) 17%,
+            rgba(180, 140, 255, .18) 19%,
+            rgba(255, 160, 200, .14) 21%,
+            transparent 25%,
+            transparent 100%);
+}
+
+/* ============================================================
+   КРАФТ — призму отключаем полностью (там бумага, не стекло)
+   ============================================================ */
+body.theme-paper .cd::after {
+    display: none;
+}
+
+/* ============================================================
+   Мобильный — призму оставляем, но без размытия (экономим)
+   ============================================================ */
+@media (max-width: 900px) {
+    .cd:not(.cd-old)::after {
+        opacity: .7;
+    }
+}
+/* ============================================================
+   СТЕКЛЯННЫЙ САЙДБАР — полупрозрачный, с blur, бликом и призмой
+   ============================================================ */
+
+/* 1. Сам сайдбар — стекло поверх фона body */
+.sb {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--b) 82%, transparent) 0%,
+        color-mix(in srgb, var(--b) 72%, transparent) 100%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+    border-right: 1px solid color-mix(in srgb, var(--a) 18%, transparent);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .08),
+        inset -1px 0 0 rgba(0, 0, 0, .18),
+        4px 0 32px rgba(0, 0, 0, .28);
+}
+
+/* 2. Блик сверху + диагональная полоса по всему сайдбару */
+.sb::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        /* Мягкий вертикальный блик сверху */
+        linear-gradient(180deg,
+            rgba(255, 255, 255, .06) 0%,
+            rgba(255, 255, 255, .02) 30%,
+            transparent 55%),
+        /* Диагональная полоса-«отражение» */
+        linear-gradient(115deg,
+            transparent 0%,
+            transparent 30%,
+            rgba(255, 255, 255, .04) 33%,
+            rgba(255, 255, 255, .015) 36%,
+            transparent 40%,
+            transparent 100%);
+    z-index: 0;
+}
+
+/* 3. Призма по краям — радужная кайма по правому ребру сайдбара */
+.sb::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    /* Только по правому ребру — тонкая радуга */
+    background: linear-gradient(90deg,
+        transparent 0%,
+        transparent calc(100% - 2px),
+        rgba(120, 220, 255, .10) calc(100% - 2px),
+        rgba(200, 120, 255, .10) 100%);
+    box-shadow:
+        inset -1px 0 0 rgba(120, 220, 255, .14),
+        inset -1px 1px 0 rgba(200, 120, 255, .10),
+        inset -1px -1px 0 rgba(255, 140, 200, .08);
+    mix-blend-mode: screen;
+    z-index: 1;
+}
+
+/* 4. Дети — выше блика */
+.sb > * {
+    position: relative;
+    z-index: 2;
+}
+
+/* ============================================================
+   БЛОК ГАРАЖА (.gb) — стеклянная вставка
+   ============================================================ */
+.gb {
+    background: color-mix(in srgb, var(--b) 40%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+    border-top: 1px solid rgba(255, 255, 255, .04);
+}
+
+.gb-header {
+    border-bottom: 1px solid rgba(255, 255, 255, .05);
+}
+
+/* ============================================================
+   КАРТОЧКИ МАШИН (.gi) — стекло + призма
+   ============================================================ */
+.gi {
+    position: relative;
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, .07) 0%,
+        rgba(255, 255, 255, .03) 100%);
+    border: 1px solid rgba(255, 255, 255, .10);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    backdrop-filter: blur(10px) saturate(160%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .10),
+        inset 0 -1px 0 rgba(0, 0, 0, .15),
+        0 2px 8px rgba(0, 0, 0, .15);
+    overflow: hidden;
+    transition: all var(--tr);
+}
+
+/* Блик сверху-слева */
+.gi::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, .10) 0%,
+        transparent 45%);
+    z-index: 0;
+}
+
+/* Радужная кайма по периметру */
+.gi::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    box-shadow:
+        inset 0 1px 0 rgba(120, 220, 255, .18),
+        inset -1px 0 0 rgba(200, 120, 255, .12),
+        inset 0 -1px 0 rgba(255, 140, 200, .10),
+        inset 1px 0 0 rgba(255, 220, 120, .10);
+    mix-blend-mode: screen;
+    z-index: 0;
+}
+
+.gi > * {
+    position: relative;
+    z-index: 1;
+}
+
+.gi:hover {
+    background: linear-gradient(135deg,
+        rgba(56, 189, 248, .16) 0%,
+        rgba(56, 189, 248, .06) 100%);
+    border-color: var(--a);
+    transform: translateY(-1px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .16),
+        inset 0 -1px 0 rgba(0, 0, 0, .15),
+        0 6px 20px rgba(0, 0, 0, .25),
+        0 0 0 1px color-mix(in srgb, var(--a) 30%, transparent);
+}
+
+.gi:hover::after {
+    box-shadow:
+        inset 0 1px 0 rgba(120, 220, 255, .30),
+        inset -1px 0 0 rgba(200, 120, 255, .22),
+        inset 0 -1px 0 rgba(255, 140, 200, .16),
+        inset 1px 0 0 rgba(255, 220, 120, .20);
+}
+
+.gi.active {
+    background: linear-gradient(135deg,
+        rgba(56, 189, 248, .22) 0%,
+        rgba(56, 189, 248, .08) 100%);
+    border-color: var(--a);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .20),
+        inset 0 0 0 1px var(--a),
+        0 4px 14px rgba(56, 189, 248, .25);
+}
+
+/* ============================================================
+   ПУНКТЫ МЕНЮ (.ni) — стеклянная подсветка hover/active
+   ============================================================ */
+.ni {
+    border: 1px solid transparent;
+    transition: all var(--tr);
+}
+
+.ni:hover {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, .08) 0%,
+        rgba(255, 255, 255, .03) 100%);
+    border-color: rgba(255, 255, 255, .10);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .10),
+        0 2px 8px rgba(0, 0, 0, .15);
+}
+
+.ni.active {
+    background: linear-gradient(135deg,
+        color-mix(in srgb, var(--a) 28%, transparent) 0%,
+        color-mix(in srgb, var(--a) 10%, transparent) 100%);
+    border-color: color-mix(in srgb, var(--a) 45%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-weight: 700;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .16),
+        inset 3px 0 0 var(--a),
+        0 4px 14px rgba(0, 0, 0, .20);
+}
+
+.ni.fav.active {
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .16),
+        inset 3px 0 0 var(--sr),
+        0 4px 14px rgba(0, 0, 0, .20);
+}
+
+/* Разделитель тоже полупрозрачный */
+.nd {
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, .14),
+        transparent);
+}
+
+/* ============================================================
+   ПОДВАЛ САЙДБАРА (.sft) — стекло
+   ============================================================ */
+.sft {
+    background: color-mix(in srgb, var(--b) 45%, transparent);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, .08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+}
+
+/* Кнопки подвала — стеклянные */
+.sft-btn {
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .12);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .10),
+        0 2px 6px rgba(0, 0, 0, .15);
+}
+
+.sft-btn:hover {
+    background: rgba(56, 189, 248, .22);
+    border-color: var(--a);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .20),
+        0 6px 18px rgba(56, 189, 248, .35);
+}
+
+/* ============================================================
+   ПРИЗМА НА .sb — усиление при наведении не требуется,
+   сайдбар всегда виден. Но при переключении темы пусть
+   призма мягко переключается.
+   ============================================================ */
+.sb::after {
+    transition: box-shadow var(--tr), background var(--tr);
+}
+
+/* ============================================================
+   КРАФТ — сайдбар чуть теплее, радуга приглушена
+   ============================================================ */
+body.theme-paper .sb {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--b) 88%, transparent) 0%,
+        color-mix(in srgb, var(--b) 78%, transparent) 100%);
+    border-right-color: color-mix(in srgb, var(--a) 22%, transparent);
+}
+
+body.theme-paper .sb::after {
+    box-shadow:
+        inset -1px 0 0 rgba(255, 180, 120, .14),
+        inset -1px 1px 0 rgba(200, 120, 80, .10),
+        inset -1px -1px 0 rgba(255, 140, 100, .08);
+}
+
+/* ============================================================
+   СВЕТЛАЯ ТЕМА — сайдбар графитовый, стекло видно хуже
+   ============================================================ */
+body.theme-light .sb {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--b) 92%, transparent) 0%,
+        color-mix(in srgb, var(--b) 86%, transparent) 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .10),
+        inset -1px 0 0 rgba(0, 0, 0, .22),
+        4px 0 28px rgba(40, 40, 38, .22);
+}
+
+body.theme-light .gi {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, .12) 0%,
+        rgba(255, 255, 255, .05) 100%);
+}
+
+body.theme-light .ni.active {
+    background: linear-gradient(135deg,
+        color-mix(in srgb, var(--a) 32%, transparent) 0%,
+        color-mix(in srgb, var(--a) 12%, transparent) 100%);
+}
+
+/* ============================================================
+   МОБИЛЬНЫЙ — сайдбар-шторка, blur полегче
+   ============================================================ */
+@media (max-width: 900px) {
+    .sb {
+        -webkit-backdrop-filter: blur(16px) saturate(160%);
+        backdrop-filter: blur(16px) saturate(160%);
+    }
 }

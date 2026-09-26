@@ -103,10 +103,22 @@ const getPurchaseHtml = p => {
 const DB = []; /* данные грузятся из data/parts.json */
 
 const UK = 'vw_polo_ui_v185', PK = 'vw_polo_db_v181', WK = 'vw_polo_workshops_v181', VK = 'vw_polo_vincario_key_v18', GK = 'vw_polo_garage_v181', DN = 'vw_polo_v181', DV = 2, SP = 'parts', SW = 'workshops';
-let APP_VERSION = '19.2'; // fallback, если update.json не загрузится
+let APP_VERSION = '1.1.1'; // fallback, если update.json не загрузится
 const LICKEY = 'vw_polo_license_v1';
 const UPKEY = 'vw_polo_update_url_v1';
 const PROFKEY = 'vw_polo_profile_v1';
+
+/* ============ ТЕМЫ ============ */
+const THEMES = [
+    { id: 'light', label: 'Светлая', icon: '☀️', cls: 'theme-light', preview: '#f3f5f9' },
+    { id: 'dark', label: 'Тёмная', icon: '🌙', cls: 'theme-dark', preview: 'linear-gradient(135deg, #0e1525 0%, #131a28 100%)' },
+    { id: 'aurora', label: 'Аврора', icon: '🌌', cls: 'theme-aurora', preview: 'linear-gradient(135deg, #0e1525 0%, #14b8a6 60%, #8b5cf6 100%)' },
+    { id: 'cyberpunk', label: 'Киберпанк', icon: '🌸', cls: 'theme-cyberpunk', preview: 'linear-gradient(135deg, #100a1c 0%, #ec4899 55%, #22d3ee 100%)' },
+    { id: 'sunset', label: 'Закат', icon: '🌅', cls: 'theme-sunset', preview: 'linear-gradient(135deg, #1a0a14 0%, #ec4899 40%, #f59e0b 100%)' },
+    { id: 'cosmos', label: 'Космос', icon: '🌠', cls: 'theme-cosmos', preview: 'linear-gradient(135deg, #0d0a24 0%, #6366f1 60%, #38bdf8 100%)' },
+    { id: 'paper', label: 'Крафт', icon: '📜', cls: 'theme-paper', preview: 'linear-gradient(135deg, #ece2cc 0%, #b45f2e 55%, #3a2a18 100%)' },
+
+];
 
 let D = [], W = [], G = [], SV = { activeCat: 'All', searchQuery: '', statusFilter: 'all', engineFilter: 'all', bodyFilter: 'all', trimFilter: 'all', transFilter: 'all', sidebarCollapsed: false, theme: 'dark', sortBy: 'default', view: 'grid', activeVinId: null, groupBySub: false, vinStrictFilter: false };
 let USER = { name: '', email: '', city: '', initials: '', color: '#00b0f0' };
@@ -911,6 +923,141 @@ function toastUndo(msg, onUndo) {
 let usT = null, rcT = null;
 const sUS = () => { clearTimeout(usT); usT = setTimeout(sU, 300); };
 const dRC = () => { clearTimeout(rcT); rcT = setTimeout(rC, 120); };
+function attachUIHandlers() {
+    if (window._uiAttached) return;
+    window._uiAttached = true;
+
+    const si = $('sr');
+    if (!si) return;
+    si.value = SV.searchQuery || '';
+    uSC();
+
+    // Поиск и фильтры
+    si.addEventListener('input', e => { SV.searchQuery = e.target.value; uSC(); sUS(); dRC(); });
+    $('sf').addEventListener('change', e => { SV.statusFilter = e.target.value; sU(); rC(); });
+    $('ss').addEventListener('change', e => { SV.sortBy = e.target.value; sU(); rC(); });
+    $('fmtr').addEventListener('change', e => { SV.engineFilter = e.target.value; updateFilterStyling(); sU(); rC(); });
+    $('fbdy').addEventListener('change', e => { SV.bodyFilter = e.target.value; updateFilterStyling(); sU(); rC(); });
+    $('ftr').addEventListener('change', e => { SV.transFilter = e.target.value; updateFilterStyling(); sU(); rC(); });
+    $('if').addEventListener('change', oIF);
+    $('pf').addEventListener('change', oPF);
+
+    ['pf_name', 'pf_ini', 'pf_city', 'pf_email'].forEach(id => {
+        const el = $(id); if (el) el.addEventListener('input', updateProfPreview);
+    });
+
+    // Контент
+    const ca = $('ca');
+    ca.addEventListener('click', oCC);
+    ca.addEventListener('focusout', e => {
+        const t = e.target;
+        if (t && t.classList && t.classList.contains('cn')) {
+            const id = t.dataset.notesId;
+            if (!id) return;
+            const p = D.find(x => x.id === id);
+            if (!p) return;
+            if (p.notes !== t.value) {
+                p.notes = t.value;
+                useIDB ? iPut(SP, p).catch(() => {}) : sD();
+                toast('Заметка сохранена', 'success');
+            }
+        }
+    });
+
+    // Гараж
+    const gl = $('gl');
+    if (gl) gl.addEventListener('click', e => {
+        const d = e.target.closest('[data-vact="delete"]');
+        if (d) { e.stopPropagation(); remV(d.dataset.gid); return; }
+        if (e.target.closest('.gi-info')) return;
+        const i = e.target.closest('.gi'); if (i && i.dataset.gid) setAV(i.dataset.gid);
+    });
+    const gab = $('gab'); if (gab) gab.addEventListener('click', oGM);
+
+    // Модалки — закрытие по клику на фон
+    ['mo', 'wmo', 'gmo', 'smo', 'aboutmo', 'bugmo', 'donmo', 'profmo', 'upmo', 'partmo',
+     'logmo', 'tomo', 'shopmo', 'vinmo', 'thememmo'].forEach(id => {
+        const el = $(id); if (!el) return;
+        el.addEventListener('click', e => {
+            if (e.target.id !== id) return;
+            if (id === 'mo') cM();
+            else if (id === 'wmo') cWM();
+            else if (id === 'gmo') cGM();
+            else if (id === 'smo') cSM();
+            else if (id === 'aboutmo') cAbout();
+            else if (id === 'bugmo') cBug();
+            else if (id === 'donmo') cDonate();
+            else if (id === 'profmo') cProfile();
+            else if (id === 'upmo') cUp();
+            else if (id === 'partmo') cPC();
+            else if (id === 'logmo') cLog();
+            else if (id === 'tomo') cTO();
+            else if (id === 'shopmo') cShop();
+            else if (id === 'vinmo') cVIN();
+            else if (id === 'thememmo') cTheme();
+        });
+    });
+
+    // Escape + Ctrl+F
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            if ($('thememmo') && $('thememmo').classList.contains('show')) return cTheme();
+            if ($('vinmo')    && $('vinmo').classList.contains('show'))    return cVIN();
+            if ($('shopmo')   && $('shopmo').classList.contains('show'))   return cShop();
+            if ($('tomo')     && $('tomo').classList.contains('show'))     return cTO();
+            if ($('logmo')    && $('logmo').classList.contains('show'))    return cLog();
+            if ($('partmo')   && $('partmo').classList.contains('show'))   return cPC();
+            if ($('lbt')      && $('lbt').classList.contains('show'))      return cL();
+            if ($('aboutmo')  && $('aboutmo').classList.contains('show'))  return cAbout();
+            if ($('bugmo')    && $('bugmo').classList.contains('show'))    return cBug();
+            if ($('donmo')    && $('donmo').classList.contains('show'))    return cDonate();
+            if ($('profmo')   && $('profmo').classList.contains('show'))   return cProfile();
+            if ($('upmo')     && $('upmo').classList.contains('show'))     return cUp();
+            if ($('mo')       && $('mo').classList.contains('show'))       return cM();
+            if ($('wmo')      && $('wmo').classList.contains('show'))      return cWM();
+            if ($('gmo')      && $('gmo').classList.contains('show'))      return cGM();
+            if ($('smo')      && $('smo').classList.contains('show'))      return cSM();
+            if ($('sb')       && $('sb').classList.contains('open-mobile')) return cMM();
+            cEM();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); si.focus(); si.select(); }
+    });
+
+    // Resize
+    let rz;
+    window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(rSz, 120); });
+
+    // Гамбургеры (desktop + mobile)
+    const dt = $('dtgl');
+    if (dt) dt.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tSB(); });
+    const mt = $('mob');
+    if (mt) mt.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tMM(); });
+
+    // Вид «плитка / дерево»
+    const vtg = $('viewToggle');
+    if (vtg) vtg.addEventListener('change', () => setV(vtg.checked ? 'tree' : 'grid'));
+
+    // VIN-инпут
+    const gv = $('g_vi'), vmLimit = 17;
+    if (gv) {
+        gv.setAttribute('autocapitalize', 'off');
+        gv.setAttribute('autocomplete', 'off');
+        gv.setAttribute('autocorrect', 'off');
+        gv.setAttribute('spellcheck', 'false');
+        gv.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); decG(); } });
+        ['paste', 'blur'].forEach(ev => gv.addEventListener(ev, () => {
+            const f = () => {
+                const r = gv.value, c = r.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '').slice(0, vmLimit);
+                if (c !== r) gv.value = c;
+            };
+            if (ev === 'paste') setTimeout(f, 0); else f();
+        }));
+    }
+
+    updSearchSuggest();
+    rTOWidget();
+    iPWA();
+}
 
 async function init() {
     if (licAppReady) return; licAppReady = true;
@@ -974,59 +1121,84 @@ async function init() {
         const i = e.target.closest('.gi'); if (i && i.dataset.gid) setAV(i.dataset.gid);
     });
     $('gab').addEventListener('click', oGM);
-    ['mo', 'wmo', 'gmo', 'smo', 'aboutmo', 'bugmo', 'donmo', 'profmo', 'upmo', 'partmo'].forEach(id => {
+    ['mo', 'wmo', 'gmo', 'smo', 'aboutmo', 'bugmo', 'donmo', 'profmo', 'upmo', 'partmo',
+     'logmo', 'tomo', 'shopmo', 'vinmo', 'thememmo'].forEach(id => {
         $(id).addEventListener('click', e => {
             if (e.target.id === id) {
-                if (id === 'mo') cM(); else if (id === 'wmo') cWM(); else if (id === 'gmo') cGM(); else if (id === 'smo') cSM();
+                if (id === 'mo') cM();
+                else if (id === 'wmo') cWM();
+                else if (id === 'gmo') cGM();
+                else if (id === 'smo') cSM();
+                else if (id === 'aboutmo') cAbout();
+                else if (id === 'bugmo') cBug();
+                else if (id === 'donmo') cDonate();
+                else if (id === 'profmo') cProfile();
+                else if (id === 'upmo') cUp();
                 else if (id === 'partmo') cPC();
-                else if (id === 'aboutmo') cAbout(); else if (id === 'bugmo') cBug(); else if (id === 'donmo') cDonate();
-                else if (id === 'profmo') cProfile(); else if (id === 'upmo') cUp();
-                else if (id === 'logmo') cLog(); else if (id === 'tomo') cTO(); else if (id === 'shopmo') cShop();
-                else if (id === 'partmo') cPC();
+                else if (id === 'logmo') cLog();
+                else if (id === 'tomo') cTO();
+                else if (id === 'shopmo') cShop();
+                else if (id === 'vinmo') cVIN();
+                else if (id === 'thememmo') cTheme();
             }
         });
-    });
-    document.addEventListener('click', e => { const m = $('em'); if (m.classList.contains('show') && !e.target.closest('.ew')) cEM(); });
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') {
-            if ($('partmo') && $('partmo').classList.contains('show')) return cPC();
-            if ($('lbt').classList.contains('show')) return cL();
-            if ($('aboutmo').classList.contains('show')) return cAbout();
-            if ($('bugmo').classList.contains('show')) return cBug();
-            if ($('donmo').classList.contains('show')) return cDonate();
-            if ($('profmo').classList.contains('show')) return cProfile();
-            if ($('upmo').classList.contains('show')) return cUp();
-            if ($('mo').classList.contains('show')) return cM();
-            if ($('wmo').classList.contains('show')) return cWM();
-            if ($('gmo').classList.contains('show')) return cGM();
-            if ($('smo').classList.contains('show')) return cSM();
-            if ($('sb').classList.contains('open-mobile')) return cMM();
-            cEM();
-        }
-        if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); si.focus(); si.select(); }
-    });
-    let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(rSz, 120); });
-    const dt = $('dtgl'); if (dt) dt.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tSB(); });
-    const mt = $('mob'); if (mt) mt.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tMM(); });
-    const vtg = $('viewToggle'); if (vtg) vtg.addEventListener('change', () => setV(vtg.checked ? 'tree' : 'grid'));
-    const gv = $('g_vi'), vm = 17;
-    gv.setAttribute('autocapitalize', 'off');
-    gv.setAttribute('autocomplete', 'off');
-    gv.setAttribute('autocorrect', 'off');
-    gv.setAttribute('spellcheck', 'false');
-    gv.addEventListener('keydown', e => {
-        if (e.key === 'Enter') { e.preventDefault(); decG(); }
     });
 
     ['paste', 'blur'].forEach(ev => gv.addEventListener(ev, () => {
         const f = () => { const r = gv.value, c = r.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '').slice(0, vm); if (c !== r) gv.value = c; };
         if (ev === 'paste') setTimeout(f, 0); else f();
     }));
-
     updSearchSuggest();
     rTOWidget();
     iPWA();
-}   // ← ✅ ЕДИНСТВЕННАЯ закрывающая скобка init() — здесь, после iPWA()
+}
+document.addEventListener('click', e => { const m = $('em'); if (m.classList.contains('show') && !e.target.closest('.ew')) cEM(); });
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        if ($('partmo') && $('partmo').classList.contains('show')) return cPC();
+        if ($('thememmo') && $('thememmo').classList.contains('show')) return cTheme();
+        if ($('vinmo') && $('vinmo').classList.contains('show')) return cVIN();
+        if ($('shopmo') && $('shopmo').classList.contains('show')) return cShop();
+        if ($('tomo') && $('tomo').classList.contains('show')) return cTO();
+        if ($('logmo') && $('logmo').classList.contains('show')) return cLog();
+        if ($('partmo') && $('partmo').classList.contains('show')) return cPC();
+        if ($('lbt').classList.contains('show')) return cL();
+        if ($('aboutmo').classList.contains('show')) return cAbout();
+        if ($('bugmo').classList.contains('show')) return cBug();
+        if ($('donmo').classList.contains('show')) return cDonate();
+        if ($('profmo').classList.contains('show')) return cProfile();
+        if ($('upmo').classList.contains('show')) return cUp();
+        if ($('mo').classList.contains('show')) return cM();
+        if ($('wmo').classList.contains('show')) return cWM();
+        if ($('gmo').classList.contains('show')) return cGM();
+        if ($('smo').classList.contains('show')) return cSM();
+        if ($('sb').classList.contains('open-mobile')) return cMM();
+        cEM();
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); si.focus(); si.select(); }
+});
+let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(rSz, 120); });
+const dt = $('dtgl'); if (dt) dt.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tSB(); });
+const mt = $('mob'); if (mt) mt.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tMM(); });
+const vtg = $('viewToggle'); if (vtg) vtg.addEventListener('change', () => setV(vtg.checked ? 'tree' : 'grid'));
+const gv = $('g_vi'), vm = 17;
+gv.setAttribute('autocapitalize', 'off');
+gv.setAttribute('autocomplete', 'off');
+gv.setAttribute('autocorrect', 'off');
+gv.setAttribute('spellcheck', 'false');
+gv.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); decG(); }
+});
+
+['paste', 'blur'].forEach(ev => gv.addEventListener(ev, () => {
+    const f = () => { const r = gv.value, c = r.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '').slice(0, vm); if (c !== r) gv.value = c; };
+    if (ev === 'paste') setTimeout(f, 0); else f();
+}));
+
+updSearchSuggest();
+rTOWidget();
+iPWA();
+// ← ✅ ЕДИНСТВЕННАЯ закрывающая скобка init() — здесь, после iPWA()
 
 function updSearchSuggest() {
     const dl = $('searchSuggest'); if (!dl) return;
@@ -1042,8 +1214,53 @@ function updSearchSuggest() {
 function updateFilterStyling() {
     ['fmtr', 'fbdy', 'ftr'].forEach(id => { const el = $(id); if (!el) return; el.classList.toggle('act', el.value && el.value !== 'all'); });
 }
-function aTh() { document.body.classList.toggle('theme-dark', SV.theme !== 'light'); const t2 = $('tb2'); if (t2) t2.textContent = SV.theme === 'light' ? '🌙' : '☀️'; }
-function tTh() { SV.theme = SV.theme === 'light' ? 'dark' : 'light'; aTh(); sU(); }
+function aTh() {
+    /* Снимаем все классы тем */
+    THEMES.forEach(t => document.body.classList.remove(t.cls));
+    /* Применяем нужную */
+    const t = THEMES.find(x => x.id === SV.theme) || THEMES[1]; // fallback — тёмная
+    document.body.classList.add(t.cls);
+    document.body.style.colorScheme = (t.id === 'light') ? 'light' : 'dark';
+}
+
+function tTh() {
+    /* Быстрое переключение light ↔ dark (по горячей клавише или кнопке) */
+    SV.theme = SV.theme === 'light' ? 'dark' : 'light';
+    aTh();
+    sU();
+}
+
+/* --- Модалка выбора темы --- */
+function oTheme() {
+    renderThemeGrid();
+    openM('thememmo');
+}
+const cTheme = () => closeM('thememmo');
+
+function renderThemeGrid() {
+    const g = $('themeGrid');
+    if (!g) return;
+    g.innerHTML = THEMES.map(t =>
+        '<button type="button" class="th-card' + (SV.theme === t.id ? ' on' : '') + '" data-th="' + t.id + '">' +
+        '<div class="th-preview" style="background:' + t.preview + '"></div>' +
+        '<div class="th-label">' + t.icon + ' ' + esc(t.label) + '</div>' +
+        '</button>'
+    ).join('');
+    g.querySelectorAll('[data-th]').forEach(b => {
+        b.onclick = () => sTheme(b.dataset.th);
+    });
+}
+
+function sTheme(id) {
+    if (!THEMES.some(t => t.id === id)) return;
+    SV.theme = id;
+    aTh();
+    sU();
+    renderThemeGrid();
+    const t = THEMES.find(x => x.id === id);
+    toast('🎨 Тема: ' + t.label, 'success');
+}
+
 function setV(v, s) {
     SV.view = v;
     if (!s) sU();
