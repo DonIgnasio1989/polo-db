@@ -258,7 +258,34 @@ function vD(v) {
 }
 async function vR(v) { return vD(v); }
 
-function lG() { try { const r = localStorage.getItem(GK); if (r) { const a = JSON.parse(r); if (Array.isArray(a)) G = a.filter(x => x && x.vin && x.id).map(x => ({ id: x.id, vin: String(x.vin).toUpperCase(), brand: String(x.brand || ''), model: String(x.model || ''), year: x.year || null, body: String(x.body || ''), plant: String(x.plant || ''), engines: Array.isArray(x.engines) ? x.engines : [], addedAt: x.addedAt || Date.now() })); } } catch (e) { } }
+function lG() {
+    try {
+        const r = localStorage.getItem(GK);
+        if (r) {
+            const a = JSON.parse(r);
+            if (Array.isArray(a)) {
+                G = a.filter(x => x && x.vin && x.id).map(x => ({
+                    id: x.id,
+                    vin: String(x.vin).toUpperCase(),
+                    brand: String(x.brand || ''),
+                    model: String(x.model || ''),
+                    year: x.year || null,
+                    body: String(x.body || ''),
+                    plant: String(x.plant || ''),
+                    engines: Array.isArray(x.engines) ? x.engines : [],
+                    // ← НОВЫЕ ПОЛЯ
+                    prodDate: String(x.prodDate || ''),
+                    engineCode: String(x.engineCode || ''),
+                    transCode: String(x.transCode || ''),
+                    equipCode: String(x.equipCode || ''),
+                    bodyColor: String(x.bodyColor || ''),
+                    roofColor: String(x.roofColor || ''),
+                    addedAt: x.addedAt || Date.now()
+                }));
+            }
+        }
+    } catch (e) { }
+}
 const sG = () => { try { localStorage.setItem(GK, JSON.stringify(G)); } catch (e) { } };
 function lMeta() {
     try {
@@ -281,6 +308,7 @@ function lMeta() {
         }
     } catch (e) { }
 }
+
 function sMeta() { try { localStorage.setItem(METAKEY, JSON.stringify(CUSTOM)); } catch (e) { } }
 function resetMeta() {
     CATS = BASE_CATS.slice();
@@ -315,23 +343,199 @@ function rGar() {
     const l = $('gl'), c = $('gc'); if (!l) return;
     c.textContent = G.length ? '(' + G.length + ')' : '';
     if (!G.length) { l.innerHTML = '<div class="ge">Нет сохранённых машин</div>'; return; }
+
     l.innerHTML = G.map(g => {
-        const act = SV.activeVinId === g.id, desc = [g.brand, g.model, g.year].filter(Boolean).join(' ');
-        return '<div class="gi' + (act ? ' active' : '') + '" data-gid="' + escA(g.id) + '"><div class="gii"><div class="giv">' + esc(g.vin) + '</div><div class="gid">' + esc(desc || '—') + '</div></div><button class="gix" data-vact="delete" data-gid="' + escA(g.id) + '" title="Удалить">✕</button></div>';
+        const act = SV.activeVinId === g.id;
+        const desc = [g.brand, g.model, g.year].filter(Boolean).join(' ');
+
+        let h = '<div class="gi' + (act ? ' active' : '') + '" data-gid="' + escA(g.id) + '">';
+        h += '<div class="gi-top">';
+        h += '<div class="gii"><div class="giv">' + esc(g.vin) + '</div>'
+            + '<div class="gid">' + esc(desc || '—') + '</div></div>';
+        h += '<button class="gix" data-vact="delete" data-gid="' + escA(g.id) + '" title="Удалить">✕</button>';
+        h += '</div>';
+
+        /* — Инфо-панель только для активного VIN — */
+        if (act) {
+            const rows = [
+                ['Модель', g.model || '—'],
+                ['Дата произв.', g.prodDate ? fmtDate(g.prodDate) : '—'],
+                ['Модельный год', g.year || '—'],
+                ['VIN', g.vin || '—'],
+                ['Двигатель', g.engineCode || '—'],
+                ['Код КПП', g.transCode || '—'],
+                ['Код оснащения', g.equipCode || '—'],
+                ['Цвет кузова', g.bodyColor || '—'],
+                ['Цвет крыши', g.roofColor || '—']
+            ];
+            h += '<div class="gi-info">';
+            h += rows.map(([k, v]) =>
+                '<div class="gi-info-row"><span class="gi-info-lb">' + esc(k) + ':</span>'
+                + '<span class="gi-info-val">' + esc(v) + '</span></div>'
+            ).join('');
+            h += '<button class="veh-edit-btn" type="button" onclick="oVIN()">✎ Уточнить данные</button>';
+            h += '</div>';
+        }
+        h += '</div>';
+        return h;
     }).join('');
+    function renderVehInfo() {
+        /* Всё рисуется в rGar() — оставлено для совместимости с существующими вызовами */
+    }
+}
+/* --- Маппинг "человеческих" названий кузова (из VIN-декодера) в ключи фильтра --- */
+const VIN_BODY_MAP = {
+    'Hatchback 3d': '3d',
+    'Hatchback 5d': '5d',
+    'Hatchback': '3d',        // fallback
+    'Variant': 'estate',
+    'Classic Sedan': 'classic',
+    'Van': 'caddy-van'
+};
+
+/* --- Автоподстановка фильтров по выбранному VIN --- */
+function applyVinFilters() {
+    const fmtr = $('fmtr'), fbdy = $('fbdy'), ftr = $('ftr');
+    const av = gAV();
+
+    if (!av) {
+        /* Нет выбранной машины → сбрасываем фильтры в «все» */
+        SV.engineFilter = 'all';
+        SV.bodyFilter = 'all';
+        SV.transFilter = 'all';
+    } else {
+        /* Двигатель: код из справочника ENGINES */
+        SV.engineFilter = (av.engineCode && ENGINES[av.engineCode]) ? av.engineCode : 'all';
+
+        /* КПП: код из TRANSMISSIONS */
+        SV.transFilter = (av.transCode && TRANSMISSIONS[av.transCode]) ? av.transCode : 'all';
+
+        /* Кузов: через маппинг из VIN-декодера */
+        const bKey = VIN_BODY_MAP[av.body] || '';
+        SV.bodyFilter = (bKey && BODIES[bKey]) ? bKey : 'all';
+    }
+
+    /* Синхронизируем DOM-селекты */
+    if (fmtr) fmtr.value = SV.engineFilter;
+    if (fbdy) fbdy.value = SV.bodyFilter;
+    if (ftr) ftr.value = SV.transFilter;
+
+    updateFilterStyling();
+    sU();
 }
 function setAV(id) {
     SV.activeVinId = SV.activeVinId === id ? null : id;
+    applyVinFilters();                 // ← автоподстановка фильтров
     sU(); rGar(); rSB(); rC();
+    renderVehInfo();
     const info = gAV();
-    toast(info ? 'Активный VIN: …' + info.vin.slice(-6) : 'VIN-фильтр снят');
+    const av = gAV();
+    let extra = '';
+    if (av) {
+        const bits = [];
+        if (SV.engineFilter !== 'all') bits.push('⚙️ ' + SV.engineFilter);
+        if (SV.bodyFilter !== 'all') bits.push('🚗 ' + (BODIES[SV.bodyFilter] || SV.bodyFilter));
+        if (SV.transFilter !== 'all') bits.push('🔄 ' + SV.transFilter);
+        if (bits.length) extra = ' · ' + bits.join(' · ');
+    }
+    toast(info ? 'Активный VIN: …' + info.vin.slice(-6) + extra : 'VIN-фильтр снят');
+}
+// ... (после функции setAV или рядом с ней)
+
+function renderVehInfo() {
+    const container = $('vehInfoBody');
+    const editBtn = $('vehEditBtn');
+    if (!container) return;
+
+    const av = gAV();
+
+    /* — Нет выбранной машины — */
+    if (!av) {
+        container.innerHTML = '<div class="veh-empty">Автомобиль не выбран</div>';
+        if (editBtn) {
+            editBtn.textContent = '➕ Добавить VIN';
+            editBtn.onclick = oGM;                 // открыть модалку добавления VIN
+            editBtn.classList.add('add-mode');
+        }
+        return;
+    }
+
+    /* — Есть активный VIN — */
+    const model = av.model || '—';
+    const prodDate = av.prodDate ? fmtDate(av.prodDate) : '—';
+    const year = av.year || '—';
+    const vin = av.vin || '—';
+    const engineCode = av.engineCode || '—';
+    const transCode = av.transCode || '—';
+    const equipCode = av.equipCode || '—';
+    const bodyColor = av.bodyColor || '—';
+    const roofColor = av.roofColor || '—';
+
+    let h = '';
+    h += '<div class="veh-row"><div class="veh-label">Модель:</div><div class="veh-val">' + esc(model) + '</div></div>';
+    h += '<div class="veh-row"><div class="veh-label">Дата произв.:</div><div class="veh-val">' + esc(prodDate) + '</div></div>';
+    h += '<div class="veh-row"><div class="veh-label">Модельный год:</div><div class="veh-val">' + esc(year) + '</div></div>';
+    h += '<div class="veh-row"><div class="veh-label">VIN:</div><div class="veh-val">' + esc(vin) + '</div></div>';
+    h += '<div class="veh-row"><div class="veh-label">Двигатель:</div><div class="veh-val">' + esc(engineCode) + '</div></div>';
+    h += '<div class="veh-row"><div class="veh-label">Код КПП:</div><div class="veh-val">' + esc(transCode) + '</div></div>';
+    h += '<div class="veh-row"><div class="veh-label">Код оснащения:</div><div class="veh-val">' + esc(equipCode) + '</div></div>';
+    h += '<div class="veh-row"><div class="veh-label">Цвет кузова:</div><div class="veh-val">' + esc(bodyColor) + '</div></div>';
+    h += '<div class="veh-row"><div class="veh-label">Цвет крыши:</div><div class="veh-val">' + esc(roofColor) + '</div></div>';
+
+    container.innerHTML = h;
+
+    if (editBtn) {
+        editBtn.textContent = '✎ Уточнить данные';
+        editBtn.onclick = oVIN;                    // открыть модалку редактирования
+        editBtn.classList.remove('add-mode');
+    }
+}
+
+// Хелпер: превратить "1999-04-14" в "14.04.1999"
+function fmtDate(d) {
+    if (!d) return '';
+    const s = String(d);
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) return m[3] + '.' + m[2] + '.' + m[1];
+    return s;
+}
+
+function sGarV() {
+    if (!pGV || !pGV.ok) return;
+    if (G.some(g => g.vin === pGV.vin)) { toast('VIN уже в гараже', 'danger'); return; }
+    const g = {
+        id: 'g_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6),
+        vin: pGV.vin,
+        brand: pGV.brand || '',
+        model: pGV.model || '',
+        year: pGV.year || null,
+        body: pGV.body || '',
+        plant: pGV.plant || '',
+        engines: Array.isArray(pGV.engines) ? pGV.engines : [],
+        // ← НОВЫЕ ПОЛЯ (пустые, заполняются вручную)
+        prodDate: '',
+        engineCode: '',
+        transCode: '',
+        equipCode: '',
+        bodyColor: '',
+        roofColor: '',
+        addedAt: Date.now()
+    };
+    G.push(g); sG(); SV.activeVinId = g.id;
+    applyVinFilters();
+    sU(); rGar(); rSB(); rC();
+    renderVehInfo();
+    cGM(); toast('VIN сохранён', 'success');
 }
 function remV(id) {
     const g = G.find(x => x.id === id); if (!g) return;
     if (!confirm('Удалить VIN ' + g.vin + '?')) return;
     G = G.filter(x => x.id !== id);
     if (SV.activeVinId === id) SV.activeVinId = null;
-    sG(); sU(); rGar(); rSB(); rC(); toast('VIN удалён', 'danger');
+    applyVinFilters();                    // ← сброс фильтров, если VIN был активным
+    sG(); sU(); rGar(); rSB(); rC();
+    renderVehInfo();
+    toast('VIN удалён', 'danger');
 }
 function oGM() { pGV = null; $('g_vi').value = ''; $('g_re').style.display = 'none'; $('g_re').innerHTML = ''; $('g_sb').disabled = true; $('gmo').classList.add('show'); setTimeout(() => $('g_vi').focus(), 50); }
 const cGM = () => { $('gmo').classList.remove('show'); pGV = null; };
@@ -355,12 +559,7 @@ async function decG() {
     } catch (e) { re.innerHTML = '<span class="er">Ошибка: ' + esc(e.message) + '</span>'; sb.disabled = true; }
     finally { btn.disabled = false; }
 }
-function sGarV() {
-    if (!pGV || !pGV.ok) return;
-    if (G.some(g => g.vin === pGV.vin)) { toast('VIN уже в гараже', 'danger'); return; }
-    const g = { id: 'g_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6), vin: pGV.vin, brand: pGV.brand || '', model: pGV.model || '', year: pGV.year || null, body: pGV.body || '', plant: pGV.plant || '', engines: Array.isArray(pGV.engines) ? pGV.engines : [], addedAt: Date.now() };
-    G.push(g); sG(); SV.activeVinId = g.id; sU(); rGar(); rSB(); rC(); cGM(); toast('VIN сохранён', 'success');
-}
+
 
 /* ============ ПРОФИЛЬ ============ */
 function lProfile() {
@@ -394,6 +593,9 @@ function oProfile() {
     renderColors();
     updateProfPreview();
     $('profmo').classList.add('show');
+}
+function oProfileSoon() {
+    toast('👤 Раздел появится в будущих релизах (но это не точно)', 'info');
 }
 function cProfile() { $('profmo').classList.remove('show'); }
 function sProfile() {
@@ -713,7 +915,19 @@ const dRC = () => { clearTimeout(rcT); rcT = setTimeout(rC, 120); };
 async function init() {
     if (licAppReady) return; licAppReady = true;
     showSkeleton();
-    await lAll(); aTh(); aSS(); rGar(); rSB(); rC(); renderProfile();
+    await lAll(); aTh(); aSS(); rGar(); applyVinFilters(); rSB(); rC(); renderProfile();
+    renderVehInfo();
+    (function _persistDetails() {
+        const persist = (id, key) => {
+            const el = $(id);
+            if (!el) return;
+            try { if (localStorage.getItem(key) === '1') el.removeAttribute('open'); } catch (e) { }
+            el.addEventListener('toggle', () => {
+                try { localStorage.setItem(key, el.open ? '0' : '1'); } catch (e) { }
+            });
+        };
+        persist('garageBox', 'vw_garage_collapsed');
+    })();
     const si = $('sr'); si.value = SV.searchQuery || ''; uSC();
     [['sr', 'input', e => { SV.searchQuery = e.target.value; uSC(); sUS(); dRC(); }],
     ['sf', 'change', e => { SV.statusFilter = e.target.value; sU(); rC(); }],
@@ -728,6 +942,11 @@ async function init() {
     $('fbdy').value = SV.bodyFilter || 'all';
     $('ftr').value = SV.transFilter || 'all';
     updateFilterStyling();
+    const av2 = gAV();
+    const hint = av2 ? 'Автоподставлено из активного VIN' : '';
+    if (fmtr) fmtr.title = 'Фильтр по мотору' + (hint ? ' · ' + hint : '');
+    if (fbdy) fbdy.title = 'Фильтр по кузову' + (hint ? ' · ' + hint : '');
+    if (ftr) ftr.title = 'Фильтр по КПП' + (hint ? ' · ' + hint : '');
     setV(SV.view || 'grid', true);
     $('ca').addEventListener('click', oCC);
     $('ca').addEventListener('focusout', e => {
@@ -748,6 +967,10 @@ async function init() {
     $('gl').addEventListener('click', e => {
         const d = e.target.closest('[data-vact="delete"]');
         if (d) { e.stopPropagation(); remV(d.dataset.gid); return; }
+
+        /* Клики внутри инфо-панели (в т.ч. «Уточнить данные») НЕ переключают VIN */
+        if (e.target.closest('.gi-info')) return;
+
         const i = e.target.closest('.gi'); if (i && i.dataset.gid) setAV(i.dataset.gid);
     });
     $('gab').addEventListener('click', oGM);
@@ -803,7 +1026,8 @@ async function init() {
     updSearchSuggest();
     rTOWidget();
     iPWA();
-}
+}   // ← ✅ ЕДИНСТВЕННАЯ закрывающая скобка init() — здесь, после iPWA()
+
 function updSearchSuggest() {
     const dl = $('searchSuggest'); if (!dl) return;
     const items = [], seen = new Set();
@@ -1808,6 +2032,61 @@ function confetti() {
     }
     tick();
 
+}
+/* ============ РЕДАКТОР ДАННЫХ VIN ============ */
+let vinEdId = null;
+
+function oVIN() {
+    const av = gAV();
+    if (!av || !av.ok) { toast('VIN не выбран', 'danger'); return; }
+    vinEdId = av.id;
+
+    // Заполняем select двигателей
+    const engSel = $('v_engine');
+    engSel.innerHTML = '<option value="">— не указан —</option>' +
+        Object.keys(ENGINES).map(k => '<option value="' + k + '">' + k + ' — ' + ENGINES[k].v + ' ' + ENGINES[k].hp + ' л.с.</option>').join('');
+
+    // Заполняем select КПП
+    const trnSel = $('v_trans');
+    trnSel.innerHTML = '<option value="">— не указан —</option>' +
+        Object.keys(TRANSMISSIONS).map(k => '<option value="' + k + '">' + TRANSMISSIONS[k] + '</option>').join('');
+
+    // Заполняем поля
+    $('v_model').value = av.model || '';
+    $('v_proddate').value = av.prodDate || '';
+    $('v_year').value = av.year || '';
+    $('v_engine').value = av.engineCode || '';
+    $('v_trans').value = av.transCode || '';
+    $('v_equip').value = av.equipCode || '';
+    $('v_bodycolor').value = av.bodyColor || '';
+    $('v_roofcolor').value = av.roofColor || '';
+
+    openM('vinmo');
+}
+
+const cVIN = () => { closeM('vinmo'); vinEdId = null; };
+
+function sVIN() {
+    if (!vinEdId) return;
+    const g = G.find(x => x.id === vinEdId);
+    if (!g) return;
+
+    g.model = $('v_model').value.trim();
+    g.prodDate = $('v_proddate').value || '';
+    const yv = $('v_year').value;
+    g.year = yv ? Number(yv) : null;
+    g.engineCode = $('v_engine').value || '';
+    g.transCode = $('v_trans').value || '';
+    g.equipCode = $('v_equip').value.trim();
+    g.bodyColor = $('v_bodycolor').value.trim().toUpperCase();
+    g.roofColor = $('v_roofcolor').value.trim().toUpperCase();
+
+    applyVinFilters();                    // ← фильтры обновятся по новым engineCode/transCode
+    sG();
+    renderVehInfo();
+    rGar();
+    cVIN();
+    toast('Данные сохранены', 'success');
 }
 
 /* ============ SKELETON ============ */

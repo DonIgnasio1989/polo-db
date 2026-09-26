@@ -65,17 +65,17 @@
       <h2>VW Polo / Caddy</h2>
       <p>6N1 · 6N2 · Classic · Estate · Caddy<br>1995–2003 · ALL engines</p>
     </div>
-    <div class="gb">
-      <label>🚗 Гараж <span class="gc" id="gc"></span></label>
+
+    <details class="gb" id="garageBox" open>
+      <summary class="gb-header">
+        <span>🚗 Гараж <span class="gc" id="gc"></span></span>
+      </summary>
       <div class="gl" id="gl"></div>
       <button class="gab" id="gab">+ Добавить VIN</button>
-    </div>
+    </details>
     <ul class="nl" id="nl"></ul>
     <div class="sft">
-      <button class="sft-user" onclick="oProfile()" title="Профиль пользователя">
-        <span class="sft-avatar" id="sft_avatar">👤</span>
-        <span class="sft-username" id="sft_username">Гость</span>
-      </button>
+
       <div class="sft-btns">
         <a class="sft-btn vk" href="https://vk.com/donignasio" target="_blank" rel="noopener noreferrer"
           title="VK автора">💬</a>
@@ -198,33 +198,42 @@
           <button class="bn" onclick="toggleAllDetails()" title="Развернуть/свернуть все карточки" id="tb3">⇕</button>
           <div class="ew">
             <button class="bn" type="button" id="btnSettings" onclick="tMMenu(event)" title="Меню">⚙️</button>
-            <div class="em" id="em">
-              <button onclick="oAM();cEM()">➕ Добавить деталь</button>
-              <button onclick="oLogNew();cEM()">📖 Запись в журнал</button>
-              <button onclick="oShopList();cEM()">🛒 Список покупок на ТО</button>
-              <button onclick="oTO();cEM()">🛠 Настройки ТО</button>
-              <div class="ms"></div>
-              <button onclick="tI();cEM()">📥 Импорт JSON</button>
-              <button onclick="eD();cEM()">📄 Экспорт — JSON</button>
-              <button onclick="eCSV(false);cEM()">📊 CSV — все позиции</button>
-              <button onclick="eCSV(true);cEM()">⭐ CSV — избранное</button>
-              <button onclick="eET();cEM()">🗂 CSV — ETKA</button>
-              <button onclick="eWCSV();cEM()">🔧 CSV — мастерские</button>
-              <div class="ms"></div>
-              <button onclick="oUp();cEM()">🌐 Обновление базы</button>
-              <button onclick="resetFilters();cEM()">🔄 Сбросить фильтры</button>
-              <button onclick="rD() ;cEM()">♻️ Пересобрать БД (сброс)</button>
-              <div class="ms"></div>
-              <button onclick="oProfile();cEM()">👤 Профиль</button>
-              <button onclick="oDonate();cEM()">❤️ Поддержать</button>
-              <button onclick="tTh();cEM()" id="em_theme">🌓 Сменить тему</button>
-              <button onclick="oSM();cEM()">⚙️ VIN-API ключ</button>
-              <button onclick="oWM();cEM()">🔧 Добавить мастерскую</button>
-              <div class="ms"></div>
-              <button onclick="oAbout();cEM()">ℹ️ О программе / Лицензия</button>
-              <button onclick="oBug();cEM()">🐛 Сообщить о баге</button>
-            </div>
-          </div>
+           <div class="em" id="em">
+  <details class="em-sec">
+    <summary class="em-group"><span>📦 База данных</span></summary>
+    <button onclick="tI();cEM()">📥 Импорт JSON</button>
+    <button onclick="eD();cEM()">📄 Экспорт — JSON</button>
+    <button onclick="eCSV(false);cEM()">📊 CSV — все позиции</button>
+    <button onclick="eCSV(true);cEM()">⭐ CSV — избранное</button>
+    <button onclick="eET();cEM()">🗂 CSV — ETKA</button>
+    <button onclick="eWCSV();cEM()">🔧 CSV — мастерские</button>
+    <button onclick="oUp();cEM()">🌐 Обновление базы</button>
+    <button onclick="rD();cEM()">♻️ Пересобрать БД (сброс)</button>
+  </details>
+
+  <details class="em-sec">
+    <summary class="em-group"><span>🛠 Обслуживание</span></summary>
+    <button onclick="oAM();cEM()">➕ Добавить деталь</button>
+    <button onclick="oLogNew();cEM()">📖 Запись в журнал</button>
+    <button onclick="oShopList();cEM()">🛒 Список покупок на ТО</button>
+    <button onclick="oTO();cEM()">🛠 Настройки ТО</button>
+    <button onclick="oWM();cEM()">🔧 Добавить мастерскую</button>
+  </details>
+
+  <details class="em-sec">
+    <summary class="em-group"><span>🎨 Интерфейс</span></summary>
+    <button onclick="tTh();cEM()" id="em_theme">🌓 Сменить тему</button>
+    <button onclick="resetFilters();cEM()">🔄 Сбросить фильтры</button>
+  </details>
+
+  <details class="em-sec">
+    <summary class="em-group"><span>⚙️ Прочее</span></summary>
+    <button onclick="oSM();cEM()">🔑 VIN-API ключ</button>
+    <button onclick="oProfileSoon();cEM()">👤 Профиль <span class="em-soon">скоро</span></button>
+    <button onclick="oAbout();cEM()">ℹ️ О программе / Лицензия</button>
+    <button onclick="oBug();cEM()">🐛 Сообщить о баге</button>
+  </details>
+</div>
 
         </div>
       </div>
@@ -609,6 +618,52 @@
         <button class="mc" onclick="cPC()">✕</button>
       </div>
       <div class="mb" id="partmo_body"></div>
+    </div>
+  </div>
+  <div class="mo" id="vinmo">
+    <div class="mdl" onclick="event.stopPropagation()" style="max-width:560px">
+      <div class="mh">
+        <h3>✎ Уточнить данные автомобиля</h3>
+        <button class="mc" onclick="cVIN()">✕</button>
+      </div>
+      <div class="mb">
+        <div class="fg"><label>Обозначение модели</label>
+          <input type="text" id="v_model" placeholder="Polo/Derby/Vento-IND">
+        </div>
+        <div class="fr">
+          <div class="fg"><label>Дата производства</label>
+            <input type="date" id="v_proddate">
+          </div>
+          <div class="fg"><label>Модельный год</label>
+            <input type="number" id="v_year" min="1995" max="2003">
+          </div>
+        </div>
+        <div class="fg"><label>Код двигателя</label>
+          <select id="v_engine"></select>
+        </div>
+        <div class="fg"><label>Код КПП</label>
+          <select id="v_trans"></select>
+        </div>
+        <div class="fr">
+          <div class="fg"><label>Код оснащения</label>
+            <input type="text" id="v_equip" placeholder="41">
+          </div>
+          <div class="fg"><label>Цвет кузова</label>
+            <input type="text" id="v_bodycolor" placeholder="J2">
+          </div>
+        </div>
+        <div class="fg"><label>Цвет крыши</label>
+          <input type="text" id="v_roofcolor" placeholder="J2">
+        </div>
+        <div class="fh"
+          style="padding:8px 10px;background:var(--hv);border-radius:4px;font-size:.75rem;line-height:1.5">
+          ℹ️ Эти данные не закодированы в VIN. Возьми их из ETKA, Elcats или из наклейки в багажнике / сервисной книжки.
+        </div>
+      </div>
+      <div class="mf">
+        <button class="bn" onclick="cVIN()">Отмена</button>
+        <button class="bn p" onclick="sVIN()">💾 Сохранить</button>
+      </div>
     </div>
   </div>
   <div class="lb2" id="lbt" onclick="cL()"><img id="lbi" alt=""></div>
