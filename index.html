@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- тест -->
 <html lang="ru">
 
 <head>
@@ -11,9 +10,9 @@
   <link rel="stylesheet" href="css/app.css">
 </head>
 
+<body class="theme-aurora">
 
-<body class="theme-dark">
-
+  <!-- ============ ЛИЦЕНЗИОННЫЙ ГЕЙТ ============ -->
   <div id="licgate">
     <div class="gate-inner">
       <div class="gate-head">
@@ -22,11 +21,9 @@
       </div>
       <div class="gate-body">
         <h4>О программе</h4>
-        <p>Неофициальный каталог запчастей и регламентов по автомобилям VW Polo/Caddy (6N1/6N2, Classic, Estate, Caddy)
-          1995–2003 гг.</p>
+        <p>Неофициальный каталог запчастей и регламентов по автомобилям VW Polo/Caddy (6N1/6N2, Classic, Estate, Caddy) 1995–2003 гг.</p>
         <h4>⚠️ Важно</h4>
-        <p><b>Всегда сверяйте артикулы перед заказом</b> по оригинальному каталогу ETKA, у дилера или в официальном
-          сервисе.</p>
+        <p><b>Всегда сверяйте артикулы перед заказом</b> по оригинальному каталогу ETKA, у дилера или в официальном сервисе.</p>
         <h4>Лицензия «Как есть» (AS IS)</h4>
         <div class="lic-as">ПРОГРАММА ПРЕДОСТАВЛЯЕТСЯ «КАК ЕСТЬ» (AS IS)
           БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ, ЯВНЫХ ИЛИ ПОДРАЗУМЕВАЕМЫХ.
@@ -38,8 +35,7 @@
           You are free to: use, study, share (link only).
           Terms: attribution · no warranty · no liability · non-commercial.
           © 2026 Игнат Ткачев. Some rights reserved.</div>
-        <p style="font-size:.76rem;color:var(--mu);margin-top:12px">Нажимая «Принять», вы подтверждаете, что
-          ознакомились с условиями и используете программу на свой риск.</p>
+        <p style="font-size:.76rem;color:var(--mu);margin-top:12px">Нажимая «Принять», вы подтверждаете, что ознакомились с условиями и используете программу на свой риск.</p>
       </div>
       <div class="gate-foot">
         <button class="bn dg-btn" onclick="licDecline()">✖ Отказаться</button>
@@ -48,6 +44,7 @@
     </div>
   </div>
 
+  <!-- ============ ОТКАЗ ============ -->
   <div id="declined">
     <div class="dbox">
       <h1>Доступ отклонён</h1>
@@ -58,6 +55,7 @@
     </div>
   </div>
 
+  <!-- ============ САЙДБАР ============ -->
   <button class="tbd" id="dtgl" title="Меню">☰</button>
   <nav class="sb" id="sb">
 
@@ -73,12 +71,12 @@
       <div class="gl" id="gl"></div>
       <button class="gab" id="gab">+ Добавить VIN</button>
     </details>
-    <ul class="nl" id="nl"></ul>
-    <div class="sft">
 
+    <ul class="nl" id="nl"></ul>
+
+    <div class="sft">
       <div class="sft-btns">
-        <a class="sft-btn vk" href="https://vk.com/donignasio" target="_blank" rel="noopener noreferrer"
-          title="VK автора">💬</a>
+        <a class="sft-btn vk" href="https://vk.com/donignasio" target="_blank" rel="noopener noreferrer" title="VK автора">💬</a>
         <a class="sft-btn" href="mailto:donignasio@vk.com?subject=База%20Мастера" title="Email">✉️</a>
         <button class="sft-btn don" onclick="oDonate()" title="Поддержать проект">❤️</button>
         <button class="sft-btn up" onclick="oUp()" title="Обновление базы">🌐</button>
@@ -88,20 +86,27 @@
       <div class="sft-line">Игнат Ткачев · v<span id="ver_footer">…</span></div>
     </div>
   </nav>
+
   <div class="ov" id="ov" onclick="cMM()"></div>
+
+  <!-- ============ ОСНОВНАЯ ОБЛАСТЬ ============ -->
   <div class="mw">
     <button id="mob" title="Меню">☰</button>
+
     <header class="tb">
-      <div class="sc"><span class="si">🔍</span>
+      <div class="sc">
+        <span class="si">🔍</span>
         <input type="text" class="sr" id="sr" list="searchSuggest" placeholder="OEM, деталь, аналог, заметка…">
-        <datalist id="searchSuggest"></datalist><button class="scl" id="scl" onclick="cS()" title="Очистить">✕</button>
+        <datalist id="searchSuggest"></datalist>
+        <button class="scl" id="scl" onclick="cS()" title="Очистить">✕</button>
       </div>
+
       <div class="tb-filters">
         <div class="to-chip unset" id="toChip" onclick="oTO()" title="Настройки ТО — клик для редактирования"
           style="display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:4px;font-size:.78rem;font-weight:700;cursor:pointer;border:1px solid var(--bd);background:var(--cd);color:var(--tx);white-space:nowrap">
-          <span>🛠</span><span class="to-lb" id="toLbl">Настроить ТО</span><span
-            style="opacity:.5;font-size:.7rem">✏️</span>
+          <span>🛠</span><span class="to-lb" id="toLbl">Настроить ТО</span><span style="opacity:.5;font-size:.7rem">✏️</span>
         </div>
+
         <select class="fs flt mtr" id="fmtr" title="Фильтр по мотору">
           <option value="all">⚙️ Все моторы</option>
           <optgroup label="Бензин 1.0">
@@ -147,6 +152,7 @@
             <option value="ALH">ALH 1.9 TDI 90</option>
           </optgroup>
         </select>
+
         <select class="fs flt bdy" id="fbdy" title="Фильтр по кузову">
           <option value="all">🚗 Все кузова</option>
           <option value="3d">Hatchback 3д (6N1)</option>
@@ -157,6 +163,7 @@
           <option value="caddy-kombi">Caddy Kombi</option>
           <option value="caddy-pickup">Caddy Pickup</option>
         </select>
+
         <select class="fs flt trn" id="ftr" title="Фильтр по КПП">
           <option value="all">🔄 Все КПП</option>
           <optgroup label="Механика">
@@ -170,6 +177,7 @@
             <option value="AG4">AG4 (4-ст АКПП)</option>
           </optgroup>
         </select>
+
         <select class="fs" id="sf" title="Фильтр по статусу">
           <option value="all">Все статусы</option>
           <option value="">Без статуса</option>
@@ -177,6 +185,7 @@
           <option value="bought">📦 Куплено</option>
           <option value="installed">✅ Установлено</option>
         </select>
+
         <select class="fs" id="ss" title="Сортировка">
           <option value="default">Сортировка</option>
           <option value="oem">по OEM</option>
@@ -185,64 +194,69 @@
           <option value="priceDesc">цена ↓</option>
           <option value="favorite">⭐ вверху</option>
         </select>
+
         <label class="vt-switch" title="Плитка / Дерево">
           <input type="checkbox" id="viewToggle">
           <span class="vt-track"><span class="vt-thumb"></span></span>
           <span class="vt-lbl" id="vtLbl">▦ Плитка</span>
         </label>
+
         <div class="ac">
-          <button class="bn" onclick="oLogNew()" title="Запись в журнал обслуживания"><span>📖</span><span
-              class="bl">Журнал</span></button>
-          <button class="bn p" onclick="oAM()" title="Добавить деталь по OEM"><span>➕</span><span
-              class="bl">OEM</span></button>
+          <button class="bn" onclick="oLogNew()" title="Запись в журнал обслуживания"><span>📖</span><span class="bl">Журнал</span></button>
+          <button class="bn p" onclick="oAM()" title="Добавить деталь по OEM"><span>➕</span><span class="bl">OEM</span></button>
           <button class="bn" onclick="toggleAllDetails()" title="Развернуть/свернуть все карточки" id="tb3">⇕</button>
+
           <div class="ew">
             <button class="bn" type="button" id="btnSettings" onclick="tMMenu(event)" title="Меню">⚙️</button>
-           <div class="em" id="em">
-  <details class="em-sec">
-    <summary class="em-group"><span>📦 База данных</span></summary>
-    <button onclick="tI();cEM()">📥 Импорт JSON</button>
-    <button onclick="eD();cEM()">📄 Экспорт — JSON</button>
-    <button onclick="eCSV(false);cEM()">📊 CSV — все позиции</button>
-    <button onclick="eCSV(true);cEM()">⭐ CSV — избранное</button>
-    <button onclick="eET();cEM()">🗂 CSV — ETKA</button>
-    <button onclick="eWCSV();cEM()">🔧 CSV — мастерские</button>
-    <button onclick="oUp();cEM()">🌐 Обновление базы</button>
-    <button onclick="rD();cEM()">♻️ Пересобрать БД (сброс)</button>
-  </details>
+            <div class="em" id="em">
+              <details class="em-sec">
+                <summary><span>📦 База данных</span></summary>
+                <button onclick="tI();cEM()">📥 Импорт JSON</button>
+                <button onclick="eD();cEM()">📄 Экспорт — JSON</button>
+                <button onclick="eCSV(false);cEM()">📊 CSV — все позиции</button>
+                <button onclick="eCSV(true);cEM()">⭐ CSV — избранное</button>
+                <button onclick="eET();cEM()">🗂 CSV — ETKA</button>
+                <button onclick="eWCSV();cEM()">🔧 CSV — мастерские</button>
+                <button onclick="oUp();cEM()">🌐 Обновление базы</button>
+                <button onclick="rD();cEM()">♻️ Пересобрать БД (сброс)</button>
+              </details>
 
-  <details class="em-sec">
-    <summary class="em-group"><span>🛠 Обслуживание</span></summary>
-    <button onclick="oAM();cEM()">➕ Добавить деталь</button>
-    <button onclick="oLogNew();cEM()">📖 Запись в журнал</button>
-    <button onclick="oShopList();cEM()">🛒 Список покупок на ТО</button>
-    <button onclick="oTO();cEM()">🛠 Настройки ТО</button>
-    <button onclick="oWM();cEM()">🔧 Добавить мастерскую</button>
-  </details>
+              <details class="em-sec">
+                <summary><span>🛠 Обслуживание</span></summary>
+                <button onclick="oAM();cEM()">➕ Добавить деталь</button>
+                <button onclick="oLogNew();cEM()">📖 Запись в журнал</button>
+                <button onclick="oShopList();cEM()">🛒 Список покупок на ТО</button>
+                <button onclick="oTO();cEM()">🛠 Настройки ТО</button>
+                <button onclick="oWM();cEM()">🔧 Добавить мастерскую</button>
+              </details>
 
-  <details class="em-sec">
-    <summary class="em-group"><span>🎨 Интерфейс</span></summary>
-    <button onclick="oTheme();cEM()">🎨 Тема оформления</button>
-    <button onclick="resetFilters();cEM()">🔄 Сбросить фильтры</button>
-  </details>
+              <details class="em-sec">
+                <summary><span>🎨 Интерфейс</span></summary>
+                <button onclick="oTheme();cEM()">🎨 Тема оформления</button>
+                <button onclick="resetFilters();cEM()">🔄 Сбросить фильтры</button>
+              </details>
 
-  <details class="em-sec">
-    <summary class="em-group"><span>⚙️ Прочее</span></summary>
-    <button onclick="oSM();cEM()">🔑 VIN-API ключ</button>
-    <button onclick="oProfileSoon();cEM()">👤 Профиль <span class="em-soon">скоро</span></button>
-    <button onclick="oAbout();cEM()">ℹ️ О программе / Лицензия</button>
-    <button onclick="oBug();cEM()">🐛 Сообщить о баге</button>
-  </details>
-</div>
-
+              <details class="em-sec">
+                <summary><span>⚙️ Прочее</span></summary>
+                <button onclick="oSM();cEM()">🔑 VIN-API ключ</button>
+                <button onclick="oProfileSoon();cEM()">👤 Профиль <span class="em-soon">скоро</span></button>
+                <button onclick="oAbout();cEM()">ℹ️ О программе / Лицензия</button>
+                <button onclick="oBug();cEM()">🐛 Сообщить о баге</button>
+              </details>
+            </div>
+          </div>
         </div>
       </div>
     </header>
+
     <div class="ca" id="ca"></div>
   </div>
+
+  <!-- ============ СКРЫТЫЕ FILE-INPUT ============ -->
   <input type="file" id="if" accept="application/json,.json" style="display:none">
   <input type="file" id="pf" accept="image/*" style="display:none">
 
+  <!-- ============ МОДАЛКА: ДЕТАЛЬ ============ -->
   <div class="mo" id="mo">
     <div class="mdl" onclick="event.stopPropagation()">
       <div class="mh">
@@ -252,48 +266,46 @@
         <input type="hidden" id="f_id">
         <div class="fr">
           <div class="fg"><label>Категория *</label><select id="f_cat"></select></div>
-          <div class="fg"><label>Название *</label><input type="text" id="f_name" placeholder="Ремень ГРМ + Ролики">
-          </div>
+          <div class="fg"><label>Название *</label><input type="text" id="f_name" placeholder="Ремень ГРМ + Ролики"></div>
         </div>
         <div class="fg"><label>OEM / Артикул</label><input type="text" id="f_oem" placeholder="030 109 119"></div>
-        <div class="fg"><label class="cbr"><input type="checkbox" id="f_ver"><span>✅ OEM подтверждён по
-              ETKA</span></label></div>
-        <div class="fg"><label>Аналоги (через запятую)</label><input type="text" id="f_an"
-            placeholder="INA 530 0090 10, Gates KP235"></div>
-        <div class="fg"><label>Доноры (через запятую)</label><input type="text" id="f_dn"
-            placeholder="VW Lupo, Seat Arosa"></div>
-        <div class="fg"><label>Двигатели (пусто = все)</label><input type="text" id="f_eng" placeholder="AER, ALL, AEX">
-        </div>
+        <div class="fg"><label class="cbr"><input type="checkbox" id="f_ver"><span>✅ OEM подтверждён по ETKA</span></label></div>
+        <div class="fg"><label>Аналоги (через запятую)</label><input type="text" id="f_an" placeholder="INA 530 0090 10, Gates KP235"></div>
+        <div class="fg"><label>Доноры (через запятую)</label><input type="text" id="f_dn" placeholder="VW Lupo, Seat Arosa"></div>
+        <div class="fg"><label>Двигатели (пусто = все)</label><input type="text" id="f_eng" placeholder="AER, ALL, AEX"></div>
         <div class="fr">
-          <div class="fg"><label>КПП (пусто = все)</label><input type="text" id="f_trn" placeholder="085, 020, 01M">
-          </div>
-          <div class="fg"><label>Кузова (пусто = все)</label><input type="text" id="f_bdy"
-              placeholder="3d, 5d, caddy-van"></div>
+          <div class="fg"><label>КПП (пусто = все)</label><input type="text" id="f_trn" placeholder="085, 020, 01M"></div>
+          <div class="fg"><label>Кузова (пусто = все)</label><input type="text" id="f_bdy" placeholder="3d, 5d, caddy-van"></div>
         </div>
-        <div class="fg"><label>Комплектации (пусто = все)</label><input type="text" id="f_trm"
-            placeholder="Base, CL, GL"></div>
+        <div class="fg"><label>Комплектации (пусто = все)</label><input type="text" id="f_trm" placeholder="Base, CL, GL"></div>
         <div class="fr">
           <div class="fg"><label>Цена</label><input type="number" id="f_pr" min="0" step="0.01" placeholder="0"></div>
-          <div class="fg"><label>Валюта</label><select id="f_cu">
+          <div class="fg"><label>Валюта</label>
+            <select id="f_cu">
               <option value="RUB">₽ RUB</option>
               <option value="USD">$ USD</option>
               <option value="EUR">€ EUR</option>
               <option value="BYN">Br BYN</option>
               <option value="KZT">₸ KZT</option>
               <option value="UAH">₴ UAH</option>
-            </select></div>
+            </select>
+          </div>
         </div>
         <div class="fr">
-          <div class="fg"><label>Статус</label><select id="f_sts">
+          <div class="fg"><label>Статус</label>
+            <select id="f_sts">
               <option value="">— нет —</option>
               <option value="want">🛒 Хочу купить</option>
               <option value="bought">📦 Куплено</option>
               <option value="installed">✅ Установлено</option>
-            </select></div>
-          <div class="fg"><label>Избранное</label><select id="f_fav">
+            </select>
+          </div>
+          <div class="fg"><label>Избранное</label>
+            <select id="f_fav">
               <option value="0">Нет</option>
               <option value="1">⭐ Да</option>
-            </select></div>
+            </select>
+          </div>
         </div>
         <div class="fg"><label>Ссылка на магазин</label><input type="url" id="f_su" placeholder="https://…"></div>
         <div class="fg"><label>📝 Заметки</label><textarea id="f_notes" rows="3"></textarea></div>
@@ -301,19 +313,25 @@
           <div class="phl" id="phl"></div>
         </div>
         <div class="fg"><label>Фото</label>
-          <div class="pa"><button type="button" class="bn" onclick="pkP()">📷 Загрузить</button><button type="button"
-              class="bn" onclick="clP()" id="pcb" style="display:none">Удалить</button></div><img id="pp" class="pp"
-            style="display:none" alt="">
+          <div class="pa">
+            <button type="button" class="bn" onclick="pkP()">📷 Загрузить</button>
+            <button type="button" class="bn" onclick="clP()" id="pcb" style="display:none">Удалить</button>
+          </div>
+          <img id="pp" class="pp" style="display:none" alt="">
         </div>
         <div class="fg"><label>Инструкции</label>
-          <div class="ie" id="ie"></div><button type="button" class="aib" onclick="aIR()">+ Добавить строку</button>
+          <div class="ie" id="ie"></div>
+          <button type="button" class="aib" onclick="aIR()">+ Добавить строку</button>
         </div>
       </div>
-      <div class="mf"><button class="bn" onclick="cM()">Отмена</button><button class="bn p" onclick="sPt()">💾
-          Сохранить</button></div>
+      <div class="mf">
+        <button class="bn" onclick="cM()">Отмена</button>
+        <button class="bn p" onclick="sPt()">💾 Сохранить</button>
+      </div>
     </div>
   </div>
 
+  <!-- ============ МОДАЛКА: МАСТЕРСКАЯ ============ -->
   <div class="mo" id="wmo">
     <div class="mdl" onclick="event.stopPropagation()">
       <div class="mh">
@@ -324,24 +342,29 @@
         <div class="fg"><label>Название *</label><input type="text" id="w_name"></div>
         <div class="fr">
           <div class="fg"><label>Телефон</label><input type="tel" id="w_ph"></div>
-          <div class="fg"><label>Рейтинг</label><select id="w_ra">
+          <div class="fg"><label>Рейтинг</label>
+            <select id="w_ra">
               <option value="0">— нет —</option>
               <option value="1">⭐</option>
               <option value="2">⭐⭐</option>
               <option value="3">⭐⭐⭐</option>
               <option value="4">⭐⭐⭐⭐</option>
               <option value="5">⭐⭐⭐⭐⭐</option>
-            </select></div>
+            </select>
+          </div>
         </div>
         <div class="fg"><label>Адрес</label><input type="text" id="w_ad"></div>
         <div class="fg"><label>Специализация</label><input type="text" id="w_sp"></div>
         <div class="fg"><label>Заметка</label><textarea id="w_no" rows="3"></textarea></div>
       </div>
-      <div class="mf"><button class="bn" onclick="cWM()">Отмена</button><button class="bn p" onclick="sWsh()">💾
-          Сохранить</button></div>
+      <div class="mf">
+        <button class="bn" onclick="cWM()">Отмена</button>
+        <button class="bn p" onclick="sWsh()">💾 Сохранить</button>
+      </div>
     </div>
   </div>
 
+  <!-- ============ МОДАЛКА: VIN ============ -->
   <div class="mo" id="gmo">
     <div class="mdl" onclick="event.stopPropagation()">
       <div class="mh">
@@ -356,11 +379,14 @@
         </div>
         <div class="gdr" id="g_re" style="display:none"></div>
       </div>
-      <div class="mf"><button class="bn" onclick="cGM()">Отмена</button><button class="bn p" id="g_sb" onclick="sGarV()"
-          disabled>💾 Сохранить</button></div>
+      <div class="mf">
+        <button class="bn" onclick="cGM()">Отмена</button>
+        <button class="bn p" id="g_sb" onclick="sGarV()" disabled>💾 Сохранить</button>
+      </div>
     </div>
   </div>
 
+  <!-- ============ МОДАЛКА: VIN-API ============ -->
   <div class="mo" id="smo">
     <div class="mdl" onclick="event.stopPropagation()">
       <div class="mh">
@@ -369,11 +395,14 @@
       <div class="mb">
         <div class="fg"><label>vindecoder.eu API-ключ</label><input type="text" id="s_vk"></div>
       </div>
-      <div class="mf"><button class="bn" onclick="cSM()">Отмена</button><button class="bn p" onclick="sSet()">💾
-          Сохранить</button></div>
+      <div class="mf">
+        <button class="bn" onclick="cSM()">Отмена</button>
+        <button class="bn p" onclick="sSet()">💾 Сохранить</button>
+      </div>
     </div>
   </div>
 
+  <!-- ============ МОДАЛКА: О ПРОГРАММЕ ============ -->
   <div class="mo" id="aboutmo">
     <div class="mdl" onclick="event.stopPropagation()">
       <div class="mh">
@@ -383,9 +412,7 @@
         <div class="lic-box">
           <h4>VW Polo/Caddy 6N — База Мастера</h4>
           <p>Версия <b id="ver_about">…</b> · 2026<br>
-            Автор: Игнат Ткачев · <a href="https://vk.ru/donignasio" target="_blank" rel="noopener noreferrer"
-              style="color:var(--a)">vk.ru/donignasio</a> · <a href="mailto:donignasio@vk.com"
-              style="color:var(--a)">donignasio@vk.com</a></p>
+            Автор: Игнат Ткачев · <a href="https://vk.ru/donignasio" target="_blank" rel="noopener noreferrer" style="color:var(--a)">vk.ru/donignasio</a> · <a href="mailto:donignasio@vk.com" style="color:var(--a)">donignasio@vk.com</a></p>
           <p>Неофициальный каталог запчастей по VW Polo/Caddy (6N1/6N2, Classic, Estate, Caddy) 1995–2003 гг.</p>
           <div class="lic-as">⚠️ ПРОГРАММА ПРЕДОСТАВЛЯЕТСЯ «КАК ЕСТЬ» (AS IS)
             БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ, ЯВНЫХ ИЛИ ПОДРАЗУМЕВАЕМЫХ.
@@ -393,27 +420,28 @@
             Автор НЕ НЕСЁТ ОТВЕТСТВЕННОСТИ за любые прямые или
             косвенные последствия использования программы: ошибки
             в артикулах, ущерб автомобилю, здоровью или имуществу.</div>
-          <p style="margin-top:10px"><b>Всегда сверяйте артикулы перед заказом</b> по оригинальному каталогу ETKA, у
-            дилера или в официальном сервисе.</p>
+          <p style="margin-top:10px"><b>Всегда сверяйте артикулы перед заказом</b> по оригинальному каталогу ETKA, у дилера или в официальном сервисе.</p>
           <div class="lic-cc">Public Free License · Non-commercial use · v1.0
             You are free to: use, study, share (link only).
             Terms: attribution · no warranty · no liability · non-commercial.
             © 2026 Игнат Ткачев. Some rights reserved.</div>
         </div>
       </div>
-      <div class="mf"><button class="bn" onclick="licReset()">🔄 Показать при след. запуске</button><button class="bn"
-          onclick="cAbout()">Закрыть</button></div>
+      <div class="mf">
+        <button class="bn" onclick="licReset()">🔄 Показать при след. запуске</button>
+        <button class="bn" onclick="cAbout()">Закрыть</button>
+      </div>
     </div>
   </div>
 
+  <!-- ============ МОДАЛКА: БАГ-РЕПОРТ ============ -->
   <div class="mo" id="bugmo">
     <div class="mdl" onclick="event.stopPropagation()">
       <div class="mh">
         <h3>🐛 Сообщить о баге / Обратная связь</h3><button class="mc" onclick="cBug()">✕</button>
       </div>
       <div class="mb">
-        <p style="margin-top:0;font-size:.86rem;line-height:1.6;color:var(--mu)">Нашли ошибку в артикуле, опечатку,
-          зависание или есть идея по улучшению? Напишите автору.</p>
+        <p style="margin-top:0;font-size:.86rem;line-height:1.6;color:var(--mu)">Нашли ошибку в артикуле, опечатку, зависание или есть идея по улучшению? Напишите автору.</p>
         <a class="contact-row" href="https://vk.ru/donignasio" target="_blank" rel="noopener noreferrer">
           <span class="ci">💬</span>
           <span class="ct2"><b>Личная страница VK</b><span>vk.com/donignasio</span></span>
@@ -424,8 +452,7 @@
           <span class="ct2"><b>Email</b><span>donignasio@vk.com</span></span>
           <span style="font-size:1.1rem;color:var(--mu)">→</span>
         </a>
-        <div
-          style="margin-top:14px;padding:12px;background:var(--hv);border:1px solid var(--bd);border-radius:6px;font-size:.8rem;line-height:1.6">
+        <div style="margin-top:14px;padding:12px;background:var(--hv);border:1px solid var(--bd);border-radius:6px;font-size:.8rem;line-height:1.6">
           <b style="color:var(--a)">💡 Что указать:</b>
           <ul style="margin:6px 0 0;padding-left:20px">
             <li>Версию базы (v<span id="ver_bug">…</span>)</li>
@@ -436,11 +463,14 @@
           </ul>
         </div>
       </div>
-      <div class="mf"><button class="bn" onclick="cBug()">Закрыть</button><a class="bn p"
-          href="https://vk.com/donignasio" target="_blank" rel="noopener noreferrer">💬 Написать в VK</a></div>
+      <div class="mf">
+        <button class="bn" onclick="cBug()">Закрыть</button>
+        <a class="bn p" href="https://vk.com/donignasio" target="_blank" rel="noopener noreferrer">💬 Написать в VK</a>
+      </div>
     </div>
   </div>
 
+  <!-- ============ МОДАЛКА: ДОНАТ ============ -->
   <div class="mo" id="donmo">
     <div class="mdl" onclick="event.stopPropagation()">
       <div class="mh">
@@ -448,10 +478,8 @@
       </div>
       <div class="mb">
         <div class="don-test">⚠️ ТЕСТОВЫЙ РЕЖИМ — реквизиты демонстрационные, реальные платежи не проводятся</div>
-        <p style="margin-top:0;font-size:.86rem;line-height:1.6;color:var(--mu)">Проект делается в свободное время на
-          чистом энтузиазме. Любая сумма приятна и помогает развитию!</p>
-        <a class="don-card" href="https://www.donationalerts.com/r/donignasio" target="_blank"
-          rel="noopener noreferrer">
+        <p style="margin-top:0;font-size:.86rem;line-height:1.6;color:var(--mu)">Проект делается в свободное время на чистом энтузиазме. Любая сумма приятна и помогает развитию!</p>
+        <a class="don-card" href="https://www.donationalerts.com/r/donignasio" target="_blank" rel="noopener noreferrer">
           <div class="don-icon">💸</div>
           <div class="don-info"><b>DonationAlerts</b><span>donationalerts.com/r/donignasio</span></div>
         </a>
@@ -469,6 +497,7 @@
     </div>
   </div>
 
+  <!-- ============ МОДАЛКА: ПРОФИЛЬ ============ -->
   <div class="mo" id="profmo">
     <div class="mdl" onclick="event.stopPropagation()">
       <div class="mh">
@@ -482,22 +511,18 @@
             <div class="prof-sub" id="prof_sub_view">Локальный профиль · не синхронизируется</div>
           </div>
         </div>
-        <div class="fg"><label>Имя / Ник</label><input type="text" id="pf_name" maxlength="40"
-            placeholder="Например: Иван"></div>
+        <div class="fg"><label>Имя / Ник</label><input type="text" id="pf_name" maxlength="40" placeholder="Например: Иван"></div>
         <div class="fr">
           <div class="fg"><label>Email</label><input type="email" id="pf_email" placeholder="your@email.com"></div>
-          <div class="fg"><label>Город / Гараж</label><input type="text" id="pf_city" maxlength="60"
-              placeholder="Москва"></div>
+          <div class="fg"><label>Город / Гараж</label><input type="text" id="pf_city" maxlength="60" placeholder="Москва"></div>
         </div>
         <div class="fr">
-          <div class="fg"><label>Инициалы (2 буквы)</label><input type="text" id="pf_ini" maxlength="2"
-              placeholder="ИВ"></div>
+          <div class="fg"><label>Инициалы (2 буквы)</label><input type="text" id="pf_ini" maxlength="2" placeholder="ИВ"></div>
           <div class="fg"><label>Цвет аватара</label>
             <div class="prof-colors" id="pf_colors"></div>
           </div>
         </div>
-        <div class="fh"
-          style="margin-top:10px;padding:10px;background:var(--hv);border:1px solid var(--bd);border-radius:4px;font-size:.75rem;line-height:1.5">
+        <div class="fh" style="margin-top:10px;padding:10px;background:var(--hv);border:1px solid var(--bd);border-radius:4px;font-size:.75rem;line-height:1.5">
           ℹ️ Профиль хранится <b>только в вашем браузере</b> (localStorage) и никуда не отправляется.<br>
           Используется для подписи экспортируемых данных и персонализации интерфейса.
         </div>
@@ -510,6 +535,7 @@
     </div>
   </div>
 
+  <!-- ============ МОДАЛКА: ОБНОВЛЕНИЕ ============ -->
   <div class="mo" id="upmo">
     <div class="mdl" onclick="event.stopPropagation()">
       <div class="mh">
@@ -519,8 +545,7 @@
         <div class="fg">
           <label>URL источника обновления (JSON)</label>
           <input type="url" id="up_url" placeholder="https://example.com/polo_db.json">
-          <div class="fh">Прямая ссылка на JSON, совместимый с экспортом приложения. Источник должен поддерживать CORS.
-          </div>
+          <div class="fh">Прямая ссылка на JSON, совместимый с экспортом приложения. Источник должен поддерживать CORS.</div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="bn p" onclick="checkUpdate()">🔍 Проверить обновление</button>
@@ -540,7 +565,8 @@
       <div class="mf"><button class="bn" onclick="cUp()">Закрыть</button></div>
     </div>
   </div>
-  <!-- МОДАЛКА ЖУРНАЛА -->
+
+  <!-- ============ МОДАЛКА: ЖУРНАЛ ============ -->
   <div class="mo" id="logmo">
     <div class="mdl" onclick="event.stopPropagation()">
       <div class="mh">
@@ -552,52 +578,57 @@
           <div class="fg"><label>Дата *</label><input type="date" id="l_date"></div>
           <div class="fg"><label>Пробег, км</label><input type="number" id="l_km" min="0" placeholder="187300"></div>
         </div>
-        <div class="fg"><label>Что делали *</label><input type="text" id="l_title" placeholder="Замена масла + фильтр">
-        </div>
-        <div class="fg"><label>Детали из базы (OEM через запятую)</label><input type="text" id="l_items"
-            placeholder="030 115 561 B, G 052 162 A2"></div>
+        <div class="fg"><label>Что делали *</label><input type="text" id="l_title" placeholder="Замена масла + фильтр"></div>
+        <div class="fg"><label>Детали из базы (OEM через запятую)</label><input type="text" id="l_items" placeholder="030 115 561 B, G 052 162 A2"></div>
         <div class="fr">
           <div class="fg"><label>Стоимость</label><input type="number" id="l_cost" min="0" step="0.01"></div>
-          <div class="fg"><label>Валюта</label><select id="l_cur">
+          <div class="fg"><label>Валюта</label>
+            <select id="l_cur">
               <option value="RUB">₽ RUB</option>
               <option value="USD">$ USD</option>
               <option value="EUR">€ EUR</option>
-            </select></div>
+            </select>
+          </div>
         </div>
         <div class="fg"><label>Где делали</label><input type="text" id="l_shop" placeholder="СТО / сам"></div>
         <div class="fg"><label>Заметка</label><textarea id="l_notes" rows="3"></textarea></div>
       </div>
-      <div class="mf"><button class="bn" onclick="cLog()">Отмена</button><button class="bn p" onclick="sLog()">💾
-          Сохранить</button></div>
+      <div class="mf">
+        <button class="bn" onclick="cLog()">Отмена</button>
+        <button class="bn p" onclick="sLog()">💾 Сохранить</button>
+      </div>
     </div>
   </div>
 
-  <!-- МОДАЛКА НАСТРОЕК ТО -->
+  <!-- ============ МОДАЛКА: ТО ============ -->
   <div class="mo" id="tomo">
     <div class="mdl" onclick="event.stopPropagation()" style="max-width:520px">
       <div class="mh">
         <h3>🛠 Настройки ТО</h3><button class="mc" onclick="cTO()">✕</button>
       </div>
       <div class="mb">
-        <p style="font-size:.82rem;color:var(--mu);margin-top:0">Заполни один раз — виджет в шапке будет подсказывать,
-          когда ехать на ТО.</p>
+        <p style="font-size:.82rem;color:var(--mu);margin-top:0">Заполни один раз — виджет в шапке будет подсказывать, когда ехать на ТО.</p>
         <div class="fr">
-          <div class="fg"><label>Текущий пробег, км</label><input type="number" id="t_km" min="0" placeholder="189000">
-          </div>
+          <div class="fg"><label>Текущий пробег, км</label><input type="number" id="t_km" min="0" placeholder="189000"></div>
           <div class="fg"><label>Дата последнего ТО</label><input type="date" id="t_date"></div>
         </div>
-        <div class="fg"><label>Интервал ТО</label><select id="t_interval">
+        <div class="fg"><label>Интервал ТО</label>
+          <select id="t_interval">
             <option value="15000">Каждые 15 000 км / 12 мес.</option>
             <option value="10000">Каждые 10 000 км</option>
             <option value="7500">Каждые 7 500 км</option>
-          </select></div>
+          </select>
+        </div>
       </div>
-      <div class="mf"><button class="bn dg-btn" onclick="resetTO()">Сбросить ТО</button><button class="bn"
-          onclick="cTO()">Отмена</button><button class="bn p" onclick="sTO()">💾 Сохранить</button></div>
+      <div class="mf">
+        <button class="bn dg-btn" onclick="resetTO()">Сбросить ТО</button>
+        <button class="bn" onclick="cTO()">Отмена</button>
+        <button class="bn p" onclick="sTO()">💾 Сохранить</button>
+      </div>
     </div>
   </div>
 
-  <!-- МОДАЛКА СПИСКА ПОКУПОК (пока пустая — наполним во втором сообщении) -->
+  <!-- ============ МОДАЛКА: СПИСОК ПОКУПОК ============ -->
   <div class="mo" id="shopmo">
     <div class="mdl" onclick="event.stopPropagation()" style="max-width:760px">
       <div class="mh">
@@ -611,6 +642,8 @@
       </div>
     </div>
   </div>
+
+  <!-- ============ МОДАЛКА: КАРТОЧКА ДЕТАЛИ ============ -->
   <div class="mo" id="partmo">
     <div class="mdl" onclick="event.stopPropagation()" style="max-width:720px">
       <div class="mh">
@@ -620,6 +653,8 @@
       <div class="mb" id="partmo_body"></div>
     </div>
   </div>
+
+  <!-- ============ МОДАЛКА: УТОЧНИТЬ VIN ============ -->
   <div class="mo" id="vinmo">
     <div class="mdl" onclick="event.stopPropagation()" style="max-width:560px">
       <div class="mh">
@@ -631,32 +666,17 @@
           <input type="text" id="v_model" placeholder="Polo/Derby/Vento-IND">
         </div>
         <div class="fr">
-          <div class="fg"><label>Дата производства</label>
-            <input type="date" id="v_proddate">
-          </div>
-          <div class="fg"><label>Модельный год</label>
-            <input type="number" id="v_year" min="1995" max="2003">
-          </div>
+          <div class="fg"><label>Дата производства</label><input type="date" id="v_proddate"></div>
+          <div class="fg"><label>Модельный год</label><input type="number" id="v_year" min="1995" max="2003"></div>
         </div>
-        <div class="fg"><label>Код двигателя</label>
-          <select id="v_engine"></select>
-        </div>
-        <div class="fg"><label>Код КПП</label>
-          <select id="v_trans"></select>
-        </div>
+        <div class="fg"><label>Код двигателя</label><select id="v_engine"></select></div>
+        <div class="fg"><label>Код КПП</label><select id="v_trans"></select></div>
         <div class="fr">
-          <div class="fg"><label>Код оснащения</label>
-            <input type="text" id="v_equip" placeholder="41">
-          </div>
-          <div class="fg"><label>Цвет кузова</label>
-            <input type="text" id="v_bodycolor" placeholder="J2">
-          </div>
+          <div class="fg"><label>Код оснащения</label><input type="text" id="v_equip" placeholder="41"></div>
+          <div class="fg"><label>Цвет кузова</label><input type="text" id="v_bodycolor" placeholder="J2"></div>
         </div>
-        <div class="fg"><label>Цвет крыши</label>
-          <input type="text" id="v_roofcolor" placeholder="J2">
-        </div>
-        <div class="fh"
-          style="padding:8px 10px;background:var(--hv);border-radius:4px;font-size:.75rem;line-height:1.5">
+        <div class="fg"><label>Цвет крыши</label><input type="text" id="v_roofcolor" placeholder="J2"></div>
+        <div class="fh" style="padding:8px 10px;background:var(--hv);border-radius:4px;font-size:.75rem;line-height:1.5">
           ℹ️ Эти данные не закодированы в VIN. Возьми их из ETKA, Elcats или из наклейки в багажнике / сервисной книжки.
         </div>
       </div>
@@ -666,29 +686,28 @@
       </div>
     </div>
   </div>
+
+  <!-- ============ МОДАЛКА: ТЕМА ============ -->
   <div class="mo" id="thememmo">
-  <div class="mdl" onclick="event.stopPropagation()" style="max-width:600px">
-    <div class="mh">
-      <h3>🎨 Тема оформления</h3>
-      <button class="mc" onclick="cTheme()">✕</button>
-    </div>
-    <div class="mb">
-      <p style="font-size:.82rem;color:var(--mu);margin-top:0">
-        Выбери оформление — оно сохранится на этом устройстве.
-      </p>
-      <div class="th-grid" id="themeGrid"></div>
-    </div>
-    <div class="mf">
-      <button class="bn" onclick="cTheme()">Закрыть</button>
+    <div class="mdl" onclick="event.stopPropagation()" style="max-width:600px">
+      <div class="mh">
+        <h3>🎨 Тема оформления</h3>
+        <button class="mc" onclick="cTheme()">✕</button>
+      </div>
+      <div class="mb">
+        <p style="font-size:.82rem;color:var(--mu);margin-top:0">Выбери оформление — оно сохранится на этом устройстве.</p>
+        <div class="th-grid" id="themeGrid"></div>
+      </div>
+      <div class="mf"><button class="bn" onclick="cTheme()">Закрыть</button></div>
     </div>
   </div>
-</div>
+
+  <!-- ============ ЛАЙТБОКС / ТОСТ / КОНФЕТТИ ============ -->
   <div class="lb2" id="lbt" onclick="cL()"><img id="lbi" alt=""></div>
   <div class="tst" id="tt"></div>
   <canvas id="confetti-canvas"></canvas>
-  <script src="js/app.js"></script>
 
-
+  <script src="js/app.js" defer></script>
 </body>
 
 </html>
