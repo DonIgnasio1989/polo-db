@@ -1044,11 +1044,17 @@ function tSB() {
 }
 const oMM = () => { $('sb').classList.add('open-mobile'); $('ov').classList.add('show'); };
 const cMM = () => { $('sb').classList.remove('open-mobile'); $('ov').classList.remove('show'); };
-const tMM = () => $('sb').classList.contains('open-mobile') ? cMM() : oMM();
+const tMM = (e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    $('sb').classList.contains('open-mobile') ? cMM() : oMM();
+};;
 
 function rSB() {
     const n = $('nl'); n.innerHTML = '';
+    if (!SV.expandedCats) SV.expandedCats = {};
     const cnt = id => D.filter(p => p.cat === id).length;
+
+    // Обычный пункт (без детей) — кликабельный, ведёт в категорию
     const add = (id, ic, lb, count, cls, sub) => {
         const li = document.createElement('li');
         li.className = 'ni ' + (SV.activeCat === id ? 'active ' : '') + (cls || '') + (sub ? ' sub' : '');
@@ -1061,16 +1067,40 @@ function rSB() {
         li.innerHTML = '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ic + ' ' + esc(lb) + '</span><span class="bdg">' + count + '</span>';
         n.appendChild(li);
     };
+
+    // Папка с детьми — клик сворачивает/разворачивает
+    const addFolder = (c, kids) => {
+        const expanded = !!SV.expandedCats[c.id];
+        const total = cnt(c.id) + kids.reduce((s, k) => s + cnt(k.id), 0);
+        const li = document.createElement('li');
+        li.className = 'ni folder' + (expanded ? ' open' : '') + (SV.activeCat === c.id ? ' active' : '');
+        li.setAttribute('tabindex', '-1');
+        li.innerHTML =
+            '<span class="fold-arr">▶</span>' +
+            '<span class="fold-lb">' + c.icon + ' ' + esc(c.label) + '</span>' +
+            '<span class="bdg">' + total + '</span>';
+        li.onclick = () => {
+            SV.expandedCats[c.id] = !SV.expandedCats[c.id];
+            sU(); rSB();
+        };
+        n.appendChild(li);
+        if (expanded) kids.forEach(k => add(k.id, k.icon, k.label, cnt(k.id), '', true));
+    };
+
     add('All', '📦', 'Все системы', D.length);
     add('Favorites', '⭐', 'Избранное', D.filter(p => p.favorite).length, 'fav');
+
     const dv = document.createElement('li'); dv.className = 'nd'; n.appendChild(dv);
+
     CATS.filter(c => c.id !== 'All' && !c.parent).forEach(c => {
         const kids = CATS.filter(k => k.parent === c.id);
-        const own = cnt(c.id);
-        const total = own + kids.reduce((s, k) => s + cnt(k.id), 0);
-        add(c.id, c.icon, c.label, total, kids.length ? 'folder' : '');
-        kids.forEach(k => add(k.id, k.icon, k.label, cnt(k.id), '', true));
+        if (kids.length) {
+            addFolder(c, kids);
+        } else {
+            add(c.id, c.icon, c.label, cnt(c.id));
+        }
     });
+
     const dv2 = document.createElement('li'); dv2.className = 'nd'; n.appendChild(dv2);
     add('Workshops', '🔧', 'Мастерские', W.length);
     add('Log', '📖', 'Журнал обслуживания', LOG.length);
@@ -1347,15 +1377,17 @@ function rET(parts) {
         if (!t[m.g][m.s]) t[m.g][m.s] = [];
         t[m.g][m.s].push(p);
     }
+    const isMobile = window.innerWidth <= 900;
+    const openAttr = isMobile ? '' : ' open';
     let h = '<div class="et">';
     for (const g of Object.keys(t).sort()) {
         const sg = t[g];
         let tot = 0;
         for (const s of Object.keys(sg)) tot += sg[s].length;
-        h += '<details open><summary>📁 ' + esc(g) + '<span class="gc">' + tot + '</span></summary>';
+        h += '<details' + openAttr + '><summary>📁 ' + esc(g) + '<span class="gc">' + tot + '</span></summary>';
         for (const s of Object.keys(sg).sort()) {
             const a = sg[s];
-            h += '<details open><summary style="font-size:.8rem;font-weight:600;color:var(--mu)">📂 ' + esc(s) + '<span class="gc">' + a.length + '</span></summary><div class="sg">';
+            h += '<details' + openAttr + '><summary style="font-size:.8rem;font-weight:600;color:var(--mu)">📂 ' + esc(s) + '<span class="gc">' + a.length + '</span></summary><div class="sg">';
             for (const p of a.slice().sort((x, y) => (x.oem || '').localeCompare(y.oem || ''))) {
                 const w = p.verified ? '' : ' <span style="color:var(--wn);font-size:.68rem">⚠</span>';
                 const cm = pCompat(p);
@@ -2111,8 +2143,8 @@ function rTOWidget() {
     if (urgent) { chip.style.borderColor = 'var(--dg)'; chip.style.color = 'var(--dg)'; chip.style.background = 'rgba(220,53,69,.08)'; }
     else if (warn) { chip.style.borderColor = 'var(--sr)'; chip.style.color = 'var(--sr)'; chip.style.background = 'rgba(245,166,35,.08)'; }
     else { chip.style.borderColor = 'var(--ok)'; chip.style.color = 'var(--ok)'; chip.style.background = 'rgba(40,167,69,.08)'; }
-    lbl.textContent = 'До ТО: ' + t.kmLeft.toLocaleString('ru-RU') + ' км / ' + t.daysLeft + ' дн.';
-    chip.title = 'ТО каждые ' + t.interval.toLocaleString('ru-RU') + ' км. Клик для настроек.';
+    lbl.textContent = '⏱ ' + t.kmLeft.toLocaleString('ru-RU') + ' км / ' + t.daysLeft + ' дн.';
+    chip.title = 'До ТО: ' + t.kmLeft.toLocaleString('ru-RU') + ' км / ' + t.daysLeft + ' дн. · Интервал ' + t.interval.toLocaleString('ru-RU') + ' км. Клик для настроек.';
 }
 function oTO() {
     $('t_km').value = TO.km || '';
@@ -2231,6 +2263,16 @@ function findCheaper(oem) {
     'https://www.avito.ru/rossiya/zapchasti_i_aksessuary?q=' + encodeURIComponent(oem)
     ].forEach(u => window.open(u, '_blank', 'noopener'));
     toast('Открыто 3 магазина', 'success');
+}
+/* ============ КОПИРОВАНИЕ НОМЕРА ЮMONEY ============ */
+function copyYm() {
+    const num = '410017195918895';
+    const done = () => toast('📋 ЮMoney: 4100 1719 5918 895', 'success');
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(num).then(done).catch(() => fC(num, done));
+    } else {
+        fC(num, done);
+    }
 }
 
 /* ============ PWA ============ */
@@ -2396,6 +2438,8 @@ async function init() {
     updSearchSuggest();
     rTOWidget();
     iPWA();
+    fCS();
+
 }
 
 function bindUI() {
@@ -2528,8 +2572,7 @@ function bindUI() {
     // Гамбургеры
     const dt = $('dtgl');
     if (dt) dt.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tSB(); });
-    const mt = $('mob');
-    if (mt) mt.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tMM(); });
+    
 
     // Вид «плитка / дерево»
     const vtg = $('viewToggle');

@@ -1,5 +1,5 @@
 {
-  "appVersion": "1.1.1",
+  "appVersion": "1.1.3",
   "notes": "",
   "updatedAt": "2026-09-26",
   "files": [
@@ -8,6 +8,7 @@
     "data/parts-03-trans-exh-elec-bulbs.json",
     "data/parts-04-body-interior-maint-fluids-roadkit.json",
     "data/parts-05-rear-axle-controls.json",
+    "data/parts-06.json",
     "data/categories.json",
     "data/sections.json",
     "data/workshops.json"

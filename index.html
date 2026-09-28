@@ -91,8 +91,7 @@
 
   <!-- ============ ОСНОВНАЯ ОБЛАСТЬ ============ -->
   <div class="mw">
-    <button id="mob" title="Меню">☰</button>
-
+    <button id="mob" type="button" title="Меню" onclick="tMM(event)">☰</button>
     <header class="tb">
       <div class="sc">
         <span class="si">🔍</span>
@@ -470,27 +469,34 @@
     </div>
   </div>
 
-  <!-- ============ МОДАЛКА: ДОНАТ ============ -->
+    <!-- ============ МОДАЛКА: ДОНАТ ============ -->
   <div class="mo" id="donmo">
     <div class="mdl" onclick="event.stopPropagation()">
       <div class="mh">
         <h3>❤️ Поддержать проект</h3><button class="mc" onclick="cDonate()">✕</button>
       </div>
       <div class="mb">
-        <div class="don-test">⚠️ ТЕСТОВЫЙ РЕЖИМ — реквизиты демонстрационные, реальные платежи не проводятся</div>
         <p style="margin-top:0;font-size:.86rem;line-height:1.6;color:var(--mu)">Проект делается в свободное время на чистом энтузиазме. Любая сумма приятна и помогает развитию!</p>
-        <a class="don-card" href="https://www.donationalerts.com/r/donignasio" target="_blank" rel="noopener noreferrer">
-          <div class="don-icon">💸</div>
-          <div class="don-info"><b>DonationAlerts</b><span>donationalerts.com/r/donignasio</span></div>
+
+        <a class="don-card" href="https://pay.cloudtips.ru/p/5a2de793" target="_blank" rel="noopener noreferrer">
+          <div class="don-icon">💚</div>
+          <div class="don-info">
+            <b>CloudTips</b>
+            <span>Карта, СБП · моментально · комиссия 0% при компенсации</span>
+          </div>
         </a>
-        <a class="don-card" href="https://vk.com/donut/donignasio" target="_blank" rel="noopener noreferrer">
-          <div class="don-icon">💬</div>
-          <div class="don-info"><b>VK Донат</b><span>vk.com/donut/donignasio</span></div>
-        </a>
-        <a class="don-card" href="https://yoomoney.ru/to/4100112345678" target="_blank" rel="noopener noreferrer">
+
+        <a class="don-card" href="https://yoomoney.ru/to/410017195918895" target="_blank" rel="noopener noreferrer">
           <div class="don-icon">💳</div>
-          <div class="don-info"><b>ЮMoney (тест)</b><span>4100 1123 4567 8</span></div>
+          <div class="don-info">
+            <b>ЮMoney</b>
+            <span>Кошелёк 4100 1719 5918 895 · карта, СБП, перевод</span>
+          </div>
         </a>
+        <button class="bn" type="button" onclick="copyYm()" style="width:100%;justify-content:center;margin:0 0 14px 0">
+          📋 Скопировать номер кошелька ЮMoney
+        </button>
+
         <div class="don-note">Спасибо за поддержку! ❤️</div>
       </div>
       <div class="mf"><button class="bn" onclick="cDonate()">Закрыть</button></div>

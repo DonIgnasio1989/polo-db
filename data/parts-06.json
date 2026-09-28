@@ -1,0 +1,329 @@
+[
+  {
+    "id": "p_mnt_oilfilter",
+    "cat": "Maintenance",
+    "sub": "Масло ДВС",
+    "name": "Масляный фильтр",
+    "oem": "030 115 561 B",
+    "v": true,
+    "a": ["Mann W 712/52", "Mahle OC 264", "Bosch 045 110 2101", "Filtron OP 526/1"],
+    "d": ["VW Polo 6N", "VW Lupo", "VW Golf III 1.4 ABU", "Seat Arosa", "Seat Ibiza 6K"],
+    "engines": ["AER", "ALL", "AKL", "AHT", "AEX", "APQ"],
+    "inst": [
+      { "type": "spec", "text": "Момент затяжки 20 Нм. Резиновое кольцо смазать маслом." },
+      { "type": "note", "text": "Взаимозаменяем с ABU 1.4 (Golf III) и Lupo 1.0/1.4." }
+    ]
+  },
+  {
+    "id": "p_mnt_airfilter",
+    "cat": "Maintenance",
+    "sub": "Воздух",
+    "name": "Воздушный фильтр",
+    "oem": "030 129 620",
+    "v": true,
+    "a": ["Mann C 25114", "Mahle LX 604", "Bosch 1 457 429 916", "Filtron AP 059/1"],
+    "d": ["VW Polo 6N 1.0/1.4", "Seat Arosa 1.0/1.4", "VW Lupo 1.0/1.4"],
+    "engines": ["AER", "ALL", "AKL", "AHT", "AEX", "APQ"],
+    "inst": [
+      { "type": "note", "text": "Аналог от Lupo 1.0 подходит 1:1." }
+    ]
+  },
+  {
+    "id": "p_mnt_cabfilter",
+    "cat": "Maintenance",
+    "sub": "Салон",
+    "name": "Фильтр салона",
+    "oem": "6N0 819 644",
+    "v": false,
+    "a": ["Mann CU 2855", "Mahle LA 87", "Filtron K 1068", "Bosch 1 987 432 002"],
+    "d": ["VW Polo 6N", "Seat Arosa", "VW Lupo"],
+    "bodies": ["3d", "5d", "classic", "estate"],
+    "inst": [
+      { "type": "note", "text": "Под бардачком. Угольный аналог — Mann CUK 2855." }
+    ]
+  },
+  {
+    "id": "p_mnt_fuelfilter",
+    "cat": "Maintenance",
+    "sub": "Топливо",
+    "name": "Топливный фильтр (инжектор)",
+    "oem": "1H0 201 511 A",
+    "v": true,
+    "a": ["Mann WK 730/1", "Mahle KL 132", "Bosch 0 450 905 909", "Filtron PP 837/1"],
+    "d": ["VW Polo 6N", "VW Golf III", "Seat Arosa", "Seat Ibiza 6K", "VW Lupo"],
+    "engines": ["AER", "ALL", "AKL", "AHT", "AEX", "APQ", "AEE"],
+    "inst": [
+      { "type": "warn", "text": "Стрелка на корпусе указывает направление потока — не перепутать!" },
+      { "type": "proc", "text": "Перед снятием сбросить давление в рампе — иначе бензин под давлением." }
+    ]
+  },
+  {
+    "id": "p_eng_belt",
+    "cat": "Engine",
+    "sub": "ГРМ / Ремни",
+    "name": "Ремень ГРМ + натяжной ролик (комплект)",
+    "oem": "030 198 119 A",
+    "v": false,
+    "a": ["INA 530 0198 10", "Gates K015433XS", "Contitech CT 1061 K1"],
+    "d": ["VW Polo 6N 1.0", "Seat Arosa 1.0", "VW Lupo 1.0"],
+    "engines": ["AER", "ALL", "AKL", "AHT"],
+    "inst": [
+      { "type": "warn", "text": "Замена каждые 60 000 км или 4 года. При обрыве — клапаны гнёт!" },
+      { "type": "proc", "text": "Метки ГРМ обязательны. Фиксатор коленвала — обязателен." }
+    ]
+  },
+  {
+    "id": "p_eng_spark",
+    "cat": "Ignition",
+    "sub": "Свечи / Катушки",
+    "name": "Свеча зажигания (комплект 4 шт)",
+    "oem": "101 000 035 AA",
+    "v": true,
+    "a": ["NGK BKUR6ET-10", "Bosch FR7LDC+", "Denso K20TXR"],
+    "d": ["VW Polo 6N", "VW Golf III 1.4 ABU", "Seat Arosa", "VW Lupo"],
+    "engines": ["AER", "ALL", "AKL", "AHT", "AEX", "APQ", "AEE"],
+    "inst": [
+      { "type": "spec", "text": "Зазор 0.9–1.0 мм. Момент затяжки 20–25 Нм." },
+      { "type": "note", "text": "Оригинал — NGK. Bosch в РФ много подделок — берите NGK." }
+    ]
+  },
+  {
+    "id": "p_eng_lambda",
+    "cat": "Fuel",
+    "sub": "Датчики",
+    "name": "Лямбда-зонд (до катализатора)",
+    "oem": "030 906 265 K",
+    "v": false,
+    "a": ["Bosch 0 258 005 133", "NGK 1825", "Denso DOX-1364"],
+    "d": ["VW Polo 6N", "VW Golf III", "Seat Arosa", "VW Lupo"],
+    "engines": ["AER", "ALL", "AKL", "AHT", "AEX", "APQ"],
+    "inst": [
+      { "type": "warn", "text": "Не путать с 3-проводным и 4-проводным. На 6N1 обычно 4-проводный." }
+    ]
+  },
+  {
+    "id": "p_cool_thermostat",
+    "cat": "Cooling",
+    "sub": "Радиатор / Термостат",
+    "name": "Термостат с корпусом",
+    "oem": "030 121 113 A",
+    "v": false,
+    "a": ["Wahler 410 822D", "Febi 14453", "Vernet TH1447.87J"],
+    "d": ["VW Polo 6N", "Seat Arosa", "VW Lupo", "VW Golf III"],
+    "engines": ["AER", "ALL", "AKL", "AHT", "AEX", "APQ"],
+    "inst": [
+      { "type": "spec", "text": "Температура открытия 87 °C." },
+      { "type": "warn", "text": "Менять вместе с прокладкой корпуса. Антифриз — G12 (розовый), не смешивать с G11." }
+    ]
+  },
+  {
+    "id": "p_sus_strut",
+    "cat": "Suspension",
+    "sub": "Передняя ось",
+    "name": "Стойка переднего амортизатора (McPherson)",
+    "oem": "6N0 413 031",
+    "v": false,
+    "a": ["Bilstein 22-031150", "Sachs 312 281", "Monroe G1630"],
+    "d": ["VW Polo 6N", "Seat Arosa"],
+    "bodies": ["3d", "5d"],
+    "inst": [
+      { "type": "warn", "text": "6N1 и 9N — разные крепления стабилизатора. Сверяйте по VIN." },
+      { "type": "note", "text": "Пружины 6N1 и 6N2 отличаются жёсткостью." }
+    ]
+  },
+  {
+    "id": "p_sus_arm",
+    "cat": "Suspension",
+    "sub": "Передняя ось",
+    "name": "Рычаг передней подвески (с шаровой)",
+    "oem": "6N0 407 151",
+    "v": false,
+    "a": ["Lemförder 13015 02", "Febi 03144", "TRW JTC201"],
+    "d": ["VW Polo 6N", "Seat Arosa"],
+    "bodies": ["3d", "5d"],
+    "inst": [
+      { "type": "warn", "text": "От Golf II рычаг НЕ подходит — короче и другой крепёж." }
+    ]
+  },
+  {
+    "id": "p_sus_shock_r",
+    "cat": "RearAxle",
+    "sub": "Задняя ось",
+    "name": "Амортизатор задней торсионной балки",
+    "oem": "6N0 513 031",
+    "v": false,
+    "a": ["Sachs 315 655", "Bilstein 19-067317", "Monroe R1437"],
+    "d": ["VW Polo 6N", "Seat Arosa"],
+    "inst": [
+      { "type": "proc", "text": "Задняя балка — торсионная. Амортизаторы меняются парой." }
+    ]
+  },
+  {
+    "id": "p_br_pad_f",
+    "cat": "Brakes",
+    "sub": "Передние",
+    "name": "Колодки передние (диск 239 мм)",
+    "oem": "6N0 698 151 A",
+    "v": false,
+    "a": ["ATE 13.0460-7078.2", "TRW GDB1028", "Bosch 0 986 494 079"],
+    "d": ["VW Polo 6N", "Seat Arosa", "VW Lupo"],
+    "bodies": ["3d", "5d", "classic"],
+    "inst": [
+      { "type": "warn", "text": "Различайте по диаметру диска: 239 мм и 256 мм — колодки разные!" }
+    ]
+  },
+  {
+    "id": "p_br_disc_f",
+    "cat": "Brakes",
+    "sub": "Передние",
+    "name": "Диск тормозной передний (239×20 мм, вентилируемый)",
+    "oem": "6N0 615 301",
+    "v": false,
+    "a": ["ATE 24.0120-0120.1", "Brembo 09.5879.10", "TRW DF 2544"],
+    "d": ["VW Polo 6N", "Seat Arosa", "VW Lupo"],
+    "bodies": ["3d", "5d"],
+    "inst": [
+      { "type": "spec", "text": "Минимальная толщина — 18 мм." },
+      { "type": "proc", "text": "Менять парой. Одновременно менять колодки." }
+    ]
+  },
+  {
+    "id": "p_br_pad_r",
+    "cat": "Brakes",
+    "sub": "Задние",
+    "name": "Колодки задние (барабан 200×40)",
+    "oem": "1H0 698 525",
+    "v": false,
+    "a": ["ATE 03.0137-0142.2", "TRW GS8425", "Febi 06424"],
+    "d": ["VW Polo 6N", "VW Golf III", "Seat Ibiza 6K"],
+    "inst": [
+      { "type": "note", "text": "Только барабаны 200×40 мм. Проверьте по VIN." }
+    ]
+  },
+  {
+    "id": "p_elec_battery",
+    "cat": "Electrical",
+    "sub": "Генератор / Стартер",
+    "name": "Аккумулятор 44–55 Ач (тип 063/075)",
+    "oem": "000 915 105 AB",
+    "v": false,
+    "a": ["Varta Blue Dynamic D43", "Bosch S4 0 092 S40 240", "Exide EA530"],
+    "d": ["VW Polo 6N", "VW Lupo", "Seat Arosa"],
+    "inst": [
+      { "type": "spec", "text": "Размеры 207×175×190 мм (тип 075) либо 242×175×190 мм (тип 063)." },
+      { "type": "note", "text": "При установке большего — проверить крепление и площадку." }
+    ]
+  },
+  {
+    "id": "p_bulb_h4",
+    "cat": "Bulbs",
+    "sub": "Освещение",
+    "name": "Лампа головного света H4 (12V 60/55W)",
+    "oem": "N 017 761 2",
+    "v": true,
+    "a": ["Osram Night Breaker H4", "Philips VisionPlus H4", "Bosch Pure Light H4"],
+    "d": ["VW Polo 6N", "VW Lupo", "Seat Arosa", "Практически все 90-х"],
+    "bodies": ["3d", "5d", "classic", "estate"],
+    "inst": [
+      { "type": "warn", "text": "Не трогать стекло лампы руками — жир сокращает срок службы." }
+    ]
+  },
+  {
+    "id": "p_bulb_h7",
+    "cat": "Bulbs",
+    "sub": "Освещение",
+    "name": "Лампа дальнего света H7 (12V 55W)",
+    "oem": "N 017 761 4",
+    "v": false,
+    "a": ["Osram Original H7", "Philips LongLife H7", "Bosch H7"],
+    "d": ["VW Polo 6N2 (фары H7)", "VW Lupo", "Seat Arosa"],
+    "bodies": ["5d"],
+    "inst": [
+      { "type": "note", "text": "Только для 6N2 с раздельными H4/H7. Проверьте по VIN." }
+    ]
+  },
+  {
+    "id": "p_body_headlight",
+    "cat": "Body",
+    "sub": "Наружные панели",
+    "name": "Фара передняя (с доработкой от 9N)",
+    "oem": "6N1 941 017 / 6N1 941 018",
+    "v": false,
+    "a": [],
+    "d": ["VW Polo 9N (2001–2005)", "VW Lupo"],
+    "bodies": ["3d", "5d"],
+    "inst": [
+      { "type": "warn", "text": "От 9N — подходит с доработкой креплений. Оригинал 6N1 больше не выпускается." },
+      { "type": "note", "text": "Стекло фары 6N1 уникально, стекло 9N не подходит." }
+    ]
+  },
+  {
+    "id": "p_body_bumper_f",
+    "cat": "Body",
+    "sub": "Наружные панели",
+    "name": "Бампер передний",
+    "oem": "6N0 807 217",
+    "v": false,
+    "a": [],
+    "d": ["VW Polo 6N1", "VW Polo 6N2 (частично)"],
+    "bodies": ["3d", "5d"],
+    "inst": [
+      { "type": "warn", "text": "Только разбор. 6N1 и 6N2 бамперы отличаются формой." }
+    ]
+  },
+  {
+    "id": "p_body_bumper_r",
+    "cat": "Body",
+    "sub": "Наружные панели",
+    "name": "Бампер задний (с доработкой от Cordoba)",
+    "oem": "6N0 807 417",
+    "v": false,
+    "d": ["VW Polo 6N1", "Seat Cordoba 6K (с подрезкой)"],
+    "bodies": ["3d", "5d"],
+    "inst": [
+      { "type": "note", "text": "От Seat Cordoba 6K — с подрезкой по краям." }
+    ]
+  },
+  {
+    "id": "p_body_windshield",
+    "cat": "Body",
+    "sub": "Стёкла",
+    "name": "Лобовое стекло",
+    "oem": "6N0 845 011",
+    "v": false,
+    "a": ["Pilkington 4310", "Saint-Gobain Sekurit 4304"],
+    "d": ["VW Polo 6N", "VW Polo 9N (по геометрии)"],
+    "bodies": ["3d", "5d"],
+    "inst": [
+      { "type": "note", "text": "Лобовое 9N совместимо геометрически, крепление то же." },
+      { "type": "warn", "text": "Боковые стёкла уникальны — только разбор." }
+    ]
+  },
+  {
+    "id": "p_roadkit_first_aid",
+    "cat": "RoadKit",
+    "sub": "Аварийный набор",
+    "name": "Аптечка первой помощи (по ГОСТ)",
+    "oem": "—",
+    "v": false,
+    "a": ["ФЭСТ", "Аптечка Авто"],
+    "d": [],
+    "inst": [
+      { "type": "spec", "text": "Срок годности — проверять ежегодно." },
+      { "type": "note", "text": "С 2021 — новый состав по приказу Минздрава." }
+    ]
+  },
+  {
+    "id": "p_roadkit_extinguisher",
+    "cat": "RoadKit",
+    "sub": "Аварийный набор",
+    "name": "Огнетушитель ОП-2 или ОУ-2",
+    "oem": "—",
+    "v": false,
+    "a": ["—"],
+    "d": [],
+    "inst": [
+      { "type": "spec", "text": "Перезарядка каждые 5 лет. Крепить в салоне, не в багажнике!" }
+    ]
+  }
+]
