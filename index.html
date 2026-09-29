@@ -216,7 +216,7 @@
                 <button onclick="eCSV(true);cEM()">⭐ CSV — избранное</button>
                 <button onclick="eET();cEM()">🗂 CSV — ETKA</button>
                 <button onclick="eWCSV();cEM()">🔧 CSV — мастерские</button>
-                <button onclick="oUp();cEM()">🌐 Обновление базы</button>
+                <button onclick="oUp();cEM()">🌐 Обновление (программа + база)</button>
                 <button onclick="rD();cEM()">♻️ Пересобрать БД (сброс)</button>
               </details>
 
@@ -239,9 +239,11 @@
                 <summary><span>⚙️ Прочее</span></summary>
                 <button onclick="oSM();cEM()">🔑 VIN-API ключ</button>
                 <button onclick="oProfileSoon();cEM()">👤 Профиль <span class="em-soon">скоро</span></button>
+                <button onclick="oFaq();cEM()">❓ Помощь — что делают кнопки</button>
                 <button onclick="oAbout();cEM()">ℹ️ О программе / Лицензия</button>
                 <button onclick="oBug();cEM()">🐛 Сообщить о баге</button>
               </details>
+
             </div>
           </div>
         </div>
@@ -545,28 +547,56 @@
   <div class="mo" id="upmo">
     <div class="mdl" onclick="event.stopPropagation()">
       <div class="mh">
-        <h3>🌐 Обновление базы</h3><button class="mc" onclick="cUp()">✕</button>
+        <h3>🌐 Обновление</h3><button class="mc" onclick="cUp()">✕</button>
       </div>
       <div class="mb">
-        <div class="fg">
-          <label>URL источника обновления (JSON)</label>
-          <input type="url" id="up_url" placeholder="https://example.com/polo_db.json">
-          <div class="fh">Прямая ссылка на JSON, совместимый с экспортом приложения. Источник должен поддерживать CORS.</div>
+
+        <!-- Программа -->
+        <div class="up-sec">
+          <div class="up-sec-h">📱 Программа</div>
+          <p style="font-size:.84rem;color:var(--mu);margin:0 0 10px">
+            Текущая версия: <b id="up_app_cur" style="color:var(--a)">…</b>
+            · Доступна: <b id="up_app_latest" style="color:var(--a)">…</b>
+          </p>
+          <div id="up_prog_status"></div>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button class="bn p" onclick="checkAppUpdate()">🔍 Проверить программу</button>
+            <button class="bn" onclick="reloadApp()">🔄 Перезагрузить с сервера</button>
+          </div>
+          <div class="fh" style="margin-top:10px">
+            <b style="color:var(--a)">Когда что жать:</b><br>
+            • <b>Проверить программу</b> — узнает номер последней версии с сервера и сравнит с текущей.<br>
+            • <b>Перезагрузить с сервера</b> — подтянет свежие базы каталога (данные гаража, избранного и журнала не тронет).<br>
+          </div>
         </div>
-        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-          <button class="bn p" onclick="checkUpdate()">🔍 Проверить обновление</button>
-          <button class="bn" onclick="sUpUrl()">💾 Сохранить URL</button>
+        <!-- Что нового -->
+        <div class="up-sec">
+          <div class="up-sec-h">📰 Что нового</div>
+          <div id="up_changelog" class="changelog">
+            <div class="cl-empty">⏳ Загружаем список изменений…</div>
+          </div>
         </div>
-        <div id="up_status" style="margin-top:14px"></div>
-        <div class="up-hint" style="margin-top:14px">
-          <b style="color:var(--a)">Как это работает:</b>
-          <ul style="margin:6px 0 0;padding-left:20px">
-            <li>Приложение скачивает JSON по указанному URL</li>
-            <li>Показывает, что нового и что изменилось</li>
-            <li>Вы выбираете: <b>добавить</b> новые (merge) или <b>заменить</b> всю базу</li>
-            <li>При merge ваши личные правки сохраняются</li>
-          </ul>
+        
+        <div class="up-divider"></div>
+
+        <!-- База данных -->
+        <div class="up-sec">
+          <div class="up-sec-h">📦 База данных (каталог)</div>
+          <div class="fg">
+            <label>URL источника обновления (JSON)</label>
+            <input type="url" id="up_url" placeholder="https://example.com/polo_db.json">
+            <div class="fh">Прямая ссылка на JSON с позициями каталога. Источник должен поддерживать CORS.</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="bn p" onclick="checkUpdate()">🔍 Проверить базу</button>
+            <button class="bn" onclick="sUpUrl()">💾 Сохранить URL</button>
+          </div>
+          <div id="up_status" style="margin-top:14px"></div>
+          <div class="fh" style="margin-top:10px">
+            <b style="color:var(--a)">Как это работает:</b> приложение скачивает JSON по ссылке и предлагает добавить новые позиции (merge) или заменить базу целиком. Ваши правки (статусы, заметки, избранное) при merge сохраняются.
+          </div>
         </div>
+
       </div>
       <div class="mf"><button class="bn" onclick="cUp()">Закрыть</button></div>
     </div>
@@ -705,6 +735,170 @@
         <div class="th-grid" id="themeGrid"></div>
       </div>
       <div class="mf"><button class="bn" onclick="cTheme()">Закрыть</button></div>
+    </div>
+  </div>
+  <!-- ============ МОДАЛКА: FAQ / ПОМОЩЬ ============ -->
+  <div class="mo" id="faqmo">
+    <div class="mdl" onclick="event.stopPropagation()" style="max-width:760px">
+      <div class="mh">
+        <h3>❓ Помощь — что делают кнопки</h3>
+        <button class="mc" onclick="cFaq()">✕</button>
+      </div>
+      <div class="mb">
+
+        <div class="faq-sec">
+          <div class="faq-sec-h">🧭 Шапка приложения</div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">☰</span> Меню (гамбургер)</div>
+            <div class="faq-a">Открывает и закрывает боковое меню: гараж, категории запчастей, мастерские и журнал. На десктопе сворачивает панель влево-вправо, на телефоне — выезжает шторкой.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">🔍</span> Поиск</div>
+            <div class="faq-a">Ищет по <b>OEM</b>, названию, аналогам, донорам, заметкам и применимости. Несколько слов через пробел работают как «И» — найдутся только позиции, где есть все слова. Очистить — крестик справа.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">🛠 ⏱</span> Кнопка ТО</div>
+            <div class="faq-a">Показывает остаток до следующего ТО (<b>км</b> и <b>дни</b>). Клик — открывает настройки: текущий пробег, дата последнего ТО и интервал. Цвет рамки: <b style="color:var(--ok)">зелёный</b> — запас есть, <b style="color:var(--sr)">жёлтый</b> — скоро, <b style="color:var(--dg)">красный</b> — пора.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">⚙️</span> Фильтры (мотор, кузов, КПП, статус, сортировка)</div>
+            <div class="faq-a">Ограничивают список по параметрам. Пустое значение = «все». Активный фильтр подсвечивается цветом. Кнопка <b>«Сбросить фильтры»</b> в ⚙️-меню обнуляет всё сразу.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">▦ / 🗂</span> Переключатель вида</div>
+            <div class="faq-a"><b>Плитка</b> — карточки в сетке. <b>Дерево</b> — компактный список по группам и подгруппам ETKA. Удобно, когда нужно быстро просмотреть артикулы.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">📖</span> Журнал</div>
+            <div class="faq-a">Записывай каждую работу: дата, пробег, что менял, сколько стоило. Потом в карточке детали появится бейдж «🔧 Меняли: …» — сразу видно, когда ставил в прошлый раз.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">➕</span> OEM (добавить деталь)</div>
+            <div class="faq-a">Добавляет новую позицию в каталог вручную. Можно указать: категорию, название, артикул, аналоги, доноров, применимость, цену, статус, ссылку на магазин, фото и инструкции.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">⇕</span> Развернуть/свернуть</div>
+            <div class="faq-a">Одним кликом раскрывает или закрывает блок «Подробности» у всех карточек в списке. Удобно для быстрой проверки применимости или инструкций.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">⚙️</span> Меню настроек</div>
+            <div class="faq-a">Импорт/экспорт (JSON, CSV), обновление базы, сброс к базовому состоянию, тема оформления, VIN-API ключ, профиль, о программе и баг-репорт.</div>
+          </div>
+        </div>
+
+        <div class="faq-sec">
+          <div class="faq-sec-h">📇 Карточка детали — кнопки</div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">☆ / ★</span> Избранное</div>
+            <div class="faq-a">Ставит звезду — карточка переезжает в раздел <b>⭐ Избранное</b> в сайдбаре. В карточке с избранным слева появляется золотая полоса.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">✎</span> Редактировать</div>
+            <div class="faq-a">Открывает форму правки: можно менять цену, добавлять аналоги, обновлять статус. При смене цены в историю цен пишется новая запись — кнопка <b>📊</b> рядом со стоимостью показывает, как она менялась.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">✕</span> Удалить</div>
+            <div class="faq-a">Удаляет позицию. После удаления внизу появится уведомление с кнопкой <b>↶ Вернуть</b> — можно отменить в течение 10 секунд.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">📋</span> Копировать</div>
+            <div class="faq-a">Копирует артикул или аналог в буфер обмена. Работает у кнопки рядом с OEM и у каждого чипа аналога.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">🛒 Exist · Autodoc · Avito</span> Магазины</div>
+            <div class="faq-a">Открывают поиск по артикулу в Exist, Autodoc и Avito — три вкладки. Кнопка <b>🔍 Найти дешевле</b> делает то же самое одним кликом.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">🛒 📦 ✅</span> Статусы</div>
+            <div class="faq-a"><b>Хочу</b> — добавил в план покупок. <b>Купил</b> — деталь дома. <b>Поставил</b> — установлено (при этом срабатывает небольшой праздник 🎉). Повторный клик по активной кнопке снимает статус.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">📝</span> Заметка</div>
+            <div class="faq-a">Свободное поле для своих мыслей: «брал у Пети», «ставил сам, 2 часа», «требует прокладку». Сохраняется автоматически при выходе из поля.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">🔒 VIN-строго</span> (чип над списком)</div>
+            <div class="faq-a">Скрывает позиции, которые по донорам <b>не подходят</b> к твоему VIN. Работает, если в гараже выбран активный VIN.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">📂 Группы</span> (чип над списком)</div>
+            <div class="faq-a">Собирает позиции по подкатегориям внутри выбранного раздела. Удобно, когда в категории 30+ деталей.</div>
+          </div>
+        </div>
+
+        <div class="faq-sec">
+          <div class="faq-sec-h">🚗 Гараж и VIN</div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">+ Добавить VIN</span></div>
+            <div class="faq-a">Открывает форму декодирования. Вводишь 17 символов → жмёшь <b>🔍 Декодировать</b> → проверяешь данные → <b>💾 Сохранить</b>. VIN попадёт в гараж, а фильтры автоматически подстроятся под эту машину.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">✎ Уточнить данные</span></div>
+            <div class="faq-a">Доступно после клика по карточке в гараже. Здесь можно вручную указать код двигателя, КПП, дату производства, цвета — эти данные не закодированы в VIN, их нужно взять из ETKA или из наклейки в багажнике.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">✕</span> Удалить VIN</div>
+            <div class="faq-a">Кнопка в верхнем правом углу карточки машины. Убирает её из гаража вместе со всеми связанными данными.</div>
+          </div>
+        </div>
+
+        <div class="faq-sec">
+          <div class="faq-sec-h">🧰 Сайдбар — нижние кнопки</div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">💬</span> VK</div>
+            <div class="faq-a">Страница автора во ВКонтакте. Туда же можно писать баг-репорты и предложения.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">✉️</span> Email</div>
+            <div class="faq-a">Почта для связи — если удобнее письмом, чем в VK.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">❤️</span> Поддержать проект</div>
+            <div class="faq-a">Открывает окно с реквизитами: CloudTips и ЮMoney. Любая сумма приятна, но не обязательна.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">🌐</span> Обновление</div>
+            <div class="faq-a">Проверка <b>программы</b> (обновление кода) и <b>базы</b> (новые позиции каталога). Подробное описание — внутри окна обновления.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">🐛</span> Сообщить о баге</div>
+            <div class="faq-a">Форма с готовым текстом для письма или сообщения в VK. Полезно приложить версию (указана в окне), скриншот и модель телефона.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-ic">ℹ️</span> О программе</div>
+            <div class="faq-a">Версия, лицензия «как есть», ссылки на автора. Отсюда же можно снова показать лицензию при следующем запуске.</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="mf"><button class="bn" onclick="cFaq()">Закрыть</button></div>
     </div>
   </div>
 

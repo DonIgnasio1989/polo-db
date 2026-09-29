@@ -822,15 +822,131 @@ const oBug = () => {
 };
 const cBug = () => { $('bugmo').classList.remove('show'); };
 
-/* ============ ОБНОВЛЕНИЕ ============ */
 function oUp() {
     try {
         $('up_url').value = localStorage.getItem(UPKEY)
             || (location.origin + location.pathname.replace(/[^/]*$/, '') + 'data/parts.json');
     } catch (e) { }
     $('up_status').innerHTML = '';
+    $('up_prog_status').innerHTML = '';
+    $('up_app_cur').textContent = APP_VERSION;
+    $('up_app_latest').textContent = '…';
+    const clBox = $('up_changelog');
+    if (clBox) clBox.innerHTML = '<div class="cl-empty">⏳ Загружаем список изменений…</div>';
     $('upmo').classList.add('show');
+
+    fetchUpdateMeta().then(meta => {
+        if (meta.appVersion) $('up_app_latest').textContent = String(meta.appVersion);
+        else $('up_app_latest').textContent = '—';
+        renderChangelog(meta.changelog, APP_VERSION, meta.fallbackDate);
+    }).catch(() => {
+        $('up_app_latest').textContent = '—';
+        renderChangelog(null, APP_VERSION, '');
+    });
 }
+
+/* Загрузка update.json + дата последней модификации файла */
+async function fetchUpdateMeta() {
+    const base = location.origin + location.pathname.replace(/[^/]*$/, '');
+    const r = await fetch(base + 'data/update.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('update.json: ' + r.status);
+
+    // Дата модификации файла на сервере — автоматическая
+    const lm = r.headers.get('Last-Modified');
+    let fallbackDate = '';
+    if (lm) {
+        const d = new Date(lm);
+        if (!isNaN(d.getTime())) {
+            fallbackDate = d.toISOString().slice(0, 10);
+        }
+    }
+
+    const m = await r.json();
+    return {
+        appVersion: m && m.appVersion ? String(m.appVersion) : '',
+        changelog: m && Array.isArray(m.changelog) ? m.changelog : [],
+        releasedAt: m && m.releasedAt ? String(m.releasedAt) : '',
+        fallbackDate: (m && m.releasedAt) || fallbackDate
+    };
+}
+
+/* Рендер «Что нового» с авто-датой */
+function renderChangelog(list, currentVersion, fallbackDate) {
+    const box = $('up_changelog');
+    if (!box) return;
+    if (!Array.isArray(list) || !list.length) {
+        box.innerHTML = '<div class="cl-empty">Список изменений не опубликован.</div>';
+        return;
+    }
+    let h = '';
+    list.forEach((rel, idx) => {
+        if (!rel || !rel.version) return;
+        const isCurrent = rel.version === currentVersion;
+        // Авто-дата: своя в записи → releasedAt → Last-Modified файла
+        // для самой свежей записи (индекс 0), для остальных — только своя или пусто
+        const dt = rel.date || (idx === 0 ? fallbackDate : '');
+        h += '<div class="cl-release' + (isCurrent ? ' current' : '') + '">';
+        h += '<div class="cl-head">';
+        h += '<span class="cl-ver">v' + esc(rel.version) + '</span>';
+        if (dt) h += '<span class="cl-date">' + esc(dt) + '</span>';
+        if (isCurrent) h += '<span class="cl-badge cur">у тебя</span>';
+        else h += '<span class="cl-badge new">доступно</span>';
+        h += '</div>';
+        const ch = Array.isArray(rel.changes) ? rel.changes : [];
+        if (ch.length) {
+            h += '<ul class="cl-list">';
+            for (const c of ch) h += '<li>' + esc(c) + '</li>';
+            h += '</ul>';
+        } else {
+            h += '<div class="cl-empty">— без описания —</div>';
+        }
+        h += '</div>';
+    });
+    box.innerHTML = h;
+}
+
+function checkAppUpdate() {
+    const st = $('up_prog_status');
+    st.innerHTML = '<div class="up-load">⏳ Проверяем программу…</div>';
+
+    fetchUpdateMeta().then(meta => {
+        const latest = meta.appVersion;
+        const cur = APP_VERSION;
+        if (latest) $('up_app_latest').textContent = latest;
+
+        let h = '<div class="up-ok">';
+        h += '<div>У тебя: <b>' + esc(cur) + '</b>';
+        if (latest) h += ' · На сервере: <b>' + esc(latest) + '</b>';
+        h += '</div>';
+        if (meta.fallbackDate) h += '<div style="font-size:.76rem;color:var(--mu);margin-top:2px">Проверено: ' + esc(meta.fallbackDate) + '</div>';
+        if (latest && latest !== cur) {
+            h += '<div style="margin-top:6px;color:var(--ok);font-weight:700">✓ Доступна новая версия — жми «Перезагрузить с сервера»</div>';
+        } else if (latest) {
+            h += '<div style="margin-top:6px;color:var(--mu)">✓ У тебя актуальная версия</div>';
+        } else {
+            h += '<div style="margin-top:6px;color:var(--sr)">⚠ Сервер не отдал номер версии. Проверь <code>data/update.json</code></div>';
+        }
+        h += '</div>';
+        st.innerHTML = h;
+
+        if (Array.isArray(meta.changelog) && meta.changelog.length) {
+            renderChangelog(meta.changelog, APP_VERSION, meta.fallbackDate);
+        }
+    }).catch(e => {
+        st.innerHTML = '<div class="up-err">Ошибка: ' + esc(e.message) + '</div>';
+    });
+}
+function reloadApp() {
+    if (!confirm('Перезагрузить приложение с сервера?\n\nВсе данные (гараж, избранное, журнал, настройки) сохранятся.')) return;
+    toast('🔄 Загружаем свежую версию…', 'success');
+    const url = location.pathname + '?v=' + Date.now();
+    setTimeout(() => { location.replace(url); }, 300);
+}
+
+/* ============ FAQ ============ */
+function oFaq() { openM('faqmo'); }
+function cFaq() { closeM('faqmo'); }
+
 function cUp() { $('upmo').classList.remove('show'); window._upParts = null; }
 function sUpUrl() {
     const u = $('up_url').value.trim();
@@ -2524,8 +2640,10 @@ function bindUI() {
     const modalClose = {
         mo: cM, wmo: cWM, gmo: cGM, smo: cSM, aboutmo: cAbout, bugmo: cBug,
         donmo: cDonate, profmo: cProfile, upmo: cUp, partmo: cPC,
-        logmo: cLog, tomo: cTO, shopmo: cShop, vinmo: cVIN, thememmo: cTheme
+        logmo: cLog, tomo: cTO, shopmo: cShop, vinmo: cVIN, thememmo: cTheme,
+        faqmo: cFaq
     };
+
     Object.keys(modalClose).forEach(id => {
         const el = $(id); if (!el) return;
         el.addEventListener('click', e => { if (e.target.id === id) modalClose[id](); });
@@ -2534,6 +2652,8 @@ function bindUI() {
     // Escape / Ctrl+F
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
+
+            if ($('faqmo').classList.contains('show')) return cFaq();
             if ($('thememmo').classList.contains('show')) return cTheme();
             if ($('vinmo').classList.contains('show')) return cVIN();
             if ($('shopmo').classList.contains('show')) return cShop();

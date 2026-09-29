@@ -280,7 +280,7 @@ body.theme-light .sb {
 /* Кнопка гамбургер (десктоп) */
 .tbd {
     position: fixed !important;
-    top: 14px !important; left: 14px !important;
+    top: 14px !important; left: 12px !important;
     width: 40px !important; height: 40px !important;
     background: linear-gradient(135deg, var(--a), var(--a-h)) !important;
     color: #fff !important;
@@ -302,7 +302,7 @@ body.theme-light .sb {
 }
 
 /* Бренд */
-.brand { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,.08); flex-shrink: 0; }
+.brand { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,.08); flex-shrink: 0; text-align: right; }
 .brand h2 {
     margin: 0; font-size: 1.1rem; font-weight: 800; letter-spacing: -.3px;
     background: linear-gradient(135deg, #fff 30%, var(--a) 100%);
@@ -1965,7 +1965,7 @@ body.theme-light .th-card { box-shadow: inset 0 1px 0 rgba(186,182,182,.7); }
         display: flex !important;
         position: absolute !important;
         top: 8px !important;
-        left: 12px !important;
+        left: 10px !important;
         width: 38px; height: 38px;
         font-size: 1.05rem;
     }
@@ -2145,4 +2145,137 @@ body.theme-light .th-card { box-shadow: inset 0 1px 0 rgba(186,182,182,.7); }
     .cd-body[open] { display: block; }
     .cd-nm { color: #000; }
     .cd-s-t::before { background: #000; }
+}
+/* ============================================================
+   ОБНОВЛЕНИЕ — секции (программа / база)
+   ============================================================ */
+.up-sec { margin-bottom: 18px; }
+.up-sec:last-child { margin-bottom: 0; }
+.up-sec-h {
+    font-size: .68rem; text-transform: uppercase; letter-spacing: .8px;
+    color: var(--a); font-weight: 800; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+}
+.up-sec-h::before {
+    content: ''; display: inline-block;
+    width: 3px; height: 12px;
+    background: linear-gradient(180deg, var(--a), var(--a-h));
+    border-radius: 2px;
+}
+.up-divider {
+    height: 1px; margin: 18px 0;
+    background: linear-gradient(90deg, transparent, var(--bd), transparent);
+}
+
+/* ============================================================
+   FAQ — помощь по кнопкам
+   ============================================================ */
+.faq-sec { margin-bottom: 22px; }
+.faq-sec:last-child { margin-bottom: 0; }
+.faq-sec-h {
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .8px;
+    color: var(--a); font-weight: 800; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+    padding-bottom: 6px; border-bottom: 1px solid var(--bd);
+}
+.faq-sec-h::before {
+    content: ''; display: inline-block;
+    width: 3px; height: 14px;
+    background: linear-gradient(180deg, var(--a), var(--a-h));
+    border-radius: 2px;
+}
+.faq-item {
+    padding: 10px 12px;
+    border-radius: var(--r-md);
+    background: var(--hv);
+    border: 1px solid var(--bd);
+    margin-bottom: 8px;
+}
+.faq-item:last-child { margin-bottom: 0; }
+.faq-q {
+    font-weight: 700; font-size: .86rem;
+    color: var(--tx); margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px;
+}
+.faq-ic {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 26px; height: 26px; padding: 0 6px;
+    background: var(--cd);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-sm);
+    font-size: .85rem; flex-shrink: 0;
+    font-family: var(--ff-mono);
+}
+.faq-a {
+    font-size: .8rem; line-height: 1.6;
+    color: var(--mu); padding-left: 34px;
+}
+.faq-a b { color: var(--tx); font-weight: 700; }
+.faq-a code {
+    font-family: var(--ff-mono); font-size: .76rem;
+    background: var(--cd); padding: 1px 6px;
+    border-radius: var(--r-xs); color: var(--a);
+    border: 1px solid var(--bd);
+}
+body.theme-paper .faq-item { background: rgba(58,42,24,.05); }
+body.theme-light .faq-item { background: rgba(40,40,38,.04); }
+
+/* ============================================================
+   ОБНОВЛЕНИЕ — блок «Что нового»
+   ============================================================ */
+.changelog { display: flex; flex-direction: column; gap: 10px; }
+.cl-release {
+    padding: 10px 12px;
+    border-radius: var(--r-md);
+    background: var(--hv);
+    border: 1px solid var(--bd);
+    border-left: 3px solid var(--a);
+}
+.cl-release.current {
+    border-left-color: var(--ok);
+    background: color-mix(in srgb, var(--ok) 6%, var(--hv));
+}
+.cl-head {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px; flex-wrap: wrap;
+}
+.cl-ver {
+    font-family: var(--ff-mono);
+    font-weight: 800; font-size: .84rem;
+    color: var(--a);
+    padding: 2px 8px;
+    background: color-mix(in srgb, var(--a) 12%, transparent);
+    border-radius: var(--r-pill);
+    letter-spacing: .3px;
+}
+.cl-release.current .cl-ver { color: var(--ok); background: color-mix(in srgb, var(--ok) 15%, transparent); }
+.cl-date { font-size: .72rem; color: var(--mu); font-family: var(--ff-mono); }
+.cl-badge {
+    font-size: .6rem; font-weight: 800;
+    padding: 2px 7px;
+    border-radius: var(--r-pill);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+.cl-badge.new { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+.cl-badge.cur { background: var(--hv); color: var(--mu); }
+.cl-list {
+    margin: 0; padding: 0;
+    list-style: none;
+    display: flex; flex-direction: column; gap: 4px;
+}
+.cl-list li {
+    font-size: .8rem; line-height: 1.5;
+    color: var(--tx);
+    padding-left: 16px;
+    position: relative;
+}
+.cl-list li::before {
+    content: '•';
+    position: absolute; left: 4px;
+    color: var(--a); font-weight: 800;
+}
+.cl-empty {
+    font-size: .82rem; color: var(--mu); font-style: italic;
+    text-align: center; padding: 12px 8px;
 }

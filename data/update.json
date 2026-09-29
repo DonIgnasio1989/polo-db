@@ -1,14 +1,31 @@
 {
-  "appVersion": "1.1.3",
-  "notes": "",
-  "updatedAt": "2026-09-26",
+  "appVersion": "1.1.5",
+  "changelog": [
+    {
+      "version": "1.1.5",
+      "changes": [
+        "Дата обновления теперь проставляется автоматически",
+        "Список «Что нового» тянется с сервера при открытии окна",
+        "Мелочи по вёрстке"
+      ]
+    },
+    {
+      "version": "1.1.4",
+      "date": "2026-09-29",
+      "changes": [
+        "Гамбургер сдвинут левее",
+        "Заголовок сайдбара выровнен по правому краю",
+        "Новая страница «Помощь»"
+      ]
+    }
+  ],
+  
   "files": [
     "data/parts-01-engine-fuel-ignition.json",
     "data/parts-02-cooling-heating-brakes-suspension.json",
     "data/parts-03-trans-exh-elec-bulbs.json",
     "data/parts-04-body-interior-maint-fluids-roadkit.json",
     "data/parts-05-rear-axle-controls.json",
-    "data/parts-06.json",
     "data/categories.json",
     "data/sections.json",
     "data/workshops.json"
