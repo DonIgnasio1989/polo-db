@@ -93,30 +93,34 @@ const ONLINE_CATALOGS = {
     elcats: () => 'https://www.elcats.ru/vw/Unit.aspx?mdl=8BD8FB5D&cat=1'
 };
 const getPurchaseHtml = p => {
-    const av = (typeof gAV === 'function') ? gAV() : null;
-    const vin = av && av.ok ? av.vin : '';
-    const prs = fP(p.price, p.currency);
-    const su = p.shopUrl || '';
-    const hh = p.priceHistory && p.priceHistory.length > 0 ? '<span class="hi" title="История цен">📊 ' + p.priceHistory.length + '</span>' : '';
-    let h = '';
-    h += '<div class="prow">';
-    h += prs ? '<span class="price-tag">' + esc(prs) + '</span>' : '<span style="color:var(--mu);font-size:.7rem">цена не указана</span>';
-    h += hh;
-    if (su) h += '<a class="sl" href="' + escA(su) + '" target="_blank" rel="noopener noreferrer">🛒 Свой магазин</a>';
-    h += '</div>';
-    if (p.oem) h += '<div class="prow">' + shopH(p.oem) + '</div>';
+  const isMobile = window.innerWidth <= 900;
+  const av = (typeof gAV === 'function') ? gAV() : null;
+  const vin = av && av.ok ? av.vin : '';
+  const prs = fP(p.price, p.currency);
+  const su = p.shopUrl || '';
+  const hh = (p.priceHistory && p.priceHistory.length)
+    ? '<span class="hi" title="История цен">📊 ' + p.priceHistory.length + '</span>' : '';
+  let h = '';
+  h += '<div class="prow">';
+  h += prs ? '<span class="price-tag">' + esc(prs) + '</span>' : '<span style="color:var(--mu);font-size:.7rem">цена не указана</span>';
+  h += hh;
+  if (su) h += '<a class="sl" href="' + escA(su) + '" target="_blank" rel="noopener noreferrer">🛒 Свой магазин</a>';
+  h += '</div>';
+  if (p.oem) h += '<div class="prow">' + shopH(p.oem) + '</div>';
+  if (!isMobile) {
     h += '<div class="prow op-b">';
     if (vin) {
-        h += '<a class="psl op1" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.sevenzap(vin) + '">7zap VIN</a>';
-        h += '<a class="psl op2" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.autopoisk(vin) + '">Autopoisk</a>';
-        h += '<a class="psl op3" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.partsouq(vin) + '">Partsouq</a>';
+      h += '<a class="psl op1" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.sevenzap(vin) + '">7zap VIN</a>';
+      h += '<a class="psl op2" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.autopoisk(vin) + '">Autopoisk</a>';
+      h += '<a class="psl op3" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.partsouq(vin) + '">Partsouq</a>';
     }
     h += '<a class="psl op4" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.sufix() + '">Sufix</a>';
     h += '<a class="psl op5" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.parts2407() + '">2407.pl</a>';
     h += '<a class="psl op6" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.amayama() + '">Amayama</a>';
     h += '<a class="psl op7" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.elcats() + '">Elcats</a>';
     h += '</div>';
-    return h;
+  }
+  return h;
 };
 
 /* ============ КЛЮЧИ ХРАНИЛИЩА ============ */
@@ -156,6 +160,25 @@ let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
 let vinEdId = null, shopPick = new Set(), partmoId = null;
 let tt = null, tuT = null, usT = null, rcT = null;
+
+/* ============ ИНДЕКС ЛОГОВ (O(1) поиск по OEM) ============ */
+let _logByOem = new Map();
+
+function _rebuildLogIndex() {
+    _logByOem.clear();
+    for (const e of LOG) {
+        const items = Array.isArray(e.items) ? e.items : [];
+        for (const it of items) {
+            const key = nz(it);
+            if (!key) continue;
+            const prev = _logByOem.get(key);
+            // оставляем самую свежую запись по каждой детали
+            if (!prev || (e.date || '') > (prev.date || '')) {
+                _logByOem.set(key, e);
+            }
+        }
+    }
+}
 
 /* ============ УТИЛИТЫ ============ */
 const $ = id => document.getElementById(id);
@@ -461,6 +484,7 @@ function lU() {
         if (r) {
             const p = JSON.parse(r);
             SV = Object.assign(SV, p);
+            if (!SV.expandedTree || typeof SV.expandedTree !== 'object') SV.expandedTree = {};
             if (!CATS.some(c => c.id === SV.activeCat) && !['Favorites', 'Workshops', 'Log'].includes(SV.activeCat)) SV.activeCat = 'All';
         }
     } catch (e) { }
@@ -517,6 +541,7 @@ async function lLogs() {
             }
         }
     } catch (e) { console.warn('logs load error', e); }
+    _rebuildLogIndex();
 }
 
 /* ============ ТОСТ ============ */
@@ -1299,73 +1324,149 @@ function updateFilterStyling() {
     });
 }
 function updSearchSuggest() {
-    const dl = $('searchSuggest'); if (!dl) return;
-    const items = [], seen = new Set();
-    const push = (v, k) => { if (v && !seen.has(k)) { items.push(v); seen.add(k); } };
-    for (const p of D) {
-        push(p.oem, 'o:' + p.oem);
-        push(p.name, 'n:' + p.name);
-        for (const a of (p.analogs || [])) push(a, 'a:' + a);
-    }
-    dl.innerHTML = items.slice(0, 500).map(x => '<option value="' + escA(x) + '">').join('');
+  const dl = $('searchSuggest'); if (!dl) return;
+  const items = [], seen = new Set();
+  const MAX = 200;                              // было 500
+  for (const p of D) {
+    if (items.length >= MAX) break;
+    if (p.oem && !seen.has('o:' + p.oem)) { items.push(p.oem); seen.add('o:' + p.oem); }
+    if (items.length >= MAX) break;
+    if (p.name && !seen.has('n:' + p.name)) { items.push(p.name); seen.add('n:' + p.name); }
+  }
+  dl.innerHTML = items.map(x => '<option value="' + escA(x) + '">').join('');
 }
 
-/* ============ КОНТЕНТ ============ */
-function rC() {
-    if (SV.activeCat === 'Workshops') { rW(); return; }
-    if (SV.activeCat === 'Log') { rLog(); return; }
-    if (CUSTOM.sections[SV.activeCat]) { rSec(SV.activeCat); return; }
-    const ar = $('ca'), f = gF();
-    let title, icon;
-    if (SV.activeCat === 'Favorites') { title = 'Избранное'; icon = '⭐'; }
-    else if (SV.activeCat === 'All') { title = 'Все системы'; icon = '📦'; }
-    else { const c = CATS.find(x => x.id === SV.activeCat); title = c ? c.label : '?'; icon = c ? c.icon : '📦'; }
-    let h = '<h2 class="sh">' + icon + ' ' + esc(title) + '</h2>';
-    const chips = [];
-    chips.push('<span class="chip">найдено: <b>' + f.length + '</b></span>');
-    if (SV.engineFilter && SV.engineFilter !== 'all') chips.push('<span class="chip">⚙️ ' + esc(SV.engineFilter) + '</span>');
-    if (SV.bodyFilter && SV.bodyFilter !== 'all') chips.push('<span class="chip">🚗 ' + esc(BODIES[SV.bodyFilter] || SV.bodyFilter) + '</span>');
-    if (SV.transFilter && SV.transFilter !== 'all') chips.push('<span class="chip">🔄 ' + esc(TRANSMISSIONS[SV.transFilter] || SV.transFilter) + '</span>');
-    if (SV.statusFilter && SV.statusFilter !== 'all') chips.push('<span class="chip">🏷 ' + esc(SV.statusFilter) + '</span>');
-    if (SV.searchQuery) chips.push('<span class="chip">🔍 "' + esc(SV.searchQuery) + '"</span>');
-    chips.push('<span class="chip" data-chip="groupBySub" style="cursor:pointer;' + (SV.groupBySub ? 'border-color:var(--a);background:rgba(0,176,240,.12);' : '') + '" title="Группировать по подкатегориям">📂 Группы</span>');
-    const av = gAV();
-    if (av) {
-        chips.push('<span class="chip">VIN …' + esc(av.vin.slice(-6)) + '</span>');
-        chips.push('<span class="chip" data-chip="vinStrict" style="cursor:pointer;' + (SV.vinStrictFilter ? 'border-color:var(--dg);background:rgba(220,53,69,.12);' : '') + '" title="Скрыть детали, несовместимые с VIN">🔒 VIN-строго</span>');
-    }
-    h += '<div class="ri">' + chips.join('') + '</div>';
-    if (!f.length) {
-        let ei, em;
-        if (SV.activeCat === 'Favorites') { ei = '⭐'; em = 'Пока нет избранного.'; }
-        else if (!D.length) { ei = '📂'; em = 'База пуста. Положи parts.json в data/ или нажми ⚙️ → 🌐 Обновление базы.'; }
-        else { ei = '🔍'; em = 'Ничего не найдено. Попробуйте сбросить фильтры.'; }
-        h += '<div class="emp"><div class="empi">' + ei + '</div><p>' + em + '</p><button class="bn" onclick="resetFilters()" style="margin-top:10px">🔄 Сбросить фильтры</button></div>';
-        ar.innerHTML = h; return;
-    }
-    if (SV.view === 'tree') h += rET(f);
-    else if (SV.groupBySub) {
-        const groups = {};
-        for (const p of f) {
-            const k = (p.sub || '').trim() || '— без подкатегории —';
-            if (!groups[k]) groups[k] = [];
-            groups[k].push(p);
-        }
-        const keys = Object.keys(groups).sort((a, b) =>
-            (a === '— без подкатегории —' ? 1 : b === '— без подкатегории —' ? -1 : 0) || a.localeCompare(b));
-        for (const k of keys) {
-            h += '<h3 style="margin:14px 0 8px;font-size:.9rem;color:var(--b);display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:3px;height:14px;background:var(--a);border-radius:2px"></span>' + esc(k) + ' <span style="font-size:.72rem;color:var(--mu);font-weight:400">(' + groups[k].length + ')</span></h3>';
-            h += '<div class="gr">';
-            for (const p of groups[k]) h += cH(p);
-            h += '</div>';
-        }
-    } else {
-        h += '<div class="gr">';
-        for (const p of f) h += cH(p);
-        h += '</div>';
-    }
-    ar.innerHTML = h;
+/* ============ КОНТЕНТ (с окном рендера) ============ */
+const PAGE_SIZE = 40;
+let _visibleLimit = PAGE_SIZE;
+let _lastRenderSig = '';
+
+function _renderSignature() {
+  return [
+    SV.activeCat, SV.searchQuery, SV.statusFilter,
+    SV.engineFilter, SV.bodyFilter, SV.transFilter,
+    SV.sortBy, SV.groupBySub, SV.vinStrictFilter
+  ].join('|');
 }
+
+function rC() {
+  if (SV.activeCat === 'Workshops') { rW(); return; }
+  if (SV.activeCat === 'Log') { rLog(); return; }
+  if (CUSTOM.sections[SV.activeCat]) { rSec(SV.activeCat); return; }
+
+  /* сброс окна при смене фильтра/поиска/раздела */
+  const sig = _renderSignature();
+  if (sig !== _lastRenderSig) { _visibleLimit = PAGE_SIZE; _lastRenderSig = sig; }
+
+  const ar = $('ca'), f = gF();
+
+  /* --- Заголовок раздела --- */
+  let title, icon;
+  if (SV.activeCat === 'Favorites') { title = 'Избранное'; icon = '⭐'; }
+  else if (SV.activeCat === 'All') { title = 'Все системы'; icon = '📦'; }
+  else {
+    const c = CATS.find(x => x.id === SV.activeCat);
+    title = c ? c.label : '?';
+    icon = c ? c.icon : '📦';
+  }
+  let h = '<h2 class="sh">' + icon + ' ' + esc(title) + '</h2>';
+
+  /* --- Чипы-фильтры --- */
+  const chips = [];
+  chips.push('<span class="chip">найдено: <b>' + f.length + '</b></span>');
+  if (SV.engineFilter && SV.engineFilter !== 'all') chips.push('<span class="chip">⚙️ ' + esc(SV.engineFilter) + '</span>');
+  if (SV.bodyFilter && SV.bodyFilter !== 'all') chips.push('<span class="chip">🚗 ' + esc(BODIES[SV.bodyFilter] || SV.bodyFilter) + '</span>');
+  if (SV.transFilter && SV.transFilter !== 'all') chips.push('<span class="chip">🔄 ' + esc(TRANSMISSIONS[SV.transFilter] || SV.transFilter) + '</span>');
+  if (SV.statusFilter && SV.statusFilter !== 'all') chips.push('<span class="chip">🏷 ' + esc(SV.statusFilter) + '</span>');
+  if (SV.searchQuery) chips.push('<span class="chip">🔍 "' + esc(SV.searchQuery) + '"</span>');
+  chips.push('<span class="chip" data-chip="groupBySub" style="cursor:pointer;' + (SV.groupBySub ? 'border-color:var(--a);background:rgba(0,176,240,.12);' : '') + '" title="Группировать по подкатегориям">📂 Группы</span>');
+  const av = gAV();
+  if (av) {
+    chips.push('<span class="chip">VIN …' + esc(av.vin.slice(-6)) + '</span>');
+    chips.push('<span class="chip" data-chip="vinStrict" style="cursor:pointer;' + (SV.vinStrictFilter ? 'border-color:var(--dg);background:rgba(220,53,69,.12);' : '') + '" title="Скрыть детали, несовместимые с VIN">🔒 VIN-строго</span>');
+  }
+  h += '<div class="ri">' + chips.join('') + '</div>';
+
+  /* --- Пустая выдача --- */
+  if (!f.length) {
+    let ei, em;
+    if (SV.activeCat === 'Favorites') { ei = '⭐'; em = 'Пока нет избранного.'; }
+    else if (!D.length) { ei = '📂'; em = 'База пуста. Положи parts.json в data/ или нажми ⚙️ → 🌐 Обновление базы.'; }
+    else { ei = '🔍'; em = 'Ничего не найдено. Попробуйте сбросить фильтры.'; }
+    h += '<div class="emp"><div class="empi">' + ei + '</div><p>' + em + '</p><button class="bn" onclick="resetFilters()" style="margin-top:10px">🔄 Сбросить фильтры</button></div>';
+    ar.innerHTML = h;
+    return;
+  }
+
+  /* === Ветка «дерево» — без окна === */
+  if (SV.view === 'tree') {
+    h += rET(f);
+    ar.innerHTML = h;
+    return;
+  }
+
+  /* === Плитка / группы — с окном === */
+  if (SV.groupBySub) {
+    const groups = {};
+    for (const p of f) {
+      const k = (p.sub || '').trim() || '— без подкатегории —';
+      (groups[k] || (groups[k] = [])).push(p);
+    }
+    const keys = Object.keys(groups).sort((a, b) =>
+      (a === '— без подкатегории —' ? 1 : b === '— без подкатегории —' ? -1 : 0)
+      || a.localeCompare(b));
+
+    let rendered = 0;
+    for (const k of keys) {
+      if (rendered >= _visibleLimit) break;
+      h += '<h3 style="margin:14px 0 8px;font-size:.9rem;color:var(--b);display:flex;align-items:center;gap:6px">'
+        + '<span style="display:inline-block;width:3px;height:14px;background:var(--a);border-radius:2px"></span>'
+        + esc(k) + ' <span style="font-size:.72rem;color:var(--mu);font-weight:400">('
+        + groups[k].length + ')</span></h3><div class="gr">';
+      for (const p of groups[k]) {
+        if (rendered >= _visibleLimit) break;
+        h += cH(p);
+        rendered++;
+      }
+      h += '</div>';
+    }
+  } else {
+    const slice = f.slice(0, _visibleLimit);
+    h += '<div class="gr">';
+    for (const p of slice) h += cH(p);
+    h += '</div>';
+  }
+
+  if (f.length > _visibleLimit) {
+    h += '<div style="text-align:center;padding:22px 0">'
+      + '<button class="bn p" onclick="_showMore()">▾ Показать ещё ('
+      + (f.length - _visibleLimit) + ' из ' + f.length + ')</button></div>';
+  }
+  ar.innerHTML = h;
+}
+window._showMore = function () {
+  _visibleLimit += PAGE_SIZE;
+  rC();
+};
+/* Развернуть/свернуть все папки в дереве */
+window.toggleTreeAll = function () {
+    const all = document.querySelectorAll('#ca details[data-etkey]');
+    if (!all.length) return;
+    const anyOpen = Array.from(all).some(d => d.open);
+    if (!SV.expandedTree) SV.expandedTree = {};
+    all.forEach(d => {
+        const k = d.dataset.etkey;
+        if (anyOpen) { d.open = false; delete SV.expandedTree[k]; }
+        else { d.open = true; SV.expandedTree[k] = true; }
+    });
+    sU();
+    /* обновить подпись кнопки, не перерисовывая всё дерево */
+    const btn = document.querySelector('.et-tgl-btn');
+    if (btn) {
+        btn.textContent = anyOpen ? '▼ Развернуть всё' : '▲ Свернуть всё';
+        btn.dataset.treeall = anyOpen ? 'expand' : 'collapse';
+    }
+};
 
 function cH(p) {
     const o = p.oem || '';
@@ -1493,17 +1594,43 @@ function rET(parts) {
         if (!t[m.g][m.s]) t[m.g][m.s] = [];
         t[m.g][m.s].push(p);
     }
-    const isMobile = window.innerWidth <= 900;
-    const openAttr = isMobile ? '' : ' open';
+
+    /* Состояние раскрытия папок: SV.expandedTree = { "g:Двигатель": true, "s:Двигатель|ГРМ": true } */
+    if (!SV.expandedTree || typeof SV.expandedTree !== 'object') SV.expandedTree = {};
+    const exp = SV.expandedTree;
+
+    const groupKeys = Object.keys(t).sort();
+    const anyOpen = groupKeys.some(g => exp['g:' + g]);
+
     let h = '<div class="et">';
-    for (const g of Object.keys(t).sort()) {
+
+    /* Кнопка «Развернуть/Свернуть всё» + подсказка */
+    h += '<div class="et-tools">'
+      + '<button type="button" class="bn et-tgl-btn" onclick="toggleTreeAll()" data-treeall="' + (anyOpen ? 'collapse' : 'expand') + '">'
+      + (anyOpen ? '▲ Свернуть всё' : '▼ Развернуть всё')
+      + '</button>'
+      + '<span class="et-hint">Нажми на папку 📁, чтобы раскрыть</span>'
+      + '</div>';
+
+    for (const g of groupKeys) {
         const sg = t[g];
         let tot = 0;
         for (const s of Object.keys(sg)) tot += sg[s].length;
-        h += '<details' + openAttr + '><summary>📁 ' + esc(g) + '<span class="gc">' + tot + '</span></summary>';
+        const gKey = 'g:' + g;
+        const gOpen = !!exp[gKey];
+
+        h += '<details class="et-group"' + (gOpen ? ' open' : '') + ' data-etkey="' + escA(gKey) + '">';
+        h += '<summary>📁 ' + esc(g) + '<span class="gc">' + tot + '</span></summary>';
+
         for (const s of Object.keys(sg).sort()) {
             const a = sg[s];
-            h += '<details' + openAttr + '><summary style="font-size:.8rem;font-weight:600;color:var(--mu)">📂 ' + esc(s) + '<span class="gc">' + a.length + '</span></summary><div class="sg">';
+            const sKey = 's:' + g + '|' + s;
+            const sOpen = !!exp[sKey];
+
+            h += '<details class="et-sub"' + (sOpen ? ' open' : '') + ' data-etkey="' + escA(sKey) + '">';
+            h += '<summary style="font-size:.8rem;font-weight:600;color:var(--mu)">📂 ' + esc(s) + '<span class="gc">' + a.length + '</span></summary>';
+            h += '<div class="sg">';
+
             for (const p of a.slice().sort((x, y) => (x.oem || '').localeCompare(y.oem || ''))) {
                 const w = p.verified ? '' : ' <span style="color:var(--wn);font-size:.68rem">⚠</span>';
                 const cm = pCompat(p);
@@ -1520,6 +1647,7 @@ function rET(parts) {
                 let nm = p.notes ? ' 📝' : '';
                 h += '<div class="ep" data-id="' + escA(p.id) + '"><span class="om">' + esc(p.oem || '—') + '</span><span class="nm">' + esc(p.name || '') + pm + nm + w + sm + '</span></div>';
             }
+
             h += '</div></details>';
         }
         h += '</details>';
@@ -2199,12 +2327,13 @@ function sLog() {
         vin: gAV() ? gAV().vin : '',
         createdAt: Date.now()
     };
-    if (id) {
+        if (id) {
         const i = LOG.findIndex(x => x.id === id);
         if (i >= 0) LOG[i] = rec;
     } else LOG.push(rec);
     useIDB ? iPut('logs', rec).catch(() => { }) : sLogs();
     if (!useIDB) sLogs();
+    _rebuildLogIndex();    
     cLog(); rC();
     toast(id ? 'Запись обновлена' : 'Запись добавлена', 'success');
 }
@@ -2213,14 +2342,13 @@ function dLog(id) {
     LOG = LOG.filter(x => x.id !== id);
     useIDB ? iDel('logs', id).catch(() => { }) : sLogs();
     if (!useIDB) sLogs();
+    _rebuildLogIndexrebuildLogIndex();
     rC();
     toast('Удалено', 'danger');
 }
 function lastLogForOEM(oem) {
     if (!oem) return null;
-    const arr = LOG.filter(e => (e.items || []).some(it => nz(it) === nz(oem)));
-    if (!arr.length) return null;
-    return arr.sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+    return _logByOem.get(nz(oem)) || null;
 }
 function lastLogBadge(oem) {
     if (!oem) return '';
@@ -2592,6 +2720,28 @@ function bindUI() {
     // Контент
     const ca = $('ca');
     ca.addEventListener('click', oCC);
+        // Сохранение раскрытия папок в дереве ETKA
+    ca.addEventListener('click', e => {
+        const sum = e.target.closest('summary');
+        if (!sum) return;
+        const det = sum.parentElement;
+        if (!det || det.tagName !== 'DETAILS' || !det.dataset.etkey) return;
+        /* toggle происходит после текущего клика — ждём микротик */
+        setTimeout(() => {
+            if (!SV.expandedTree) SV.expandedTree = {};
+            const k = det.dataset.etkey;
+            if (det.open) SV.expandedTree[k] = true;
+            else delete SV.expandedTree[k];
+            sU();
+            /* обновить подпись кнопки «Развернуть/Свернуть всё» */
+            const btn = document.querySelector('.et-tgl-btn');
+            if (btn) {
+                const any = !!document.querySelector('#ca details[data-etkey][open]');
+                btn.textContent = any ? '▲ Свернуть всё' : '▼ Развернуть всё';
+                btn.dataset.treeall = any ? 'collapse' : 'expand';
+            }
+        }, 0);
+    }, false);
     ca.addEventListener('focusout', e => {
         const t = e.target;
         if (t && t.classList && t.classList.contains('cn')) {

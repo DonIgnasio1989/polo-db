@@ -2279,3 +2279,229 @@ body.theme-light .faq-item { background: rgba(40,40,38,.04); }
     font-size: .82rem; color: var(--mu); font-style: italic;
     text-align: center; padding: 12px 8px;
 }
+/* ============================================================
+   MOBILE PERFORMANCE — отключаем тяжёлые эффекты
+   ============================================================ */
+@media (max-width: 900px) {
+  /* 1. Убиваем backdrop-filter — главный тормоз на мобиле */
+  .sb, .sb::before, .sb::after,
+  .cd, .cd::before, .cd::after,
+  .em, .em::before,
+  .mo, .mdl, .mh, .mf,
+  .gi, .gi::before, .gi::after,
+  .sft, .sft-btn, .gb, .tbd, #mob, .to-chip, .bn, .fs,
+  .lic-box .lic-cc, .th-preview, .gdr {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* 2. Плотные фоны вместо «стекла» */
+  .sb {
+    background: linear-gradient(180deg,
+        var(--b) 0%,
+        color-mix(in srgb, var(--b) 88%, #000) 100%) !important;
+  }
+  .sft, .gb, .gi {
+    background: rgba(0, 0, 0, .28) !important;
+  }
+  .cd { background: var(--cd) !important; }
+  .em { background: var(--cd) !important; border-color: var(--bd) !important; }
+
+  /* 3. Убираем призму и blend-mode */
+  .cd::before, .cd::after,
+  .gi::before, .gi::after,
+  .sb::before, .sb::after,
+  .em::before,
+  .th-preview::after { display: none !important; }
+
+  /* 4. Убираем анимации входа у карточек */
+  .cd { animation: none !important; }
+  .gr > .cd:nth-child(n) { animation-delay: 0s !important; }
+  .emp .empi { animation: none !important; }
+  .bdg.updating { animation: none !important; }
+
+  /* 5. Упрощаем фон body — только однотонный/линейный */
+  body, body.theme-light, body.theme-dark, body.theme-aurora,
+  body.theme-cyberpunk, body.theme-sunset, body.theme-cosmos,
+  body.theme-paper {
+    background: var(--bg) !important;
+  }
+
+  /* 6. Лёгкие тени */
+  .cd, .cd:hover, .cd.fav, .cd.fav:hover {
+    box-shadow: 0 1px 3px rgba(0,0,0,.14) !important;
+    transform: none !important;
+  }
+  .sb { box-shadow: 0 0 0 1px rgba(0,0,0,.22) !important; }
+  .mdl { box-shadow: 0 8px 24px rgba(0,0,0,.45) !important; }
+  .wc, .log-entry { box-shadow: 0 1px 3px rgba(0,0,0,.14) !important; }
+  .wc:hover, .log-entry:hover { transform: none !important; }
+
+  /* 7. content-visibility — браузер не рисует то, что за экраном.
+        Дает самый большой прирост при списке из сотен карточек. */
+  .gr > .cd {
+    content-visibility: auto;
+    contain-intrinsic-size: 240px;
+  }
+
+  /* 8. Плоские градиенты у кнопок */
+  .bn.p, .tbd, #mob, .psl.ad {
+    background: var(--a) !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,.25) !important;
+  }
+  .tp.on[data-status=want],
+  .tp.on[data-status=bought],
+  .tp.on[data-status=installed] { box-shadow: none !important; }
+
+  /* 9. Скрываем второй ряд магазинов на карточке (7 лишних ссылок × N) */
+  .cd-purchase .prow.op-b { display: none; }
+}
+
+/* Уважение prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}/* ============================================================
+   MOBILE COMPACT TOOLBAR — сжать шапку, чтобы влезала в 1-2 строки
+   ============================================================ */
+@media (max-width: 900px) {
+
+  /* --- Топбар целиком: минимальные отступы --- */
+  .tb {
+    padding: 4px 6px 6px 46px !important;
+    gap: 3px !important;
+  }
+
+  /* --- Поиск: не на всю высоту, компактнее --- */
+  .sc {
+    margin-bottom: 2px !important;
+    height: 32px !important;
+  }
+  .sr {
+    padding: 5px 28px 5px 30px !important;
+    font-size: .78rem !important;
+    border-width: 1px !important;
+    border-radius: 6px !important;
+    height: 32px !important;
+  }
+  .si { left: 8px !important; font-size: .78rem !important; }
+  .scl { right: 4px !important; padding: 4px 5px !important; font-size: .78rem !important; }
+
+  /* --- Лента фильтров: одна горизонтальная прокрутка, всё в строку --- */
+  .tb-filters {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 1px !important;
+    gap: 4px !important;
+  }
+  .tb-filters::-webkit-scrollbar { display: none; }
+
+  /* --- Селекты и чипы: узкие, маленькие, в одну строку --- */
+  .fs,
+  .fs.flt.mtr, .fs.flt.bdy, .fs.flt.trn {
+    font-size: .66rem !important;
+    padding: 5px 6px !important;
+    height: 28px !important;
+    line-height: 1 !important;
+    max-width: none !important;
+    width: auto !important;
+    flex: 0 0 auto !important;
+    border-radius: 5px !important;
+  }
+
+  .to-chip {
+    font-size: .64rem !important;
+    padding: 4px 7px !important;
+    height: 28px !important;
+    flex: 0 0 auto !important;
+    border-radius: 5px !important;
+  }
+  .to-chip .to-lb { max-width: 100px !important; }
+
+  /* --- Кнопки действий: только иконка, без подписи --- */
+  .ac {
+    flex: 0 0 auto !important;
+    gap: 3px !important;
+    margin-left: 0 !important;
+  }
+  .ac > .bn {
+    padding: 4px 7px !important;
+    font-size: .72rem !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    justify-content: center !important;
+    border-radius: 5px !important;
+  }
+  /* Все подписи .bl скрыть — уже скрыто в твоём CSS, но усилим */
+  .ac .bn .bl { display: none !important; }
+  /* У кнопки «OEM» оставим только плюс, без слова */
+  .ac .bn.p .bl { display: none !important; }
+  /* Переключатель плитка/дерево — сжать */
+  .vt-switch {
+    padding: 3px 6px !important;
+    height: 28px !important;
+    font-size: .64rem !important;
+  }
+  .vt-track { width: 26px !important; height: 14px !important; }
+  .vt-thumb { width: 10px !important; height: 10px !important; }
+  .vt-switch input:checked ~ .vt-track .vt-thumb { transform: translateX(12px) !important; }
+  .vt-lbl { min-width: 42px; font-size: .62rem !important; }
+
+  /* --- Гамбургер --- */
+  #mob { top: 6px !important; left: 8px !important; width: 32px !important; height: 32px !important; font-size: .95rem !important; }
+}
+
+/* Очень узкие экраны — ещё плотнее */
+@media (max-width: 380px) {
+  .fs { font-size: .62rem !important; padding: 4px 5px !important; }
+  .to-chip { font-size: .6rem !important; padding: 3px 6px !important; }
+  .ac > .bn { padding: 3px 6px !important; }
+  .to-chip .to-lb { max-width: 70px !important; }
+}
+/* ============================================================
+   ETKA TREE — кнопка «Развернуть всё» + индикация открытых папок
+   ============================================================ */
+.et-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-bottom: 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px dashed var(--bd);
+}
+.et-tgl-btn {
+    padding: 6px 12px;
+    font-size: .78rem;
+}
+.et-hint {
+    font-size: .72rem;
+    color: var(--mu);
+    font-style: italic;
+}
+
+/* Открытая папка — подсветка + акцентная полоса слева */
+.et details.et-group[open] > summary {
+    background: color-mix(in srgb, var(--a) 10%, transparent);
+    box-shadow: inset 3px 0 0 var(--a);
+    border-radius: var(--r-sm);
+}
+.et details.et-sub[open] > summary {
+    background: color-mix(in srgb, var(--a) 6%, transparent);
+    box-shadow: inset 3px 0 0 color-mix(in srgb, var(--a) 55%, transparent);
+    border-radius: var(--r-sm);
+}
+
+/* Чуть больше отступ у вложенных подгрупп — видно иерархию */
+.et > details > details {
+    margin-left: 14px;
+    padding-left: 6px;
+    border-left: 1px dashed color-mix(in srgb, var(--a) 20%, transparent);
+}
