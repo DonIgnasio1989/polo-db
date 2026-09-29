@@ -152,12 +152,18 @@
           </optgroup>
         </select>
 
+         <select class="fs flt gen" id="fgen" title="Фильтр по поколению">
+          <option value="all">🚘 Все поколения</option>
+          <option value="6N1">6N1 — дорестайл (1994–1999)</option>
+          <option value="6N2">6N2 — рестайлинг (1999–2001)</option>
+        </select>
+
         <select class="fs flt bdy" id="fbdy" title="Фильтр по кузову">
           <option value="all">🚗 Все кузова</option>
-          <option value="3d">Hatchback 3д (6N1)</option>
-          <option value="5d">Hatchback 5д (6N2)</option>
-          <option value="classic">Polo Classic</option>
-          <option value="estate">Polo Estate</option>
+          <option value="3d">Hatchback 3д</option>
+          <option value="5d">Hatchback 5д</option>
+          <option value="classic">Polo Classic (седан)</option>
+          <option value="estate">Polo Estate (универсал)</option>
           <option value="caddy-van">Caddy Van</option>
           <option value="caddy-kombi">Caddy Kombi</option>
           <option value="caddy-pickup">Caddy Pickup</option>
@@ -278,6 +284,7 @@
           <div class="fg"><label>КПП (пусто = все)</label><input type="text" id="f_trn" placeholder="085, 020, 01M"></div>
           <div class="fg"><label>Кузова (пусто = все)</label><input type="text" id="f_bdy" placeholder="3d, 5d, caddy-van"></div>
         </div>
+        <div class="fg"><label>Поколение (пусто = все)</label><input type="text" id="f_gen" placeholder="6N1, 6N2"></div>
         <div class="fg"><label>Комплектации (пусто = все)</label><input type="text" id="f_trm" placeholder="Base, CL, GL"></div>
         <div class="fr">
           <div class="fg"><label>Цена</label><input type="number" id="f_pr" min="0" step="0.01" placeholder="0"></div>

@@ -280,7 +280,7 @@ body.theme-light .sb {
 /* Кнопка гамбургер (десктоп) */
 .tbd {
     position: fixed !important;
-    top: 14px !important; left: 12px !important;
+    top: 8px !important; left: 12px !important;
     width: 40px !important; height: 40px !important;
     background: linear-gradient(135deg, var(--a), var(--a-h)) !important;
     color: #fff !important;
@@ -2100,25 +2100,86 @@ body.theme-light .th-card { box-shadow: inset 0 1px 0 rgba(186,182,182,.7); }
     #g_vi { font-size: .9rem; letter-spacing: 1px; }
 }
 
-/* Десктоп ≥901px */
+/* Десктоп ≥901px — всё в одну строку */
 @media (min-width: 901px) {
-    .tb { flex-wrap: nowrap !important; padding: 8px 14px !important; gap: 6px !important; min-height: 52px !important; }
-        .sc { flex: 0 0 220px !important; max-width: 220px !important; min-width: 0 !important; margin-left: 52px !important; }
-    .sr { padding: 8px 32px 8px 34px !important; font-size: .86rem !important; }
-    .si { left: 10px !important; font-size: .85rem !important; }
+    .tb {
+        flex-wrap: nowrap !important;
+        padding: 10px 16px !important;
+        gap: 10px !important;
+        min-height: 60px !important;
+    }
+
+    /* Поиск — фиксированной ширины, не жмётся */
+    .sc {
+        flex: 0 0 260px !important;
+        max-width: 260px !important;
+        min-width: 260px !important;
+        margin-left: 0 !important;
+    }
+    body.sidebar-collapsed .sc { margin-left: 52px !important; }
+
+    .sr {
+        padding: 8px 34px 8px 36px !important;
+        font-size: .86rem !important;
+        height: 36px !important;
+    }
+    .si { left: 12px !important; font-size: .86rem !important; }
+    .scl { right: 8px !important; }
+
+    /* Фильтры — сжимаются первыми, с горизонтальной прокруткой при нехватке */
     .tb-filters {
-        flex-wrap: nowrap !important; gap: 5px !important;
-        overflow-x: auto !important; overflow-y: hidden !important;
-        scrollbar-width: none; padding-bottom: 0 !important;
+        flex: 1 1 auto !important;
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        scrollbar-width: none;
+        min-width: 0 !important;
+        padding-bottom: 0 !important;
     }
     .tb-filters::-webkit-scrollbar { display: none; }
-    .fs { padding: 6px 8px !important; font-size: .72rem !important; max-width: 130px !important; min-width: 0 !important; flex-shrink: 1 !important; }
-    .to-chip { padding: 6px 9px !important; font-size: .72rem !important; }
-    .to-chip .to-lb { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: middle; }
-    .bn { padding: 6px 10px !important; font-size: .76rem !important; }
-    .ac { gap: 4px !important; flex-wrap: nowrap !important; }
-    .ac .bn .bl { display: none !important; }
+
+    .fs {
+        padding: 7px 10px !important;
+        font-size: .8rem !important;
+        max-width: 180px !important;
+        min-width: 0 !important;
+        flex: 0 1 auto !important;
+        height: 36px !important;
+    }
+
+    .to-chip {
+        padding: 7px 11px !important;
+        font-size: .8rem !important;
+        height: 36px !important;
+        flex-shrink: 0 !important;
+    }
+    .to-chip .to-lb { max-width: none !important; }
+
+    /* Кнопки справа — НЕ сжимаются, прижаты вправо */
+    .ac {
+        gap: 6px !important;
+        flex-wrap: nowrap !important;
+        flex-shrink: 0 !important;
+        margin-left: 0 !important;
+    }
+    .bn {
+        padding: 7px 12px !important;
+        font-size: .8rem !important;
+        height: 36px !important;
+    }
+    /* Подписи у кнопок Журнал/OEM — на десктопе оставляем */
+    .ac .bn .bl { display: inline !important; }
     .ac .bn.p .bl { display: inline !important; }
+
+    .vt-switch {
+        padding: 6px 10px !important;
+        font-size: .8rem !important;
+        height: 36px !important;
+        flex-shrink: 0 !important;
+    }
+    .vt-lbl { min-width: 62px; font-size: .8rem !important; }
+
     .em { position: fixed !important; max-height: 80vh; overflow-y: auto; z-index: 2500; }
 }
 
@@ -2392,12 +2453,10 @@ body.theme-light .faq-item { background: rgba(40,40,38,.04); }
   .scl { right: 4px !important; padding: 4px 5px !important; font-size: .78rem !important; }
 
   /* --- Лента фильтров: одна горизонтальная прокрутка, всё в строку --- */
+    /* --- Лента фильтров: перенос строк, всё видно --- */
   .tb-filters {
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    flex-wrap: wrap !important;
+    overflow: visible !important;
     padding-bottom: 1px !important;
     gap: 4px !important;
   }
@@ -2455,7 +2514,7 @@ body.theme-light .faq-item { background: rgba(40,40,38,.04); }
   .vt-lbl { min-width: 42px; font-size: .62rem !important; }
 
   /* --- Гамбургер --- */
-  #mob { top: 6px !important; left: 8px !important; width: 32px !important; height: 32px !important; font-size: .95rem !important; }
+  #mob { top: 3.1px !important; left: 8px !important; width: 32px !important; height: 34px !important; font-size: .95rem !important; }
 }
 
 /* Очень узкие экраны — ещё плотнее */
@@ -2505,3 +2564,16 @@ body.theme-light .faq-item { background: rgba(40,40,38,.04); }
     padding-left: 6px;
     border-left: 1px dashed color-mix(in srgb, var(--a) 20%, transparent);
 }
+/* Поколение — коричневатый чип */
+.tg.gn {
+    background: color-mix(in srgb, #a16207 12%, transparent);
+    color: #a16207;
+    border-color: color-mix(in srgb, #a16207 30%, transparent);
+    font-family: var(--ff-mono);
+}
+body:not(.dark) .tg.gn,
+body.theme-dark .tg.gn,
+body.theme-aurora .tg.gn { color: #fbbf24; }
+body.theme-light .tg.gn,
+body.theme-paper .tg.gn { color: #92400e; }
+.fs.flt.gen { color: #a16207; }

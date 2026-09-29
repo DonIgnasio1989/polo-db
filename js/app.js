@@ -5,8 +5,8 @@
 /* ============ СПРАВОЧНИКИ ============ */
 const BASE_CATS = [
     { id: 'All', label: 'Все системы', icon: '📦' },
-    { id: 'Maintenance', label: '🔧 Регламент ТО', icon: '🔧' },
-    { id: 'RoadKit', label: '🎒 С собой в дорогу', icon: '🎒' },
+    { id: 'Maintenance', label: 'Регламент ТО', icon: '🔧' },
+    { id: 'RoadKit', label: 'С собой в дорогу', icon: '🎒' },
     { id: 'Engine', label: '1. Двигатель, Сцепление', icon: '⚙️' },
     { id: 'Cooling', label: '1.1 Охлаждение', icon: '❄️', parent: 'Engine' },
     { id: 'Ignition', label: '1.2 Зажигание', icon: '🔥', parent: 'Engine' },
@@ -14,10 +14,10 @@ const BASE_CATS = [
     { id: 'Fuel', label: '2. Топливная система', icon: '⛽' },
     { id: 'Exhaust', label: '2.1 Система выпуска ОГ', icon: '💨', parent: 'Fuel' },
     { id: 'Heating', label: '2.2 Отопитель', icon: '🌡️', parent: 'Fuel' },
-    { id: 'Transmission', label: '3. Трансмиссия', icon: '🔄' },
-    { id: 'Suspension', label: '4. Передняя ось, Дифференциал, Рулевое', icon: '🛞' },
+    { id: 'Transmission', label: '3. Трансмиссия', icon: '' },
+    { id: 'Suspension', label: '4. Передняя ось, Дифференциал, Рулевое', icon: '🔩' },
     { id: 'RearAxle', label: '5. Задняя ось', icon: '🔩' },
-    { id: 'Brakes', label: '6. Колёса, Тормозная система', icon: '🛑' },
+    { id: 'Brakes', label: '6. Колёса, Тормозная система', icon: '🛞' },
     { id: 'Controls', label: '7. Механизмы управления, Педальный узел', icon: '🎛️' },
     { id: 'Body', label: '8. Кузов', icon: '🚗' },
     { id: 'Electrical', label: '9. Электрика', icon: '💡' },
@@ -41,14 +41,21 @@ const ENGINES = {
     'AGR': { v: '1.9 TDI', hp: 90, f: 'D' }, 'ALH': { v: '1.9 TDI', hp: 90, f: 'D' }
 };
 const BODIES = {
-    '3d': 'Hatchback 3д (6N1)', '5d': 'Hatchback 5д (6N2)', 'classic': 'Polo Classic (седан)',
+    '3d': 'Hatchback 3д', '5d': 'Hatchback 5д', 'classic': 'Polo Classic (седан)',
     'estate': 'Polo Estate (универсал)', 'caddy-van': 'Caddy Van',
     'caddy-kombi': 'Caddy Kombi', 'caddy-pickup': 'Caddy Pickup'
 };
+
 const TRANSMISSIONS = {
     '085': 'МКПП 085 (5-ст)', '020': 'МКПП 020 (4/5-ст)', '02K': 'МКПП 02K (5-ст)',
     '01M': 'АКПП 01M (4-ст)', '01N': 'АКПП 01N (4-ст)', 'AG4': 'АКПП AG4 (4-ст)'
 };
+
+const GENERATIONS = {
+    '6N1': '6N1 — дорестайл (1994–1999)',
+    '6N2': '6N2 — рестайлинг (1999–2001)'
+};
+
 const TRIMS = ['Base', 'CL', 'GL', 'Trendline', 'Comfortline', 'Highline', 'Open Air'];
 
 const BASE_EK = {
@@ -59,8 +66,10 @@ const BASE_EK = {
     Brakes: { g: 'Тормоза', s: 'Передние / Задние' }, Transmission: { g: 'Трансмиссия', s: 'КПП / Привод' },
     Exhaust: { g: 'Выхлоп', s: 'Глушитель' }, Electrical: { g: 'Электрика', s: 'Генератор / Стартер' },
     Bulbs: { g: 'Лампы', s: 'Освещение' }, Body: { g: 'Кузов', s: 'Наружные панели' },
-    Interior: { g: 'Интерьер', s: 'Панель / Сиденья' }, Fluids: { g: 'Жидкости', s: 'Эксплуатационные' }
+    Interior: { g: 'Интерьер', s: 'Панель / Сиденья' }, Fluids: { g: 'Жидкости', s: 'Эксплуатационные' },
+    RearAxle: { g: 'Задняя ось', s: 'Балка / Ступица' }, Controls: { g: 'Управление', s: 'Педали / Кулиса' }
 };
+
 let EK = Object.assign({}, BASE_EK);
 
 const IL = { s: 'СПЕЦИФИКАЦИЯ', t: 'ИНСТРУМЕНТ', p: 'ПРОЦЕДУРА', w: 'ВНИМАНИЕ', n: 'ЗАМЕТКА', r: 'РЕКОМЕНДАЦИЯ' };
@@ -146,10 +155,12 @@ const DB = [];
 let D = [], W = [], G = [], LOG = [];
 let SV = {
     activeCat: 'All', searchQuery: '', statusFilter: 'all', engineFilter: 'all',
-    bodyFilter: 'all', trimFilter: 'all', transFilter: 'all', sidebarCollapsed: false,
+    bodyFilter: 'all', trimFilter: 'all', transFilter: 'all', genFilter: 'all',
+    sidebarCollapsed: false,
     theme: 'aurora', sortBy: 'default', view: 'grid', activeVinId: null,
     groupBySub: false, vinStrictFilter: false
 };
+
 let USER = { name: '', email: '', city: '', initials: '', color: '#00b0f0' };
 let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastDate: null, interval: 15000 };
@@ -329,6 +340,8 @@ function nP(p) {
     const bdy = Array.isArray(p.bodies) ? p.bodies.filter(x => ALL_BODIES.includes(x)) : [];
     const trn = Array.isArray(p.transmissions) ? p.transmissions.filter(x => ALL_TRANS.includes(x)) : [];
     const trm = Array.isArray(p.trims) ? p.trims.filter(x => TRIMS.includes(x)) : [];
+        const ALL_GENS = Object.keys(GENERATIONS);
+    const gens = Array.isArray(p.gens) ? p.gens.filter(x => ALL_GENS.includes(x)) : [];
     return {
         id: p.id || uid(),
         cat,
@@ -338,7 +351,7 @@ function nP(p) {
         verified: !!(p.v || p.verified),
         analogs: Array.isArray(p.a || p.analogs) ? (p.a || p.analogs).map(String).filter(Boolean) : [],
         donors: Array.isArray(p.d || p.donors) ? (p.d || p.donors).map(String).filter(Boolean) : [],
-        engines: eng, bodies: bdy, transmissions: trn, trims: trm,
+        engines: eng, bodies: bdy, transmissions: trn, trims: trm, gens,
         price: (p.price == null || p.price === '') ? null : (isFinite(Number(p.price)) ? Number(p.price) : null),
         currency: p.currency || 'RUB',
         status: ['want', 'bought', 'installed'].includes(p.status) ? p.status : '',
@@ -379,22 +392,23 @@ function vD(v) {
     else if (w === '3VW') { brand = 'VW Mexico'; country = 'Мексика'; }
     let vp = x.slice(6, 9);
     if (!/^[0-9A-Z]{3}$/.test(vp) || /^ZZZ$/.test(vp)) vp = x.slice(3, 6);
-    let model = '—', body = '—';
+       let model = '—', body = '—', gen = '';
     if (/^6N/.test(vp)) {
         model = 'Polo/Caddy (6N)';
-        if (vp === '6N1') body = 'Hatchback 3d';
-        else if (vp === '6N2') body = 'Hatchback 5d';
+        if (vp === '6N1') { body = 'Hatchback'; gen = '6N1'; }
+        else if (vp === '6N2') { body = 'Hatchback'; gen = '6N2'; }
         else if (vp === '6NF') body = 'Variant';
         else if (vp === '6NH') body = 'Classic Sedan';
         else if (vp === '6NX') body = 'Van';
         else body = 'Hatchback';
     }
+
     else if (/^9N/.test(vp)) { model = 'Polo (9N)'; body = 'Hatchback'; }
     else if (/^6K/.test(vp)) { model = 'Polo (6K)'; body = 'Hatchback'; }
     else if (/^1J/.test(vp)) { model = 'Golf (1J)'; body = 'Hatchback'; }
     const year = VY[yc] || null, pl = VP[pc] || ['—', '—'];
     return {
-        ok: true, vin: x, brand, country, model, body, year,
+        ok: true, vin: x, brand, country, model, body, year, gen,
         plant: pl[0], plantCountry: pl[1],
         engines: /^6N/.test(vp) ? Object.keys(ENGINES) : ['—'],
         serial: sr
@@ -416,6 +430,7 @@ function lG() {
                     model: String(x.model || ''),
                     year: x.year || null,
                     body: String(x.body || ''),
+                    gen: String(x.gen || ''),
                     plant: String(x.plant || ''),
                     engines: Array.isArray(x.engines) ? x.engines : [],
                     prodDate: String(x.prodDate || ''),
@@ -652,28 +667,31 @@ function rGar() {
 const VIN_BODY_MAP = {
     'Hatchback 3d': '3d',
     'Hatchback 5d': '5d',
-    'Hatchback': '3d',
+    'Hatchback': '',      /* двери не определены — фильтр не навязываем */
     'Variant': 'estate',
     'Classic Sedan': 'classic',
     'Van': 'caddy-van'
 };
 
 function applyVinFilters() {
-    const fmtr = $('fmtr'), fbdy = $('fbdy'), ftr = $('ftr');
+    const fmtr = $('fmtr'), fbdy = $('fbdy'), ftr = $('ftr'), fgen = $('fgen');
     const av = gAV();
     if (!av) {
         SV.engineFilter = 'all';
         SV.bodyFilter = 'all';
         SV.transFilter = 'all';
+        SV.genFilter = 'all';
     } else {
         SV.engineFilter = (av.engineCode && ENGINES[av.engineCode]) ? av.engineCode : 'all';
         SV.transFilter = (av.transCode && TRANSMISSIONS[av.transCode]) ? av.transCode : 'all';
         const bKey = VIN_BODY_MAP[av.body] || '';
         SV.bodyFilter = (bKey && BODIES[bKey]) ? bKey : 'all';
+        SV.genFilter = (av.gen && GENERATIONS[av.gen]) ? av.gen : 'all';
     }
     if (fmtr) fmtr.value = SV.engineFilter;
     if (fbdy) fbdy.value = SV.bodyFilter;
     if (ftr) ftr.value = SV.transFilter;
+    if (fgen) fgen.value = SV.genFilter;
     updateFilterStyling();
     sU();
 }
@@ -705,6 +723,7 @@ function sGarV() {
         model: pGV.model || '',
         year: pGV.year || null,
         body: pGV.body || '',
+        gen: pGV.gen || '',
         plant: pGV.plant || '',
         engines: Array.isArray(pGV.engines) ? pGV.engines : [],
         prodDate: '', engineCode: '', transCode: '',
@@ -896,6 +915,20 @@ async function fetchUpdateMeta() {
 }
 
 /* Рендер «Что нового» с авто-датой */
+/* Сравнение версий: вернёт 1 / 0 / -1 */
+function _cmpVer(a, b) {
+    const pa = String(a || '').split('.').map(n => parseInt(n, 10) || 0);
+    const pb = String(b || '').split('.').map(n => parseInt(n, 10) || 0);
+    const len = Math.max(pa.length, pb.length);
+    for (let i = 0; i < len; i++) {
+        const x = pa[i] || 0, y = pb[i] || 0;
+        if (x > y) return 1;
+        if (x < y) return -1;
+    }
+    return 0;
+}
+
+/* Рендер «Что нового» — только текущая версия и то, что новее */
 function renderChangelog(list, currentVersion, fallbackDate) {
     const box = $('up_changelog');
     if (!box) return;
@@ -903,20 +936,28 @@ function renderChangelog(list, currentVersion, fallbackDate) {
         box.innerHTML = '<div class="cl-empty">Список изменений не опубликован.</div>';
         return;
     }
+
+    /* Оставляем только записи с версией >= текущей */
+    const visible = list.filter(rel => rel && rel.version);
+
+    if (!visible.length) {
+        box.innerHTML = '<div class="cl-empty">Список изменений не опубликован.</div>';
+        return;
+    }
+
     let h = '';
-    list.forEach((rel, idx) => {
-        if (!rel || !rel.version) return;
-        const isCurrent = rel.version === currentVersion;
-        // Авто-дата: своя в записи → releasedAt → Last-Modified файла
-        // для самой свежей записи (индекс 0), для остальных — только своя или пусто
+    visible.forEach((rel, idx) => {
+        const cmp = _cmpVer(rel.version, currentVersion);
+        const isCurrent = cmp === 0;
+        const isNewer = cmp > 0;
         const dt = rel.date || (idx === 0 ? fallbackDate : '');
+
         h += '<div class="cl-release' + (isCurrent ? ' current' : '') + '">';
         h += '<div class="cl-head">';
         h += '<span class="cl-ver">v' + esc(rel.version) + '</span>';
         if (dt) h += '<span class="cl-date">' + esc(dt) + '</span>';
-        if (isCurrent) h += '<span class="cl-badge cur">у тебя</span>';
-        else h += '<span class="cl-badge new">доступно</span>';
         h += '</div>';
+
         const ch = Array.isArray(rel.changes) ? rel.changes : [];
         if (ch.length) {
             h += '<ul class="cl-list">';
@@ -927,6 +968,7 @@ function renderChangelog(list, currentVersion, fallbackDate) {
         }
         h += '</div>';
     });
+
     box.innerHTML = h;
 }
 
@@ -1256,6 +1298,7 @@ function resetFilters() {
     SV.engineFilter = 'all'; $('fmtr').value = 'all';
     SV.bodyFilter = 'all'; $('fbdy').value = 'all';
     SV.transFilter = 'all'; $('ftr').value = 'all';
+    SV.genFilter = 'all'; if ($('fgen')) $('fgen').value = 'all';
     SV.sortBy = 'default'; $('ss').value = 'default';
     updateFilterStyling(); sU(); rC();
     toast('Фильтры сброшены', 'success');
@@ -1277,7 +1320,7 @@ function mP(p, t) {
     if (!t.length) return true;
     const h = nz([p.oem || '', p.name || '', ...(p.analogs || []), ...(p.donors || []),
     ...((p.inst || []).map(i => i.text)), p.notes || '',
-    ...(p.engines || []), ...(p.transmissions || []), ...(p.bodies || [])].join('  '));
+    ...(p.engines || []), ...(p.transmissions || []), ...(p.bodies || []), ...(p.gens || [])].join('  '));
     return t.every(x => h.includes(x));
 }
 function sP(a) {
@@ -1314,6 +1357,11 @@ function gF() {
         const arr = p.transmissions || [];
         return !arr.length || arr.includes(SV.transFilter);
     });
+        if (SV.genFilter && SV.genFilter !== 'all') f = f.filter(p => {
+        const arr = p.gens || [];
+        return !arr.length || arr.includes(SV.genFilter);
+    });
+
     if (t.length) f = f.filter(p => mP(p, t));
     return sP(f);
 }
@@ -1344,7 +1392,7 @@ let _lastRenderSig = '';
 function _renderSignature() {
   return [
     SV.activeCat, SV.searchQuery, SV.statusFilter,
-    SV.engineFilter, SV.bodyFilter, SV.transFilter,
+    SV.engineFilter, SV.bodyFilter, SV.transFilter, SV.genFilter,
     SV.sortBy, SV.groupBySub, SV.vinStrictFilter
   ].join('|');
 }
@@ -1377,6 +1425,7 @@ function rC() {
   if (SV.engineFilter && SV.engineFilter !== 'all') chips.push('<span class="chip">⚙️ ' + esc(SV.engineFilter) + '</span>');
   if (SV.bodyFilter && SV.bodyFilter !== 'all') chips.push('<span class="chip">🚗 ' + esc(BODIES[SV.bodyFilter] || SV.bodyFilter) + '</span>');
   if (SV.transFilter && SV.transFilter !== 'all') chips.push('<span class="chip">🔄 ' + esc(TRANSMISSIONS[SV.transFilter] || SV.transFilter) + '</span>');
+    if (SV.genFilter && SV.genFilter !== 'all') chips.push('<span class="chip">🚘 ' + esc(GENERATIONS[SV.genFilter] || SV.genFilter) + '</span>');
   if (SV.statusFilter && SV.statusFilter !== 'all') chips.push('<span class="chip">🏷 ' + esc(SV.statusFilter) + '</span>');
   if (SV.searchQuery) chips.push('<span class="chip">🔍 "' + esc(SV.searchQuery) + '"</span>');
   chips.push('<span class="chip" data-chip="groupBySub" style="cursor:pointer;' + (SV.groupBySub ? 'border-color:var(--a);background:rgba(0,176,240,.12);' : '') + '" title="Группировать по подкатегориям">📂 Группы</span>');
@@ -1481,6 +1530,7 @@ function cH(p) {
         || '<span style="color:var(--mu);font-size:.72rem">все кузова</span>';
     const trn = (p.transmissions || []).map(t => '<span class="tg tr">' + esc(TRANSMISSIONS[t] || t) + '</span>').join('');
     const trm = (p.trims || []).map(t => '<span class="tg tm">' + esc(t) + '</span>').join('');
+    const gn = (p.gens || []).map(g => '<span class="tg gn">' + esc(GENERATIONS[g] || g) + '</span>').join('');
     let ih = '';
     if (p.inst && p.inst.length) {
         const warns = p.inst.filter(i => i.type === 'warn');
@@ -1534,6 +1584,7 @@ function cH(p) {
         + '<div class="cd-sec"><div class="cd-s-t">🚗 Применимость</div>'
         + '<div class="rw"><span class="lb">Двигатели</span><div class="tgs">' + eng + '</div></div>'
         + '<div class="rw"><span class="lb">Кузова</span><div class="tgs">' + bdy + '</div></div>'
+        + (gn ? '<div class="rw"><span class="lb">Поколение</span><div class="tgs">' + gn + '</div></div>' : '')
         + (trn ? '<div class="rw"><span class="lb">КПП</span><div class="tgs">' + trn + '</div></div>' : '')
         + (trm ? '<div class="rw"><span class="lb">Комплектации</span><div class="tgs">' + trm + '</div></div>' : '')
         + '<div class="rw"><span class="lb">Доноры</span><div class="tgs">' + dn + '</div></div>'
@@ -1813,8 +1864,7 @@ function oAM() {
     $('f_id').value = '';
     $('f_cat').value = (SV.activeCat !== 'All' && SV.activeCat !== 'Favorites' && SV.activeCat !== 'Workshops' && SV.activeCat !== 'Log')
         ? SV.activeCat : 'Engine';
-    ['f_name', 'f_oem', 'f_an', 'f_dn', 'f_pr', 'f_su', 'f_notes', 'f_eng', 'f_trn', 'f_bdy', 'f_trm'].forEach(id => $(id).value = '');
-    $('f_ver').checked = false; $('f_cu').value = 'RUB'; $('f_sts').value = ''; $('f_fav').value = '0';
+        ['f_name', 'f_oem', 'f_an', 'f_dn', 'f_pr', 'f_su', 'f_notes', 'f_eng', 'f_trn', 'f_bdy', 'f_trm', 'f_gen'].forEach(id => { if ($(id)) $(id).value = ''; }); $('f_ver').checked = false; $('f_cu').value = 'RUB'; $('f_sts').value = ''; $('f_fav').value = '0';
     $('ie').innerHTML = ''; aIR('proc', '');
     uPP(); rPH([]);
     $('mo').classList.add('show');
@@ -1834,6 +1884,7 @@ function oEM(id) {
     $('f_eng').value = (p.engines || []).join(', ');
     $('f_trn').value = (p.transmissions || []).join(', ');
     $('f_bdy').value = (p.bodies || []).join(', ');
+        $('f_gen').value = (p.gens || []).join(', ');
     $('f_trm').value = (p.trims || []).join(', ');
     $('f_pr').value = (p.price != null) ? p.price : '';
     $('f_cu').value = p.currency || 'RUB';
@@ -1860,6 +1911,7 @@ function sPt() {
     const trns = sl($('f_trn').value).filter(x => TRANSMISSIONS[x]);
     const bdys = sl($('f_bdy').value).filter(x => BODIES[x]);
     const trms = sl($('f_trm').value).filter(x => TRIMS.includes(x));
+        const gens = sl($('f_gen').value).map(s => s.toUpperCase()).filter(x => GENERATIONS[x]);
     const prRaw = $('f_pr').value, price = prRaw === '' ? null : Number(prRaw);
     const currency = $('f_cu').value, status = $('f_sts').value;
     const favorite = $('f_fav').value === '1', shopUrl = sUrl($('f_su').value.trim());
@@ -1881,7 +1933,7 @@ function sPt() {
         }
         D[i] = Object.assign({}, o, {
             cat, sub: o.sub || '', name, oem, verified, analogs, donors,
-            engines: engs, bodies: bdys, transmissions: trns, trims: trms,
+            engines: engs, bodies: bdys, transmissions: trns, trims: trms, gens,
             price, currency, status, favorite, notes, shopUrl, inst, photo: phF,
             priceHistory: h
         });
@@ -1890,7 +1942,7 @@ function sPt() {
     } else {
         const np = {
             id: uid(), cat, sub: '', name, oem, verified, analogs, donors,
-            engines: engs, bodies: bdys, transmissions: trns, trims: trms,
+            engines: engs, bodies: bdys, transmissions: trns, trims: trms, gens,
             price, currency, status, favorite, notes, shopUrl, inst, photo: phF, priceHistory: []
         };
         D.push(np);
@@ -2702,6 +2754,8 @@ function bindUI() {
     $('fmtr').addEventListener('change', e => { SV.engineFilter = e.target.value; updateFilterStyling(); sU(); rC(); });
     $('fbdy').addEventListener('change', e => { SV.bodyFilter = e.target.value; updateFilterStyling(); sU(); rC(); });
     $('ftr').addEventListener('change', e => { SV.transFilter = e.target.value; updateFilterStyling(); sU(); rC(); });
+        const _fgen = $('fgen');
+    if (_fgen) _fgen.addEventListener('change', e => { SV.genFilter = e.target.value; sU(); rC(); });
     $('if').addEventListener('change', oIF);
     $('pf').addEventListener('change', oPF);
 
@@ -2710,6 +2764,7 @@ function bindUI() {
     $('fmtr').value = SV.engineFilter || 'all';
     $('fbdy').value = SV.bodyFilter || 'all';
     $('ftr').value = SV.transFilter || 'all';
+        if (_fgen) _fgen.value = SV.genFilter || 'all';
     updateFilterStyling();
     setV(SV.view || 'grid', true);
 
