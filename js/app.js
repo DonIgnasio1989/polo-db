@@ -79,30 +79,35 @@ const MI = { s: 'spec', t: 'tool', p: 'proc', w: 'warn', n: 'note', r: 'recommen
 
 const SH = {
     ex: n => 'https://www.exist.ru/Price/?pcode=' + n,
-    ad: n => 'https://www.autodoc.ru/price/0/' + n,
-    av: n => 'https://www.avito.ru/rossiya/zapchasti_i_aksessuary?q=' + encodeURIComponent(n)
+    ad: n => 'https://www.autodoc.ru/price/657/' + n,
+    // Avito: артикул без пробелов + без дубля "VW Polo" в названии
+    av: (n, name) => {
+        const cleanOem = String(n || '').replace(/\s+/g, '');
+        const cleanName = String(name || '')
+            .replace(/\b(?:vw|volkswagen)\s+polo\b/gi, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+        const q = (cleanName ? cleanName + ' ' : '') + 'VW Polo ' + cleanOem;
+        return 'https://www.avito.ru/rossiya/zapchasti_i_aksessuary?q=' + encodeURIComponent(q);
+    }
 };
-const shopH = o => {
+
+const shopH = (o, name) => {
     if (!o) return '';
     const c = o.replace(/\s/g, '');
     if (!c) return '';
     return '<div class="pr">'
         + '<a class="psl ex" target="_blank" rel="noopener noreferrer" href="' + SH.ex(c) + '" title="Поиск Exist">🛒 Exist</a>'
         + '<a class="psl ad" target="_blank" rel="noopener noreferrer" href="' + SH.ad(c) + '" title="Поиск Autodoc">🛒 Autodoc</a>'
-        + '<a class="psl av" target="_blank" rel="noopener noreferrer" href="' + SH.av(o) + '" title="Поиск Avito">🛒 Avito</a>'
+        + '<a class="psl av" target="_blank" rel="noopener noreferrer" href="' + SH.av(o, name) + '" title="Поиск Avito">🛒 Avito</a>'
         + '</div>';
 };
 const ONLINE_CATALOGS = {
-    sevenzap: vin => 'https://7zap.com/en/catalog/cars/volkswagen/global/polo-classic-typ-6n-parts-catalog/?vin=' + vin,
-    autopoisk: vin => 'https://autopoisk.ru/volkswagen?vin=' + vin,
-    partsouq: vin => 'https://partsouq.com/en/search/all?q=' + vin,
-    sufix: () => 'https://sufix.pro/catalog/volkswagen/polo-iii-6n1-94-99/1-0-aer-all-50/',
-    parts2407: () => 'https://2407.pl/en/parts/volkswagen/polo-iii-6n1-hatchback/50-1-0-aer-all-50-hp/',
-    amayama: () => 'https://www.amayama.com/en/genuine-catalogs/volkswagen/polo/6n1',
-    elcats: () => 'https://www.elcats.ru/vw/Unit.aspx?mdl=8BD8FB5D&cat=1'
+    emex: oem => 'https://emex.ru/f?detailNum=' + encodeURIComponent(oem) + '&packet=-1',
+    zzap: oem => 'https://www.zzap.ru/public/search.aspx#rawdata=' + encodeURIComponent(oem)
 };
+
 const getPurchaseHtml = p => {
-  const isMobile = window.innerWidth <= 900;
   const av = (typeof gAV === 'function') ? gAV() : null;
   const vin = av && av.ok ? av.vin : '';
   const prs = fP(p.price, p.currency);
@@ -115,20 +120,15 @@ const getPurchaseHtml = p => {
   h += hh;
   if (su) h += '<a class="sl" href="' + escA(su) + '" target="_blank" rel="noopener noreferrer">🛒 Свой магазин</a>';
   h += '</div>';
-  if (p.oem) h += '<div class="prow">' + shopH(p.oem) + '</div>';
-  if (!isMobile) {
+  if (p.oem) h += '<div class="prow">' + shopH(p.oem, p.name) + '</div>';
+  if (p.oem) {
+    const c = p.oem.replace(/\s+/g, '');
     h += '<div class="prow op-b">';
-    if (vin) {
-      h += '<a class="psl op1" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.sevenzap(vin) + '">7zap VIN</a>';
-      h += '<a class="psl op2" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.autopoisk(vin) + '">Autopoisk</a>';
-      h += '<a class="psl op3" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.partsouq(vin) + '">Partsouq</a>';
-    }
-    h += '<a class="psl op4" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.sufix() + '">Sufix</a>';
-    h += '<a class="psl op5" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.parts2407() + '">2407.pl</a>';
-    h += '<a class="psl op6" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.amayama() + '">Amayama</a>';
-    h += '<a class="psl op7" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.elcats() + '">Elcats</a>';
+    h += '<a class="psl op1" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.emex(c) + '" title="Поиск в Emex по артикулу">Emex</a>';
+    h += '<a class="psl op7" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.zzap(c) + '" title="Поиск в ZZap по артикулу">ZZap</a>';
     h += '</div>';
   }
+
   return h;
 };
 
@@ -1576,7 +1576,7 @@ function cH(p) {
         + '</div>'
         + '<div class="cd-meta cd-ans"><span class="cd-ans-lb">🔧 Аналоги:</span>' + anInline + '</div>'
         + '<div class="cd-purchase">' + getPurchaseHtml(p) + '</div>'
-        + (o ? '<div class="cd-meta"><button class="bn" style="padding:4px 8px;font-size:.7rem" onclick="findCheaper(\'' + escA(o) + '\')" title="Открыть Exist + Autodoc + Avito">🔍 Найти дешевле</button></div>' : '')
+        + (o ? '<div class="cd-meta"><button class="bn" style="padding:4px 8px;font-size:.7rem" onclick="findCheaper(\'' + escA(o) + '\', \'' + escA(p.name) + '\')" title="Открыть Exist + Autodoc + Avito">🔍 Найти дешевле</button></div>' : '')
         + lastLogBadge(o)
         + '<div class="cd-st">' + stBar + '</div>'
         + '<details class="cd-body"><summary>Подробности</summary><div class="cd-content">'
@@ -2551,15 +2551,32 @@ function eShopCSV() {
 }
 
 /* ============ НАЙТИ ДЕШЕВЛЕ ============ */
-function findCheaper(oem) {
+function findCheaper(oem, name) {
     if (!oem) { toast('Нет артикула', 'danger'); return; }
     const c = String(oem).replace(/\s/g, '');
-    ['https://www.exist.ru/Price/?pcode=' + c,
-    'https://www.autodoc.ru/price/0/' + c,
-    'https://www.avito.ru/rossiya/zapchasti_i_aksessuary?q=' + encodeURIComponent(oem)
-    ].forEach(u => window.open(u, '_blank', 'noopener'));
+    const cleanName = String(name || '')
+        .replace(/\b(?:vw|volkswagen)\s+polo\b/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    const urls = [
+        'https://www.exist.ru/Price/?pcode=' + c,
+        'https://www.autodoc.ru/price/657/' + c,
+        'https://www.avito.ru/rossiya/zapchasti_i_aksessuary?q=' +
+            encodeURIComponent((cleanName ? cleanName + ' ' : '') + 'VW Polo ' + c)
+    ];
+    urls.forEach(u => {
+        const a = document.createElement('a');
+        a.href = u;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    });
     toast('Открыто 3 магазина', 'success');
+
 }
+
 /* ============ КОПИРОВАНИЕ НОМЕРА ЮMONEY ============ */
 function copyYm() {
     const num = '410017195918895';
@@ -2948,5 +2965,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (el) el.textContent = APP_VERSION;
     });
     fCS();
-    checkLicense();
-});
+    checkLicense()
+})
+

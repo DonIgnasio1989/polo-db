@@ -1228,16 +1228,35 @@ body:not(.theme-light) .cd-purchase .price-tag {
 .psl.av { background: linear-gradient(135deg, #4cbcff, #0099ee); color: #fff; border-color: transparent; font-weight: 700; }
 .psl.av::before { content: '🟣'; margin-right: 2px; }
 .psl.av:hover { box-shadow: 0 6px 14px rgba(0,170,255,.5); color: #fff; }
-.psl.op1, .psl.op2, .psl.op3, .psl.op4, .psl.op5, .psl.op6, .psl.op7 {
-    background: var(--hv); border-color: var(--bd); color: var(--tx); font-weight: 600;
+/* Кнопки каталогов — цветные, как у магазинов */
+.psl.op1, .psl.op3, .psl.op7 {
+    color: #fff;
+    border-color: transparent;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1.4;
+    transition: all var(--tr);
 }
-.psl.op1:hover { background: #0d47a1; color: #fff; border-color: transparent; }
-.psl.op2:hover { background: #1b5e20; color: #fff; border-color: transparent; }
-.psl.op3:hover { background: #4a148c; color: #fff; border-color: transparent; }
-.psl.op4:hover { background: #856404; color: #fff; border-color: transparent; }
-.psl.op5:hover { background: #721c24; color: #fff; border-color: transparent; }
-.psl.op6:hover { background: #004d40; color: #fff; border-color: transparent; }
-.psl.op7:hover { background: #283593; color: #fff; border-color: transparent; }
+.psl.op1::before { content: '🔷'; margin-right: 3px; }
+.psl.op3::before { content: '🟢'; margin-right: 3px; }
+.psl.op7::before { content: '🔵'; margin-right: 3px; }
+
+.psl.op1 { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+.psl.op3 { background: linear-gradient(135deg, #059669, #047857); }
+.psl.op7 { background: linear-gradient(135deg, #0ea5e9, #0369a1); }
+
+.psl.op1:hover { background: linear-gradient(135deg, #6d28d9, #4c1d95); transform: translateY(-1px); box-shadow: 0 6px 14px rgba(124,58,237,.45); }
+.psl.op3:hover { background: linear-gradient(135deg, #10b981, #065f46); transform: translateY(-1px); box-shadow: 0 6px 14px rgba(5,150,105,.45); }
+.psl.op7:hover { background: linear-gradient(135deg, #38bdf8, #0284c7); transform: translateY(-1px); box-shadow: 0 6px 14px rgba(14,165,233,.45); }
+
+/* На мобильном — чуть компактнее, чтобы всё влезало в один ряд */
+@media (max-width: 900px) {
+    .cd-purchase .prow.op-b .psl {
+        font-size: .62rem;
+        padding: 3px 7px;
+    }
+}
 
 .sl { color: var(--a); text-decoration: none; font-size: .75rem; font-weight: 700; margin-left: auto; transition: all var(--tr); }
 .sl:hover { text-decoration: underline; transform: translateX(2px); }
@@ -2414,10 +2433,6 @@ body.theme-light .faq-item { background: rgba(40,40,38,.04); }
   .tp.on[data-status=bought],
   .tp.on[data-status=installed] { box-shadow: none !important; }
 
-  /* 9. Скрываем второй ряд магазинов на карточке (7 лишних ссылок × N) */
-  .cd-purchase .prow.op-b { display: none; }
-}
-
 /* Уважение prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -2426,7 +2441,9 @@ body.theme-light .faq-item { background: rgba(40,40,38,.04); }
     transition-duration: .01ms !important;
     scroll-behavior: auto !important;
   }
-}/* ============================================================
+}
+
+/* ============================================================
    MOBILE COMPACT TOOLBAR — сжать шапку, чтобы влезала в 1-2 строки
    ============================================================ */
 @media (max-width: 900px) {
@@ -2577,3 +2594,4 @@ body.theme-aurora .tg.gn { color: #fbbf24; }
 body.theme-light .tg.gn,
 body.theme-paper .tg.gn { color: #92400e; }
 .fs.flt.gen { color: #a16207; }
+}
