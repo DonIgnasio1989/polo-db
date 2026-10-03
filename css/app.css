@@ -540,10 +540,28 @@ body.theme-light .ni.active {
 }
 .ni.folder:hover .fold-arr { opacity: 1; }
 
+/* Обычный разделитель — чуть ярче прежнего */
 .nd {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent);
+    background: linear-gradient(90deg,
+        transparent,
+        color-mix(in srgb, var(--a) 35%, rgba(255,255,255,.35)),
+        transparent);
     margin: 10px 16px; list-style: none;
+    box-shadow: 0 0 6px color-mix(in srgb, var(--a) 25%, transparent);
+}
+
+/* Акцентный разделитель — заметно ярче, для отделения «Шины» */
+.nd.bright {
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        color-mix(in srgb, var(--a) 95%, #fff) 50%,
+        transparent 100%);
+    box-shadow:
+        0 0 12px color-mix(in srgb, var(--a) 65%, transparent),
+        0 0 3px color-mix(in srgb, var(--a) 90%, transparent);
+    margin: 14px 14px;
 }
 
 /* ---------- ПОДВАЛ САЙДБАРА ---------- */
@@ -2842,3 +2860,223 @@ body.theme-paper .tg.gn { color: #92400e; }
     .wn-foot { flex-wrap: wrap; }
     .wn-foot .bn { flex: 1 1 auto; justify-content: center; }
 }
+/* ============================================================
+   📷 ГАЛЕРЕЯ ФОТО (несколько снимков на позицию)
+   ============================================================ */
+
+/* Сетка превью в форме редактирования */
+.pgrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+.pgrid-item {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    border-radius: var(--r-sm);
+    overflow: hidden;
+    border: 1px solid var(--bd);
+    background: var(--hv);
+}
+.pgrid-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.pgrid-item .rm {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, .65);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: .8rem;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: all var(--tr);
+}
+.pgrid-item .rm:hover { background: var(--dg); transform: scale(1.1); }
+
+/* Галерея в карточке детали */
+.cd-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 6px;
+}
+.cd-gallery .cd-photo {
+    max-height: 140px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Лайтбокс — навигация */
+.lb2 img { cursor: default; }
+.lb2 .lb-nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .15);
+    color: #fff;
+    border: none;
+    font-size: 1.6rem;
+    font-family: inherit;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3001;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    transition: all var(--tr);
+}
+.lb2 .lb-nav:hover { background: rgba(255, 255, 255, .3); transform: translateY(-50%) scale(1.1); }
+.lb2 .lb-prev { left: 20px; }
+.lb2 .lb-next { right: 20px; }
+.lb2 .lb-counter {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    background: rgba(0, 0, 0, .55);
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: .88rem;
+    font-weight: 600;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    z-index: 3001;
+}
+.lb2 .lb-nav[disabled] { opacity: .25; cursor: default; }
+.lb2 .lb-nav[disabled]:hover { transform: translateY(-50%); background: rgba(255,255,255,.15); }
+
+/* Мобильный — компактнее */
+@media (max-width: 900px) {
+    .pgrid-item { width: 76px; height: 76px; }
+    .cd-gallery { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+    .cd-gallery .cd-photo { max-height: 110px; }
+    .lb2 .lb-nav { width: 44px; height: 44px; font-size: 1.3rem; }
+    .lb2 .lb-prev { left: 10px; }
+    .lb2 .lb-next { right: 10px; }
+}/* Крестик закрытия лайтбокса */
+.lb2 .lb-close {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .15);
+    color: #fff;
+    border: none;
+    font-size: 1.3rem;
+    font-family: inherit;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3001;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    transition: all var(--tr);
+}
+.lb2 .lb-close:hover {
+    background: var(--dg);
+    transform: rotate(90deg) scale(1.1);
+}
+
+@media (max-width: 900px) {
+    .lb2 .lb-close { top: 12px; right: 12px; width: 40px; height: 40px; font-size: 1.15rem; }
+}
+/* ============================================================
+   🛒 Блок «Купить запчасти для ТО» в карточке регламента
+   ============================================================ */
+.tp-parts { display: flex; flex-direction: column; gap: 8px; }
+.tpp-row {
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 10px 12px;
+    background: var(--hv);
+    border: 1px solid var(--bd);
+    border-left: 3px solid var(--a);
+    border-radius: var(--r-sm);
+    transition: all var(--tr);
+}
+.tpp-row:hover { border-color: var(--a); background: color-mix(in srgb, var(--a) 6%, transparent); }
+.tpp-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.tpp-name { font-weight: 700; font-size: .86rem; color: var(--tx); flex: 1; min-width: 0; }
+.tpp-oem {
+    font-family: var(--ff-mono);
+    font-size: .74rem; font-weight: 700;
+    color: var(--a);
+    padding: 2px 8px;
+    background: color-mix(in srgb, var(--a) 12%, transparent);
+    border-radius: var(--r-xs);
+    letter-spacing: -.2px;
+    cursor: pointer;
+    user-select: all;
+}
+.tpp-note { font-size: .74rem; color: var(--mu); font-style: italic; }
+.tpp-links { display: flex; gap: 5px; flex-wrap: wrap; }
+.tpp-links .psl { font-size: .68rem; padding: 4px 10px; }
+/* ============================================================
+   🛒 Блок «Купить запчасти для ТО» в карточке регламента
+   ============================================================ */
+.cd-to-parts {
+    padding: 12px 16px 14px;
+    border-top: 1px solid var(--bd);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--a) 5%, transparent), transparent);
+}
+.cd-to-parts-h {
+    font-size: .62rem; text-transform: uppercase; letter-spacing: .6px;
+    color: var(--mu); font-weight: 800; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+}
+.cd-to-parts-h::before {
+    content: ''; display: inline-block;
+    width: 3px; height: 12px;
+    background: linear-gradient(180deg, var(--a), var(--a-h));
+    border-radius: 2px; flex-shrink: 0;
+}
+.tp-parts { display: flex; flex-direction: column; gap: 8px; }
+.tpp-row {
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 10px 12px;
+    background: var(--hv);
+    border: 1px solid var(--bd);
+    border-left: 3px solid var(--a);
+    border-radius: var(--r-sm);
+    transition: all var(--tr);
+}
+.tpp-row:hover { border-color: var(--a); background: color-mix(in srgb, var(--a) 6%, transparent); }
+.tpp-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.tpp-name { font-weight: 700; font-size: .86rem; color: var(--tx); flex: 1; min-width: 0; }
+.tpp-oem {
+    font-family: var(--ff-mono);
+    font-size: .74rem; font-weight: 700;
+    color: var(--a);
+    padding: 2px 8px;
+    background: color-mix(in srgb, var(--a) 12%, transparent);
+    border-radius: var(--r-xs);
+    letter-spacing: -.2px;
+    cursor: pointer;
+    user-select: all;
+}
+.tpp-note { font-size: .74rem; color: var(--mu); font-style: italic; }
+.tpp-links { display: flex; gap: 5px; flex-wrap: wrap; }
+.tpp-links .psl { font-size: .68rem; padding: 4px 10px; }

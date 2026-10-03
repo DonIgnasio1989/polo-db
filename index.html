@@ -268,7 +268,7 @@
 
   <!-- ============ СКРЫТЫЕ FILE-INPUT ============ -->
   <input type="file" id="if" accept="application/json,.json" style="display:none">
-  <input type="file" id="pf" accept="image/*" style="display:none">
+  <input type="file" id="pf" accept="image/*" multiple style="display:none">
 
   <!-- ============ МОДАЛКА: ДЕТАЛЬ ============ -->
   <div class="mo" id="mo">
@@ -327,12 +327,11 @@
         <div class="fg" id="phg" style="display:none"><label>История цен</label>
           <div class="phl" id="phl"></div>
         </div>
-        <div class="fg"><label>Фото</label>
+        <div class="fg"><label>Фото (<span id="pCount">0</span>)</label>
           <div class="pa">
-            <button type="button" class="bn" onclick="pkP()">📷 Загрузить</button>
-            <button type="button" class="bn" onclick="clP()" id="pcb" style="display:none">Удалить</button>
+            <button type="button" class="bn" onclick="pkP()">📷 Добавить фото</button>
           </div>
-          <img id="pp" class="pp" style="display:none" alt="">
+          <div class="pgrid" id="pgrid"></div>
         </div>
         <div class="fg"><label>Инструкции</label>
           <div class="ie" id="ie"></div>
@@ -917,10 +916,16 @@
   </div>
 
   <!-- ============ ЛАЙТБОКС / ТОСТ / КОНФЕТТИ ============ -->
-  <div class="lb2" id="lbt" onclick="cL()"><img id="lbi" alt=""></div>
+  <div class="lb2" id="lbt" onclick="cL()">
+    <img id="lbi" alt="" onclick="event.stopPropagation()">
+    <button class="lb-nav lb-prev" id="lbPrev" onclick="event.stopPropagation();lbNav(-1)" title="Назад">‹</button>
+    <button class="lb-nav lb-next" id="lbNext" onclick="event.stopPropagation();lbNav(1)" title="Вперёд">›</button>
+    <div class="lb-counter" id="lbCount" onclick="event.stopPropagation()"></div>
+    <button class="lb-close" id="lbClose" onclick="event.stopPropagation();cL()" title="Закрыть (Esc)">✕</button>
+  </div>
   <div class="tst" id="tt"></div>
   <canvas id="confetti-canvas"></canvas>
-  
+
   <!-- ============ ПЛАШКА «ЧТО НОВОГО» ============ -->
 <div class="whatsnew" id="whatsnew"></div>
 
