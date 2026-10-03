@@ -137,9 +137,8 @@ const UK = 'vw_polo_ui_v186', PK = 'vw_polo_db_v181', WK = 'vw_polo_workshops_v1
     VK = 'vw_polo_vincario_key_v18', GK = 'vw_polo_garage_v181', DN = 'vw_polo_v181', DV = 2,
     SP = 'parts', SW = 'workshops', METAKEY = 'vw_polo_meta_v1', TOKEY = 'vw_polo_to_v1',
     LICKEY = 'vw_polo_license_v1', UPKEY = 'vw_polo_update_url_v1', PROFKEY = 'vw_polo_profile_v1',
-    LOGKEY = 'vw_polo_logs_v1';
-    WNKEY = 'vw_polo_last_seen_version_v1';
-
+    LOGKEY = 'vw_polo_logs_v1',
+    WNKEY = 'vw_polo_last_seen_version_v1';   /* ← добавь сюда */
 /* ============ ТЕМЫ ============ */
 const THEMES = [
     { id: 'light', label: 'Светлая', icon: '☀️', cls: 'theme-light', preview: '#f3f5f9' },
@@ -405,7 +404,7 @@ function nP(p) {
     const ALL_BODIES = Object.keys(BODIES);
     const ALL_TRANS = Object.keys(TRANSMISSIONS);
 
-       /* Чистим заголовки регламента ТО от «каждые» */
+    /* Чистим заголовки регламента ТО от «каждые» */
     let rawName = String(p.n || p.name || '');
     if (cat === 'Maintenance') {
         rawName = rawName
@@ -417,7 +416,7 @@ function nP(p) {
     }
 
     let inst;
-    
+
     if (Array.isArray(p.inst)) {
         inst = p.inst.filter(i => i && i.text).map(i => ({ type: MI[IM[i.type]] || i.type || 'note', text: String(i.text) }));
     } else if (Array.isArray(p.i)) {
@@ -445,7 +444,25 @@ function nP(p) {
         favorite: !!p.favorite,
         notes: String(p.notes || ''),
         shopUrl: sUrl(p.shopUrl || ''),
-        photo: sImg(p.photo || ''),
+        photos: (() => {
+            const arr = [];
+            if (Array.isArray(p.photos)) {
+                for (const x of p.photos) { const s = sImg(x); if (s) arr.push(s); }
+            }
+            if (!arr.length && p.photo) {
+                const s = sImg(p.photo);
+                if (s) arr.push(s);
+            }
+            return arr.slice(0, 12);   // максимум 12 фото на позицию
+        })(),
+        parts: Array.isArray(p.parts) ? p.parts
+            .filter(x => x && (x.oem || x.o || x.name || x.n))
+            .slice(0, 40)
+            .map(x => ({
+                name: String(x.name || x.n || ''),
+                oem: String(x.oem || x.o || ''),
+                note: String(x.note || x.note2 || '')
+            })) : [],
         inst,
         priceHistory: Array.isArray(p.priceHistory)
             ? p.priceHistory.filter(h => h && typeof h === 'object' && h.ts && h.price != null).slice(-50)
@@ -1103,7 +1120,7 @@ function showWhatsNew(version, changes) {
         h += '</ul>';
     } else {
         h += '<div class="wn-empty">Приложение обновлено до v' + esc(version) +
-             '. Полный список изменений — в разделе «Обновление».</div>';
+            '. Полный список изменений — в разделе «Обновление».</div>';
     }
 
     h += '<div class="wn-foot">';
@@ -1254,13 +1271,13 @@ async function lAll() {
     const base = location.origin + location.pathname.replace(/[^/]*$/, '');
     let files = [];
     try {
-    const r = await fetch(base + 'data/update.json?t=' + Date.now(), { cache: 'no-store' });
-    if (r.ok) {
-        const m = await r.json();
-        if (Array.isArray(m.files) && m.files.length) files = m.files;
-        if (Array.isArray(m.changelog)) _setChangelog(m.changelog);   /* ← новая строка */
-    }
-} catch (e) { console.warn('update.json не загрузился', e); }
+        const r = await fetch(base + 'data/update.json?t=' + Date.now(), { cache: 'no-store' });
+        if (r.ok) {
+            const m = await r.json();
+            if (Array.isArray(m.files) && m.files.length) files = m.files;
+            if (Array.isArray(m.changelog)) _setChangelog(m.changelog);   /* ← новая строка */
+        }
+    } catch (e) { console.warn('update.json не загрузился', e); }
     if (!files.length) {
         files = [
             'data/parts-01-engine-fuel-ignition.json',
@@ -1297,19 +1314,27 @@ async function lAll() {
             else {
                 const old = map.get(k);
                 const user = {
-                    id: old.id, status: old.status, favorite: old.favorite, notes: old.notes,
-                    price: old.price, currency: old.currency, priceHistory: old.priceHistory,
-                    photo: old.photo, shopUrl: old.shopUrl
+                    id: old.id,
+                    status: old.status,
+                    favorite: old.favorite,
+                    notes: old.notes,
+                    price: old.price,
+                    currency: old.currency,
+                    priceHistory: old.priceHistory,
+                    shopUrl: old.shopUrl,
+                    photos: old.photos,     /* ← сохраняем фото пользователя */
+
                 };
                 Object.assign(old, np, user);
                 upd++;
             }
-        }
+        }                                       /* ← закрываем for */
         console.log('С сервера: +' + add + ', ~' + upd + ' | Итого:', D.length);
         if (useIDB) try { await iMany(SP, D); } catch (e) { }
         else sD();
     }
 
+    /* ---- категории / секции / мастерские с сервера ---- */
     if (cats) for (const c of cats) {
         if (!c || !c.id) continue;
         if (!CATS.find(x => x.id === c.id)) CATS.push({ id: c.id, label: c.label || c.id, icon: c.icon || '📁' });
@@ -1325,7 +1350,7 @@ async function lAll() {
     lG(); lMeta(); lU(); lProfile(); lTO(); await lLogs();
     if (SV.activeVinId && !G.some(g => g.id === SV.activeVinId)) SV.activeVinId = null;
     try { vk = localStorage.getItem(VK) || ''; } catch (e) { }
-}
+}   /* ← конец lAll() */
 
 /* ============ ТЕМА ============ */
 function aTh() {
@@ -1712,9 +1737,40 @@ function cH(p) {
         }
         ih += '</div>';
     }
+    /* Блок «Купить запчасти» для ТО-позиций */
+    let partsHtml = '';
+    if (p.parts && p.parts.length) {
+        partsHtml = '<div class="cd-to-parts">'
+            + '<div class="cd-to-parts-h">🛒 Купить запчасти для ТО (' + p.parts.length + ')</div>'
+            + '<div class="tp-parts">'
+            + p.parts.map(it => {
+                const c = (it.oem || '').replace(/\s+/g, '');
+                const links = c
+                    ? '<a class="psl ex" target="_blank" rel="noopener noreferrer" href="' + SH.ex(c) + '" title="Exist">🟠 Exist</a>'
+                    + '<a class="psl ad" target="_blank" rel="noopener noreferrer" href="' + SH.ad(c) + '" title="Autodoc">🔵 Autodoc</a>'
+                    + '<a class="psl av" target="_blank" rel="noopener noreferrer" href="' + SH.av(it.oem, it.name) + '" title="Avito">🟣 Avito</a>'
+                    : '';
+                return '<div class="tpp-row">'
+                    + '<div class="tpp-head">'
+                    + '<span class="tpp-name">' + esc(it.name || '') + '</span>'
+                    + (it.oem ? '<span class="tpp-oem" title="Артикул">' + esc(it.oem) + '</span>' : '')
+                    + '</div>'
+                    + (it.note ? '<div class="tpp-note">' + esc(it.note) + '</div>' : '')
+                    + (links ? '<div class="tpp-links">' + links + '</div>' : '')
+                    + '</div>';
+            }).join('')
+            + '</div></div>';
+    }
     const ntH = '<textarea class="cn" data-notes-id="' + escA(p.id) + '" placeholder="Заметка…" rows="2">' + esc(p.notes || '') + '</textarea>';
-    const ph = p.photo || '';
-    const phh = ph ? '<div class="cd-sec" style="padding-top:4px"><img class="cd-photo" src="' + ph + '" alt="" data-lightbox="' + ph + '"></div>' : '';
+    const phList = Array.isArray(p.photos) ? p.photos : [];
+    const phh = phList.length
+        ? '<div class="cd-sec" style="padding-top:4px"><div class="cd-gallery">'
+        + phList.map((src, i) =>
+            '<img class="cd-photo" src="' + src + '" alt="" '
+            + 'data-lightbox-pid="' + escA(p.id) + '" data-lightbox-idx="' + i + '">'
+        ).join('')
+        + '</div></div>'
+        : '';
     const f = !!p.favorite;
     const vb = p.verified ? '<span class="vb t">✓ ETKA</span>' : '<span class="vb f">⚠</span>';
     const cmp = pCompat(p);
@@ -1744,8 +1800,10 @@ function cH(p) {
         + '</span>' + vb + ch
         + '</div>'
         + '<div class="cd-meta cd-ans"><span class="cd-ans-lb">🔧 Аналоги:</span>' + anInline + '</div>'
-        + '<div class="cd-purchase">' + getPurchaseHtml(p) + '</div>'
-        + (o ? '<div class="cd-meta"><button class="bn" style="padding:4px 8px;font-size:.7rem" onclick="findCheaper(\'' + escA(o) + '\', \'' + escA(p.name) + '\')" title="Открыть Exist + Autodoc + Avito">🔍 Найти дешевле</button></div>' : '')
+        + (partsHtml
+            ? partsHtml
+            : '<div class="cd-purchase">' + getPurchaseHtml(p) + '</div>'
+            + (o ? '<div class="cd-meta"><button class="bn" style="padding:4px 8px;font-size:.7rem" onclick="findCheaper(\'' + escA(o) + '\', \'' + escA(p.name) + '\')" title="Открыть Exist + Autodoc + Avito">🔍 Найти дешевле</button></div>' : ''))
         + lastLogBadge(o)
         + '<div class="cd-st">' + stBar + '</div>'
         + '<details class="cd-body"><summary>Подробности</summary><div class="cd-content">'
@@ -1852,13 +1910,13 @@ function rET(parts) {
             h += '<div class="sg">';
 
             const sorted = a.slice().sort((x, y) => {
-    if (x.cat === 'Maintenance' || y.cat === 'Maintenance') {
-        const dx = _maintWeight(x), dy = _maintWeight(y);
-        if (dx !== dy) return dx - dy;
-        return (x.name || '').localeCompare(y.name || '');
-    }
-    return (x.oem || '').localeCompare(y.oem || '');
-});
+                if (x.cat === 'Maintenance' || y.cat === 'Maintenance') {
+                    const dx = _maintWeight(x), dy = _maintWeight(y);
+                    if (dx !== dy) return dx - dy;
+                    return (x.name || '').localeCompare(y.name || '');
+                }
+                return (x.oem || '').localeCompare(y.oem || '');
+            });
             for (const p of sorted) {
                 const w = p.verified ? '' : ' <span style="color:var(--wn);font-size:.68rem">⚠</span>';
                 const cm = pCompat(p);
@@ -1945,8 +2003,13 @@ function fC(t, d) {
 
 /* ============ КЛИКИ В КОНТЕНТЕ ============ */
 function oCC(e) {
-    const img = e.target.closest('[data-lightbox]');
-    if (img) { oL(img.dataset.lightbox); return; }
+    const img = e.target.closest('[data-lightbox-pid]');
+    if (img) {
+        const pid = img.dataset.lightboxPid;
+        const idx = parseInt(img.dataset.lightboxIdx, 10) || 0;
+        const p = D.find(x => x.id === pid);
+        if (p && Array.isArray(p.photos)) { oL(p.photos, idx); return; }
+    }
     const chip = e.target.closest('[data-chip]');
     if (chip) {
         const k = chip.dataset.chip;
@@ -2010,8 +2073,37 @@ function sPS(id, st) {
     if (!same && st === 'installed' && typeof confetti === 'function') confetti();
 }
 
-const oL = s => { $('lbi').src = s; $('lbt').classList.add('show'); };
-const cL = () => { $('lbt').classList.remove('show'); $('lbi').src = ''; };
+let _lbPhotos = [], _lbIdx = 0;
+
+function oL(list, idx) {
+    _lbPhotos = Array.isArray(list) ? list.slice() : [];
+    _lbIdx = Math.max(0, Math.min(_lbPhotos.length - 1, parseInt(idx, 10) || 0));
+    if (!_lbPhotos.length) return;
+    _lbShow();
+    $('lbt').classList.add('show');
+}
+
+function _lbShow() {
+    const img = $('lbi'), cnt = $('lbCount'), prev = $('lbPrev'), next = $('lbNext');
+    if (img) img.src = _lbPhotos[_lbIdx] || '';
+    if (cnt) cnt.textContent = _lbPhotos.length > 1 ? (_lbIdx + 1) + ' / ' + _lbPhotos.length : '';
+    if (prev) prev.disabled = _lbIdx <= 0;
+    if (next) next.disabled = _lbIdx >= _lbPhotos.length - 1;
+}
+
+function lbNav(dir) {
+    if (!_lbPhotos.length) return;
+    const n = _lbIdx + (dir > 0 ? 1 : -1);
+    if (n < 0 || n >= _lbPhotos.length) return;
+    _lbIdx = n;
+    _lbShow();
+}
+
+const cL = () => {
+    $('lbt').classList.remove('show');
+    $('lbi').src = '';
+    _lbPhotos = []; _lbIdx = 0;
+};
 
 /* ============ ФОРМА ДЕТАЛИ ============ */
 const fCS = () => $('f_cat').innerHTML = CATS.filter(c => c.id !== 'All')
@@ -2036,7 +2128,7 @@ function rPH(h) {
     ).join('');
 }
 function oAM() {
-    edId = null; pPh = null; pPhCl = false;
+    edId = null; pPhs = [];
     $('mt').textContent = 'Добавить деталь';
     $('f_id').value = '';
     $('f_cat').value = (SV.activeCat !== 'All' && SV.activeCat !== 'Favorites' && SV.activeCat !== 'Workshops' && SV.activeCat !== 'Log')
@@ -2049,7 +2141,7 @@ function oAM() {
 }
 function oEM(id) {
     const p = D.find(x => x.id === id); if (!p) return;
-    edId = id; pPh = p.photo || null; pPhCl = false;
+    edId = id; pPhs = Array.isArray(p.photos) ? p.photos.slice() : [];
     $('mt').textContent = 'Редактировать: ' + (p.name || '');
     $('f_id').value = id;
     $('f_cat').value = p.cat || 'Engine';
@@ -2077,7 +2169,7 @@ function oEM(id) {
     $('mo').classList.add('show');
     setTimeout(() => $('f_name').focus(), 50);
 }
-const cM = () => { $('mo').classList.remove('show'); edId = null; pPh = null; pPhCl = false; };
+const cM = () => { $('mo').classList.remove('show'); edId = null; pPhs = []; };
 
 function sPt() {
     const name = $('f_name').value.trim(), cat = $('f_cat').value;
@@ -2098,7 +2190,7 @@ function sPt() {
         const t = r.querySelector('select').value, x = r.querySelector('input').value.trim();
         if (x) inst.push({ type: t, text: x });
     });
-    const phF = pPhCl ? null : pPh;
+    const photosArr = Array.isArray(pPhs) ? pPhs.slice() : [];
     if (edId) {
         const i = D.findIndex(x => x.id === edId);
         if (i < 0) return;
@@ -2111,7 +2203,7 @@ function sPt() {
         D[i] = Object.assign({}, o, {
             cat, sub: o.sub || '', name, oem, verified, analogs, donors,
             engines: engs, bodies: bdys, transmissions: trns, trims: trms, gens,
-            price, currency, status, favorite, notes, shopUrl, inst, photo: phF,
+            price, currency, status, favorite, notes, shopUrl, inst, photos: photosArr,
             priceHistory: h
         });
         if (useIDB) iPut(SP, D[i]).catch(() => { });
@@ -2120,7 +2212,7 @@ function sPt() {
         const np = {
             id: uid(), cat, sub: '', name, oem, verified, analogs, donors,
             engines: engs, bodies: bdys, transmissions: trns, trims: trms, gens,
-            price, currency, status, favorite, notes, shopUrl, inst, photo: phF, priceHistory: []
+            price, currency, status, favorite, notes, shopUrl, inst, photos: photosArr, priceHistory: []
         };
         D.push(np);
         if (useIDB) iPut(SP, np).catch(() => { });
@@ -2201,22 +2293,49 @@ function dWsh(id) {
     toast('Удалено', 'danger');
 }
 
-/* ============ ФОТО ============ */
+/* ============ ФОТО (массив) ============ */
+let pPhs = [];   /* рабочий массив фото в открытой форме */
+
 const pkP = () => $('pf').click();
-const clP = () => { pPh = null; pPhCl = true; uPP(); };
+
+function rmPI(i) {
+    if (!Array.isArray(pPhs)) return;
+    pPhs.splice(i, 1);
+    uPP();
+}
+
 function uPP() {
-    const im = $('pp'), d = $('pcb'), cur = pPhCl ? null : pPh, s = sImg(cur);
-    if (s) { im.src = s; im.style.display = 'block'; d.style.display = 'inline-flex'; }
-    else { im.src = ''; im.style.display = 'none'; d.style.display = 'none'; }
+    const g = $('pgrid'), cnt = $('pCount');
+    if (!g) return;
+    if (!Array.isArray(pPhs)) pPhs = [];
+    if (cnt) cnt.textContent = String(pPhs.length);
+    g.innerHTML = pPhs.map((src, i) =>
+        '<div class="pgrid-item">' +
+        '<img src="' + sImg(src) + '" alt="">' +
+        '<button type="button" class="rm" data-rmp="' + i + '" title="Удалить">✕</button>' +
+        '</div>'
+    ).join('');
+    g.querySelectorAll('[data-rmp]').forEach(b => {
+        b.onclick = () => rmPI(parseInt(b.dataset.rmp, 10));
+    });
 }
+
 async function oPF(e) {
-    const f = e.target.files && e.target.files[0];
+    const files = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = '';
-    if (!f) return;
-    if (!/^image\//.test(f.type)) { toast('Не изображение', 'danger'); return; }
-    try { pPh = await cI(f, 500, .75); pPhCl = false; uPP(); }
-    catch (err) { toast('Ошибка обработки', 'danger'); }
+    if (!files.length) return;
+    const MAX = 12;
+    for (const f of files) {
+        if (pPhs.length >= MAX) { toast('Максимум ' + MAX + ' фото', 'danger'); break; }
+        if (!/^image\//.test(f.type)) { toast('Не изображение: ' + f.name, 'danger'); continue; }
+        try {
+            const s = await cI(f, 800, .75);
+            pPhs.push(s);
+        } catch (err) { toast('Ошибка обработки', 'danger'); }
+    }
+    uPP();
 }
+
 const cI = (f, ms, q) => new Promise((res, rej) => {
     const r = new FileReader();
     r.onerror = rej;
@@ -3031,10 +3150,15 @@ function bindUI() {
 
     // Escape / Ctrl+F
     document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') {
-    if ($('whatsnew') && $('whatsnew').classList.contains('show')) return closeWhatsNew(true);   /* ← новая */
-    if ($('faqmo').classList.contains('show')) return cFaq();
+        /* Навигация в лайтбоксе работает всегда, когда он открыт */
+        if ($('lbt').classList.contains('show')) {
+            if (e.key === 'ArrowLeft') { e.preventDefault(); lbNav(-1); return; }
+            if (e.key === 'ArrowRight') { e.preventDefault(); lbNav(1); return; }
+        }
 
+        if (e.key === 'Escape') {
+            if ($('whatsnew') && $('whatsnew').classList.contains('show')) return closeWhatsNew(true);   /* ← новая */
+            if ($('faqmo').classList.contains('show')) return cFaq();
             if ($('faqmo').classList.contains('show')) return cFaq();
             if ($('thememmo').classList.contains('show')) return cTheme();
             if ($('vinmo').classList.contains('show')) return cVIN();
