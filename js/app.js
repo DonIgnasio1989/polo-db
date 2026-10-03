@@ -2479,7 +2479,7 @@ function dLog(id) {
     LOG = LOG.filter(x => x.id !== id);
     useIDB ? iDel('logs', id).catch(() => { }) : sLogs();
     if (!useIDB) sLogs();
-    _rebuildLogIndexrebuildLogIndex();
+    _rebuildLogIndex();
     rC();
     toast('Удалено', 'danger');
 }
