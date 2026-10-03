@@ -138,6 +138,7 @@ const UK = 'vw_polo_ui_v186', PK = 'vw_polo_db_v181', WK = 'vw_polo_workshops_v1
     SP = 'parts', SW = 'workshops', METAKEY = 'vw_polo_meta_v1', TOKEY = 'vw_polo_to_v1',
     LICKEY = 'vw_polo_license_v1', UPKEY = 'vw_polo_update_url_v1', PROFKEY = 'vw_polo_profile_v1',
     LOGKEY = 'vw_polo_logs_v1';
+    WNKEY = 'vw_polo_last_seen_version_v1';
 
 /* ============ ТЕМЫ ============ */
 const THEMES = [
@@ -1058,6 +1059,76 @@ function renderChangelog(list, currentVersion, fallbackDate) {
     box.innerHTML = h;
 }
 
+/* ============ ПЛАШКА «ЧТО НОВОГО» ============ */
+let _changelogCache = [];
+
+function _setChangelog(list) {
+    if (Array.isArray(list)) _changelogCache = list;
+}
+
+function checkWhatsNew() {
+    let lastSeen = '';
+    try { lastSeen = localStorage.getItem(WNKEY) || ''; } catch (e) { }
+
+    /* Первый запуск — только запоминаем версию, плашку не показываем */
+    if (!lastSeen) {
+        try { localStorage.setItem(WNKEY, APP_VERSION); } catch (e) { }
+        return;
+    }
+
+    /* Ничего не изменилось */
+    if (lastSeen === APP_VERSION) return;
+
+    /* Ищем запись для текущей версии в changelog */
+    const rec = _changelogCache.find(r => r && String(r.version) === String(APP_VERSION));
+    const changes = rec && Array.isArray(rec.changes) ? rec.changes.slice(0, 5) : [];
+
+    showWhatsNew(APP_VERSION, changes);
+}
+
+function showWhatsNew(version, changes) {
+    const el = $('whatsnew');
+    if (!el) return;
+
+    let h = '';
+    h += '<div class="wn-head">';
+    h += '<span class="wn-icon">🎉</span>';
+    h += '<span class="wn-title">Что нового в v' + esc(version) + '</span>';
+    h += '<button class="wn-close" onclick="closeWhatsNew(true)" title="Закрыть">✕</button>';
+    h += '</div>';
+
+    if (changes.length) {
+        h += '<ul class="wn-list">';
+        for (const c of changes) h += '<li>' + esc(c) + '</li>';
+        h += '</ul>';
+    } else {
+        h += '<div class="wn-empty">Приложение обновлено до v' + esc(version) +
+             '. Полный список изменений — в разделе «Обновление».</div>';
+    }
+
+    h += '<div class="wn-foot">';
+    h += '<button class="bn" onclick="closeWhatsNew(true)">Понятно</button>';
+    h += '<button class="bn p" onclick="openWhatsNewDetails()">Подробнее</button>';
+    h += '</div>';
+
+    el.innerHTML = h;
+    el.classList.add('show');
+}
+
+function closeWhatsNew(markSeen) {
+    const el = $('whatsnew');
+    if (!el) return;
+    el.classList.remove('show');
+    if (markSeen) {
+        try { localStorage.setItem(WNKEY, APP_VERSION); } catch (e) { }
+    }
+}
+
+function openWhatsNewDetails() {
+    closeWhatsNew(true);
+    oUp();
+}
+
 function checkAppUpdate() {
     const st = $('up_prog_status');
     st.innerHTML = '<div class="up-load">⏳ Проверяем программу…</div>';
@@ -1183,12 +1254,13 @@ async function lAll() {
     const base = location.origin + location.pathname.replace(/[^/]*$/, '');
     let files = [];
     try {
-        const r = await fetch(base + 'data/update.json?t=' + Date.now(), { cache: 'no-store' });
-        if (r.ok) {
-            const m = await r.json();
-            if (Array.isArray(m.files) && m.files.length) files = m.files;
-        }
-    } catch (e) { console.warn('update.json не загрузился', e); }
+    const r = await fetch(base + 'data/update.json?t=' + Date.now(), { cache: 'no-store' });
+    if (r.ok) {
+        const m = await r.json();
+        if (Array.isArray(m.files) && m.files.length) files = m.files;
+        if (Array.isArray(m.changelog)) _setChangelog(m.changelog);   /* ← новая строка */
+    }
+} catch (e) { console.warn('update.json не загрузился', e); }
     if (!files.length) {
         files = [
             'data/parts-01-engine-fuel-ignition.json',
@@ -2837,6 +2909,7 @@ async function init() {
     rTOWidget();
     iPWA();
     fCS();
+    checkWhatsNew();
 
 }
 
@@ -2959,6 +3032,8 @@ function bindUI() {
     // Escape / Ctrl+F
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
+    if ($('whatsnew') && $('whatsnew').classList.contains('show')) return closeWhatsNew(true);   /* ← новая */
+    if ($('faqmo').classList.contains('show')) return cFaq();
 
             if ($('faqmo').classList.contains('show')) return cFaq();
             if ($('thememmo').classList.contains('show')) return cTheme();
