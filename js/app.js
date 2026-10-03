@@ -1780,12 +1780,13 @@ function rET(parts) {
             h += '<div class="sg">';
 
             const sorted = a.slice().sort((x, y) => {
-                if (p.cat === 'Maintenance' || x.cat === 'Maintenance' || y.cat === 'Maintenance') {
-                    const dx = _maintWeight(x), dy = _maintWeight(y);
-                    if (dx !== dy) return dx - dy;
-                }
-                return (x.oem || '').localeCompare(y.oem || '');
-            });
+    if (x.cat === 'Maintenance' || y.cat === 'Maintenance') {
+        const dx = _maintWeight(x), dy = _maintWeight(y);
+        if (dx !== dy) return dx - dy;
+        return (x.name || '').localeCompare(y.name || '');
+    }
+    return (x.oem || '').localeCompare(y.oem || '');
+});
             for (const p of sorted) {
                 const w = p.verified ? '' : ' <span style="color:var(--wn);font-size:.68rem">⚠</span>';
                 const cm = pCompat(p);
