@@ -2738,3 +2738,107 @@ body.theme-paper .tg.gn { color: #92400e; }
 @media (max-width: 380px) {
     .sc-oem-btn { padding: 4px 8px !important; }
 }
+/* ============================================================
+   🎉 ПЛАШКА «ЧТО НОВОГО» (при обновлении версии)
+   ============================================================ */
+.whatsnew {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 3500;
+    max-width: 400px;
+    min-width: 280px;
+    padding: 16px 18px 14px;
+    background: var(--cd);
+    color: var(--tx);
+    border: 1px solid var(--bd);
+    border-left: 4px solid var(--a);
+    border-radius: var(--r-lg);
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, .28),
+        0 0 0 1px rgba(0, 0, 0, .03);
+    display: none;
+    animation: wnIn .35s cubic-bezier(.4, 0, .2, 1);
+}
+.whatsnew.show { display: block; }
+@keyframes wnIn {
+    from { opacity: 0; transform: translateY(20px) scale(.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.wn-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.wn-icon { font-size: 1.3rem; line-height: 1; }
+.wn-title {
+    font-weight: 800;
+    color: var(--a);
+    font-size: .95rem;
+    flex: 1;
+    letter-spacing: -.2px;
+}
+.wn-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--mu);
+    font-size: 1rem;
+    padding: 4px 8px;
+    border-radius: var(--r-sm);
+    font-family: inherit;
+    transition: all var(--tr);
+}
+.wn-close:hover { background: var(--dg); color: #fff; transform: rotate(90deg); }
+.wn-list {
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.wn-list li {
+    font-size: .82rem;
+    line-height: 1.5;
+    color: var(--tx);
+    padding-left: 16px;
+    position: relative;
+}
+.wn-list li::before {
+    content: '•';
+    position: absolute;
+    left: 4px;
+    color: var(--a);
+    font-weight: 800;
+}
+.wn-empty {
+    font-size: .82rem;
+    color: var(--mu);
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+.wn-foot {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+/* Мобильный — плашка превращается в ленту снизу */
+@media (max-width: 900px) {
+    .whatsnew {
+        right: 10px;
+        left: 10px;
+        bottom: 10px;
+        max-width: none;
+        min-width: 0;
+        padding: 14px 16px 12px;
+        border-radius: var(--r-md);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, .45);
+    }
+    .wn-title { font-size: .9rem; }
+    .wn-list li { font-size: .78rem; }
+    .wn-foot { flex-wrap: wrap; }
+    .wn-foot .bn { flex: 1 1 auto; justify-content: center; }
+}
