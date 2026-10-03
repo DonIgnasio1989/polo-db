@@ -540,10 +540,28 @@ body.theme-light .ni.active {
 }
 .ni.folder:hover .fold-arr { opacity: 1; }
 
+/* Обычный разделитель — чуть ярче прежнего */
 .nd {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent);
+    background: linear-gradient(90deg,
+        transparent,
+        color-mix(in srgb, var(--a) 35%, rgba(255,255,255,.35)),
+        transparent);
     margin: 10px 16px; list-style: none;
+    box-shadow: 0 0 6px color-mix(in srgb, var(--a) 25%, transparent);
+}
+
+/* Акцентный разделитель — заметно ярче, для отделения «Шины» */
+.nd.bright {
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        color-mix(in srgb, var(--a) 95%, #fff) 50%,
+        transparent 100%);
+    box-shadow:
+        0 0 12px color-mix(in srgb, var(--a) 65%, transparent),
+        0 0 3px color-mix(in srgb, var(--a) 90%, transparent);
+    margin: 14px 14px;
 }
 
 /* ---------- ПОДВАЛ САЙДБАРА ---------- */

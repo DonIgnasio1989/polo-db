@@ -22,7 +22,8 @@ const BASE_CATS = [
     { id: 'Body', label: '8. Кузов', icon: '🚗' },
     { id: 'Electrical', label: '9. Электрика', icon: '💡' },
     { id: 'Bulbs', label: '9.1 Освещение, Лампы', icon: '🔆', parent: 'Electrical' },
-    { id: 'Interior', label: '0. Аксессуары, Салон', icon: '🪑' }
+    { id: 'Interior', label: '0. Аксессуары, Салон', icon: '🪑' },
+{ id: 'Tires', label: 'Шины и давление', icon: '🛞' }   // ← новая строка
 ];
 let CATS = BASE_CATS.slice();
 
@@ -66,7 +67,7 @@ const BASE_EK = {
     Brakes: { g: 'Тормоза', s: 'Передние / Задние' }, Transmission: { g: 'Трансмиссия', s: 'КПП / Привод' },
     Exhaust: { g: 'Выхлоп', s: 'Глушитель' }, Electrical: { g: 'Электрика', s: 'Генератор / Стартер' },
     Bulbs: { g: 'Лампы', s: 'Освещение' }, Body: { g: 'Кузов', s: 'Наружные панели' },
-    Interior: { g: 'Интерьер', s: 'Панель / Сиденья' }, Fluids: { g: 'Жидкости', s: 'Эксплуатационные' },
+    Interior: { g: 'Интерьер', s: 'Панель / Сиденья' }, Tires: { g: 'Колёса', s: 'Шины и давление' }, Fluids: { g: 'Жидкости', s: 'Эксплуатационные' },
     RearAxle: { g: 'Задняя ось', s: 'Балка / Ступица' }, Controls: { g: 'Управление', s: 'Педали / Кулиса' }
 };
 
@@ -418,10 +419,13 @@ function nP(p) {
     let inst;
 
     if (Array.isArray(p.inst)) {
-        inst = p.inst.filter(i => i && i.text).map(i => ({ type: MI[IM[i.type]] || i.type || 'note', text: String(i.text) }));
-    } else if (Array.isArray(p.i)) {
-        inst = p.i.map(x => ({ type: MI[x[0]] || 'note', text: String(x[1] || '') })).filter(x => x.text);
-    } else inst = [];
+    // формат:  "inst": [{ "type": "spec", "text": "..." }, ...]
+    inst = p.inst.filter(i => i && i.text).map(i => ({ type: MI[IM[i.type]] || i.type, text: String(i.text) }));
+} else if (Array.isArray(p.i)) {
+    // формат:  "i": [["s", "..."], ["n", "..."], ...]
+    inst = p.i.map(x => ({ type: MI[x[0]] || 'note', text: String(x[1] || '') })).filter(x => x.text);
+}
+    else inst = [];
     const eng = Array.isArray(p.engines) ? p.engines.filter(x => ALL_ENGINES.includes(x)) : [];
     const bdy = Array.isArray(p.bodies) ? p.bodies.filter(x => ALL_BODIES.includes(x)) : [];
     const trn = Array.isArray(p.transmissions) ? p.transmissions.filter(x => ALL_TRANS.includes(x)) : [];
@@ -1458,7 +1462,8 @@ function rSB() {
 
     const dv = document.createElement('li'); dv.className = 'nd'; n.appendChild(dv);
 
-    CATS.filter(c => c.id !== 'All' && !c.parent).forEach(c => {
+    /* Категории — исключаем 'Tires', её вынесем отдельно */
+    CATS.filter(c => c.id !== 'All' && c.id !== 'Tires' && !c.parent).forEach(c => {
         const kids = CATS.filter(k => k.parent === c.id);
         if (kids.length) {
             addFolder(c, kids);
@@ -1467,11 +1472,15 @@ function rSB() {
         }
     });
 
-    const dv2 = document.createElement('li'); dv2.className = 'nd'; n.appendChild(dv2);
+    /* ─── Служебные разделы: Шины · Мастерские · Журнал ─── */
+    const dv2 = document.createElement('li');
+    dv2.className = 'nd bright';
+    n.appendChild(dv2);
+
+    add('Tires', '🛞', 'Шины и давление', cnt('Tires'));
     add('Workshops', '🔧', 'Мастерские', W.length);
     add('Log', '📖', 'Журнал обслуживания', LOG.length);
 }
-
 /* ============ ПОИСК / ФИЛЬТРЫ ============ */
 const uSC = () => $('scl').classList.toggle('show', !!(SV.searchQuery || '').length);
 const cS = () => { SV.searchQuery = ''; $('sr').value = ''; uSC(); sU(); rC(); };
@@ -3251,4 +3260,3 @@ window.addEventListener('DOMContentLoaded', async () => {
     fCS();
     checkLicense()
 })
-
