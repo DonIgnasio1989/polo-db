@@ -2595,3 +2595,146 @@ body.theme-light .tg.gn,
 body.theme-paper .tg.gn { color: #92400e; }
 .fs.flt.gen { color: #a16207; }
 }
+
+/* ============================================================
+   ⚙️ Настройки в подвале сайдбара — одна строка + рабочее меню
+   ============================================================ */
+
+/* 7 иконок в один ряд, все равные, ничего не переносится */
+.sft-btns {
+    flex-wrap: nowrap;
+    gap: 4px;
+}
+.sft-btns > * {
+    flex: 1 1 0;
+    min-width: 0;
+}
+.sft-btns .sft-btn {
+    width: auto;
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+/* Обёртка ⚙️ — тоже flex-ячейка, как и остальные кнопки */
+.sft-btns .ew {
+    display: inline-flex;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    flex: 1 1 0;
+    min-width: 0;
+}
+.sft-btns .ew > #btnSettings {
+    width: 100%;
+    flex: none;
+}
+
+/* На десктопе меню выезжает СПРАВА от кнопки, выровнено по её низу. */
+@media (min-width: 901px) {
+    .sft-btns .em {
+        position: absolute !important;
+        top: auto !important;
+        right: auto !important;
+        bottom: 0 !important;
+        left: calc(100% + 10px) !important;
+        transform: none !important;
+        min-width: 280px;
+        max-width: 340px;
+        max-height: 80vh;
+        overflow-y: auto;
+        z-index: 2500 !important;
+
+        /* НЕПРОЗРАЧНЫЙ фон — иначе меню «просвечивает» поверх контента */
+        background: var(--cd) !important;
+        border: 1px solid var(--bd) !important;
+        box-shadow:
+            0 12px 40px rgba(0,0,0,.35),
+            0 0 0 1px rgba(0,0,0,.04) !important;
+
+        /* Убираем вложенный blur — он конфликтует с .sft и .sb */
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* Верхний светлый градиент .em::before на непрозрачном фоне оставим,
+       он добавляет глубину и не мешает читаемости. */
+    .sft-btns .em::before {
+        background: linear-gradient(180deg,
+            rgba(255,255,255,.06) 0%,
+            rgba(255,255,255,0) 40%) !important;
+    }
+
+    /* В тёмных темах подсветка сверху — наоборот, чуть ярче */
+    body:not(.theme-light):not(.theme-paper) .sft-btns .em::before {
+        background: linear-gradient(180deg,
+            rgba(255,255,255,.10) 0%,
+            rgba(255,255,255,0) 45%) !important;
+    }
+}
+/* ============================================================
+   🔍 Поиск + кнопка +OEM — в одной связке
+   ============================================================ */
+
+.sc-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+    min-width: 0;
+    margin-left: 0;
+}
+/* Внутри обёртки поле поиска больше не отступает само по себе */
+.sc-wrap .sc {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Кнопка +OEM рядом с поиском — по высоте как поле */
+.sc-oem-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* ---------- Десктоп ---------- */
+@media (min-width: 901px) {
+    /* При свёрнутом сайдбаре сдвигаем всю связку, а не только поле */
+    body.sidebar-collapsed .sc-wrap {
+        margin-left: 52px !important;
+    }
+    .sc-oem-btn {
+        height: 36px !important;
+    }
+}
+
+/* ---------- Мобильный ---------- */
+@media (max-width: 900px) {
+    .sc-wrap {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-bottom: 4px !important;
+        gap: 4px !important;
+        order: -1;               /* поиск остаётся сверху */
+    }
+    /* Внутри связки поле сжимается, а не растягивается на 100% */
+    .sc-wrap .sc {
+        flex: 1 1 auto !important;
+        width: auto !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        margin-bottom: 0 !important;
+        order: 0;
+    }
+    .sc-oem-btn {
+        padding: 5px 10px !important;
+        height: 32px !important;
+        font-size: .72rem !important;
+    }
+    /* На узких — только «➕», без слова OEM */
+    .sc-oem-btn .bl { display: none !important; }
+}
+
+/* Очень узкие экраны — минимальный отступ */
+@media (max-width: 380px) {
+    .sc-oem-btn { padding: 4px 8px !important; }
+}

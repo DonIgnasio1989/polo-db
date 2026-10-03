@@ -108,28 +108,28 @@ const ONLINE_CATALOGS = {
 };
 
 const getPurchaseHtml = p => {
-  const av = (typeof gAV === 'function') ? gAV() : null;
-  const vin = av && av.ok ? av.vin : '';
-  const prs = fP(p.price, p.currency);
-  const su = p.shopUrl || '';
-  const hh = (p.priceHistory && p.priceHistory.length)
-    ? '<span class="hi" title="История цен">📊 ' + p.priceHistory.length + '</span>' : '';
-  let h = '';
-  h += '<div class="prow">';
-  h += prs ? '<span class="price-tag">' + esc(prs) + '</span>' : '<span style="color:var(--mu);font-size:.7rem">цена не указана</span>';
-  h += hh;
-  if (su) h += '<a class="sl" href="' + escA(su) + '" target="_blank" rel="noopener noreferrer">🛒 Свой магазин</a>';
-  h += '</div>';
-  if (p.oem) h += '<div class="prow">' + shopH(p.oem, p.name) + '</div>';
-  if (p.oem) {
-    const c = p.oem.replace(/\s+/g, '');
-    h += '<div class="prow op-b">';
-    h += '<a class="psl op1" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.emex(c) + '" title="Поиск в Emex по артикулу">Emex</a>';
-    h += '<a class="psl op7" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.zzap(c) + '" title="Поиск в ZZap по артикулу">ZZap</a>';
+    const av = (typeof gAV === 'function') ? gAV() : null;
+    const vin = av && av.ok ? av.vin : '';
+    const prs = fP(p.price, p.currency);
+    const su = p.shopUrl || '';
+    const hh = (p.priceHistory && p.priceHistory.length)
+        ? '<span class="hi" title="История цен">📊 ' + p.priceHistory.length + '</span>' : '';
+    let h = '';
+    h += '<div class="prow">';
+    h += prs ? '<span class="price-tag">' + esc(prs) + '</span>' : '<span style="color:var(--mu);font-size:.7rem">цена не указана</span>';
+    h += hh;
+    if (su) h += '<a class="sl" href="' + escA(su) + '" target="_blank" rel="noopener noreferrer">🛒 Свой магазин</a>';
     h += '</div>';
-  }
+    if (p.oem) h += '<div class="prow">' + shopH(p.oem, p.name) + '</div>';
+    if (p.oem) {
+        const c = p.oem.replace(/\s+/g, '');
+        h += '<div class="prow op-b">';
+        h += '<a class="psl op1" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.emex(c) + '" title="Поиск в Emex по артикулу">Emex</a>';
+        h += '<a class="psl op7" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.zzap(c) + '" title="Поиск в ZZap по артикулу">ZZap</a>';
+        h += '</div>';
+    }
 
-  return h;
+    return h;
 };
 
 /* ============ КЛЮЧИ ХРАНИЛИЩА ============ */
@@ -220,6 +220,79 @@ const csvE = v => {
     if (/[",\r\n;]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
     return s;
 };
+/* ============ ЛОГИЧЕСКИЙ ПОРЯДОК РЕГЛАМЕНТА ТО ============ */
+/* Чем меньше число — тем выше в списке. Порядок — как в сервисной книжке. */
+const MAINT_ORDER = [
+    /* 1. Расходники ДВС */
+    'масло мотор', 'масло двс', 'масло двигател', 'масло в двигател',
+    'фильтр маслян', 'масляный фильтр', 'фильтр масл',
+    'воздушный фильтр', 'фильтр воздушн',
+    'салонн', 'фильтр салон',
+    'топливный фильтр', 'фильтр топливн',
+    /* 2. Зажигание */
+    'свеч', 'свечи зажиган', 'катушк', 'провод высоковольт', 'провода зажиган',
+    /* 3. Ремни */
+    'ремень грм', 'грм', 'ролик грм', 'натяжитель грм',
+    'ремень генератор', 'ремень поликлин', 'ремень приводн', 'ремень кондиц',
+    /* 4. Жидкости */
+    'антифриз', 'охлаждающ', 'жидкость охлажд',
+    'тормозн жидк', 'жидкость тормозн', 'жидкость тормоз',
+    'жидкость гур', 'жидкость гидроусил',
+    'масло кпп', 'масло акпп', 'масло трансмисс', 'масло коробк',
+    'омывател', 'жидкость омыв',
+    /* 5. Тормоза */
+    'колодк', 'колодки',
+    'тормозн диск', 'диск тормозн',
+    'тормозн барабан', 'барабан',
+    'суппорт', 'шланг тормозн',
+    /* 6. Ходовая / рулевое */
+    'амортизатор', 'стойк',
+    'пыльник', 'шрус', 'шаров', 'наконечник', 'тяга рулев',
+    'сайлентблок', 'втулк стабилиз',
+    /* 7. Электрика / прочее */
+    'аккумулятор', 'акб',
+    'щетк', 'щётк', 'дворник', 'стеклоочист',
+    'предохранит', 'лампочк', 'лампы',
+    /* 8. Фильтры сажевые, катализаторы и прочее */
+    'сажев', 'катализатор', 'лямбда', 'датчик кислород'
+];
+
+function _maintWeight(p) {
+    const n = nz(p.name || '');
+    if (!n) return 9999999;
+
+    /* Главное: порядок по числу в «ТО-N».
+       ТО-1 → 1, ТО-2 → 2, …, ТО-10 → 10, ТО-11 → 11, ТО-12 → 12 */
+    let m = n.match(/(?:^|\s)то[\s\-–—]*(\d+)/i);
+    if (m) {
+        const num = parseInt(m[1], 10);
+        if (!isNaN(num) && num > 0) return num;
+    }
+
+    /* Fallback для позиций без «ТО-N» — по числу перед «км» */
+    m = n.match(/(\d[\d\s]{2,})\s*км/);
+    if (m) {
+        const km = parseInt(m[1].replace(/\s/g, ''), 10);
+        if (!isNaN(km) && km > 0) return 1000 + km;
+    }
+
+    /* «раз в год» */
+    if (/(?:раз в год|ежегодн|каждый год)/.test(n)) return 500000;
+
+    /* Сезонные */
+    if (/(?:^|\s)зим/.test(n)) return 900000;
+    if (/(?:^|\s)лет/.test(n)) return 901000;
+    if (/(?:^|\s)весн/.test(n)) return 902000;
+    if (/(?:^|\s)осен/.test(n)) return 903000;
+
+    /* Совсем без меток — по ключевым словам из MAINT_ORDER */
+    for (let i = 0; i < MAINT_ORDER.length; i++) {
+        if (n.includes(MAINT_ORDER[i])) return 950000 + i;
+    }
+
+    return 9999999;
+}
+
 function fmtDate(d) {
     if (!d) return '';
     const s = String(d);
@@ -330,7 +403,20 @@ function nP(p) {
     const ALL_ENGINES = Object.keys(ENGINES);
     const ALL_BODIES = Object.keys(BODIES);
     const ALL_TRANS = Object.keys(TRANSMISSIONS);
+
+       /* Чистим заголовки регламента ТО от «каждые» */
+    let rawName = String(p.n || p.name || '');
+    if (cat === 'Maintenance') {
+        rawName = rawName
+            .replace(/\bкаждые\b\s*/gi, '')
+            .replace(/\s{2,}/g, ' ')
+            .replace(/\(\s+/g, '(')
+            .replace(/\s+\)/g, ')')
+            .trim();
+    }
+
     let inst;
+    
     if (Array.isArray(p.inst)) {
         inst = p.inst.filter(i => i && i.text).map(i => ({ type: MI[IM[i.type]] || i.type || 'note', text: String(i.text) }));
     } else if (Array.isArray(p.i)) {
@@ -340,13 +426,13 @@ function nP(p) {
     const bdy = Array.isArray(p.bodies) ? p.bodies.filter(x => ALL_BODIES.includes(x)) : [];
     const trn = Array.isArray(p.transmissions) ? p.transmissions.filter(x => ALL_TRANS.includes(x)) : [];
     const trm = Array.isArray(p.trims) ? p.trims.filter(x => TRIMS.includes(x)) : [];
-        const ALL_GENS = Object.keys(GENERATIONS);
+    const ALL_GENS = Object.keys(GENERATIONS);
     const gens = Array.isArray(p.gens) ? p.gens.filter(x => ALL_GENS.includes(x)) : [];
     return {
         id: p.id || uid(),
         cat,
         sub: String(p.sub || p.subcategory || ''),
-        name: String(p.n || p.name || ''),
+        name: rawName,
         oem: String(p.o || p.oem || ''),
         verified: !!(p.v || p.verified),
         analogs: Array.isArray(p.a || p.analogs) ? (p.a || p.analogs).map(String).filter(Boolean) : [],
@@ -392,7 +478,7 @@ function vD(v) {
     else if (w === '3VW') { brand = 'VW Mexico'; country = 'Мексика'; }
     let vp = x.slice(6, 9);
     if (!/^[0-9A-Z]{3}$/.test(vp) || /^ZZZ$/.test(vp)) vp = x.slice(3, 6);
-       let model = '—', body = '—', gen = '';
+    let model = '—', body = '—', gen = '';
     if (/^6N/.test(vp)) {
         model = 'Polo/Caddy (6N)';
         if (vp === '6N1') { body = 'Hatchback'; gen = '6N1'; }
@@ -1325,6 +1411,16 @@ function mP(p, t) {
 }
 function sP(a) {
     const s = SV.sortBy;
+
+    /* «Логический» порядок для регламента ТО — только по умолчанию */
+    if (s === 'default' && SV.activeCat === 'Maintenance') {
+        return [...a].sort((x, y) =>
+            _maintWeight(x) - _maintWeight(y)
+            || (x.name || '').localeCompare(y.name || '')
+            || (x.oem || '').localeCompare(y.oem || '')
+        );
+    }
+
     if (s === 'oem') return [...a].sort((x, y) => (x.oem || '').localeCompare(y.oem || ''));
     if (s === 'name') return [...a].sort((x, y) => (x.name || '').localeCompare(y.name || ''));
     if (s === 'priceAsc') return [...a].sort((x, y) => (Number(x.price) || Infinity) - (Number(y.price) || Infinity));
@@ -1332,6 +1428,7 @@ function sP(a) {
     if (s === 'favorite') return [...a].sort((x, y) => (y.favorite ? 1 : 0) - (x.favorite ? 1 : 0));
     return a;
 }
+
 function gF() {
     const t = nz(SV.searchQuery).split(/\s+/).filter(Boolean);
     let f = D;
@@ -1357,7 +1454,7 @@ function gF() {
         const arr = p.transmissions || [];
         return !arr.length || arr.includes(SV.transFilter);
     });
-        if (SV.genFilter && SV.genFilter !== 'all') f = f.filter(p => {
+    if (SV.genFilter && SV.genFilter !== 'all') f = f.filter(p => {
         const arr = p.gens || [];
         return !arr.length || arr.includes(SV.genFilter);
     });
@@ -1372,16 +1469,16 @@ function updateFilterStyling() {
     });
 }
 function updSearchSuggest() {
-  const dl = $('searchSuggest'); if (!dl) return;
-  const items = [], seen = new Set();
-  const MAX = 200;                              // было 500
-  for (const p of D) {
-    if (items.length >= MAX) break;
-    if (p.oem && !seen.has('o:' + p.oem)) { items.push(p.oem); seen.add('o:' + p.oem); }
-    if (items.length >= MAX) break;
-    if (p.name && !seen.has('n:' + p.name)) { items.push(p.name); seen.add('n:' + p.name); }
-  }
-  dl.innerHTML = items.map(x => '<option value="' + escA(x) + '">').join('');
+    const dl = $('searchSuggest'); if (!dl) return;
+    const items = [], seen = new Set();
+    const MAX = 200;                              // было 500
+    for (const p of D) {
+        if (items.length >= MAX) break;
+        if (p.oem && !seen.has('o:' + p.oem)) { items.push(p.oem); seen.add('o:' + p.oem); }
+        if (items.length >= MAX) break;
+        if (p.name && !seen.has('n:' + p.name)) { items.push(p.name); seen.add('n:' + p.name); }
+    }
+    dl.innerHTML = items.map(x => '<option value="' + escA(x) + '">').join('');
 }
 
 /* ============ КОНТЕНТ (с окном рендера) ============ */
@@ -1390,112 +1487,112 @@ let _visibleLimit = PAGE_SIZE;
 let _lastRenderSig = '';
 
 function _renderSignature() {
-  return [
-    SV.activeCat, SV.searchQuery, SV.statusFilter,
-    SV.engineFilter, SV.bodyFilter, SV.transFilter, SV.genFilter,
-    SV.sortBy, SV.groupBySub, SV.vinStrictFilter
-  ].join('|');
+    return [
+        SV.activeCat, SV.searchQuery, SV.statusFilter,
+        SV.engineFilter, SV.bodyFilter, SV.transFilter, SV.genFilter,
+        SV.sortBy, SV.groupBySub, SV.vinStrictFilter
+    ].join('|');
 }
 
 function rC() {
-  if (SV.activeCat === 'Workshops') { rW(); return; }
-  if (SV.activeCat === 'Log') { rLog(); return; }
-  if (CUSTOM.sections[SV.activeCat]) { rSec(SV.activeCat); return; }
+    if (SV.activeCat === 'Workshops') { rW(); return; }
+    if (SV.activeCat === 'Log') { rLog(); return; }
+    if (CUSTOM.sections[SV.activeCat]) { rSec(SV.activeCat); return; }
 
-  /* сброс окна при смене фильтра/поиска/раздела */
-  const sig = _renderSignature();
-  if (sig !== _lastRenderSig) { _visibleLimit = PAGE_SIZE; _lastRenderSig = sig; }
+    /* сброс окна при смене фильтра/поиска/раздела */
+    const sig = _renderSignature();
+    if (sig !== _lastRenderSig) { _visibleLimit = PAGE_SIZE; _lastRenderSig = sig; }
 
-  const ar = $('ca'), f = gF();
+    const ar = $('ca'), f = gF();
 
-  /* --- Заголовок раздела --- */
-  let title, icon;
-  if (SV.activeCat === 'Favorites') { title = 'Избранное'; icon = '⭐'; }
-  else if (SV.activeCat === 'All') { title = 'Все системы'; icon = '📦'; }
-  else {
-    const c = CATS.find(x => x.id === SV.activeCat);
-    title = c ? c.label : '?';
-    icon = c ? c.icon : '📦';
-  }
-  let h = '<h2 class="sh">' + icon + ' ' + esc(title) + '</h2>';
+    /* --- Заголовок раздела --- */
+    let title, icon;
+    if (SV.activeCat === 'Favorites') { title = 'Избранное'; icon = '⭐'; }
+    else if (SV.activeCat === 'All') { title = 'Все системы'; icon = '📦'; }
+    else {
+        const c = CATS.find(x => x.id === SV.activeCat);
+        title = c ? c.label : '?';
+        icon = c ? c.icon : '📦';
+    }
+    let h = '<h2 class="sh">' + icon + ' ' + esc(title) + '</h2>';
 
-  /* --- Чипы-фильтры --- */
-  const chips = [];
-  chips.push('<span class="chip">найдено: <b>' + f.length + '</b></span>');
-  if (SV.engineFilter && SV.engineFilter !== 'all') chips.push('<span class="chip">⚙️ ' + esc(SV.engineFilter) + '</span>');
-  if (SV.bodyFilter && SV.bodyFilter !== 'all') chips.push('<span class="chip">🚗 ' + esc(BODIES[SV.bodyFilter] || SV.bodyFilter) + '</span>');
-  if (SV.transFilter && SV.transFilter !== 'all') chips.push('<span class="chip">🔄 ' + esc(TRANSMISSIONS[SV.transFilter] || SV.transFilter) + '</span>');
+    /* --- Чипы-фильтры --- */
+    const chips = [];
+    chips.push('<span class="chip">найдено: <b>' + f.length + '</b></span>');
+    if (SV.engineFilter && SV.engineFilter !== 'all') chips.push('<span class="chip">⚙️ ' + esc(SV.engineFilter) + '</span>');
+    if (SV.bodyFilter && SV.bodyFilter !== 'all') chips.push('<span class="chip">🚗 ' + esc(BODIES[SV.bodyFilter] || SV.bodyFilter) + '</span>');
+    if (SV.transFilter && SV.transFilter !== 'all') chips.push('<span class="chip">🔄 ' + esc(TRANSMISSIONS[SV.transFilter] || SV.transFilter) + '</span>');
     if (SV.genFilter && SV.genFilter !== 'all') chips.push('<span class="chip">🚘 ' + esc(GENERATIONS[SV.genFilter] || SV.genFilter) + '</span>');
-  if (SV.statusFilter && SV.statusFilter !== 'all') chips.push('<span class="chip">🏷 ' + esc(SV.statusFilter) + '</span>');
-  if (SV.searchQuery) chips.push('<span class="chip">🔍 "' + esc(SV.searchQuery) + '"</span>');
-  chips.push('<span class="chip" data-chip="groupBySub" style="cursor:pointer;' + (SV.groupBySub ? 'border-color:var(--a);background:rgba(0,176,240,.12);' : '') + '" title="Группировать по подкатегориям">📂 Группы</span>');
-  const av = gAV();
-  if (av) {
-    chips.push('<span class="chip">VIN …' + esc(av.vin.slice(-6)) + '</span>');
-    chips.push('<span class="chip" data-chip="vinStrict" style="cursor:pointer;' + (SV.vinStrictFilter ? 'border-color:var(--dg);background:rgba(220,53,69,.12);' : '') + '" title="Скрыть детали, несовместимые с VIN">🔒 VIN-строго</span>');
-  }
-  h += '<div class="ri">' + chips.join('') + '</div>';
-
-  /* --- Пустая выдача --- */
-  if (!f.length) {
-    let ei, em;
-    if (SV.activeCat === 'Favorites') { ei = '⭐'; em = 'Пока нет избранного.'; }
-    else if (!D.length) { ei = '📂'; em = 'База пуста. Положи parts.json в data/ или нажми ⚙️ → 🌐 Обновление базы.'; }
-    else { ei = '🔍'; em = 'Ничего не найдено. Попробуйте сбросить фильтры.'; }
-    h += '<div class="emp"><div class="empi">' + ei + '</div><p>' + em + '</p><button class="bn" onclick="resetFilters()" style="margin-top:10px">🔄 Сбросить фильтры</button></div>';
-    ar.innerHTML = h;
-    return;
-  }
-
-  /* === Ветка «дерево» — без окна === */
-  if (SV.view === 'tree') {
-    h += rET(f);
-    ar.innerHTML = h;
-    return;
-  }
-
-  /* === Плитка / группы — с окном === */
-  if (SV.groupBySub) {
-    const groups = {};
-    for (const p of f) {
-      const k = (p.sub || '').trim() || '— без подкатегории —';
-      (groups[k] || (groups[k] = [])).push(p);
+    if (SV.statusFilter && SV.statusFilter !== 'all') chips.push('<span class="chip">🏷 ' + esc(SV.statusFilter) + '</span>');
+    if (SV.searchQuery) chips.push('<span class="chip">🔍 "' + esc(SV.searchQuery) + '"</span>');
+    chips.push('<span class="chip" data-chip="groupBySub" style="cursor:pointer;' + (SV.groupBySub ? 'border-color:var(--a);background:rgba(0,176,240,.12);' : '') + '" title="Группировать по подкатегориям">📂 Группы</span>');
+    const av = gAV();
+    if (av) {
+        chips.push('<span class="chip">VIN …' + esc(av.vin.slice(-6)) + '</span>');
+        chips.push('<span class="chip" data-chip="vinStrict" style="cursor:pointer;' + (SV.vinStrictFilter ? 'border-color:var(--dg);background:rgba(220,53,69,.12);' : '') + '" title="Скрыть детали, несовместимые с VIN">🔒 VIN-строго</span>');
     }
-    const keys = Object.keys(groups).sort((a, b) =>
-      (a === '— без подкатегории —' ? 1 : b === '— без подкатегории —' ? -1 : 0)
-      || a.localeCompare(b));
+    h += '<div class="ri">' + chips.join('') + '</div>';
 
-    let rendered = 0;
-    for (const k of keys) {
-      if (rendered >= _visibleLimit) break;
-      h += '<h3 style="margin:14px 0 8px;font-size:.9rem;color:var(--b);display:flex;align-items:center;gap:6px">'
-        + '<span style="display:inline-block;width:3px;height:14px;background:var(--a);border-radius:2px"></span>'
-        + esc(k) + ' <span style="font-size:.72rem;color:var(--mu);font-weight:400">('
-        + groups[k].length + ')</span></h3><div class="gr">';
-      for (const p of groups[k]) {
-        if (rendered >= _visibleLimit) break;
-        h += cH(p);
-        rendered++;
-      }
-      h += '</div>';
+    /* --- Пустая выдача --- */
+    if (!f.length) {
+        let ei, em;
+        if (SV.activeCat === 'Favorites') { ei = '⭐'; em = 'Пока нет избранного.'; }
+        else if (!D.length) { ei = '📂'; em = 'База пуста. Положи parts.json в data/ или нажми ⚙️ → 🌐 Обновление базы.'; }
+        else { ei = '🔍'; em = 'Ничего не найдено. Попробуйте сбросить фильтры.'; }
+        h += '<div class="emp"><div class="empi">' + ei + '</div><p>' + em + '</p><button class="bn" onclick="resetFilters()" style="margin-top:10px">🔄 Сбросить фильтры</button></div>';
+        ar.innerHTML = h;
+        return;
     }
-  } else {
-    const slice = f.slice(0, _visibleLimit);
-    h += '<div class="gr">';
-    for (const p of slice) h += cH(p);
-    h += '</div>';
-  }
 
-  if (f.length > _visibleLimit) {
-    h += '<div style="text-align:center;padding:22px 0">'
-      + '<button class="bn p" onclick="_showMore()">▾ Показать ещё ('
-      + (f.length - _visibleLimit) + ' из ' + f.length + ')</button></div>';
-  }
-  ar.innerHTML = h;
+    /* === Ветка «дерево» — без окна === */
+    if (SV.view === 'tree') {
+        h += rET(f);
+        ar.innerHTML = h;
+        return;
+    }
+
+    /* === Плитка / группы — с окном === */
+    if (SV.groupBySub) {
+        const groups = {};
+        for (const p of f) {
+            const k = (p.sub || '').trim() || '— без подкатегории —';
+            (groups[k] || (groups[k] = [])).push(p);
+        }
+        const keys = Object.keys(groups).sort((a, b) =>
+            (a === '— без подкатегории —' ? 1 : b === '— без подкатегории —' ? -1 : 0)
+            || a.localeCompare(b));
+
+        let rendered = 0;
+        for (const k of keys) {
+            if (rendered >= _visibleLimit) break;
+            h += '<h3 style="margin:14px 0 8px;font-size:.9rem;color:var(--b);display:flex;align-items:center;gap:6px">'
+                + '<span style="display:inline-block;width:3px;height:14px;background:var(--a);border-radius:2px"></span>'
+                + esc(k) + ' <span style="font-size:.72rem;color:var(--mu);font-weight:400">('
+                + groups[k].length + ')</span></h3><div class="gr">';
+            for (const p of groups[k]) {
+                if (rendered >= _visibleLimit) break;
+                h += cH(p);
+                rendered++;
+            }
+            h += '</div>';
+        }
+    } else {
+        const slice = f.slice(0, _visibleLimit);
+        h += '<div class="gr">';
+        for (const p of slice) h += cH(p);
+        h += '</div>';
+    }
+
+    if (f.length > _visibleLimit) {
+        h += '<div style="text-align:center;padding:22px 0">'
+            + '<button class="bn p" onclick="_showMore()">▾ Показать ещё ('
+            + (f.length - _visibleLimit) + ' из ' + f.length + ')</button></div>';
+    }
+    ar.innerHTML = h;
 }
 window._showMore = function () {
-  _visibleLimit += PAGE_SIZE;
-  rC();
+    _visibleLimit += PAGE_SIZE;
+    rC();
 };
 /* Развернуть/свернуть все папки в дереве */
 window.toggleTreeAll = function () {
@@ -1657,11 +1754,11 @@ function rET(parts) {
 
     /* Кнопка «Развернуть/Свернуть всё» + подсказка */
     h += '<div class="et-tools">'
-      + '<button type="button" class="bn et-tgl-btn" onclick="toggleTreeAll()" data-treeall="' + (anyOpen ? 'collapse' : 'expand') + '">'
-      + (anyOpen ? '▲ Свернуть всё' : '▼ Развернуть всё')
-      + '</button>'
-      + '<span class="et-hint">Нажми на папку 📁, чтобы раскрыть</span>'
-      + '</div>';
+        + '<button type="button" class="bn et-tgl-btn" onclick="toggleTreeAll()" data-treeall="' + (anyOpen ? 'collapse' : 'expand') + '">'
+        + (anyOpen ? '▲ Свернуть всё' : '▼ Развернуть всё')
+        + '</button>'
+        + '<span class="et-hint">Нажми на папку 📁, чтобы раскрыть</span>'
+        + '</div>';
 
     for (const g of groupKeys) {
         const sg = t[g];
@@ -1682,7 +1779,14 @@ function rET(parts) {
             h += '<summary style="font-size:.8rem;font-weight:600;color:var(--mu)">📂 ' + esc(s) + '<span class="gc">' + a.length + '</span></summary>';
             h += '<div class="sg">';
 
-            for (const p of a.slice().sort((x, y) => (x.oem || '').localeCompare(y.oem || ''))) {
+            const sorted = a.slice().sort((x, y) => {
+                if (p.cat === 'Maintenance' || x.cat === 'Maintenance' || y.cat === 'Maintenance') {
+                    const dx = _maintWeight(x), dy = _maintWeight(y);
+                    if (dx !== dy) return dx - dy;
+                }
+                return (x.oem || '').localeCompare(y.oem || '');
+            });
+            for (const p of sorted) {
                 const w = p.verified ? '' : ' <span style="color:var(--wn);font-size:.68rem">⚠</span>';
                 const cm = pCompat(p);
                 let sm = '';
@@ -1864,7 +1968,7 @@ function oAM() {
     $('f_id').value = '';
     $('f_cat').value = (SV.activeCat !== 'All' && SV.activeCat !== 'Favorites' && SV.activeCat !== 'Workshops' && SV.activeCat !== 'Log')
         ? SV.activeCat : 'Engine';
-        ['f_name', 'f_oem', 'f_an', 'f_dn', 'f_pr', 'f_su', 'f_notes', 'f_eng', 'f_trn', 'f_bdy', 'f_trm', 'f_gen'].forEach(id => { if ($(id)) $(id).value = ''; }); $('f_ver').checked = false; $('f_cu').value = 'RUB'; $('f_sts').value = ''; $('f_fav').value = '0';
+    ['f_name', 'f_oem', 'f_an', 'f_dn', 'f_pr', 'f_su', 'f_notes', 'f_eng', 'f_trn', 'f_bdy', 'f_trm', 'f_gen'].forEach(id => { if ($(id)) $(id).value = ''; }); $('f_ver').checked = false; $('f_cu').value = 'RUB'; $('f_sts').value = ''; $('f_fav').value = '0';
     $('ie').innerHTML = ''; aIR('proc', '');
     uPP(); rPH([]);
     $('mo').classList.add('show');
@@ -1884,7 +1988,7 @@ function oEM(id) {
     $('f_eng').value = (p.engines || []).join(', ');
     $('f_trn').value = (p.transmissions || []).join(', ');
     $('f_bdy').value = (p.bodies || []).join(', ');
-        $('f_gen').value = (p.gens || []).join(', ');
+    $('f_gen').value = (p.gens || []).join(', ');
     $('f_trm').value = (p.trims || []).join(', ');
     $('f_pr').value = (p.price != null) ? p.price : '';
     $('f_cu').value = p.currency || 'RUB';
@@ -1911,7 +2015,7 @@ function sPt() {
     const trns = sl($('f_trn').value).filter(x => TRANSMISSIONS[x]);
     const bdys = sl($('f_bdy').value).filter(x => BODIES[x]);
     const trms = sl($('f_trm').value).filter(x => TRIMS.includes(x));
-        const gens = sl($('f_gen').value).map(s => s.toUpperCase()).filter(x => GENERATIONS[x]);
+    const gens = sl($('f_gen').value).map(s => s.toUpperCase()).filter(x => GENERATIONS[x]);
     const prRaw = $('f_pr').value, price = prRaw === '' ? null : Number(prRaw);
     const currency = $('f_cu').value, status = $('f_sts').value;
     const favorite = $('f_fav').value === '1', shopUrl = sUrl($('f_su').value.trim());
@@ -2079,29 +2183,9 @@ window.tMMenu = function (e) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
     const m = document.getElementById('em');
     if (!m) return;
-    if (window.innerWidth > 900) {
-        const btn = document.getElementById('btnSettings');
-        const edge = 8;
-        m.style.setProperty('position', 'fixed', 'important');
-        m.style.setProperty('right', edge + 'px', 'important');
-        m.style.setProperty('left', 'auto', 'important');
-        m.style.setProperty('bottom', 'auto', 'important');
-        m.style.setProperty('transform', 'none', 'important');
-        let topPx = 60;
-        if (btn) { const r = btn.getBoundingClientRect(); topPx = r.bottom + 6; }
-        const mh = m.offsetHeight || 300;
-        if (topPx + mh > window.innerHeight - 8) topPx = Math.max(8, window.innerHeight - mh - 8);
-        m.style.setProperty('top', topPx + 'px', 'important');
-    } else {
-        m.style.removeProperty('position');
-        m.style.removeProperty('top');
-        m.style.removeProperty('right');
-        m.style.removeProperty('left');
-        m.style.removeProperty('bottom');
-        m.style.removeProperty('transform');
-    }
     m.classList.toggle('show');
 };
+
 const tMMenu = window.tMMenu;
 
 /* ============ ЭКСПОРТ ============ */
@@ -2379,13 +2463,13 @@ function sLog() {
         vin: gAV() ? gAV().vin : '',
         createdAt: Date.now()
     };
-        if (id) {
+    if (id) {
         const i = LOG.findIndex(x => x.id === id);
         if (i >= 0) LOG[i] = rec;
     } else LOG.push(rec);
     useIDB ? iPut('logs', rec).catch(() => { }) : sLogs();
     if (!useIDB) sLogs();
-    _rebuildLogIndex();    
+    _rebuildLogIndex();
     cLog(); rC();
     toast(id ? 'Запись обновлена' : 'Запись добавлена', 'success');
 }
@@ -2562,7 +2646,7 @@ function findCheaper(oem, name) {
         'https://www.exist.ru/Price/?pcode=' + c,
         'https://www.autodoc.ru/price/657/' + c,
         'https://www.avito.ru/rossiya/zapchasti_i_aksessuary?q=' +
-            encodeURIComponent((cleanName ? cleanName + ' ' : '') + 'VW Polo ' + c)
+        encodeURIComponent((cleanName ? cleanName + ' ' : '') + 'VW Polo ' + c)
     ];
     urls.forEach(u => {
         const a = document.createElement('a');
@@ -2771,7 +2855,7 @@ function bindUI() {
     $('fmtr').addEventListener('change', e => { SV.engineFilter = e.target.value; updateFilterStyling(); sU(); rC(); });
     $('fbdy').addEventListener('change', e => { SV.bodyFilter = e.target.value; updateFilterStyling(); sU(); rC(); });
     $('ftr').addEventListener('change', e => { SV.transFilter = e.target.value; updateFilterStyling(); sU(); rC(); });
-        const _fgen = $('fgen');
+    const _fgen = $('fgen');
     if (_fgen) _fgen.addEventListener('change', e => { SV.genFilter = e.target.value; sU(); rC(); });
     $('if').addEventListener('change', oIF);
     $('pf').addEventListener('change', oPF);
@@ -2781,7 +2865,7 @@ function bindUI() {
     $('fmtr').value = SV.engineFilter || 'all';
     $('fbdy').value = SV.bodyFilter || 'all';
     $('ftr').value = SV.transFilter || 'all';
-        if (_fgen) _fgen.value = SV.genFilter || 'all';
+    if (_fgen) _fgen.value = SV.genFilter || 'all';
     updateFilterStyling();
     setV(SV.view || 'grid', true);
 
@@ -2792,7 +2876,7 @@ function bindUI() {
     // Контент
     const ca = $('ca');
     ca.addEventListener('click', oCC);
-        // Сохранение раскрытия папок в дереве ETKA
+    // Сохранение раскрытия папок в дереве ETKA
     ca.addEventListener('click', e => {
         const sum = e.target.closest('summary');
         if (!sum) return;
@@ -2914,7 +2998,7 @@ function bindUI() {
     // Гамбургеры
     const dt = $('dtgl');
     if (dt) dt.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tSB(); });
-    
+
 
     // Вид «плитка / дерево»
     const vtg = $('viewToggle');

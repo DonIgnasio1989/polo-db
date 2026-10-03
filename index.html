@@ -82,6 +82,49 @@
         <button class="sft-btn up" onclick="oUp()" title="Обновление базы">🌐</button>
         <button class="sft-btn" onclick="oBug()" title="Сообщить о баге">🐛</button>
         <button class="sft-btn" onclick="oAbout()" title="О программе / Лицензия">ℹ️</button>
+
+        <!-- ⚙️ Меню настроек — в подвале сайдбара -->
+        <div class="ew" id="sftSettingsWrap">
+          <button class="sft-btn" type="button" id="btnSettings" onclick="tMMenu(event)" title="Меню">⚙️</button>
+          <div class="em" id="em">
+            <details class="em-sec">
+              <summary><span>📦 База данных</span></summary>
+              <button onclick="tI();cEM()">📥 Импорт JSON</button>
+              <button onclick="eD();cEM()">📄 Экспорт — JSON</button>
+              <button onclick="eCSV(false);cEM()">📊 CSV — все позиции</button>
+              <button onclick="eCSV(true);cEM()">⭐ CSV — избранное</button>
+              <button onclick="eET();cEM()">🗂 CSV — ETKA</button>
+              <button onclick="eWCSV();cEM()">🔧 CSV — мастерские</button>
+              <button onclick="oUp();cEM()">🌐 Обновление (программа + база)</button>
+              <button onclick="rD();cEM()">♻️ Пересобрать БД (сброс)</button>
+            </details>
+
+            <details class="em-sec">
+              <summary><span>🛠 Обслуживание</span></summary>
+              <button onclick="oAM();cEM()">➕ Добавить деталь</button>
+              <button onclick="oLogNew();cEM()">📖 Запись в журнал</button>
+              <button onclick="oShopList();cEM()">🛒 Список покупок на ТО</button>
+              <button onclick="oTO();cEM()">🛠 Настройки ТО</button>
+              <button onclick="oWM();cEM()">🔧 Добавить мастерскую</button>
+            </details>
+
+            <details class="em-sec">
+              <summary><span>🎨 Интерфейс</span></summary>
+              <button onclick="oTheme();cEM()">🎨 Тема оформления</button>
+              <button onclick="resetFilters();cEM()">🔄 Сбросить фильтры</button>
+            </details>
+
+            <details class="em-sec">
+              <summary><span>⚙️ Прочее</span></summary>
+              <button onclick="oSM();cEM()">🔑 VIN-API ключ</button>
+              <button onclick="oProfileSoon();cEM()">👤 Профиль <span class="em-soon">скоро</span></button>
+              <button onclick="oFaq();cEM()">❓ Помощь — что делают кнопки</button>
+              <button onclick="oAbout();cEM()">ℹ️ О программе / Лицензия</button>
+              <button onclick="oBug();cEM()">🐛 Сообщить о баге</button>
+            </details>
+          </div>
+        </div>
+        <!-- /⚙️ -->
       </div>
       <div class="sft-line">Игнат Ткачев vk.com/donignasio · v<span id="ver_footer">…</span></div>
     </div>
@@ -93,11 +136,16 @@
   <div class="mw">
     <button id="mob" type="button" title="Меню" onclick="tMM(event)">☰</button>
     <header class="tb">
-      <div class="sc">
-        <span class="si">🔍</span>
-        <input type="text" class="sr" id="sr" list="searchSuggest" placeholder="OEM, деталь, аналог, заметка…">
-        <datalist id="searchSuggest"></datalist>
-        <button class="scl" id="scl" onclick="cS()" title="Очистить">✕</button>
+      <div class="sc-wrap">
+        <div class="sc">
+          <span class="si">🔍</span>
+          <input type="text" class="sr" id="sr" list="searchSuggest" placeholder="OEM, деталь, аналог, заметка…">
+          <datalist id="searchSuggest"></datalist>
+          <button class="scl" id="scl" onclick="cS()" title="Очистить">✕</button>
+        </div>
+        <button class="bn p sc-oem-btn" onclick="oAM()" title="Добавить деталь по OEM">
+          <span>➕</span><span class="bl">OEM</span>
+        </button>
       </div>
 
       <div class="tb-filters">
@@ -105,6 +153,9 @@
           style="display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:4px;font-size:.78rem;font-weight:700;cursor:pointer;border:1px solid var(--bd);background:var(--cd);color:var(--tx);white-space:nowrap">
           <span>🛠</span><span class="to-lb" id="toLbl">Настроить ТО</span><span style="opacity:.5;font-size:.7rem">✏️</span>
         </div>
+                <button class="bn log-chip" onclick="oLogNew()" title="Запись в журнал обслуживания">
+          <span>📖</span><span class="bl">Журнал</span>
+        </button>
 
         <select class="fs flt mtr" id="fmtr" title="Фильтр по мотору">
           <option value="all">⚙️ Все моторы</option>
@@ -207,51 +258,7 @@
         </label>
 
         <div class="ac">
-          <button class="bn" onclick="oLogNew()" title="Запись в журнал обслуживания"><span>📖</span><span class="bl">Журнал</span></button>
-          <button class="bn p" onclick="oAM()" title="Добавить деталь по OEM"><span>➕</span><span class="bl">OEM</span></button>
           <button class="bn" onclick="toggleAllDetails()" title="Развернуть/свернуть все карточки" id="tb3">⇕</button>
-
-          <div class="ew">
-            <button class="bn" type="button" id="btnSettings" onclick="tMMenu(event)" title="Меню">⚙️</button>
-            <div class="em" id="em">
-              <details class="em-sec">
-                <summary><span>📦 База данных</span></summary>
-                <button onclick="tI();cEM()">📥 Импорт JSON</button>
-                <button onclick="eD();cEM()">📄 Экспорт — JSON</button>
-                <button onclick="eCSV(false);cEM()">📊 CSV — все позиции</button>
-                <button onclick="eCSV(true);cEM()">⭐ CSV — избранное</button>
-                <button onclick="eET();cEM()">🗂 CSV — ETKA</button>
-                <button onclick="eWCSV();cEM()">🔧 CSV — мастерские</button>
-                <button onclick="oUp();cEM()">🌐 Обновление (программа + база)</button>
-                <button onclick="rD();cEM()">♻️ Пересобрать БД (сброс)</button>
-              </details>
-
-              <details class="em-sec">
-                <summary><span>🛠 Обслуживание</span></summary>
-                <button onclick="oAM();cEM()">➕ Добавить деталь</button>
-                <button onclick="oLogNew();cEM()">📖 Запись в журнал</button>
-                <button onclick="oShopList();cEM()">🛒 Список покупок на ТО</button>
-                <button onclick="oTO();cEM()">🛠 Настройки ТО</button>
-                <button onclick="oWM();cEM()">🔧 Добавить мастерскую</button>
-              </details>
-
-              <details class="em-sec">
-                <summary><span>🎨 Интерфейс</span></summary>
-                <button onclick="oTheme();cEM()">🎨 Тема оформления</button>
-                <button onclick="resetFilters();cEM()">🔄 Сбросить фильтры</button>
-              </details>
-
-              <details class="em-sec">
-                <summary><span>⚙️ Прочее</span></summary>
-                <button onclick="oSM();cEM()">🔑 VIN-API ключ</button>
-                <button onclick="oProfileSoon();cEM()">👤 Профиль <span class="em-soon">скоро</span></button>
-                <button onclick="oFaq();cEM()">❓ Помощь — что делают кнопки</button>
-                <button onclick="oAbout();cEM()">ℹ️ О программе / Лицензия</button>
-                <button onclick="oBug();cEM()">🐛 Сообщить о баге</button>
-              </details>
-
-            </div>
-          </div>
         </div>
       </div>
     </header>
