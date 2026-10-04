@@ -2992,36 +2992,7 @@ body.theme-paper .tg.gn { color: #92400e; }
 @media (max-width: 900px) {
     .lb2 .lb-close { top: 12px; right: 12px; width: 40px; height: 40px; font-size: 1.15rem; }
 }
-/* ============================================================
-   🛒 Блок «Купить запчасти для ТО» в карточке регламента
-   ============================================================ */
-.tp-parts { display: flex; flex-direction: column; gap: 8px; }
-.tpp-row {
-    display: flex; flex-direction: column; gap: 6px;
-    padding: 10px 12px;
-    background: var(--hv);
-    border: 1px solid var(--bd);
-    border-left: 3px solid var(--a);
-    border-radius: var(--r-sm);
-    transition: all var(--tr);
-}
-.tpp-row:hover { border-color: var(--a); background: color-mix(in srgb, var(--a) 6%, transparent); }
-.tpp-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-.tpp-name { font-weight: 700; font-size: .86rem; color: var(--tx); flex: 1; min-width: 0; }
-.tpp-oem {
-    font-family: var(--ff-mono);
-    font-size: .74rem; font-weight: 700;
-    color: var(--a);
-    padding: 2px 8px;
-    background: color-mix(in srgb, var(--a) 12%, transparent);
-    border-radius: var(--r-xs);
-    letter-spacing: -.2px;
-    cursor: pointer;
-    user-select: all;
-}
-.tpp-note { font-size: .74rem; color: var(--mu); font-style: italic; }
-.tpp-links { display: flex; gap: 5px; flex-wrap: wrap; }
-.tpp-links .psl { font-size: .68rem; padding: 4px 10px; }
+
 /* ============================================================
    🛒 Блок «Купить запчасти для ТО» в карточке регламента
    ============================================================ */
@@ -3068,3 +3039,110 @@ body.theme-paper .tg.gn { color: #92400e; }
 .tpp-note { font-size: .74rem; color: var(--mu); font-style: italic; }
 .tpp-links { display: flex; gap: 5px; flex-wrap: wrap; }
 .tpp-links .psl { font-size: .68rem; padding: 4px 10px; }
+
+/* История версий — принудительно вписываем в экран */
+#upmo .mdl {
+    max-width: 640px;
+    max-height: calc(100vh - 48px);
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+#upmo .mdl .mb {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+#upmo .mdl .mh,
+#upmo .mdl .mf { flex: 0 0 auto; }
+
+@media (max-width: 900px) {
+    #upmo .mdl { max-height: 92vh; }
+}
+
+/* Свёрнутые релизы в истории версий */
+details.cl-release > summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;           /* ← ключевое: arrow + head в одну строку */
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    margin-bottom: 0;
+}
+details.cl-release > summary::-webkit-details-marker { display: none; }
+details.cl-release > summary::marker { content: ''; }
+
+/* Внутри summary у .cl-head убираем flex-grow и margin */
+details.cl-release > summary .cl-head {
+    flex: 1 1 auto;
+    margin-bottom: 0;
+    min-width: 0;
+}
+
+details.cl-release > summary::before {
+    content: '▸';
+    flex: 0 0 auto;
+    color: var(--a);
+    font-weight: 700;
+    font-size: .85rem;
+    transition: transform .15s ease;
+    display: inline-block;
+}
+details.cl-release[open] > summary::before { transform: rotate(90deg); }
+details.cl-release[open] > summary { margin-bottom: 8px; }
+
+/* Сам свёрнутый релиз — визуально как обычный, но с курсором */
+details.cl-release:not([open]) {
+    padding-bottom: 8px;
+}
+details.cl-release:not([open]):hover {
+    border-color: var(--a);
+    background: color-mix(in srgb, var(--a) 6%, var(--hv));
+}
+/* Заголовок меню настроек */
+.em-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px 10px;
+    margin: -6px -6px 6px;            /* растянуть на всю ширину .em с учётом его padding */
+    font-size: .82rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--a);
+    border-bottom: 1px solid rgba(255, 255, 255, .10);
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, .06) 0%,
+        rgba(255, 255, 255, 0) 100%);
+    border-radius: var(--r-sm) var(--r-sm) 0 0;
+}
+
+/* На мобиле (bottom sheet) отступы чуть другие */
+@media (max-width: 900px) {
+    .em-title {
+        padding: 12px 14px;
+        margin: -12px -10px 8px;
+        font-size: .78rem;
+    }
+}
+
+/* Крафт-тема — тёплый акцент */
+body.theme-paper .em-title {
+    color: var(--a-h);
+    border-bottom-color: rgba(58, 42, 24, .18);
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, .30) 0%,
+        rgba(255, 255, 255, 0) 100%);
+}
+
+/* Светлая тема — мягче */
+body.theme-light .em-title {
+    border-bottom-color: rgba(40, 40, 38, .12);
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, .55) 0%,
+        rgba(255, 255, 255, 0) 100%);
+}
