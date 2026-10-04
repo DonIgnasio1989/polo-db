@@ -555,34 +555,6 @@ function vD(v) {
 }
     async function vR(v) { return vD(v); }
 
-function rD() {
-    askConfirm(
-        'При пересборке ваши записи и фото, внесённые вручную, удалятся.\n\n' +
-        'Вы уверены?\n\n' +
-        '💡 Если уверены — сначала сделайте Экспорт JSON.',
-        doRebuild,
-        {
-            title: '♻️ Пересобрать базу?',
-            yes: 'Да, пересобрать',
-            no: 'Нет',
-            showExport: true
-        }
-    );
-}
-
-async function doRebuild() {
-    try {
-        if (useIDB) { await iClr(SP); await iClr(SW); }
-        localStorage.removeItem(PK);
-        localStorage.removeItem(WK);
-        resetMeta();
-        D = []; W = [];
-        await lAll();
-        rSB(); rC();
-        toast('Загружено: ' + D.length + ' поз.', 'success');
-    } catch (e) { toast('Ошибка: ' + e.message, 'danger'); }
-}
-
 /* ============ ХРАНИЛИЩЕ ============ */
 function lG() {
     try {
@@ -2501,7 +2473,6 @@ function eD() {
             categories: CUSTOM.categories || [],
             sections: CUSTOM.sections || {}
         };
-        dl('vw_polo_caddy_' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(p, null, 2), 'application/json');
         const photoCount = D.reduce((s, x) => s + (Array.isArray(x.photos) ? x.photos.length : 0), 0);
         dl('vw_polo_caddy_' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(p, null, 2), 'application/json');
         toast('Экспорт: ' + D.length + ' поз., ' + W.length + ' СТО, ' + photoCount + ' фото', 'success');
@@ -2641,20 +2612,45 @@ function aI(parts, ws, gs, meta) {
                 if (touched) { merged++; if (useIDB) iPut(SP, old).catch(() => {}); }
             }
         }
-        if (!useIDB) sD();
-        toast('+' + add + ' новых, ~' + merged + ' с восстановленными фото', 'success');
-        if (useIDB) iMany(SP, D).catch(() => { });
-        else sD();
-        if (ws && ws.length) {
-            const wsn = new Set(W.map(w => w.name || ''));
-            let wa = 0;
-            for (const w of ws.map(nW).filter(Boolean)) {
-                if (!wsn.has(w.name)) { W.push(w); wsn.add(w.name); wa++; }
+      } else if (m === 'merge') {
+    const keyOf = x => (x.oem || '') + '||' + (x.name || '');
+    const map = new Map(D.map(x => [keyOf(x), x]));
+    let add = 0, merged = 0;
+    for (const p of cl) {
+        const k = keyOf(p);
+        if (!map.has(k)) {
+            D.push(p); map.set(k, p); add++;
+        } else {
+            const old = map.get(k);
+            let touched = false;
+            if (Array.isArray(p.photos) && p.photos.length) {
+                const existing = new Set(Array.isArray(old.photos) ? old.photos : []);
+                const merged2 = [...(old.photos || [])];
+                for (const src of p.photos) {
+                    if (!existing.has(src)) { merged2.push(src); touched = true; }
+                }
+                if (touched) old.photos = merged2.slice(0, 12);
             }
-            if (useIDB) iMany(SW, W).catch(() => { });
-            else sWk();
-            toast('+' + add + ' поз., +' + wa + ' СТО', 'success');
-        } else toast('+' + add + ' из ' + cl.length, 'success');
+            if (p.notes && p.notes !== old.notes) { old.notes = p.notes; touched = true; }
+            if (p.price != null && p.price !== old.price) { old.price = p.price; touched = true; }
+            if (p.shopUrl && p.shopUrl !== old.shopUrl) { old.shopUrl = p.shopUrl; touched = true; }
+            if (touched) { merged++; if (useIDB) iPut(SP, old).catch(() => {}); }
+        }
+    }
+    if (useIDB) iMany(SP, D).catch(() => { });
+    else sD();
+    if (ws && ws.length) {
+        const wsn = new Set(W.map(w => w.name || ''));
+        let wa = 0;
+        for (const w of ws.map(nW).filter(Boolean)) {
+            if (!wsn.has(w.name)) { W.push(w); wsn.add(w.name); wa++; }
+        }
+        if (useIDB) iMany(SW, W).catch(() => { });
+        else sWk();
+        toast('+' + add + ' поз., +' + wa + ' СТО (фото: +' + merged + ')', 'success');
+    } else {
+        toast('+' + add + ' новых, ~' + merged + ' с фото', 'success');
+    }
         if (gs && gs.length) {
             const gsn = new Set(G.map(g => g.vin));
             let ga = 0;
@@ -3282,11 +3278,8 @@ function bindUI() {
 
         if (e.key === 'Escape') {
             if ($('confirmmo') && $('confirmmo').classList.contains('show')) return cConfirm(false);   /* ← новая */
-            if ($('whatsnew') && $('whatsnew').classList.contains('show')) return closeWhatsNew(true);
             if ($('faqmo').classList.contains('show')) return cFaq();
             if ($('whatsnew') && $('whatsnew').classList.contains('show')) return closeWhatsNew(true);   /* ← новая */
-            if ($('faqmo').classList.contains('show')) return cFaq();
-            if ($('faqmo').classList.contains('show')) return cFaq();
             if ($('thememmo').classList.contains('show')) return cTheme();
             if ($('vinmo').classList.contains('show')) return cVIN();
             if ($('shopmo').classList.contains('show')) return cShop();
