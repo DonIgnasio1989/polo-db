@@ -552,8 +552,9 @@ function vD(v) {
         engines: /^6N/.test(vp) ? Object.keys(ENGINES) : ['—'],
         serial: sr
     };
-    async function vR(v) { return vD(v); }
 }
+    async function vR(v) { return vD(v); }
+
 function rD() {
     askConfirm(
         'При пересборке ваши записи и фото, внесённые вручную, удалятся.\n\n' +
