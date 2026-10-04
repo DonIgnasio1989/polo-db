@@ -553,7 +553,33 @@ function vD(v) {
         serial: sr
     };
 }
-async function vR(v) { return vD(v); }
+function rD() {
+    askConfirm(
+        'При пересборке ваши записи и фото, внесённые вручную, удалятся.\n\n' +
+        'Вы уверены?\n\n' +
+        '💡 Если уверены — сначала сделайте Экспорт JSON.',
+        doRebuild,
+        {
+            title: '♻️ Пересобрать базу?',
+            yes: 'Да, пересобрать',
+            no: 'Нет',
+            showExport: true
+        }
+    );
+}
+
+async function doRebuild() {
+    try {
+        if (useIDB) { await iClr(SP); await iClr(SW); }
+        localStorage.removeItem(PK);
+        localStorage.removeItem(WK);
+        resetMeta();
+        D = []; W = [];
+        await lAll();
+        rSB(); rC();
+        toast('Загружено: ' + D.length + ' поз.', 'success');
+    } catch (e) { toast('Ошибка: ' + e.message, 'danger'); }
+}
 
 /* ============ ХРАНИЛИЩЕ ============ */
 function lG() {
