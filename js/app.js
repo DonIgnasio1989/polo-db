@@ -1,5 +1,5 @@
 /* ============================================================
-   VW Polo/Caddy 6N — База Мастера · app.js (clean/optimized)
+   VW Polo/Caddy 6N — База Мастера · app.js
    ============================================================ */
 
 /* ============ СПРАВОЧНИКИ ============ */
@@ -23,7 +23,7 @@ const BASE_CATS = [
     { id: 'Electrical', label: '9. Электрика', icon: '💡' },
     { id: 'Bulbs', label: '9.1 Освещение, Лампы', icon: '🔆', parent: 'Electrical' },
     { id: 'Interior', label: '0. Аксессуары, Салон', icon: '🪑' },
-    { id: 'Tires', label: 'Шины и давление', icon: '🛞' }   // ← новая строка
+    { id: 'Tires', label: 'Шины и давление', icon: '🛞' }
 ];
 let CATS = BASE_CATS.slice();
 
@@ -39,24 +39,27 @@ const ENGINES = {
     'AEY': { v: '1.9 SDI', hp: 64, f: 'D' }, 'AGP': { v: '1.9 D', hp: 68, f: 'D' }, 'AQM': { v: '1.9 SDI', hp: 68, f: 'D' },
     'AYQ': { v: '1.9 SDI', hp: 64, f: 'D' }, 'ASV': { v: '1.9 SDI', hp: 110, f: 'D' }, '1Y': { v: '1.9 D', hp: 64, f: 'D' },
     'AFN': { v: '1.9 TDI', hp: 110, f: 'D' }, 'AHU': { v: '1.9 TDI', hp: 90, f: 'D' }, 'ALE': { v: '1.9 TDI', hp: 90, f: 'D' },
-    'AGR': { v: '1.9 TDI', hp: 90, f: 'D' }, 'ALH': { v: '1.9 TDI', hp: 90, f: 'D' }
+    'AGR': { v: '1.9 TDI', hp: 90, f: 'D' }, 'ALH': { v: '1.9 TDI', hp: 90, f: 'D' },
+    'ADX': { v: '1.3', hp: 55, f: 'P' }, 'AEA': { v: '1.6', hp: 75, f: 'P' }, 'AHS': { v: '1.6', hp: 75, f: 'P' },
+    'AFH': { v: '1.4 16V', hp: 100, f: 'P' }, 'AJV': { v: '1.6 16V', hp: 120, f: 'P' }, 'AHW': { v: '1.4 16V', hp: 75, f: 'P' },
+    'AKL': { v: '1.6', hp: 100, f: 'P' }, 'AHT': { v: '1.4', hp: 75, f: 'P' }, 'ABU': { v: '1.4', hp: 60, f: 'P' },
+    'AKQ': { v: '1.4 16V', hp: 75, f: 'P' }, 'AFK': { v: '1.4 16V', hp: 75, f: 'P' }, 'ANM': { v: '1.4 16V', hp: 75, f: 'P' },
+    'AKU': { v: '1.7 SDI', hp: 57, f: 'D' }, 'AHG': { v: '1.7 SDI', hp: 57, f: 'D' },
+    'AGD': { v: '1.9 SDI', hp: 64, f: 'D' }, 'AEF': { v: '1.9 SDI', hp: 64, f: 'D' }
 };
 const BODIES = {
     '3d': 'Hatchback 3д', '5d': 'Hatchback 5д', 'classic': 'Polo Classic (седан)',
     'estate': 'Polo Estate (универсал)', 'caddy-van': 'Caddy Van',
     'caddy-kombi': 'Caddy Kombi', 'caddy-pickup': 'Caddy Pickup'
 };
-
 const TRANSMISSIONS = {
-    '085': 'МКПП 085 (5-ст)', '020': 'МКПП 020 (4/5-ст)', '02K': 'МКПП 02K (5-ст)',
-    '01M': 'АКПП 01M (4-ст)', '01N': 'АКПП 01N (4-ст)', 'AG4': 'АКПП AG4 (4-ст)'
+    '085': 'МКПП 085 (5-ст)', '020': 'МКПП 020 (5-ст)', '02K': 'МКПП 02K (5-ст)',
+    '01M': 'АКПП 01M (4-ст)', '01N': 'АКПП 01N (4-ст)'
 };
-
 const GENERATIONS = {
     '6N1': '6N1 — дорестайл (1994–1999)',
     '6N2': '6N2 — рестайлинг (1999–2001)'
 };
-
 const TRIMS = ['Base', 'CL', 'GL', 'Trendline', 'Comfortline', 'Highline', 'Open Air'];
 
 const BASE_EK = {
@@ -67,10 +70,10 @@ const BASE_EK = {
     Brakes: { g: 'Тормоза', s: 'Передние / Задние' }, Transmission: { g: 'Трансмиссия', s: 'КПП / Привод' },
     Exhaust: { g: 'Выхлоп', s: 'Глушитель' }, Electrical: { g: 'Электрика', s: 'Генератор / Стартер' },
     Bulbs: { g: 'Лампы', s: 'Освещение' }, Body: { g: 'Кузов', s: 'Наружные панели' },
-    Interior: { g: 'Интерьер', s: 'Панель / Сиденья' }, Tires: { g: 'Колёса', s: 'Шины и давление' }, Fluids: { g: 'Жидкости', s: 'Эксплуатационные' },
+    Interior: { g: 'Интерьер', s: 'Панель / Сиденья' }, Tires: { g: 'Колёса', s: 'Шины и давление' },
+    Fluids: { g: 'Жидкости', s: 'Эксплуатационные' },
     RearAxle: { g: 'Задняя ось', s: 'Балка / Ступица' }, Controls: { g: 'Управление', s: 'Педали / Кулиса' }
 };
-
 let EK = Object.assign({}, BASE_EK);
 
 const IL = { s: 'СПЕЦИФИКАЦИЯ', t: 'ИНСТРУМЕНТ', p: 'ПРОЦЕДУРА', w: 'ВНИМАНИЕ', n: 'ЗАМЕТКА', r: 'РЕКОМЕНДАЦИЯ' };
@@ -81,7 +84,6 @@ const MI = { s: 'spec', t: 'tool', p: 'proc', w: 'warn', n: 'note', r: 'recommen
 const SH = {
     ex: n => 'https://www.exist.ru/Price/?pcode=' + n,
     ad: n => 'https://www.autodoc.ru/price/657/' + n,
-    // Avito: артикул без пробелов + без дубля "VW Polo" в названии
     av: (n, name) => {
         const cleanOem = String(n || '').replace(/\s+/g, '');
         const cleanName = String(name || '')
@@ -110,7 +112,6 @@ const ONLINE_CATALOGS = {
 
 const getPurchaseHtml = p => {
     const av = (typeof gAV === 'function') ? gAV() : null;
-    const vin = av && av.ok ? av.vin : '';
     const prs = fP(p.price, p.currency);
     const su = p.shopUrl || '';
     const hh = (p.priceHistory && p.priceHistory.length)
@@ -129,7 +130,6 @@ const getPurchaseHtml = p => {
         h += '<a class="psl op7" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.zzap(c) + '" title="Поиск в ZZap по артикулу">ZZap</a>';
         h += '</div>';
     }
-
     return h;
 };
 
@@ -139,8 +139,8 @@ const UK = 'vw_polo_ui_v186', PK = 'vw_polo_db_v181', WK = 'vw_polo_workshops_v1
     SP = 'parts', SW = 'workshops', METAKEY = 'vw_polo_meta_v1', TOKEY = 'vw_polo_to_v1',
     LICKEY = 'vw_polo_license_v1', UPKEY = 'vw_polo_update_url_v1', PROFKEY = 'vw_polo_profile_v1',
     LOGKEY = 'vw_polo_logs_v1',
-    WNKEY = 'vw_polo_last_seen_version_v1';   /* ← добавь сюда */
-/* ============ ТЕМЫ ============ */
+    WNKEY = 'vw_polo_last_seen_version_v1';
+
 const THEMES = [
     { id: 'light', label: 'Светлая', icon: '☀️', cls: 'theme-light', preview: '#f3f5f9' },
     { id: 'dark', label: 'Тёмная', icon: '🌙', cls: 'theme-dark', preview: 'linear-gradient(135deg, #0e1525 0%, #131a28 100%)' },
@@ -161,21 +161,26 @@ let SV = {
     theme: 'aurora', sortBy: 'default', view: 'grid', activeVinId: null,
     groupBySub: false, vinStrictFilter: false
 };
-
 let USER = { name: '', email: '', city: '', initials: '', color: '#00b0f0' };
 let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastDate: null, interval: 15000 };
 
-let APP_VERSION = '1.1.1';
+let APP_VERSION = '1.2.2';
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
 let vinEdId = null, shopPick = new Set(), partmoId = null;
 let tt = null, tuT = null, usT = null, rcT = null;
-
-/* ============ ИНДЕКС ЛОГОВ (O(1) поиск по OEM) ============ */
+let pPhs = [];
+let _lbPhotos = [], _lbIdx = 0;
+let _confirmCb = null;
+let _changelogCache = [];
 let _logByOem = new Map();
+let _visibleLimit = 40, _lastRenderSig = '';
 
+const PAGE_SIZE = 40;
+
+/* ============ ИНДЕКС ЛОГОВ ============ */
 function _rebuildLogIndex() {
     _logByOem.clear();
     for (const e of LOG) {
@@ -184,7 +189,6 @@ function _rebuildLogIndex() {
             const key = nz(it);
             if (!key) continue;
             const prev = _logByOem.get(key);
-            // оставляем самую свежую запись по каждой детали
             if (!prev || (e.date || '') > (prev.date || '')) {
                 _logByOem.set(key, e);
             }
@@ -221,76 +225,56 @@ const csvE = v => {
     if (/[",\r\n;]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
     return s;
 };
-/* ============ ЛОГИЧЕСКИЙ ПОРЯДОК РЕГЛАМЕНТА ТО ============ */
-/* Чем меньше число — тем выше в списке. Порядок — как в сервисной книжке. */
+
+/* ============ ЛОГИЧЕСКИЙ ПОРЯДОК ТО ============ */
 const MAINT_ORDER = [
-    /* 1. Расходники ДВС */
     'масло мотор', 'масло двс', 'масло двигател', 'масло в двигател',
     'фильтр маслян', 'масляный фильтр', 'фильтр масл',
     'воздушный фильтр', 'фильтр воздушн',
     'салонн', 'фильтр салон',
     'топливный фильтр', 'фильтр топливн',
-    /* 2. Зажигание */
     'свеч', 'свечи зажиган', 'катушк', 'провод высоковольт', 'провода зажиган',
-    /* 3. Ремни */
     'ремень грм', 'грм', 'ролик грм', 'натяжитель грм',
     'ремень генератор', 'ремень поликлин', 'ремень приводн', 'ремень кондиц',
-    /* 4. Жидкости */
     'антифриз', 'охлаждающ', 'жидкость охлажд',
     'тормозн жидк', 'жидкость тормозн', 'жидкость тормоз',
     'жидкость гур', 'жидкость гидроусил',
     'масло кпп', 'масло акпп', 'масло трансмисс', 'масло коробк',
     'омывател', 'жидкость омыв',
-    /* 5. Тормоза */
     'колодк', 'колодки',
     'тормозн диск', 'диск тормозн',
     'тормозн барабан', 'барабан',
     'суппорт', 'шланг тормозн',
-    /* 6. Ходовая / рулевое */
     'амортизатор', 'стойк',
     'пыльник', 'шрус', 'шаров', 'наконечник', 'тяга рулев',
     'сайлентблок', 'втулк стабилиз',
-    /* 7. Электрика / прочее */
     'аккумулятор', 'акб',
     'щетк', 'щётк', 'дворник', 'стеклоочист',
     'предохранит', 'лампочк', 'лампы',
-    /* 8. Фильтры сажевые, катализаторы и прочее */
     'сажев', 'катализатор', 'лямбда', 'датчик кислород'
 ];
 
 function _maintWeight(p) {
     const n = nz(p.name || '');
     if (!n) return 9999999;
-
-    /* Главное: порядок по числу в «ТО-N».
-       ТО-1 → 1, ТО-2 → 2, …, ТО-10 → 10, ТО-11 → 11, ТО-12 → 12 */
     let m = n.match(/(?:^|\s)то[\s\-–—]*(\d+)/i);
     if (m) {
         const num = parseInt(m[1], 10);
         if (!isNaN(num) && num > 0) return num;
     }
-
-    /* Fallback для позиций без «ТО-N» — по числу перед «км» */
     m = n.match(/(\d[\d\s]{2,})\s*км/);
     if (m) {
         const km = parseInt(m[1].replace(/\s/g, ''), 10);
         if (!isNaN(km) && km > 0) return 1000 + km;
     }
-
-    /* «раз в год» */
     if (/(?:раз в год|ежегодн|каждый год)/.test(n)) return 500000;
-
-    /* Сезонные */
     if (/(?:^|\s)зим/.test(n)) return 900000;
     if (/(?:^|\s)лет/.test(n)) return 901000;
     if (/(?:^|\s)весн/.test(n)) return 902000;
     if (/(?:^|\s)осен/.test(n)) return 903000;
-
-    /* Совсем без меток — по ключевым словам из MAINT_ORDER */
     for (let i = 0; i < MAINT_ORDER.length; i++) {
         if (n.includes(MAINT_ORDER[i])) return 950000 + i;
     }
-
     return 9999999;
 }
 
@@ -304,9 +288,7 @@ function fmtDate(d) {
 const openM = id => $(id).classList.add('show');
 const closeM = id => $(id).classList.remove('show');
 
-/* ============ КАСТОМНЫЙ CONFIRM (Да/Нет) ============ */
-let _confirmCb = null;
-
+/* ============ КАСТОМНЫЙ CONFIRM ============ */
 function askConfirm(msg, onYes, opts) {
     opts = opts || {};
     $('confirm_title').textContent = opts.title || '⚠️ Подтверждение';
@@ -318,7 +300,6 @@ function askConfirm(msg, onYes, opts) {
     _confirmCb = onYes || null;
     openM('confirmmo');
 }
-
 function cConfirm(ok) {
     closeM('confirmmo');
     const cb = _confirmCb;
@@ -436,7 +417,6 @@ function nP(p) {
     const ALL_BODIES = Object.keys(BODIES);
     const ALL_TRANS = Object.keys(TRANSMISSIONS);
 
-    /* Чистим заголовки регламента ТО от «каждые» */
     let rawName = String(p.n || p.name || '');
     if (cat === 'Maintenance') {
         rawName = rawName
@@ -448,21 +428,19 @@ function nP(p) {
     }
 
     let inst;
-
     if (Array.isArray(p.inst)) {
-        // формат:  "inst": [{ "type": "spec", "text": "..." }, ...]
         inst = p.inst.filter(i => i && i.text).map(i => ({ type: MI[IM[i.type]] || i.type, text: String(i.text) }));
     } else if (Array.isArray(p.i)) {
-        // формат:  "i": [["s", "..."], ["n", "..."], ...]
         inst = p.i.map(x => ({ type: MI[x[0]] || 'note', text: String(x[1] || '') })).filter(x => x.text);
-    }
-    else inst = [];
+    } else inst = [];
+
     const eng = Array.isArray(p.engines) ? p.engines.filter(x => ALL_ENGINES.includes(x)) : [];
     const bdy = Array.isArray(p.bodies) ? p.bodies.filter(x => ALL_BODIES.includes(x)) : [];
     const trn = Array.isArray(p.transmissions) ? p.transmissions.filter(x => ALL_TRANS.includes(x)) : [];
     const trm = Array.isArray(p.trims) ? p.trims.filter(x => TRIMS.includes(x)) : [];
     const ALL_GENS = Object.keys(GENERATIONS);
     const gens = Array.isArray(p.gens) ? p.gens.filter(x => ALL_GENS.includes(x)) : [];
+
     return {
         id: p.id || uid(),
         cat,
@@ -488,7 +466,7 @@ function nP(p) {
                 const s = sImg(p.photo);
                 if (s) arr.push(s);
             }
-            return arr.slice(0, 12);   // максимум 12 фото на позицию
+            return arr.slice(0, 12);
         })(),
         parts: Array.isArray(p.parts) ? p.parts
             .filter(x => x && (x.oem || x.o || x.name || x.n))
@@ -541,7 +519,6 @@ function vD(v) {
         else if (vp === '6NX') body = 'Van';
         else body = 'Hatchback';
     }
-
     else if (/^9N/.test(vp)) { model = 'Polo (9N)'; body = 'Hatchback'; }
     else if (/^6K/.test(vp)) { model = 'Polo (6K)'; body = 'Hatchback'; }
     else if (/^1J/.test(vp)) { model = 'Golf (1J)'; body = 'Hatchback'; }
@@ -553,7 +530,7 @@ function vD(v) {
         serial: sr
     };
 }
-    async function vR(v) { return vD(v); }
+async function vR(v) { return vD(v); }
 
 /* ============ ХРАНИЛИЩЕ ============ */
 function lG() {
@@ -738,7 +715,7 @@ const dRC = () => { clearTimeout(rcT); rcT = setTimeout(rC, 120); };
 function gAV() {
     if (!SV.activeVinId) return null;
     const g = G.find(x => x.id === SV.activeVinId);
-    return g ? { ok: true, ...g } : null;
+    return g ? Object.assign({ ok: true }, g) : null;
 }
 
 function pCompat(p) {
@@ -791,9 +768,9 @@ function rGar() {
                 ['Цвет крыши', g.roofColor || '—']
             ];
             h += '<div class="gi-info">';
-            h += rows.map(([k, v]) =>
-                '<div class="gi-info-row"><span class="gi-info-lb">' + esc(k) + ':</span>'
-                + '<span class="gi-info-val">' + esc(v) + '</span></div>'
+            h += rows.map(r =>
+                '<div class="gi-info-row"><span class="gi-info-lb">' + esc(r[0]) + ':</span>'
+                + '<span class="gi-info-val">' + esc(r[1]) + '</span></div>'
             ).join('');
             h += '<button class="veh-edit-btn" type="button" onclick="oVIN()">✎ Уточнить данные</button>';
             h += '</div>';
@@ -806,7 +783,7 @@ function rGar() {
 const VIN_BODY_MAP = {
     'Hatchback 3d': '3d',
     'Hatchback 5d': '5d',
-    'Hatchback': '',      /* двери не определены — фильтр не навязываем */
+    'Hatchback': '',
     'Variant': 'estate',
     'Classic Sedan': 'classic',
     'Van': 'caddy-van'
@@ -990,6 +967,24 @@ function oDonate() { $('donmo').classList.add('show'); }
 function cDonate() { $('donmo').classList.remove('show'); }
 const oAbout = () => { $('aboutmo').classList.add('show'); };
 const cAbout = () => { $('aboutmo').classList.remove('show'); };
+function oAPK() {
+    openM('aboutmo');
+    setTimeout(() => {
+        const el = $('about_apk');
+        if (!el) return;
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const oldBg = el.style.background;
+        const oldShadow = el.style.boxShadow;
+        el.style.transition = 'all .3s ease';
+        el.style.background = 'color-mix(in srgb, var(--a) 25%, transparent)';
+        el.style.boxShadow = '0 0 0 3px color-mix(in srgb, var(--a) 30%, transparent)';
+        setTimeout(() => {
+            el.style.background = oldBg || '';
+            el.style.boxShadow = oldShadow || '';
+        }, 1200);
+    }, 80);
+}
+
 const oBug = () => {
     const ml = $('bug_mailto');
     if (ml) ml.href = 'mailto:donignasio@vk.com?subject='
@@ -1005,36 +1000,11 @@ const oBug = () => {
 };
 const cBug = () => { $('bugmo').classList.remove('show'); };
 
-function oUp() {
-    try {
-        $('up_url').value = localStorage.getItem(UPKEY)
-            || (location.origin + location.pathname.replace(/[^/]*$/, '') + 'data/parts.json');
-    } catch (e) { }
-    $('up_status').innerHTML = '';
-    $('up_prog_status').innerHTML = '';
-    $('up_app_cur').textContent = APP_VERSION;
-    $('up_app_latest').textContent = '…';
-    const clBox = $('up_changelog');
-    if (clBox) clBox.innerHTML = '<div class="cl-empty">⏳ Загружаем список изменений…</div>';
-    $('upmo').classList.add('show');
-
-    fetchUpdateMeta().then(meta => {
-        if (meta.appVersion) $('up_app_latest').textContent = String(meta.appVersion);
-        else $('up_app_latest').textContent = '—';
-        renderChangelog(meta.changelog, APP_VERSION, meta.fallbackDate);
-    }).catch(() => {
-        $('up_app_latest').textContent = '—';
-        renderChangelog(null, APP_VERSION, '');
-    });
-}
-
-/* Загрузка update.json + дата последней модификации файла */
+/* ============ ИСТОРИЯ ВЕРСИЙ ============ */
 async function fetchUpdateMeta() {
     const base = location.origin + location.pathname.replace(/[^/]*$/, '');
     const r = await fetch(base + 'data/update.json?t=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) throw new Error('update.json: ' + r.status);
-
-    // Дата модификации файла на сервере — автоматическая
     const lm = r.headers.get('Last-Modified');
     let fallbackDate = '';
     if (lm) {
@@ -1043,7 +1013,6 @@ async function fetchUpdateMeta() {
             fallbackDate = d.toISOString().slice(0, 10);
         }
     }
-
     const m = await r.json();
     return {
         appVersion: m && m.appVersion ? String(m.appVersion) : '',
@@ -1053,8 +1022,6 @@ async function fetchUpdateMeta() {
     };
 }
 
-/* Рендер «Что нового» с авто-датой */
-/* Сравнение версий: вернёт 1 / 0 / -1 */
 function _cmpVer(a, b) {
     const pa = String(a || '').split('.').map(n => parseInt(n, 10) || 0);
     const pb = String(b || '').split('.').map(n => parseInt(n, 10) || 0);
@@ -1067,7 +1034,6 @@ function _cmpVer(a, b) {
     return 0;
 }
 
-/* Рендер «Что нового» — только текущая версия и то, что новее */
 function renderChangelog(list, currentVersion, fallbackDate) {
     const box = $('up_changelog');
     if (!box) return;
@@ -1075,160 +1041,68 @@ function renderChangelog(list, currentVersion, fallbackDate) {
         box.innerHTML = '<div class="cl-empty">Список изменений не опубликован.</div>';
         return;
     }
-
-    /* Оставляем только записи с версией >= текущей */
     const visible = list.filter(rel => rel && rel.version);
-
     if (!visible.length) {
         box.innerHTML = '<div class="cl-empty">Список изменений не опубликован.</div>';
         return;
     }
-
     let h = '';
     visible.forEach((rel, idx) => {
         const cmp = _cmpVer(rel.version, currentVersion);
         const isCurrent = cmp === 0;
-        const isNewer = cmp > 0;
         const dt = rel.date || (idx === 0 ? fallbackDate : '');
-
-        h += '<div class="cl-release' + (isCurrent ? ' current' : '') + '">';
-        h += '<div class="cl-head">';
-        h += '<span class="cl-ver">v' + esc(rel.version) + '</span>';
-        if (dt) h += '<span class="cl-date">' + esc(dt) + '</span>';
-        h += '</div>';
-
         const ch = Array.isArray(rel.changes) ? rel.changes : [];
-        if (ch.length) {
-            h += '<ul class="cl-list">';
-            for (const c of ch) h += '<li>' + esc(c) + '</li>';
-            h += '</ul>';
+        const head = '<div class="cl-head">'
+            + '<span class="cl-ver">v' + esc(rel.version) + '</span>'
+            + (dt ? '<span class="cl-date">' + esc(dt) + '</span>' : '')
+            + '</div>';
+        const body = ch.length
+            ? '<ul class="cl-list">' + ch.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>'
+            : '<div class="cl-empty">— без описания —</div>';
+        if (isCurrent) {
+            h += '<div class="cl-release current">' + head + body + '</div>';
         } else {
-            h += '<div class="cl-empty">— без описания —</div>';
+            h += '<details class="cl-release"><summary>' + head + '</summary>' + body + '</details>';
         }
-        h += '</div>';
     });
-
     box.innerHTML = h;
 }
 
-/* ============ ПЛАШКА «ЧТО НОВОГО» ============ */
-let _changelogCache = [];
-
-function _setChangelog(list) {
-    if (Array.isArray(list)) _changelogCache = list;
-}
-
-function checkWhatsNew() {
-    let lastSeen = '';
-    try { lastSeen = localStorage.getItem(WNKEY) || ''; } catch (e) { }
-
-    /* Первый запуск — только запоминаем версию, плашку не показываем */
-    if (!lastSeen) {
-        try { localStorage.setItem(WNKEY, APP_VERSION); } catch (e) { }
-        return;
+function oUp() {
+    const u = $('up_url');
+    if (u && !u.value) {
+        let def = 'data/parts.json';
+        try {
+            const stored = localStorage.getItem(UPKEY);
+            if (stored) {
+                def = stored;
+            } else if (location.protocol === 'http:' || location.protocol === 'https:') {
+                def = location.origin +
+                    location.pathname.replace(/[^/]*$/, '') +
+                    'data/parts.json';
+            }
+        } catch (e) { }
+        u.value = def;
     }
-
-    /* Ничего не изменилось */
-    if (lastSeen === APP_VERSION) return;
-
-    /* Ищем запись для текущей версии в changelog */
-    const rec = _changelogCache.find(r => r && String(r.version) === String(APP_VERSION));
-    const changes = rec && Array.isArray(rec.changes) ? rec.changes.slice(0, 5) : [];
-
-    showWhatsNew(APP_VERSION, changes);
-}
-
-function showWhatsNew(version, changes) {
-    const el = $('whatsnew');
-    if (!el) return;
-
-    let h = '';
-    h += '<div class="wn-head">';
-    h += '<span class="wn-icon">🎉</span>';
-    h += '<span class="wn-title">Что нового в v' + esc(version) + '</span>';
-    h += '<button class="wn-close" onclick="closeWhatsNew(true)" title="Закрыть">✕</button>';
-    h += '</div>';
-
-    if (changes.length) {
-        h += '<ul class="wn-list">';
-        for (const c of changes) h += '<li>' + esc(c) + '</li>';
-        h += '</ul>';
-    } else {
-        h += '<div class="wn-empty">Приложение обновлено до v' + esc(version) +
-            '. Полный список изменений — в разделе «Обновление».</div>';
-    }
-
-    h += '<div class="wn-foot">';
-    h += '<button class="bn" onclick="closeWhatsNew(true)">Понятно</button>';
-    h += '<button class="bn p" onclick="openWhatsNewDetails()">Подробнее</button>';
-    h += '</div>';
-
-    el.innerHTML = h;
-    el.classList.add('show');
-}
-
-function closeWhatsNew(markSeen) {
-    const el = $('whatsnew');
-    if (!el) return;
-    el.classList.remove('show');
-    if (markSeen) {
-        try { localStorage.setItem(WNKEY, APP_VERSION); } catch (e) { }
-    }
-}
-
-function openWhatsNewDetails() {
-    closeWhatsNew(true);
-    oUp();
-}
-
-function checkAppUpdate() {
-    const st = $('up_prog_status');
-    st.innerHTML = '<div class="up-load">⏳ Проверяем программу…</div>';
+    const st = $('up_status'); if (st) st.innerHTML = '';
+    const clBox = $('up_changelog');
+    if (clBox) clBox.innerHTML = '<div class="cl-empty">⏳ Загружаем список изменений…</div>';
+    $('upmo').classList.add('show');
 
     fetchUpdateMeta().then(meta => {
-        const latest = meta.appVersion;
-        const cur = APP_VERSION;
-        if (latest) $('up_app_latest').textContent = latest;
-
-        let h = '<div class="up-ok">';
-        h += '<div>У тебя: <b>' + esc(cur) + '</b>';
-        if (latest) h += ' · На сервере: <b>' + esc(latest) + '</b>';
-        h += '</div>';
-        if (meta.fallbackDate) h += '<div style="font-size:.76rem;color:var(--mu);margin-top:2px">Проверено: ' + esc(meta.fallbackDate) + '</div>';
-        if (latest && latest !== cur) {
-            h += '<div style="margin-top:6px;color:var(--ok);font-weight:700">✓ Доступна новая версия — жми «Перезагрузить с сервера»</div>';
-        } else if (latest) {
-            h += '<div style="margin-top:6px;color:var(--mu)">✓ У тебя актуальная версия</div>';
-        } else {
-            h += '<div style="margin-top:6px;color:var(--sr)">⚠ Сервер не отдал номер версии. Проверь <code>data/update.json</code></div>';
-        }
-        h += '</div>';
-        st.innerHTML = h;
-
-        if (Array.isArray(meta.changelog) && meta.changelog.length) {
-            renderChangelog(meta.changelog, APP_VERSION, meta.fallbackDate);
-        }
-    }).catch(e => {
-        st.innerHTML = '<div class="up-err">Ошибка: ' + esc(e.message) + '</div>';
+        renderChangelog(meta.changelog, APP_VERSION, meta.fallbackDate);
+    }).catch(() => {
+        renderChangelog(null, APP_VERSION, '');
     });
 }
-function reloadApp() {
-    if (!confirm('Перезагрузить приложение с сервера?\n\nВсе данные (гараж, избранное, журнал, настройки) сохранятся.')) return;
-    toast('🔄 Загружаем свежую версию…', 'success');
-    const url = location.pathname + '?v=' + Date.now();
-    setTimeout(() => { location.replace(url); }, 300);
-}
 
-/* ============ FAQ ============ */
-function oFaq() { openM('faqmo'); }
-function cFaq() { closeM('faqmo'); }
-
-function cUp() { $('upmo').classList.remove('show'); window._upParts = null; }
+const cUp = () => { $('upmo').classList.remove('show'); window._upParts = null; };
 function sUpUrl() {
     const u = $('up_url').value.trim();
     try { localStorage.setItem(UPKEY, u); } catch (e) { }
     toast(u ? 'URL сохранён' : 'URL очищен', 'success');
 }
+
 async function checkUpdate() {
     const st = $('up_status');
     st.innerHTML = '<div class="up-load">⏳ Проверяем сервер…</div>';
@@ -1238,6 +1112,7 @@ async function checkUpdate() {
         const r = await fetch(base + 'data/update.json?t=' + Date.now(), { cache: 'no-store' });
         if (r.ok) { const m = await r.json(); remoteVer = String(m.appVersion || ''); }
     } catch (e) { }
+
     const files = [
         'data/parts-01-engine-fuel-ignition.json',
         'data/parts-02-cooling-heating-brakes-suspension.json',
@@ -1255,13 +1130,27 @@ async function checkUpdate() {
         } catch (e) { }
     }
     window._upParts = parts;
-    const seen = new Set(D.map(x => (x.oem || '') + '||' + (x.name || '')));
+
+    const iKey = p => [
+        p.cat || '',
+        (p.sub || '').trim(),
+        (p.oem || '').trim(),
+        (p.name || '').trim()
+    ].join('|');
+
+    const seen = new Set(D.map(iKey));
+    const serverSeen = new Set();
     let newCnt = 0;
+    let dupCnt = 0;
+
     for (const raw of parts) {
         const p = nP(raw); if (!p) continue;
-        const k = (p.oem || '') + '||' + (p.name || '');
+        const k = iKey(p);
+        if (serverSeen.has(k)) { dupCnt++; continue; }
+        serverSeen.add(k);
         if (!seen.has(k)) newCnt++;
     }
+
     const appNewer = remoteVer && remoteVer !== APP_VERSION;
     let h = '<div class="up-ok">';
     h += '<div style="font-weight:700;margin-bottom:8px">✓ Проверка завершена</div>';
@@ -1269,20 +1158,29 @@ async function checkUpdate() {
     if (appNewer) h += ' → <b style="color:var(--a)">' + esc(remoteVer) + '</b> — доступна новая';
     else h += ' — актуальна';
     h += '</div>';
-    h += '<div style="margin-bottom:4px">Позиций: <b>' + D.length + '</b> у вас · <b>' + parts.length + '</b> на сервере</div>';
-    h += '<div style="margin-bottom:8px">Новых: <b>' + newCnt + '</b></div>';
+    h += '<div style="margin-bottom:4px">У вас: <b>' + D.length + '</b> позиций · На сервере: <b>' + parts.length + '</b></div>';
+    if (dupCnt > 0) {
+        h += '<div style="margin-bottom:4px;font-size:.78rem;color:var(--mu)">'
+            + 'В источнике <b>' + dupCnt + '</b> дубликатов (совпадают по категории+OEM+названию) — '
+            + 'они не считаются новыми'
+            + '</div>';
+    }
+    h += '<div style="margin-bottom:8px">Новых для добавления: <b>' + newCnt + '</b></div>';
     h += '<div class="up-actions">';
     h += '<button class="bn ok-btn" onclick="doFullUpdate()">🔄 Обновить всё</button>';
     if (newCnt) h += '<button class="bn p" onclick="applyUpMerge()">➕ Добавить новые (' + newCnt + ')</button>';
     h += '</div></div>';
     st.innerHTML = h;
 }
+
 function doFullUpdate() {
     toast('Загружаем свежую версию…', 'success');
     setTimeout(() => location.replace(location.pathname + '?v=' + Date.now()), 300);
 }
+
 function applyUpMerge() {
-    const parts = window._upParts; if (!parts) { toast('Нет данных', 'danger'); return; }
+    const parts = window._upParts;
+    if (!parts) { toast('Нет данных', 'danger'); return; }
     const cl = parts.map(nP).filter(Boolean);
     const seen = new Set(D.map(x => (x.oem || '') + '||' + (x.name || '')));
     let add = 0;
@@ -1310,7 +1208,7 @@ async function lAll() {
         if (r.ok) {
             const m = await r.json();
             if (Array.isArray(m.files) && m.files.length) files = m.files;
-            if (Array.isArray(m.changelog)) _setChangelog(m.changelog);   /* ← новая строка */
+            if (Array.isArray(m.changelog)) _setChangelog(m.changelog);
         }
     } catch (e) { console.warn('update.json не загрузился', e); }
     if (!files.length) {
@@ -1357,19 +1255,17 @@ async function lAll() {
                     currency: old.currency,
                     priceHistory: old.priceHistory,
                     shopUrl: old.shopUrl,
-                    photos: old.photos,     /* ← сохраняем фото пользователя */
-
+                    photos: old.photos
                 };
                 Object.assign(old, np, user);
                 upd++;
             }
-        }                                       /* ← закрываем for */
+        }
         console.log('С сервера: +' + add + ', ~' + upd + ' | Итого:', D.length);
         if (useIDB) try { await iMany(SP, D); } catch (e) { }
         else sD();
     }
 
-    /* ---- категории / секции / мастерские с сервера ---- */
     if (cats) for (const c of cats) {
         if (!c || !c.id) continue;
         if (!CATS.find(x => x.id === c.id)) CATS.push({ id: c.id, label: c.label || c.id, icon: c.icon || '📁' });
@@ -1385,7 +1281,7 @@ async function lAll() {
     lG(); lMeta(); lU(); lProfile(); lTO(); await lLogs();
     if (SV.activeVinId && !G.some(g => g.id === SV.activeVinId)) SV.activeVinId = null;
     try { vk = localStorage.getItem(VK) || ''; } catch (e) { }
-}   /* ← конец lAll() */
+}
 
 /* ============ ТЕМА ============ */
 function aTh() {
@@ -1448,20 +1344,17 @@ const cMM = () => { $('sb').classList.remove('open-mobile'); $('ov').classList.r
 const tMM = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     $('sb').classList.contains('open-mobile') ? cMM() : oMM();
-};;
+};
 
 function rSB() {
     const n = $('nl'); n.innerHTML = '';
     if (!SV.expandedCats) SV.expandedCats = {};
     const cnt = id => {
-        /* Кастомная секция (Диагностика, Моменты затяжки и пр.) — считаем строки таблицы */
         const sec = CUSTOM.sections && CUSTOM.sections[id];
         if (sec && Array.isArray(sec.rows)) return sec.rows.length;
-        /* Обычная категория — считаем записи в базе */
         return D.filter(p => p.cat === id).length;
     };
 
-    // Обычный пункт (без детей) — кликабельный, ведёт в категорию
     const add = (id, ic, lb, count, cls, sub) => {
         const li = document.createElement('li');
         li.className = 'ni ' + (SV.activeCat === id ? 'active ' : '') + (cls || '') + (sub ? ' sub' : '');
@@ -1475,7 +1368,6 @@ function rSB() {
         n.appendChild(li);
     };
 
-    // Папка с детьми — клик сворачивает/разворачивает
     const addFolder = (c, kids) => {
         const expanded = !!SV.expandedCats[c.id];
         const total = cnt(c.id) + kids.reduce((s, k) => s + cnt(k.id), 0);
@@ -1494,18 +1386,12 @@ function rSB() {
         if (expanded) kids.forEach(k => add(k.id, k.icon, k.label, cnt(k.id), '', true));
     };
 
-    /* Вверху — только «Избранное» */
     add('Favorites', '⭐', 'Избранное', D.filter(p => p.favorite).length, 'fav');
-
     const dv = document.createElement('li'); dv.className = 'nd'; n.appendChild(dv);
-
-    /* «Все системы» — прямо перед категориями (перед «Двигатель») */
     add('All', '📦', 'Все системы', D.length);
 
-    /* Список разделов, которые вынесены под нижний разделитель */
     const BOTTOM_IDS = ['Maintenance', 'RoadKit', 'Tires', 'Diagnostics', 'Torque'];
 
-    /* Категории — исключаем 'Tires' и всё, что уходит вниз */
     CATS.filter(c => c.id !== 'All' && !BOTTOM_IDS.includes(c.id) && !c.parent).forEach(c => {
         const kids = CATS.filter(k => k.parent === c.id);
         if (kids.length) {
@@ -1515,7 +1401,6 @@ function rSB() {
         }
     });
 
-    /* ─── Служебные разделы под нижним разделителем ─── */
     const dv2 = document.createElement('li');
     dv2.className = 'nd';
     n.appendChild(dv2);
@@ -1527,8 +1412,8 @@ function rSB() {
     add('Tires', '🛞', 'Шины и давление', cnt('Tires'));
     add('Torque', '🔩', 'Моменты затяжки', cnt('Torque'));
     add('RoadKit', '🎒', 'С собой в дорогу', cnt('RoadKit'));
-
 }
+
 /* ============ ПОИСК / ФИЛЬТРЫ ============ */
 const uSC = () => $('scl').classList.toggle('show', !!(SV.searchQuery || '').length);
 const cS = () => { SV.searchQuery = ''; $('sr').value = ''; uSC(); sU(); rC(); };
@@ -1549,12 +1434,7 @@ function rD() {
         'Вы уверены?\n\n' +
         '💡 Если уверены — сначала сделайте Экспорт JSON.',
         doRebuild,
-        {
-            title: '♻️ Пересобрать базу?',
-            yes: 'Да, пересобрать',
-            no: 'Нет',
-            showExport: true
-        }
+        { title: '♻️ Пересобрать базу?', yes: 'Да, пересобрать', no: 'Нет', showExport: true }
     );
 }
 
@@ -1580,21 +1460,18 @@ function mP(p, t) {
 }
 function sP(a) {
     const s = SV.sortBy;
-
-    /* «Логический» порядок для регламента ТО — только по умолчанию */
     if (s === 'default' && SV.activeCat === 'Maintenance') {
-        return [...a].sort((x, y) =>
+        return a.slice().sort((x, y) =>
             _maintWeight(x) - _maintWeight(y)
             || (x.name || '').localeCompare(y.name || '')
             || (x.oem || '').localeCompare(y.oem || '')
         );
     }
-
-    if (s === 'oem') return [...a].sort((x, y) => (x.oem || '').localeCompare(y.oem || ''));
-    if (s === 'name') return [...a].sort((x, y) => (x.name || '').localeCompare(y.name || ''));
-    if (s === 'priceAsc') return [...a].sort((x, y) => (Number(x.price) || Infinity) - (Number(y.price) || Infinity));
-    if (s === 'priceDesc') return [...a].sort((x, y) => (Number(y.price) || -Infinity) - (Number(x.price) || -Infinity));
-    if (s === 'favorite') return [...a].sort((x, y) => (y.favorite ? 1 : 0) - (x.favorite ? 1 : 0));
+    if (s === 'oem') return a.slice().sort((x, y) => (x.oem || '').localeCompare(y.oem || ''));
+    if (s === 'name') return a.slice().sort((x, y) => (x.name || '').localeCompare(y.name || ''));
+    if (s === 'priceAsc') return a.slice().sort((x, y) => (Number(x.price) || Infinity) - (Number(y.price) || Infinity));
+    if (s === 'priceDesc') return a.slice().sort((x, y) => (Number(y.price) || -Infinity) - (Number(x.price) || -Infinity));
+    if (s === 'favorite') return a.slice().sort((x, y) => (y.favorite ? 1 : 0) - (x.favorite ? 1 : 0));
     return a;
 }
 
@@ -1627,7 +1504,6 @@ function gF() {
         const arr = p.gens || [];
         return !arr.length || arr.includes(SV.genFilter);
     });
-
     if (t.length) f = f.filter(p => mP(p, t));
     return sP(f);
 }
@@ -1640,7 +1516,7 @@ function updateFilterStyling() {
 function updSearchSuggest() {
     const dl = $('searchSuggest'); if (!dl) return;
     const items = [], seen = new Set();
-    const MAX = 200;                              // было 500
+    const MAX = 200;
     for (const p of D) {
         if (items.length >= MAX) break;
         if (p.oem && !seen.has('o:' + p.oem)) { items.push(p.oem); seen.add('o:' + p.oem); }
@@ -1650,11 +1526,7 @@ function updSearchSuggest() {
     dl.innerHTML = items.map(x => '<option value="' + escA(x) + '">').join('');
 }
 
-/* ============ КОНТЕНТ (с окном рендера) ============ */
-const PAGE_SIZE = 40;
-let _visibleLimit = PAGE_SIZE;
-let _lastRenderSig = '';
-
+/* ============ КОНТЕНТ ============ */
 function _renderSignature() {
     return [
         SV.activeCat, SV.searchQuery, SV.statusFilter,
@@ -1668,13 +1540,11 @@ function rC() {
     if (SV.activeCat === 'Log') { rLog(); return; }
     if (CUSTOM.sections[SV.activeCat]) { rSec(SV.activeCat); return; }
 
-    /* сброс окна при смене фильтра/поиска/раздела */
     const sig = _renderSignature();
     if (sig !== _lastRenderSig) { _visibleLimit = PAGE_SIZE; _lastRenderSig = sig; }
 
     const ar = $('ca'), f = gF();
 
-    /* --- Заголовок раздела --- */
     let title, icon;
     if (SV.activeCat === 'Favorites') { title = 'Избранное'; icon = '⭐'; }
     else if (SV.activeCat === 'All') { title = 'Все системы'; icon = '📦'; }
@@ -1685,7 +1555,6 @@ function rC() {
     }
     let h = '<h2 class="sh">' + icon + ' ' + esc(title) + '</h2>';
 
-    /* --- Чипы-фильтры --- */
     const chips = [];
     chips.push('<span class="chip">найдено: <b>' + f.length + '</b></span>');
     if (SV.engineFilter && SV.engineFilter !== 'all') chips.push('<span class="chip">⚙️ ' + esc(SV.engineFilter) + '</span>');
@@ -1702,25 +1571,22 @@ function rC() {
     }
     h += '<div class="ri">' + chips.join('') + '</div>';
 
-    /* --- Пустая выдача --- */
     if (!f.length) {
         let ei, em;
         if (SV.activeCat === 'Favorites') { ei = '⭐'; em = 'Пока нет избранного.'; }
-        else if (!D.length) { ei = '📂'; em = 'База пуста. Положи parts.json в data/ или нажми ⚙️ → 🌐 Обновление базы.'; }
+        else if (!D.length) { ei = '📂'; em = 'База пуста. Положи parts.json в data/ или нажми ⚙️ → 📜 История версий.'; }
         else { ei = '🔍'; em = 'Ничего не найдено. Попробуйте сбросить фильтры.'; }
         h += '<div class="emp"><div class="empi">' + ei + '</div><p>' + em + '</p><button class="bn" onclick="resetFilters()" style="margin-top:10px">🔄 Сбросить фильтры</button></div>';
         ar.innerHTML = h;
         return;
     }
 
-    /* === Ветка «дерево» — без окна === */
     if (SV.view === 'tree') {
         h += rET(f);
         ar.innerHTML = h;
         return;
     }
 
-    /* === Плитка / группы — с окном === */
     if (SV.groupBySub) {
         const groups = {};
         for (const p of f) {
@@ -1763,7 +1629,6 @@ window._showMore = function () {
     _visibleLimit += PAGE_SIZE;
     rC();
 };
-/* Развернуть/свернуть все папки в дереве */
 window.toggleTreeAll = function () {
     const all = document.querySelectorAll('#ca details[data-etkey]');
     if (!all.length) return;
@@ -1775,7 +1640,6 @@ window.toggleTreeAll = function () {
         else { d.open = true; SV.expandedTree[k] = true; }
     });
     sU();
-    /* обновить подпись кнопки, не перерисовывая всё дерево */
     const btn = document.querySelector('.et-tgl-btn');
     if (btn) {
         btn.textContent = anyOpen ? '▼ Развернуть всё' : '▲ Свернуть всё';
@@ -1790,10 +1654,12 @@ function cH(p) {
         : '<span style="color:var(--mu);font-size:.66rem">—</span>';
     const dn = (p.donors || []).map(d => '<span class="tg dn">' + esc(d) + '</span>').join('')
         || '<span style="color:var(--mu);font-size:.72rem">— нет данных —</span>';
-    const eng = (p.engines || []).map(e => '<span class="tg eg">' + esc(e) + '</span>').join('')
-        || '<span style="color:var(--mu);font-size:.72rem">универсально</span>';
-    const bdy = (p.bodies || []).map(b => '<span class="tg bd">' + esc(BODIES[b] || b) + '</span>').join('')
-        || '<span style="color:var(--mu);font-size:.72rem">все кузова</span>';
+    const eng = (p.engines || []).length
+        ? p.engines.map(e => '<span class="tg eg">' + esc(e) + '</span>').join('')
+        : '<span style="color:var(--mu);font-size:.72rem">— не указано —</span>';
+    const bdy = (p.bodies || []).length
+        ? p.bodies.map(b => '<span class="tg bd">' + esc(BODIES[b] || b) + '</span>').join('')
+        : '<span style="color:var(--mu);font-size:.72rem">— не указано —</span>';
     const trn = (p.transmissions || []).map(t => '<span class="tg tr">' + esc(TRANSMISSIONS[t] || t) + '</span>').join('');
     const trm = (p.trims || []).map(t => '<span class="tg tm">' + esc(t) + '</span>').join('');
     const gn = (p.gens || []).map(g => '<span class="tg gn">' + esc(GENERATIONS[g] || g) + '</span>').join('');
@@ -1809,11 +1675,10 @@ function cH(p) {
         }
         ih += '</div>';
     }
-    /* Блок «Купить запчасти» для ТО-позиций */
     let partsHtml = '';
     if (p.parts && p.parts.length) {
         partsHtml = '<div class="cd-to-parts">'
-            + '<div class="cd-to-parts-h">🛒 Купить запчасти для ТО (' + p.parts.length + ')</div>'
+            + '<div class="cd-to-parts-h">🛒 Купить запчасти для ТО </div>'
             + '<div class="tp-parts">'
             + p.parts.map(it => {
                 const c = (it.oem || '').replace(/\s+/g, '');
@@ -1854,8 +1719,8 @@ function cH(p) {
     const st = p.status || '';
     const stBar = '<span class="cd-st-lb">Статус:</span>'
         + [['want', '🛒', 'Хочу'], ['bought', '📦', 'Купил'], ['installed', '✅', 'Поставил']]
-            .map(([id, ic, lb]) =>
-                '<button class="tp' + (st === id ? ' on' : '') + '" data-action="set-status" data-status="' + id + '" data-id="' + escA(p.id) + '">' + ic + ' ' + lb + '</button>'
+            .map(x =>
+                '<button class="tp' + (st === x[0] ? ' on' : '') + '" data-action="set-status" data-status="' + x[0] + '" data-id="' + escA(p.id) + '">' + x[1] + ' ' + x[2] + '</button>'
             ).join('');
 
     return '<div class="cd' + (f ? ' fav' : '') + '" data-id="' + escA(p.id) + '">'
@@ -1944,17 +1809,12 @@ function rET(parts) {
         if (!t[m.g][m.s]) t[m.g][m.s] = [];
         t[m.g][m.s].push(p);
     }
-
-    /* Состояние раскрытия папок: SV.expandedTree = { "g:Двигатель": true, "s:Двигатель|ГРМ": true } */
     if (!SV.expandedTree || typeof SV.expandedTree !== 'object') SV.expandedTree = {};
     const exp = SV.expandedTree;
-
     const groupKeys = Object.keys(t).sort();
     const anyOpen = groupKeys.some(g => exp['g:' + g]);
 
     let h = '<div class="et">';
-
-    /* Кнопка «Развернуть/Свернуть всё» + подсказка */
     h += '<div class="et-tools">'
         + '<button type="button" class="bn et-tgl-btn" onclick="toggleTreeAll()" data-treeall="' + (anyOpen ? 'collapse' : 'expand') + '">'
         + (anyOpen ? '▲ Свернуть всё' : '▼ Развернуть всё')
@@ -1976,11 +1836,9 @@ function rET(parts) {
             const a = sg[s];
             const sKey = 's:' + g + '|' + s;
             const sOpen = !!exp[sKey];
-
             h += '<details class="et-sub"' + (sOpen ? ' open' : '') + ' data-etkey="' + escA(sKey) + '">';
             h += '<summary style="font-size:.8rem;font-weight:600;color:var(--mu)">📂 ' + esc(s) + '<span class="gc">' + a.length + '</span></summary>';
             h += '<div class="sg">';
-
             const sorted = a.slice().sort((x, y) => {
                 if (x.cat === 'Maintenance' || y.cat === 'Maintenance') {
                     const dx = _maintWeight(x), dy = _maintWeight(y);
@@ -2005,7 +1863,6 @@ function rET(parts) {
                 let nm = p.notes ? ' 📝' : '';
                 h += '<div class="ep" data-id="' + escA(p.id) + '"><span class="om">' + esc(p.oem || '—') + '</span><span class="nm">' + esc(p.name || '') + pm + nm + w + sm + '</span></div>';
             }
-
             h += '</div></details>';
         }
         h += '</details>';
@@ -2073,7 +1930,7 @@ function fC(t, d) {
     } catch (e) { toast('Не удалось скопировать', 'danger'); }
 }
 
-/* ============ КЛИКИ В КОНТЕНТЕ ============ */
+/* ============ КЛИКИ ============ */
 function oCC(e) {
     const img = e.target.closest('[data-lightbox-pid]');
     if (img) {
@@ -2129,7 +1986,7 @@ function tF(id) {
     p.favorite = !p.favorite;
     useIDB ? iPut(SP, p).catch(() => { }) : sD();
     rSB(); rC();
-    if (partmoId === id) oPC(id);   // перерисовать открытую модалку
+    if (partmoId === id) oPC(id);
     toast(p.favorite ? '⭐ Добавлено' : 'Убрано');
 }
 function sPS(id, st) {
@@ -2139,13 +1996,11 @@ function sPS(id, st) {
     p.status = same ? '' : st;
     useIDB ? iPut(SP, p).catch(() => { }) : sD();
     rSB(); rC();
-    if (partmoId === id) oPC(id);   // перерисовать открытую модалку
+    if (partmoId === id) oPC(id);
     const L = { want: '🛒 Хочу', bought: '📦 Куплено', installed: '✅ Установлено' };
     toast(same ? 'Статус снят' : L[st], same ? '' : 'success');
     if (!same && st === 'installed' && typeof confetti === 'function') confetti();
 }
-
-let _lbPhotos = [], _lbIdx = 0;
 
 function oL(list, idx) {
     _lbPhotos = Array.isArray(list) ? list.slice() : [];
@@ -2154,7 +2009,6 @@ function oL(list, idx) {
     _lbShow();
     $('lbt').classList.add('show');
 }
-
 function _lbShow() {
     const img = $('lbi'), cnt = $('lbCount'), prev = $('lbPrev'), next = $('lbNext');
     if (img) img.src = _lbPhotos[_lbIdx] || '';
@@ -2162,7 +2016,6 @@ function _lbShow() {
     if (prev) prev.disabled = _lbIdx <= 0;
     if (next) next.disabled = _lbIdx >= _lbPhotos.length - 1;
 }
-
 function lbNav(dir) {
     if (!_lbPhotos.length) return;
     const n = _lbIdx + (dir > 0 ? 1 : -1);
@@ -2170,7 +2023,6 @@ function lbNav(dir) {
     _lbIdx = n;
     _lbShow();
 }
-
 const cL = () => {
     $('lbt').classList.remove('show');
     $('lbi').src = '';
@@ -2205,7 +2057,8 @@ function oAM() {
     $('f_id').value = '';
     $('f_cat').value = (SV.activeCat !== 'All' && SV.activeCat !== 'Favorites' && SV.activeCat !== 'Workshops' && SV.activeCat !== 'Log')
         ? SV.activeCat : 'Engine';
-    ['f_name', 'f_oem', 'f_an', 'f_dn', 'f_pr', 'f_su', 'f_notes', 'f_eng', 'f_trn', 'f_bdy', 'f_trm', 'f_gen'].forEach(id => { if ($(id)) $(id).value = ''; }); $('f_ver').checked = false; $('f_cu').value = 'RUB'; $('f_sts').value = ''; $('f_fav').value = '0';
+    ['f_name', 'f_oem', 'f_an', 'f_dn', 'f_pr', 'f_su', 'f_notes', 'f_eng', 'f_trn', 'f_bdy', 'f_trm', 'f_gen'].forEach(id => { if ($(id)) $(id).value = ''; });
+    $('f_ver').checked = false; $('f_cu').value = 'RUB'; $('f_sts').value = ''; $('f_fav').value = '0';
     $('ie').innerHTML = ''; aIR('proc', '');
     uPP(); rPH([]);
     $('mo').classList.add('show');
@@ -2365,9 +2218,7 @@ function dWsh(id) {
     toast('Удалено', 'danger');
 }
 
-/* ============ ФОТО (массив) ============ */
-let pPhs = [];   /* рабочий массив фото в открытой форме */
-
+/* ============ ФОТО ============ */
 const pkP = () => $('pf').click();
 
 function rmPI(i) {
@@ -2375,7 +2226,6 @@ function rmPI(i) {
     pPhs.splice(i, 1);
     uPP();
 }
-
 function uPP() {
     const g = $('pgrid'), cnt = $('pCount');
     if (!g) return;
@@ -2391,7 +2241,6 @@ function uPP() {
         b.onclick = () => rmPI(parseInt(b.dataset.rmp, 10));
     });
 }
-
 async function oPF(e) {
     const files = e.target.files ? Array.from(e.target.files) : [];
     e.target.value = '';
@@ -2407,7 +2256,6 @@ async function oPF(e) {
     }
     uPP();
 }
-
 const cI = (f, ms, q) => new Promise((res, rej) => {
     const r = new FileReader();
     r.onerror = rej;
@@ -2449,7 +2297,6 @@ window.tMMenu = function (e) {
     if (!m) return;
     m.classList.toggle('show');
 };
-
 const tMMenu = window.tMMenu;
 
 /* ============ ЭКСПОРТ ============ */
@@ -2561,6 +2408,7 @@ function aI(parts, ws, gs, meta) {
     const m = mode.trim().toLowerCase();
     const cl = parts.map(nP).filter(Boolean);
     if (!cl.length) { toast('Нет валидных позиций', 'danger'); return; }
+
     if (m === 'replace') {
         if (!confirm('Заменить базу?')) return;
         D = cl;
@@ -2595,7 +2443,6 @@ function aI(parts, ws, gs, meta) {
             if (!map.has(k)) {
                 D.push(p); map.set(k, p); add++;
             } else {
-                /* Позиция уже есть — дотягиваем пользовательские поля, включая фото */
                 const old = map.get(k);
                 let touched = false;
                 if (Array.isArray(p.photos) && p.photos.length) {
@@ -2609,51 +2456,24 @@ function aI(parts, ws, gs, meta) {
                 if (p.notes && p.notes !== old.notes) { old.notes = p.notes; touched = true; }
                 if (p.price != null && p.price !== old.price) { old.price = p.price; touched = true; }
                 if (p.shopUrl && p.shopUrl !== old.shopUrl) { old.shopUrl = p.shopUrl; touched = true; }
-                if (touched) { merged++; if (useIDB) iPut(SP, old).catch(() => {}); }
+                if (touched) { merged++; if (useIDB) iPut(SP, old).catch(() => { }); }
             }
         }
-      } else if (m === 'merge') {
-    const keyOf = x => (x.oem || '') + '||' + (x.name || '');
-    const map = new Map(D.map(x => [keyOf(x), x]));
-    let add = 0, merged = 0;
-    for (const p of cl) {
-        const k = keyOf(p);
-        if (!map.has(k)) {
-            D.push(p); map.set(k, p); add++;
-        } else {
-            const old = map.get(k);
-            let touched = false;
-            if (Array.isArray(p.photos) && p.photos.length) {
-                const existing = new Set(Array.isArray(old.photos) ? old.photos : []);
-                const merged2 = [...(old.photos || [])];
-                for (const src of p.photos) {
-                    if (!existing.has(src)) { merged2.push(src); touched = true; }
-                }
-                if (touched) old.photos = merged2.slice(0, 12);
-            }
-            if (p.notes && p.notes !== old.notes) { old.notes = p.notes; touched = true; }
-            if (p.price != null && p.price !== old.price) { old.price = p.price; touched = true; }
-            if (p.shopUrl && p.shopUrl !== old.shopUrl) { old.shopUrl = p.shopUrl; touched = true; }
-            if (touched) { merged++; if (useIDB) iPut(SP, old).catch(() => {}); }
-        }
-    }
-    if (useIDB) iMany(SP, D).catch(() => { });
-    else sD();
-    if (ws && ws.length) {
-        const wsn = new Set(W.map(w => w.name || ''));
+        if (useIDB) iMany(SP, D).catch(() => { });
+        else sD();
+
         let wa = 0;
-        for (const w of ws.map(nW).filter(Boolean)) {
-            if (!wsn.has(w.name)) { W.push(w); wsn.add(w.name); wa++; }
+        if (ws && ws.length) {
+            const wsn = new Set(W.map(w => w.name || ''));
+            for (const w of ws.map(nW).filter(Boolean)) {
+                if (!wsn.has(w.name)) { W.push(w); wsn.add(w.name); wa++; }
+            }
+            if (useIDB) iMany(SW, W).catch(() => { });
+            else sWk();
         }
-        if (useIDB) iMany(SW, W).catch(() => { });
-        else sWk();
-        toast('+' + add + ' поз., +' + wa + ' СТО (фото: +' + merged + ')', 'success');
-    } else {
-        toast('+' + add + ' новых, ~' + merged + ' с фото', 'success');
-    }
+        let ga = 0;
         if (gs && gs.length) {
             const gsn = new Set(G.map(g => g.vin));
-            let ga = 0;
             for (const g of gs) {
                 if (g && g.vin && !gsn.has(String(g.vin).toUpperCase())) {
                     G.push({
@@ -2671,9 +2491,17 @@ function aI(parts, ws, gs, meta) {
                     ga++;
                 }
             }
-            if (ga) { sG(); toast('+' + ga + ' VIN', 'success'); }
+            if (ga) sG();
         }
-    } else { toast('Неизвестный режим', 'danger'); return; }
+        let msg = '+' + add + ' поз., ~' + merged + ' обновлено';
+        if (wa) msg += ', +' + wa + ' СТО';
+        if (ga) msg += ', +' + ga + ' VIN';
+        toast(msg, 'success');
+    } else {
+        toast('Неизвестный режим', 'danger');
+        return;
+    }
+
     if (meta && typeof meta === 'object') {
         if (Array.isArray(meta.categories)) {
             for (const c of meta.categories) {
@@ -2710,7 +2538,7 @@ function rLog() {
         h += '<div class="emp"><div class="empi">📖</div><p><b>Журнал пуст</b></p><p>Фиксируй каждую работу — потом не вспомнишь, когда менял ГРМ.</p></div>';
         ar.innerHTML = h; return;
     }
-    const srt = [...LOG].sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.km || 0) - (a.km || 0));
+    const srt = LOG.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.km || 0) - (a.km || 0));
     for (const e of srt) {
         h += '<div class="log-entry" data-lid="' + escA(e.id) + '" style="background:var(--cd);border:1px solid var(--bd);border-left:4px solid var(--a);border-radius:6px;padding:10px 12px;margin-bottom:8px">';
         h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px"><span style="font-family:Consolas,monospace;font-size:.72rem;color:var(--mu);font-weight:700">' + esc(e.date || '—') + '</span>';
@@ -2969,10 +2797,9 @@ function findCheaper(oem, name) {
         document.body.removeChild(a);
     });
     toast('Открыто 3 магазина', 'success');
-
 }
 
-/* ============ КОПИРОВАНИЕ НОМЕРА ЮMONEY ============ */
+/* ============ ЮMONEY ============ */
 function copyYm() {
     const num = '410017195918895';
     const done = () => toast('📋 ЮMoney: 4100 1719 5918 895', 'success');
@@ -3129,6 +2956,63 @@ function confetti() {
     tick();
 }
 
+/* ============ ПЛАШКА «ЧТО НОВОГО» ============ */
+function _setChangelog(list) {
+    if (Array.isArray(list)) _changelogCache = list;
+}
+function checkWhatsNew() {
+    let lastSeen = '';
+    try { lastSeen = localStorage.getItem(WNKEY) || ''; } catch (e) { }
+    if (!lastSeen) {
+        try { localStorage.setItem(WNKEY, APP_VERSION); } catch (e) { }
+        return;
+    }
+    if (lastSeen === APP_VERSION) return;
+    const rec = _changelogCache.find(r => r && String(r.version) === String(APP_VERSION));
+    const changes = rec && Array.isArray(rec.changes) ? rec.changes.slice(0, 5) : [];
+    showWhatsNew(APP_VERSION, changes);
+}
+function showWhatsNew(version, changes) {
+    const el = $('whatsnew');
+    if (!el) return;
+    let h = '';
+    h += '<div class="wn-head">';
+    h += '<span class="wn-icon">🎉</span>';
+    h += '<span class="wn-title">Что нового в v' + esc(version) + '</span>';
+    h += '<button class="wn-close" onclick="closeWhatsNew(true)" title="Закрыть">✕</button>';
+    h += '</div>';
+    if (changes.length) {
+        h += '<ul class="wn-list">';
+        for (const c of changes) h += '<li>' + esc(c) + '</li>';
+        h += '</ul>';
+    } else {
+        h += '<div class="wn-empty">Приложение обновлено до v' + esc(version) +
+            '. Полный список изменений — в разделе «История версий».</div>';
+    }
+    h += '<div class="wn-foot">';
+    h += '<button class="bn" onclick="closeWhatsNew(true)">Понятно</button>';
+    h += '<button class="bn p" onclick="openWhatsNewDetails()">Подробнее</button>';
+    h += '</div>';
+    el.innerHTML = h;
+    el.classList.add('show');
+}
+function closeWhatsNew(markSeen) {
+    const el = $('whatsnew');
+    if (!el) return;
+    el.classList.remove('show');
+    if (markSeen) {
+        try { localStorage.setItem(WNKEY, APP_VERSION); } catch (e) { }
+    }
+}
+function openWhatsNewDetails() {
+    closeWhatsNew(true);
+    oUp();
+}
+
+/* ============ FAQ ============ */
+function oFaq() { openM('faqmo'); }
+function cFaq() { closeM('faqmo'); }
+
 /* ============ INIT ============ */
 async function init() {
     if (licAppReady) return;
@@ -3148,7 +3032,6 @@ async function init() {
     iPWA();
     fCS();
     checkWhatsNew();
-
 }
 
 function bindUI() {
@@ -3160,7 +3043,6 @@ function bindUI() {
     si.value = SV.searchQuery || '';
     uSC();
 
-    // Поиск / фильтры
     si.addEventListener('input', e => { SV.searchQuery = e.target.value; uSC(); sUS(); dRC(); });
     $('sf').addEventListener('change', e => { SV.statusFilter = e.target.value; sU(); rC(); });
     $('ss').addEventListener('change', e => { SV.sortBy = e.target.value; sU(); rC(); });
@@ -3185,23 +3067,19 @@ function bindUI() {
         const el = $(id); if (el) el.addEventListener('input', updateProfPreview);
     });
 
-    // Контент
     const ca = $('ca');
     ca.addEventListener('click', oCC);
-    // Сохранение раскрытия папок в дереве ETKA
     ca.addEventListener('click', e => {
         const sum = e.target.closest('summary');
         if (!sum) return;
         const det = sum.parentElement;
         if (!det || det.tagName !== 'DETAILS' || !det.dataset.etkey) return;
-        /* toggle происходит после текущего клика — ждём микротик */
         setTimeout(() => {
             if (!SV.expandedTree) SV.expandedTree = {};
             const k = det.dataset.etkey;
             if (det.open) SV.expandedTree[k] = true;
             else delete SV.expandedTree[k];
             sU();
-            /* обновить подпись кнопки «Развернуть/Свернуть всё» */
             const btn = document.querySelector('.et-tgl-btn');
             if (btn) {
                 const any = !!document.querySelector('#ca details[data-etkey][open]');
@@ -3224,7 +3102,6 @@ function bindUI() {
             }
         }
     });
-    // Контент модалки карточки — те же обработчики, что и для списка
     const pmb = $('partmo_body');
     if (pmb) {
         pmb.addEventListener('click', oCC);
@@ -3243,7 +3120,6 @@ function bindUI() {
             }
         });
     }
-    // Гараж
     const gl = $('gl');
     if (gl) gl.addEventListener('click', e => {
         const d = e.target.closest('[data-vact="delete"]');
@@ -3254,32 +3130,28 @@ function bindUI() {
     });
     const gab = $('gab'); if (gab) gab.addEventListener('click', oGM);
 
-    // Модалки — закрытие по клику на фон
     const modalClose = {
         mo: cM, wmo: cWM, gmo: cGM, smo: cSM, aboutmo: cAbout, bugmo: cBug,
         donmo: cDonate, profmo: cProfile, upmo: cUp, partmo: cPC,
         logmo: cLog, tomo: cTO, shopmo: cShop, vinmo: cVIN, thememmo: cTheme,
-        faqmo: cFaq,
+        faqmo: cFaq, apkmo: () => closeM('apkmo'),
         confirmmo: () => cConfirm(false)
     };
-
     Object.keys(modalClose).forEach(id => {
         const el = $(id); if (!el) return;
         el.addEventListener('click', e => { if (e.target.id === id) modalClose[id](); });
     });
 
-    // Escape / Ctrl+F
     document.addEventListener('keydown', e => {
-        /* Навигация в лайтбоксе работает всегда, когда он открыт */
         if ($('lbt').classList.contains('show')) {
             if (e.key === 'ArrowLeft') { e.preventDefault(); lbNav(-1); return; }
             if (e.key === 'ArrowRight') { e.preventDefault(); lbNav(1); return; }
         }
-
         if (e.key === 'Escape') {
-            if ($('confirmmo') && $('confirmmo').classList.contains('show')) return cConfirm(false);   /* ← новая */
+            if ($('confirmmo') && $('confirmmo').classList.contains('show')) return cConfirm(false);
+            if ($('apkmo') && $('apkmo').classList.contains('show')) return closeM('apkmo');
             if ($('faqmo').classList.contains('show')) return cFaq();
-            if ($('whatsnew') && $('whatsnew').classList.contains('show')) return closeWhatsNew(true);   /* ← новая */
+            if ($('whatsnew') && $('whatsnew').classList.contains('show')) return closeWhatsNew(true);
             if ($('thememmo').classList.contains('show')) return cTheme();
             if ($('vinmo').classList.contains('show')) return cVIN();
             if ($('shopmo').classList.contains('show')) return cShop();
@@ -3305,26 +3177,20 @@ function bindUI() {
         }
     });
 
-    // Клик вне меню ⚙️
     document.addEventListener('click', e => {
         const m = $('em');
         if (m.classList.contains('show') && !e.target.closest('.ew')) cEM();
     });
 
-    // Resize
     let rz;
     window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(rSz, 120); });
 
-    // Гамбургеры
     const dt = $('dtgl');
     if (dt) dt.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tSB(); });
 
-
-    // Вид «плитка / дерево»
     const vtg = $('viewToggle');
     if (vtg) vtg.addEventListener('change', () => setV(vtg.checked ? 'tree' : 'grid'));
 
-    // VIN-инпут
     const gv = $('g_vi');
     if (gv) {
         const vmLimit = 17;
@@ -3344,7 +3210,6 @@ function bindUI() {
         }));
     }
 
-    // Сохранение состояния гаража
     const box = $('garageBox');
     if (box) {
         try { if (localStorage.getItem('vw_garage_collapsed') === '1') box.removeAttribute('open'); } catch (e) { }
@@ -3369,5 +3234,5 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (el) el.textContent = APP_VERSION;
     });
     fCS();
-    checkLicense()
-})
+    checkLicense();
+});
