@@ -23,7 +23,7 @@ const BASE_CATS = [
     { id: 'Electrical', label: '9. Электрика', icon: '💡' },
     { id: 'Bulbs', label: '9.1 Освещение, Лампы', icon: '🔆', parent: 'Electrical' },
     { id: 'Interior', label: '0. Аксессуары, Салон', icon: '🪑' },
-{ id: 'Tires', label: 'Шины и давление', icon: '🛞' }   // ← новая строка
+    { id: 'Tires', label: 'Шины и давление', icon: '🛞' }   // ← новая строка
 ];
 let CATS = BASE_CATS.slice();
 
@@ -304,6 +304,37 @@ function fmtDate(d) {
 const openM = id => $(id).classList.add('show');
 const closeM = id => $(id).classList.remove('show');
 
+/* ============ КАСТОМНЫЙ CONFIRM (Да/Нет) ============ */
+let _confirmCb = null;
+
+function askConfirm(msg, onYes, opts) {
+    opts = opts || {};
+    $('confirm_title').textContent = opts.title || '⚠️ Подтверждение';
+    $('confirm_msg').textContent = msg;
+    $('confirm_yes').textContent = opts.yes || 'Да';
+    $('confirm_no').textContent = opts.no || 'Нет';
+    const exp = $('confirm_export');
+    if (exp) exp.style.display = opts.showExport ? '' : 'none';
+    _confirmCb = onYes || null;
+    openM('confirmmo');
+}
+
+function cConfirm(ok) {
+    closeM('confirmmo');
+    const cb = _confirmCb;
+    _confirmCb = null;
+    if (ok && typeof cb === 'function') {
+        try {
+            const r = cb();
+            if (r && typeof r.catch === 'function') {
+                r.catch(e => toast('Ошибка: ' + ((e && e.message) || e), 'danger'));
+            }
+        } catch (e) {
+            toast('Ошибка: ' + ((e && e.message) || e), 'danger');
+        }
+    }
+}
+
 /* ============ ЛИЦЕНЗИЯ ============ */
 function checkLicense() {
     let st = '';
@@ -419,12 +450,12 @@ function nP(p) {
     let inst;
 
     if (Array.isArray(p.inst)) {
-    // формат:  "inst": [{ "type": "spec", "text": "..." }, ...]
-    inst = p.inst.filter(i => i && i.text).map(i => ({ type: MI[IM[i.type]] || i.type, text: String(i.text) }));
-} else if (Array.isArray(p.i)) {
-    // формат:  "i": [["s", "..."], ["n", "..."], ...]
-    inst = p.i.map(x => ({ type: MI[x[0]] || 'note', text: String(x[1] || '') })).filter(x => x.text);
-}
+        // формат:  "inst": [{ "type": "spec", "text": "..." }, ...]
+        inst = p.inst.filter(i => i && i.text).map(i => ({ type: MI[IM[i.type]] || i.type, text: String(i.text) }));
+    } else if (Array.isArray(p.i)) {
+        // формат:  "i": [["s", "..."], ["n", "..."], ...]
+        inst = p.i.map(x => ({ type: MI[x[0]] || 'note', text: String(x[1] || '') })).filter(x => x.text);
+    }
     else inst = [];
     const eng = Array.isArray(p.engines) ? p.engines.filter(x => ALL_ENGINES.includes(x)) : [];
     const bdy = Array.isArray(p.bodies) ? p.bodies.filter(x => ALL_BODIES.includes(x)) : [];
@@ -1422,7 +1453,13 @@ const tMM = (e) => {
 function rSB() {
     const n = $('nl'); n.innerHTML = '';
     if (!SV.expandedCats) SV.expandedCats = {};
-    const cnt = id => D.filter(p => p.cat === id).length;
+    const cnt = id => {
+        /* Кастомная секция (Диагностика, Моменты затяжки и пр.) — считаем строки таблицы */
+        const sec = CUSTOM.sections && CUSTOM.sections[id];
+        if (sec && Array.isArray(sec.rows)) return sec.rows.length;
+        /* Обычная категория — считаем записи в базе */
+        return D.filter(p => p.cat === id).length;
+    };
 
     // Обычный пункт (без детей) — кликабельный, ведёт в категорию
     const add = (id, ic, lb, count, cls, sub) => {
@@ -1457,13 +1494,19 @@ function rSB() {
         if (expanded) kids.forEach(k => add(k.id, k.icon, k.label, cnt(k.id), '', true));
     };
 
-    add('All', '📦', 'Все системы', D.length);
+    /* Вверху — только «Избранное» */
     add('Favorites', '⭐', 'Избранное', D.filter(p => p.favorite).length, 'fav');
 
     const dv = document.createElement('li'); dv.className = 'nd'; n.appendChild(dv);
 
-    /* Категории — исключаем 'Tires', её вынесем отдельно */
-    CATS.filter(c => c.id !== 'All' && c.id !== 'Tires' && !c.parent).forEach(c => {
+    /* «Все системы» — прямо перед категориями (перед «Двигатель») */
+    add('All', '📦', 'Все системы', D.length);
+
+    /* Список разделов, которые вынесены под нижний разделитель */
+    const BOTTOM_IDS = ['Maintenance', 'RoadKit', 'Tires', 'Diagnostics', 'Torque'];
+
+    /* Категории — исключаем 'Tires' и всё, что уходит вниз */
+    CATS.filter(c => c.id !== 'All' && !BOTTOM_IDS.includes(c.id) && !c.parent).forEach(c => {
         const kids = CATS.filter(k => k.parent === c.id);
         if (kids.length) {
             addFolder(c, kids);
@@ -1472,14 +1515,19 @@ function rSB() {
         }
     });
 
-    /* ─── Служебные разделы: Шины · Мастерские · Журнал ─── */
+    /* ─── Служебные разделы под нижним разделителем ─── */
     const dv2 = document.createElement('li');
-    dv2.className = 'nd bright';
+    dv2.className = 'nd';
     n.appendChild(dv2);
 
-    add('Tires', '🛞', 'Шины и давление', cnt('Tires'));
-    add('Workshops', '🔧', 'Мастерские', W.length);
+    add('Workshops', '🔧', 'Мастерские/СТО', W.length);
     add('Log', '📖', 'Журнал обслуживания', LOG.length);
+    add('Maintenance', '🔧', 'Регламент ТО', cnt('Maintenance'));
+    add('Diagnostics', '🩺', 'Диагностика (OBD)', cnt('Diagnostics'));
+    add('Tires', '🛞', 'Шины и давление', cnt('Tires'));
+    add('Torque', '🔩', 'Моменты затяжки', cnt('Torque'));
+    add('RoadKit', '🎒', 'С собой в дорогу', cnt('RoadKit'));
+
 }
 /* ============ ПОИСК / ФИЛЬТРЫ ============ */
 const uSC = () => $('scl').classList.toggle('show', !!(SV.searchQuery || '').length);
@@ -1495,8 +1543,22 @@ function resetFilters() {
     updateFilterStyling(); sU(); rC();
     toast('Фильтры сброшены', 'success');
 }
-async function rD() {
-    if (!confirm('Полный сброс: удалить всё и загрузить заново с сервера?')) return;
+function rD() {
+    askConfirm(
+        'При пересборке ваши записи и фото, внесённые вручную, удалятся.\n\n' +
+        'Вы уверены?\n\n' +
+        '💡 Если уверены — сначала сделайте Экспорт JSON.',
+        doRebuild,
+        {
+            title: '♻️ Пересобрать базу?',
+            yes: 'Да, пересобрать',
+            no: 'Нет',
+            showExport: true
+        }
+    );
+}
+
+async function doRebuild() {
     try {
         if (useIDB) { await iClr(SP); await iClr(SW); }
         localStorage.removeItem(PK);
@@ -1508,6 +1570,7 @@ async function rD() {
         toast('Загружено: ' + D.length + ' поз.', 'success');
     } catch (e) { toast('Ошибка: ' + e.message, 'danger'); }
 }
+
 function mP(p, t) {
     if (!t.length) return true;
     const h = nz([p.oem || '', p.name || '', ...(p.analogs || []), ...(p.donors || []),
@@ -2411,7 +2474,9 @@ function eD() {
             sections: CUSTOM.sections || {}
         };
         dl('vw_polo_caddy_' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(p, null, 2), 'application/json');
-        toast('Экспорт: ' + D.length + ' поз., ' + W.length + ' СТО', 'success');
+        const photoCount = D.reduce((s, x) => s + (Array.isArray(x.photos) ? x.photos.length : 0), 0);
+        dl('vw_polo_caddy_' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(p, null, 2), 'application/json');
+        toast('Экспорт: ' + D.length + ' поз., ' + W.length + ' СТО, ' + photoCount + ' фото', 'success');
     } catch (e) { toast('Ошибка: ' + e.message, 'danger'); }
 }
 const statL = s => ({ want: 'Хочу купить', bought: 'Куплено', installed: 'Установлено' }[s] || '');
@@ -2523,12 +2588,33 @@ function aI(parts, ws, gs, meta) {
         }
         toast('База заменена: ' + D.length + ' поз.', 'success');
     } else if (m === 'merge') {
-        const seen = new Set(D.map(x => (x.oem || '') + '||' + (x.name || '')));
-        let add = 0;
+        const keyOf = x => (x.oem || '') + '||' + (x.name || '');
+        const map = new Map(D.map(x => [keyOf(x), x]));
+        let add = 0, merged = 0;
         for (const p of cl) {
-            const k = (p.oem || '') + '||' + (p.name || '');
-            if (!seen.has(k)) { D.push(p); seen.add(k); add++; }
+            const k = keyOf(p);
+            if (!map.has(k)) {
+                D.push(p); map.set(k, p); add++;
+            } else {
+                /* Позиция уже есть — дотягиваем пользовательские поля, включая фото */
+                const old = map.get(k);
+                let touched = false;
+                if (Array.isArray(p.photos) && p.photos.length) {
+                    const existing = new Set(Array.isArray(old.photos) ? old.photos : []);
+                    const merged2 = [...(old.photos || [])];
+                    for (const src of p.photos) {
+                        if (!existing.has(src)) { merged2.push(src); touched = true; }
+                    }
+                    if (touched) old.photos = merged2.slice(0, 12);
+                }
+                if (p.notes && p.notes !== old.notes) { old.notes = p.notes; touched = true; }
+                if (p.price != null && p.price !== old.price) { old.price = p.price; touched = true; }
+                if (p.shopUrl && p.shopUrl !== old.shopUrl) { old.shopUrl = p.shopUrl; touched = true; }
+                if (touched) { merged++; if (useIDB) iPut(SP, old).catch(() => {}); }
+            }
         }
+        if (!useIDB) sD();
+        toast('+' + add + ' новых, ~' + merged + ' с восстановленными фото', 'success');
         if (useIDB) iMany(SP, D).catch(() => { });
         else sD();
         if (ws && ws.length) {
@@ -3149,7 +3235,8 @@ function bindUI() {
         mo: cM, wmo: cWM, gmo: cGM, smo: cSM, aboutmo: cAbout, bugmo: cBug,
         donmo: cDonate, profmo: cProfile, upmo: cUp, partmo: cPC,
         logmo: cLog, tomo: cTO, shopmo: cShop, vinmo: cVIN, thememmo: cTheme,
-        faqmo: cFaq
+        faqmo: cFaq,
+        confirmmo: () => cConfirm(false)
     };
 
     Object.keys(modalClose).forEach(id => {
@@ -3166,6 +3253,9 @@ function bindUI() {
         }
 
         if (e.key === 'Escape') {
+            if ($('confirmmo') && $('confirmmo').classList.contains('show')) return cConfirm(false);   /* ← новая */
+            if ($('whatsnew') && $('whatsnew').classList.contains('show')) return closeWhatsNew(true);
+            if ($('faqmo').classList.contains('show')) return cFaq();
             if ($('whatsnew') && $('whatsnew').classList.contains('show')) return closeWhatsNew(true);   /* ← новая */
             if ($('faqmo').classList.contains('show')) return cFaq();
             if ($('faqmo').classList.contains('show')) return cFaq();

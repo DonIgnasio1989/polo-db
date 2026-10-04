@@ -915,6 +915,24 @@
     </div>
   </div>
 
+<!-- ============ МОДАЛКА: ПОДТВЕРЖДЕНИЕ ============ -->
+<div class="mo" id="confirmmo">
+  <div class="mdl" onclick="event.stopPropagation()" style="max-width:560px">
+    <div class="mh">
+      <h3 id="confirm_title">⚠️ Подтверждение</h3>
+      <button class="mc" onclick="cConfirm(false)">✕</button>
+    </div>
+    <div class="mb">
+      <p id="confirm_msg" style="font-size:.9rem;line-height:1.7;margin:0;white-space:pre-line"></p>
+    </div>
+    <div class="mf">
+      <button class="bn" id="confirm_export" onclick="eD()" style="margin-right:auto;display:none">📄 Экспорт JSON</button>
+      <button class="bn" id="confirm_no" onclick="cConfirm(false)">Нет</button>
+      <button class="bn dg-btn" id="confirm_yes" onclick="cConfirm(true)">Да</button>
+    </div>
+  </div>
+</div>
+
   <!-- ============ ЛАЙТБОКС / ТОСТ / КОНФЕТТИ ============ -->
   <div class="lb2" id="lbt" onclick="cL()">
     <img id="lbi" alt="" onclick="event.stopPropagation()">
