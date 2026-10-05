@@ -6382,3 +6382,4 @@ body.theme-light .em-title {
             rgba(255, 255, 255, .55) 0%,
             rgba(255, 255, 255, 0) 100%);
 }
+.rSec td { white-space: pre-line; }

@@ -77,25 +77,25 @@ const TRIMS = ['Base', 'CL', 'GL', 'Trendline', 'Comfortline', 'Highline', 'Open
 
 const BASE_EK = {
     Maintenance: { g: 'Регламент ТО', s: 'Обслуживание' },
-    RoadKit:     { g: 'С собой в дорогу', s: 'Аварийный набор' },
-    Engine:      { g: 'Двигатель', s: 'ГРМ / Ремни' },
-    Fuel:        { g: 'Топливная', s: 'Подача / Фильтры' },
-    Ignition:    { g: 'Зажигание', s: 'Свечи / Катушки' },
-    Cooling:     { g: 'Охлаждение', s: 'Радиатор / Термостат' },
-    Heating:     { g: 'Отопление', s: 'Печка / Климат' },
-    Suspension:  { g: 'Подвеска', s: 'Передняя / Задняя' },
-    Steering:    { g: 'Рулевое', s: 'Рейка / Тяги' },              // ← ДОБАВЛЕНО
-    Brakes:      { g: 'Тормоза', s: 'Передние / Задние' },
-    Transmission:{ g: 'Трансмиссия', s: 'КПП / Привод' },
-    Exhaust:     { g: 'Выхлоп', s: 'Глушитель' },
-    Electrical:  { g: 'Электрика', s: 'Генератор / Стартер' },
-    Bulbs:       { g: 'Лампы', s: 'Освещение' },
-    Body:        { g: 'Кузов', s: 'Наружные панели' },
-    Interior:    { g: 'Интерьер', s: 'Панель / Сиденья' },
-    Tires:       { g: 'Колёса', s: 'Шины и давление' },
-    Fluids:      { g: 'Жидкости', s: 'Эксплуатационные' },
-    RearAxle:    { g: 'Задняя ось', s: 'Балка / Ступица' },        // ← уже было
-    Controls:    { g: 'Управление', s: 'Педали / Кулиса' }
+    RoadKit: { g: 'С собой в дорогу', s: 'Аварийный набор' },
+    Engine: { g: 'Двигатель', s: 'ГРМ / Ремни' },
+    Fuel: { g: 'Топливная', s: 'Подача / Фильтры' },
+    Ignition: { g: 'Зажигание', s: 'Свечи / Катушки' },
+    Cooling: { g: 'Охлаждение', s: 'Радиатор / Термостат' },
+    Heating: { g: 'Отопление', s: 'Печка / Климат' },
+    Suspension: { g: 'Подвеска', s: 'Передняя / Задняя' },
+    Steering: { g: 'Рулевое', s: 'Рейка / Тяги' },              // ← ДОБАВЛЕНО
+    Brakes: { g: 'Тормоза', s: 'Передние / Задние' },
+    Transmission: { g: 'Трансмиссия', s: 'КПП / Привод' },
+    Exhaust: { g: 'Выхлоп', s: 'Глушитель' },
+    Electrical: { g: 'Электрика', s: 'Генератор / Стартер' },
+    Bulbs: { g: 'Лампы', s: 'Освещение' },
+    Body: { g: 'Кузов', s: 'Наружные панели' },
+    Interior: { g: 'Интерьер', s: 'Панель / Сиденья' },
+    Tires: { g: 'Колёса', s: 'Шины и давление' },
+    Fluids: { g: 'Жидкости', s: 'Эксплуатационные' },
+    RearAxle: { g: 'Задняя ось', s: 'Балка / Ступица' },        // ← уже было
+    Controls: { g: 'Управление', s: 'Педали / Кулиса' }
 };
 
 /* ============================================================
@@ -138,6 +138,7 @@ const CAT_GROUPS = [
         id: 'refs',
         label: 'Справочники',
         cats: ['Torque', 'Diagnostics', 'Workshops', 'Log'],
+
         virtual: true
     }
 ];
@@ -233,7 +234,7 @@ let USER = { name: '', email: '', city: '', initials: '', color: '#00b0f0' };
 let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastDate: null, interval: 15000 };
 
-let APP_VERSION = '1.2.2';
+let APP_VERSION = '1.2.4';
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -889,7 +890,7 @@ function rGar() {
         return h;
     }).join('');
 
-    rVinBar(); 
+    rVinBar();
 }
 
 const VIN_BODY_MAP = {
@@ -1313,6 +1314,15 @@ function applyUpMerge() {
 }
 
 /* ============ ЗАГРУЗКА ============ */
+function _guessType(path) {
+    const p = String(path || '').toLowerCase();
+    if (/parts-\d|parts\.json|\/parts\//.test(p))    return 'parts';
+    if (/categories\.json/.test(p))                  return 'categories';
+    if (/sections\.json|composition\.json/.test(p))  return 'sections';
+    if (/workshops\.json/.test(p))                   return 'workshops';
+    return 'unknown';
+}
+
 async function lAll() {
     try {
         const p = await iAll(SP), w = await iAll(SW);
@@ -1330,29 +1340,48 @@ async function lAll() {
             if (Array.isArray(m.changelog)) _setChangelog(m.changelog);
         }
     } catch (e) { console.warn('update.json не загрузился', e); }
-    if (!files.length) {
+        if (!files.length) {
         files = [
-            'data/parts-01-engine-fuel-ignition.json',
-            'data/parts-02-cooling-heating-brakes-suspension.json',
-            'data/parts-03-trans-exh-elec-bulbs.json',
-            'data/parts-04-body-interior-maint-fluids-roadkit.json',
-            'data/parts-05-rear-axle-controls.json',
-            'data/categories.json',
-            'data/sections.json',
-            'data/workshops.json'
+            { path: 'data/parts-01-engine-fuel-ignition.json',                   type: 'parts'      },
+            { path: 'data/parts-02-cooling-heating-brakes-suspension.json',      type: 'parts'      },
+            { path: 'data/parts-03-trans-exh-elec-bulbs.json',                   type: 'parts'      },
+            { path: 'data/parts-04-body-interior-maint-fluids-roadkit.json',     type: 'parts'      },
+            { path: 'data/parts-05-rear-axle-controls.json',                     type: 'parts'      },
+            { path: 'data/parts-07-engine-composition.json',                     type: 'parts'      },
+            { path: 'data/categories.json',                                      type: 'categories' },
+            { path: 'data/sections.json',                                        type: 'sections'   },
+            { path: 'data/workshops.json',                                       type: 'workshops'  }
         ];
     }
 
-    let serverParts = [], cats = null, secs = null, wss = null;
-    for (const f of files) {
+        let serverParts = [], cats = null, secs = null, wss = null;
+    for (const item of files) {
+        const f    = typeof item === 'string' ? item         : item.path;
+        const type = typeof item === 'string' ? _guessType(f) : item.type;
+
         try {
             const r = await fetch(f + '?t=' + Date.now(), { cache: 'no-store' });
             if (!r.ok) { console.warn('Не найден:', f); continue; }
             const data = await r.json();
-            if (/parts-/.test(f) && Array.isArray(data)) serverParts = serverParts.concat(data);
-            else if (/categories/.test(f) && Array.isArray(data)) cats = data;
-            else if (/sections/.test(f) && data && typeof data === 'object') secs = data;
-            else if (/workshops/.test(f) && Array.isArray(data)) wss = data;
+
+            switch (type) {
+                case 'parts':
+                    if (Array.isArray(data)) serverParts = serverParts.concat(data);
+                    break;
+                case 'categories':
+                    if (Array.isArray(data)) cats = data;
+                    break;
+                case 'sections':
+                    if (data && typeof data === 'object' && !Array.isArray(data)) {
+                        secs = Object.assign(secs || {}, data);
+                    }
+                    break;
+                case 'workshops':
+                    if (Array.isArray(data)) wss = data;
+                    break;
+                default:
+                    console.warn('Неизвестный тип файла:', f, '→', type);
+            }
         } catch (e) { console.warn('Ошибка ' + f, e); }
     }
 
@@ -1470,7 +1499,8 @@ const VIRTUAL_CATS = {
     Workshops: { label: 'Мастерские/СТО', icon: '🔧' },
     Log: { label: 'Журнал обслуживания', icon: '📖' },
     Diagnostics: { label: 'Диагностика (OBD)', icon: '🩺' },
-    Torque: { label: 'Моменты затяжки', icon: '🔩' }
+    Torque: { label: 'Моменты затяжки', icon: '🔩' },
+    
 };
 
 /* ============================================================

@@ -81,15 +81,42 @@
       ]
     }
   ],
-  "files": [
-    "data/engine-composition.json",
-    "data/parts-01-engine-fuel-ignition.json",
-    "data/parts-02-cooling-heating-brakes-suspension.json",
-    "data/parts-03-trans-exh-elec-bulbs.json",
-    "data/parts-04-body-interior-maint-fluids-roadkit.json",
-    "data/parts-05-rear-axle-controls.json",
-    "data/categories.json",
-    "data/sections.json",
-    "data/workshops.json"
+   "files": [
+    {
+      "path": "data/parts-01-engine-fuel-ignition.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-02-cooling-heating-brakes-suspension.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-03-trans-exh-elec-bulbs.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-04-body-interior-maint-fluids-roadkit.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-05-rear-axle-controls.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-07-engine-composition.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/categories.json",
+      "type": "categories"
+    },
+    {
+      "path": "data/sections.json",
+      "type": "sections"
+    },
+    {
+      "path": "data/workshops.json",
+      "type": "workshops"
+    }
   ]
 }

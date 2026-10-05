@@ -1,0 +1,5 @@
+#!/bin/bash
+V=$(date +%Y%m%d%H%M)
+sed -i "s/\(app\.css\)?v=[^\"']*/\1?v=$V/" index.html
+sed -i "s/\(app\.js\)?v=[^\"']*/\1?v=$V/" index.html
+echo "Bumped to $V"
