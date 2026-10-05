@@ -5,24 +5,36 @@
 /* ============ СПРАВОЧНИКИ ============ */
 const BASE_CATS = [
     { id: 'All', label: 'Все системы', icon: '📦' },
+
+    // ─── Сервис ──────────────────────────────
     { id: 'Maintenance', label: 'Регламент ТО', icon: '🔧' },
     { id: 'RoadKit', label: 'С собой в дорогу', icon: '🎒' },
-    { id: 'Engine', label: '1. Двигатель, Сцепление', icon: '⚙️' },
-    { id: 'Cooling', label: '1.1 Охлаждение', icon: '❄️', parent: 'Engine' },
-    { id: 'Ignition', label: '1.2 Зажигание', icon: '🔥', parent: 'Engine' },
-    { id: 'Fluids', label: '1.3 Жидкости', icon: '🛢️', parent: 'Engine' },
-    { id: 'Fuel', label: '2. Топливная система', icon: '⛽' },
-    { id: 'Exhaust', label: '2.1 Система выпуска ОГ', icon: '💨', parent: 'Fuel' },
-    { id: 'Heating', label: '2.2 Отопитель', icon: '🌡️', parent: 'Fuel' },
-    { id: 'Transmission', label: '3. Трансмиссия', icon: '' },
-    { id: 'Suspension', label: '4. Передняя ось, Дифференциал, Рулевое', icon: '🔩' },
-    { id: 'RearAxle', label: '5. Задняя ось', icon: '🔩' },
-    { id: 'Brakes', label: '6. Колёса, Тормозная система', icon: '🛞' },
-    { id: 'Controls', label: '7. Механизмы управления, Педальный узел', icon: '🎛️' },
-    { id: 'Body', label: '8. Кузов', icon: '🚗' },
-    { id: 'Electrical', label: '9. Электрика', icon: '💡' },
-    { id: 'Bulbs', label: '9.1 Освещение, Лампы', icon: '🔆', parent: 'Electrical' },
-    { id: 'Interior', label: '0. Аксессуары, Салон', icon: '🪑' },
+
+    // ─── Силовой агрегат ─────────────────────
+    { id: 'Engine', label: 'Двигатель', icon: '⚙️' },
+    { id: 'Cooling', label: 'Охлаждение', icon: '❄️', parent: 'Engine' },
+    { id: 'Ignition', label: 'Зажигание', icon: '🔥', parent: 'Engine' },
+    { id: 'Fuel', label: 'Топливная система', icon: '⛽' },
+    { id: 'Exhaust', label: 'Выпуск ОГ', icon: '💨', parent: 'Fuel' },
+    { id: 'Transmission', label: 'Трансмиссия', icon: '🔄' },
+
+    // ─── Ходовая часть ───────────────────────
+    { id: 'Suspension', label: 'Подвеска', icon: '🌀' },
+    { id: 'Steering', label: 'Рулевое управление', icon: '⎈' },
+    { id: 'Brakes', label: 'Тормозная система', icon: '🛑' },
+    { id: 'Controls', label: 'Приводы управления', icon: '🎛️' },
+
+    // ─── Кузов и салон ───────────────────────
+    { id: 'Body', label: 'Кузов', icon: '🚗' },
+    { id: 'Interior', label: 'Салон', icon: '🪑' },
+
+    // ─── Электрика и климат ──────────────────
+    { id: 'Electrical', label: 'Электрика', icon: '⚡' },
+    { id: 'Bulbs', label: 'Освещение', icon: '💡', parent: 'Electrical' },
+    { id: 'Climate', label: 'Климат', icon: '🌡️' },
+
+    // ─── Расходники ──────────────────────────
+    { id: 'Fluids', label: 'Жидкости', icon: '🛢️' },
     { id: 'Tires', label: 'Шины и давление', icon: '🛞' }
 ];
 let CATS = BASE_CATS.slice();
@@ -74,6 +86,50 @@ const BASE_EK = {
     Fluids: { g: 'Жидкости', s: 'Эксплуатационные' },
     RearAxle: { g: 'Задняя ось', s: 'Балка / Ступица' }, Controls: { g: 'Управление', s: 'Педали / Кулиса' }
 };
+/* ============================================================
+   ГРУППЫ КАТЕГОРИЙ — порядок и состав блоков в сайдбаре
+   Порядок соответствует физической логике автомобиля:
+   мотор → трансмиссия → ходовая → кузов → электрика → расходники
+   ============================================================ */
+const CAT_GROUPS = [
+    {
+        id: 'service',
+        label: 'Сервис',
+        cats: ['Maintenance', 'RoadKit']
+    },
+    {
+        id: 'powertrain',
+        label: 'Силовой агрегат',
+        cats: ['Engine', 'Fuel', 'Transmission']
+    },
+    {
+        id: 'chassis',
+        label: 'Ходовая часть',
+        cats: ['Suspension', 'Steering', 'Brakes', 'Controls']
+    },
+    {
+        id: 'body',
+        label: 'Кузов и салон',
+        cats: ['Body', 'Interior']
+    },
+    {
+        id: 'electro',
+        label: 'Электрика и климат',
+        cats: ['Electrical', 'Climate']
+    },
+    {
+        id: 'consumables',
+        label: 'Расходники',
+        cats: ['Fluids', 'Tires']
+    },
+    {
+        id: 'refs',
+        label: 'Справочники',
+        cats: ['Torque', 'Diagnostics', 'Workshops', 'Log'],
+        virtual: true   // ← эти ID не в CATS, обрабатываются отдельно
+    }
+];
+
 let EK = Object.assign({}, BASE_EK);
 
 const IL = { s: 'СПЕЦИФИКАЦИЯ', t: 'ИНСТРУМЕНТ', p: 'ПРОЦЕДУРА', w: 'ВНИМАНИЕ', n: 'ЗАМЕТКА', r: 'РЕКОМЕНДАЦИЯ' };
@@ -709,7 +765,10 @@ function toastUndo(msg, onUndo) {
     tuT = setTimeout(() => e.classList.remove('show'), 10000);
 }
 const sUS = () => { clearTimeout(usT); usT = setTimeout(sU, 300); };
-const dRC = () => { clearTimeout(rcT); rcT = setTimeout(rC, 120); };
+const dRC = () => {
+    clearTimeout(rcT);
+    rcT = setTimeout(() => { rSB(); rC(); }, 120);
+};
 
 /* ============ ГАРАЖ ============ */
 function gAV() {
@@ -741,11 +800,50 @@ function pCompat(p) {
     return { pct: best, cls, label };
 }
 
+/* ============================================================
+   VIN-индикатор — рендерится в #vinBar (внутри заголовка гаража)
+   ============================================================ */
+function rVinBar() {
+    const box = $('vinBar');
+    if (!box) return;
+
+    const av = gAV();
+    if (!av || !av.ok) { box.innerHTML = ''; return; }
+
+    const strictMark = SV.vinStrictFilter
+        ? '<span class="nd-vin-tag">строго</span>'
+        : '';
+
+    box.innerHTML =
+        '<span class="nd-vin">' +
+        '<span class="nd-vin-ic">🔒</span>' +
+        '<span class="nd-vin-lb">VIN …' + esc(av.vin.slice(-6)) + '</span>' +
+        strictMark +
+        '<button class="nd-vin-x" type="button" title="Снять VIN-фильтр">✕</button>' +
+        '</span>';
+
+    const btn = box.querySelector('.nd-vin-x');
+    if (btn) btn.onclick = (e) => {
+        e.stopPropagation();
+        SV.activeVinId = null;
+        SV.vinStrictFilter = false;
+        applyVinFilters();
+        sU(); rGar(); rSB(); rC();
+        toast('VIN-фильтр снят');
+    };
+}
+
 function rGar() {
     const l = $('gl'), c = $('gc');
     if (!l) return;
     c.textContent = G.length ? '(' + G.length + ')' : '';
-    if (!G.length) { l.innerHTML = '<div class="ge">Нет сохранённых машин</div>'; return; }
+
+    if (!G.length) {
+        l.innerHTML = '<div class="ge">Нет сохранённых машин</div>';
+        rVinBar();                      // ← очистит плашку
+        return;
+    }
+
     l.innerHTML = G.map(g => {
         const act = SV.activeVinId === g.id;
         const desc = [g.brand, g.model, g.year].filter(Boolean).join(' ');
@@ -778,6 +876,8 @@ function rGar() {
         h += '</div>';
         return h;
     }).join('');
+
+    rVinBar(); 
 }
 
 const VIN_BODY_MAP = {
@@ -813,9 +913,16 @@ function applyVinFilters() {
 }
 
 function setAV(id) {
+    const wasActive = !!SV.activeVinId;
     SV.activeVinId = SV.activeVinId === id ? null : id;
+
+    // При выборе VIN — включаем строгий режим; при снятии — выключаем
+    if (!wasActive && SV.activeVinId) SV.vinStrictFilter = true;
+    if (wasActive && !SV.activeVinId) SV.vinStrictFilter = false;
+
     applyVinFilters();
     sU(); rGar(); rSB(); rC();
+
     const info = gAV();
     const av = gAV();
     let extra = '';
@@ -1346,16 +1453,97 @@ const tMM = (e) => {
     $('sb').classList.contains('open-mobile') ? cMM() : oMM();
 };
 
+/* Виртуальные (не товарные) разделы — для сайдбара */
+const VIRTUAL_CATS = {
+    Workshops: { label: 'Мастерские/СТО', icon: '🔧' },
+    Log: { label: 'Журнал обслуживания', icon: '📖' },
+    Diagnostics: { label: 'Диагностика (OBD)', icon: '🩺' },
+    Torque: { label: 'Моменты затяжки', icon: '🔩' }
+};
+
+/* ============================================================
+   Отфильтрованный список для счётчиков в сайдбаре.
+   Учитывает: VIN-строго, статус, мотор, кузов, КПП,
+   поколение, поисковый запрос.
+   ============================================================ */
+function computeFilteredForSidebar() {
+    const t = nz(SV.searchQuery).split(/\s+/).filter(Boolean);
+    let f = D;
+
+    // VIN-строго
+    if (SV.activeVinId && SV.vinStrictFilter) {
+        f = f.filter(p => {
+            if (!p.donors || !p.donors.length) return true;
+            const cmp = pCompat(p);
+            return !cmp || cmp.cls !== 'n';
+        });
+    }
+
+    if (SV.statusFilter && SV.statusFilter !== 'all')
+        f = f.filter(p => (p.status || '') === SV.statusFilter);
+
+    if (SV.engineFilter && SV.engineFilter !== 'all')
+        f = f.filter(p => {
+            const arr = p.engines || [];
+            return !arr.length || arr.includes(SV.engineFilter);
+        });
+
+    if (SV.bodyFilter && SV.bodyFilter !== 'all')
+        f = f.filter(p => {
+            const arr = p.bodies || [];
+            return !arr.length || arr.includes(SV.bodyFilter);
+        });
+
+    if (SV.transFilter && SV.transFilter !== 'all')
+        f = f.filter(p => {
+            const arr = p.transmissions || [];
+            return !arr.length || arr.includes(SV.transFilter);
+        });
+
+    if (SV.genFilter && SV.genFilter !== 'all')
+        f = f.filter(p => {
+            const arr = p.gens || [];
+            return !arr.length || arr.includes(SV.genFilter);
+        });
+
+    if (t.length) f = f.filter(p => mP(p, t));
+    return f;
+}
+
 function rSB() {
     const n = $('nl'); n.innerHTML = '';
     if (!SV.expandedCats) SV.expandedCats = {};
+
+    // ── Фильтрованный список + раскладка по категориям ────────
+    const filtered = computeFilteredForSidebar();
+    const byCat = {};
+    let favCount = 0;
+    for (const p of filtered) {
+        byCat[p.cat] = (byCat[p.cat] || 0) + 1;
+        if (p.favorite) favCount++;
+    }
+
+    // ── Счётчики ──────────────────────────────────────────────
     const cnt = id => {
         const sec = CUSTOM.sections && CUSTOM.sections[id];
         if (sec && Array.isArray(sec.rows)) return sec.rows.length;
-        return D.filter(p => p.cat === id).length;
+
+        // Виртуальные разделы — не подлежат фильтрации
+        if (id === 'Workshops') return W.length;
+        if (id === 'Log') return LOG.length;
+        if (id === 'Diagnostics')
+            return (CUSTOM.sections.Diagnostics && CUSTOM.sections.Diagnostics.rows || []).length;
+        if (id === 'Torque')
+            return (CUSTOM.sections.Torque && CUSTOM.sections.Torque.rows || []).length;
+
+        if (id === 'All') return filtered.length;
+        if (id === 'Favorites') return favCount;
+
+        return byCat[id] || 0;
     };
 
-    const add = (id, ic, lb, count, cls, sub) => {
+    // ── Отрисовка пункта ─────────────────────────────────────
+    const addItem = (id, icon, label, count, cls, sub) => {
         const li = document.createElement('li');
         li.className = 'ni ' + (SV.activeCat === id ? 'active ' : '') + (cls || '') + (sub ? ' sub' : '');
         li.setAttribute('tabindex', '-1');
@@ -1364,10 +1552,16 @@ function rSB() {
             if (window.innerWidth <= 900) cMM();
             $('ca').scrollTop = 0;
         };
-        li.innerHTML = '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ic + ' ' + esc(lb) + '</span><span class="bdg">' + count + '</span>';
+        // Уменьшенный счётчик: показываем "найдено", если 0 — приглушаем
+        const dimStyle = (count === 0 && id !== 'All') ? ' style="opacity:.45"' : '';
+        li.innerHTML =
+            '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+            + icon + ' ' + esc(label) +
+            '</span><span class="bdg"' + dimStyle + '>' + count + '</span>';
         n.appendChild(li);
     };
 
+    // ── Папка с вложениями ───────────────────────────────────
     const addFolder = (c, kids) => {
         const expanded = !!SV.expandedCats[c.id];
         const total = cnt(c.id) + kids.reduce((s, k) => s + cnt(k.id), 0);
@@ -1377,41 +1571,45 @@ function rSB() {
         li.innerHTML =
             '<span class="fold-arr">▶</span>' +
             '<span class="fold-lb">' + c.icon + ' ' + esc(c.label) + '</span>' +
-            '<span class="bdg">' + total + '</span>';
+            '<span class="bdg"' + (total === 0 ? ' style="opacity:.45"' : '') + '>' + total + '</span>';
         li.onclick = () => {
             SV.expandedCats[c.id] = !SV.expandedCats[c.id];
             sU(); rSB();
         };
         n.appendChild(li);
-        if (expanded) kids.forEach(k => add(k.id, k.icon, k.label, cnt(k.id), '', true));
+        if (expanded) kids.forEach(k => addItem(k.id, k.icon, k.label, cnt(k.id), '', true));
     };
 
-    add('Favorites', '⭐', 'Избранное', D.filter(p => p.favorite).length, 'fav');
-    const dv = document.createElement('li'); dv.className = 'nd'; n.appendChild(dv);
-    add('All', '📦', 'Все системы', D.length);
+    // ── Заголовок группы ─────────────────────────────────────
+    const addSection = label => {
+        const li = document.createElement('li');
+        li.className = 'nd-label';
+        li.textContent = label;
+        n.appendChild(li);
+    };
 
-    const BOTTOM_IDS = ['Maintenance', 'RoadKit', 'Tires', 'Diagnostics', 'Torque'];
+    // ── ПИН-БЛОК (всегда сверху) ─────────────────
+    addItem('Favorites', '⭐', 'Избранное', cnt('Favorites'), 'fav');
+    addItem('All', '📦', 'Все системы', cnt('All'));
 
-    CATS.filter(c => c.id !== 'All' && !BOTTOM_IDS.includes(c.id) && !c.parent).forEach(c => {
-        const kids = CATS.filter(k => k.parent === c.id);
-        if (kids.length) {
-            addFolder(c, kids);
-        } else {
-            add(c.id, c.icon, c.label, cnt(c.id));
+    // ── ГРУППЫ ───────────────────────────────────────────────
+    for (const grp of CAT_GROUPS) {
+        addSection(grp.label);
+
+        for (const cid of grp.cats) {
+            if (grp.virtual && VIRTUAL_CATS[cid]) {
+                const v = VIRTUAL_CATS[cid];
+                addItem(cid, v.icon, v.label, cnt(cid));
+                continue;
+            }
+            const c = CATS.find(x => x.id === cid);
+            if (!c) continue;
+
+            const kids = CATS.filter(k => k.parent === cid);
+            if (kids.length) addFolder(c, kids);
+            else addItem(c.id, c.icon, c.label, cnt(c.id));
         }
-    });
-
-    const dv2 = document.createElement('li');
-    dv2.className = 'nd';
-    n.appendChild(dv2);
-
-    add('Workshops', '🔧', 'Мастерские/СТО', W.length);
-    add('Log', '📖', 'Журнал обслуживания', LOG.length);
-    add('Maintenance', '🔧', 'Регламент ТО', cnt('Maintenance'));
-    add('Diagnostics', '🩺', 'Диагностика (OBD)', cnt('Diagnostics'));
-    add('Tires', '🛞', 'Шины и давление', cnt('Tires'));
-    add('Torque', '🔩', 'Моменты затяжки', cnt('Torque'));
-    add('RoadKit', '🎒', 'С собой в дорогу', cnt('RoadKit'));
+    }
 }
 
 /* ============ ПОИСК / ФИЛЬТРЫ ============ */
@@ -1425,7 +1623,7 @@ function resetFilters() {
     SV.transFilter = 'all'; $('ftr').value = 'all';
     SV.genFilter = 'all'; if ($('fgen')) $('fgen').value = 'all';
     SV.sortBy = 'default'; $('ss').value = 'default';
-    updateFilterStyling(); sU(); rC();
+    updateFilterStyling(); sU(); rSB(); rC();
     toast('Фильтры сброшены', 'success');
 }
 function rD() {
@@ -1942,11 +2140,16 @@ function oCC(e) {
     const chip = e.target.closest('[data-chip]');
     if (chip) {
         const k = chip.dataset.chip;
-        if (k === 'groupBySub') SV.groupBySub = !SV.groupBySub;
-        else if (k === 'vinStrict') SV.vinStrictFilter = !SV.vinStrictFilter;
-        sU(); rC();
+        if (k === 'groupBySub') {
+            SV.groupBySub = !SV.groupBySub;
+            sU(); rC();
+        } else if (k === 'vinStrict') {
+            SV.vinStrictFilter = !SV.vinStrictFilter;
+            sU(); rGar(); rSB(); rC();   // ← rGar обновит метку «СТРОГО»
+        }
         return;
     }
+
     if (e.target.classList && e.target.classList.contains('cn')) return;
     const wb = e.target.closest('[data-wact]');
     if (wb) {
@@ -3044,13 +3247,14 @@ function bindUI() {
     uSC();
 
     si.addEventListener('input', e => { SV.searchQuery = e.target.value; uSC(); sUS(); dRC(); });
-    $('sf').addEventListener('change', e => { SV.statusFilter = e.target.value; sU(); rC(); });
+    $('sf').addEventListener('change', e => { SV.statusFilter = e.target.value; sU(); rSB(); rC(); });
     $('ss').addEventListener('change', e => { SV.sortBy = e.target.value; sU(); rC(); });
-    $('fmtr').addEventListener('change', e => { SV.engineFilter = e.target.value; updateFilterStyling(); sU(); rC(); });
-    $('fbdy').addEventListener('change', e => { SV.bodyFilter = e.target.value; updateFilterStyling(); sU(); rC(); });
-    $('ftr').addEventListener('change', e => { SV.transFilter = e.target.value; updateFilterStyling(); sU(); rC(); });
+    $('fmtr').addEventListener('change', e => { SV.engineFilter = e.target.value; updateFilterStyling(); sU(); rSB(); rC(); });
+    $('fbdy').addEventListener('change', e => { SV.bodyFilter = e.target.value; updateFilterStyling(); sU(); rSB(); rC(); });
+    $('ftr').addEventListener('change', e => { SV.transFilter = e.target.value; updateFilterStyling(); sU(); rSB(); rC(); });
+
     const _fgen = $('fgen');
-    if (_fgen) _fgen.addEventListener('change', e => { SV.genFilter = e.target.value; sU(); rC(); });
+    if (_fgen) _fgen.addEventListener('change', e => { SV.genFilter = e.target.value; sU(); rSB(); rC(); });
     $('if').addEventListener('change', oIF);
     $('pf').addEventListener('change', oPF);
 
