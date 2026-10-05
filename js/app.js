@@ -224,7 +224,7 @@ const THEMES = [
 const DB = [];
 let D = [], W = [], G = [], LOG = [];
 let SV = {
-    activeCat: 'All', searchQuery: '', statusFilter: 'all', engineFilter: 'all',
+    activeCat: 'All', activeSub: null, searchQuery: '', statusFilter: 'all', engineFilter: 'all',
     bodyFilter: 'all', trimFilter: 'all', transFilter: 'all', genFilter: 'all',
     sidebarCollapsed: false,
     theme: 'aurora', sortBy: 'default', view: 'grid', activeVinId: null,
@@ -648,8 +648,21 @@ function lMeta() {
             CUSTOM.sections = Object.assign({}, m.sections);
             for (const sid of Object.keys(m.sections)) {
                 const s = m.sections[sid]; if (!s) continue;
-                if (!CATS.find(x => x.id === sid)) CATS.push({ id: sid, label: s.label || sid, icon: s.icon || '📋' });
+                const ex = CATS.find(x => x.id === sid);
+                if (ex) {
+                    ex.label = s.label || ex.label;
+                    ex.icon = s.icon || ex.icon;
+                    if (s.parent) ex.parent = s.parent;
+                } else {
+                    CATS.push({
+                        id: sid,
+                        label: s.label || sid,
+                        icon: s.icon || '📋',
+                        parent: s.parent || null
+                    });
+                }
             }
+
         }
     } catch (e) { }
 }
@@ -1316,10 +1329,10 @@ function applyUpMerge() {
 /* ============ ЗАГРУЗКА ============ */
 function _guessType(path) {
     const p = String(path || '').toLowerCase();
-    if (/parts-\d|parts\.json|\/parts\//.test(p))    return 'parts';
-    if (/categories\.json/.test(p))                  return 'categories';
-    if (/sections\.json|composition\.json/.test(p))  return 'sections';
-    if (/workshops\.json/.test(p))                   return 'workshops';
+    if (/parts-\d|parts\.json|\/parts\//.test(p)) return 'parts';
+    if (/categories\.json/.test(p)) return 'categories';
+    if (/sections\.json|composition\.json/.test(p)) return 'sections';
+    if (/workshops\.json/.test(p)) return 'workshops';
     return 'unknown';
 }
 
@@ -1340,23 +1353,23 @@ async function lAll() {
             if (Array.isArray(m.changelog)) _setChangelog(m.changelog);
         }
     } catch (e) { console.warn('update.json не загрузился', e); }
-        if (!files.length) {
+    if (!files.length) {
         files = [
-            { path: 'data/parts-01-engine-fuel-ignition.json',                   type: 'parts'      },
-            { path: 'data/parts-02-cooling-heating-brakes-suspension.json',      type: 'parts'      },
-            { path: 'data/parts-03-trans-exh-elec-bulbs.json',                   type: 'parts'      },
-            { path: 'data/parts-04-body-interior-maint-fluids-roadkit.json',     type: 'parts'      },
-            { path: 'data/parts-05-rear-axle-controls.json',                     type: 'parts'      },
-            { path: 'data/parts-07-engine-composition.json',                     type: 'parts'      },
-            { path: 'data/categories.json',                                      type: 'categories' },
-            { path: 'data/sections.json',                                        type: 'sections'   },
-            { path: 'data/workshops.json',                                       type: 'workshops'  }
+            { path: 'data/parts-01-engine-fuel-ignition.json', type: 'parts' },
+            { path: 'data/parts-02-cooling-heating-brakes-suspension.json', type: 'parts' },
+            { path: 'data/parts-03-trans-exh-elec-bulbs.json', type: 'parts' },
+            { path: 'data/parts-04-body-interior-maint-fluids-roadkit.json', type: 'parts' },
+            { path: 'data/parts-05-rear-axle-controls.json', type: 'parts' },
+            { path: 'data/parts-07-engine-composition.json', type: 'parts' },
+            { path: 'data/categories.json', type: 'categories' },
+            { path: 'data/sections.json', type: 'sections' },
+            { path: 'data/workshops.json', type: 'workshops' }
         ];
     }
 
-        let serverParts = [], cats = null, secs = null, wss = null;
+    let serverParts = [], cats = null, secs = null, wss = null;
     for (const item of files) {
-        const f    = typeof item === 'string' ? item         : item.path;
+        const f = typeof item === 'string' ? item : item.path;
         const type = typeof item === 'string' ? _guessType(f) : item.type;
 
         try {
@@ -1500,7 +1513,8 @@ const VIRTUAL_CATS = {
     Log: { label: 'Журнал обслуживания', icon: '📖' },
     Diagnostics: { label: 'Диагностика (OBD)', icon: '🩺' },
     Torque: { label: 'Моменты затяжки', icon: '🔩' },
-    
+
+
 };
 
 /* ============================================================
@@ -1590,11 +1604,12 @@ function rSB() {
         li.className = 'ni ' + (SV.activeCat === id ? 'active ' : '') + (cls || '') + (sub ? ' sub' : '');
         li.setAttribute('tabindex', '-1');
         li.onclick = () => {
-            SV.activeCat = id; sU(); rSB(); rC();
+            SV.activeCat = id;
+            SV.activeSub = null;         // ← сброс подкатегории
+            sU(); rSB(); rC();
             if (window.innerWidth <= 900) cMM();
             $('ca').scrollTop = 0;
         };
-        // Уменьшенный счётчик: показываем "найдено", если 0 — приглушаем
         const dimStyle = (count === 0 && id !== 'All') ? ' style="opacity:.45"' : '';
         li.innerHTML =
             '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
@@ -1636,6 +1651,76 @@ function rSB() {
 
     // ── ГРУППЫ ───────────────────────────────────────────────
     for (const grp of CAT_GROUPS) {
+        // ── Папка «Двигатель» с подкатегориями из данных ──────────
+        const addEngineFolder = (c) => {
+            // Собираем уникальные sub у деталей категории Engine
+            const subs = new Map();
+            for (const p of filtered) {
+                if (p.cat !== 'Engine') continue;
+                const s = (p.sub || '').trim();
+                if (!s) continue;
+                subs.set(s, (subs.get(s) || 0) + 1);
+            }
+            const subList = Array.from(subs.entries())
+                .sort((a, b) => a[0].localeCompare(b[0], 'ru'));
+
+            const total = cnt(c.id);
+            const expanded = !!SV.expandedCats[c.id];
+            const isAllActive = SV.activeCat === 'Engine' && !SV.activeSub;
+
+            const li = document.createElement('li');
+            li.className = 'ni folder' + (expanded ? ' open' : '') + (isAllActive ? ' active' : '');
+            li.setAttribute('tabindex', '-1');
+            li.innerHTML =
+                '<span class="fold-arr">▶</span>' +
+                '<span class="fold-lb">' + c.icon + ' ' + esc(c.label) + '</span>' +
+                '<span class="bdg"' + (total === 0 ? ' style="opacity:.45"' : '') + '>' + total + '</span>';
+            li.onclick = () => {
+                SV.expandedCats[c.id] = !SV.expandedCats[c.id];
+                sU(); rSB();
+            };
+            n.appendChild(li);
+
+            if (!expanded) return;
+
+            // Пункт «Все разделы» — сброс подкатегории
+            const allLi = document.createElement('li');
+            allLi.className = 'ni sub' + (isAllActive ? ' active' : '');
+            allLi.setAttribute('tabindex', '-1');
+            allLi.innerHTML =
+                '<span style="flex:1;min-width:0">📦 Все разделы</span>' +
+                '<span class="bdg">' + total + '</span>';
+            allLi.onclick = (e) => {
+                e.stopPropagation();
+                SV.activeCat = 'Engine';
+                SV.activeSub = null;
+                sU(); rSB(); rC();
+                if (window.innerWidth <= 900) cMM();
+                $('ca').scrollTop = 0;
+            };
+            n.appendChild(allLi);
+
+            // Сами подкатегории
+            subList.forEach(([sub, count]) => {
+                const subActive = SV.activeCat === 'Engine' && SV.activeSub === sub;
+                const sli = document.createElement('li');
+                sli.className = 'ni sub' + (subActive ? ' active' : '');
+                sli.setAttribute('tabindex', '-1');
+                sli.innerHTML =
+                    '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+                    + esc(sub) + '</span>' +
+                    '<span class="bdg"' + (count === 0 ? ' style="opacity:.45"' : '') + '>' + count + '</span>';
+                sli.onclick = (e) => {
+                    e.stopPropagation();
+                    SV.activeCat = 'Engine';
+                    SV.activeSub = sub;
+                    sU(); rSB(); rC();
+                    if (window.innerWidth <= 900) cMM();
+                    $('ca').scrollTop = 0;
+                };
+                n.appendChild(sli);
+            });
+        };
         addSection(grp.label);
 
         for (const cid of grp.cats) {
@@ -1646,6 +1731,11 @@ function rSB() {
             }
             const c = CATS.find(x => x.id === cid);
             if (!c) continue;
+
+            if (cid === 'Engine') {          // ← НОВАЯ ветка
+                addEngineFolder(c);
+                continue;
+            }
 
             const kids = CATS.filter(k => k.parent === cid);
             if (kids.length) addFolder(c, kids);
@@ -1725,9 +1815,14 @@ function gF() {
             return !cmp || cmp.cls !== 'n';
         });
     }
-    if (SV.activeCat === 'Favorites') f = f.filter(p => p.favorite);
-    else if (SV.activeCat !== 'All' && SV.activeCat !== 'Workshops' && SV.activeCat !== 'Log') f = f.filter(p => p.cat === SV.activeCat);
-    if (SV.statusFilter && SV.statusFilter !== 'all') f = f.filter(p => (p.status || '') === SV.statusFilter);
+    if (SV.activeCat === 'Favorites') {
+        f = f.filter(p => p.favorite);
+    } else if (SV.activeCat !== 'All' && SV.activeCat !== 'Workshops' && SV.activeCat !== 'Log') {
+        f = f.filter(p => p.cat === SV.activeCat);
+        if (SV.activeSub) {
+            f = f.filter(p => (p.sub || '').trim() === SV.activeSub);
+        }
+    }
     if (SV.engineFilter && SV.engineFilter !== 'all') f = f.filter(p => {
         const arr = p.engines || [];
         return !arr.length || arr.includes(SV.engineFilter);
@@ -1792,6 +1887,7 @@ function rC() {
         const c = CATS.find(x => x.id === SV.activeCat);
         title = c ? c.label : '?';
         icon = c ? c.icon : '📦';
+        if (SV.activeSub) title += ' → ' + SV.activeSub;
     }
     let h = '<h2 class="sh">' + icon + ' ' + esc(title) + '</h2>';
 
@@ -1803,6 +1899,12 @@ function rC() {
     if (SV.genFilter && SV.genFilter !== 'all') chips.push('<span class="chip">🚘 ' + esc(GENERATIONS[SV.genFilter] || SV.genFilter) + '</span>');
     if (SV.statusFilter && SV.statusFilter !== 'all') chips.push('<span class="chip">🏷 ' + esc(SV.statusFilter) + '</span>');
     if (SV.searchQuery) chips.push('<span class="chip">🔍 "' + esc(SV.searchQuery) + '"</span>');
+    if (SV.activeSub) {
+    chips.push(
+        '<span class="chip" data-chip="clearSub" style="cursor:pointer" title="Показать весь раздел">'
+        + '📂 ' + esc(SV.activeSub) + ' ✕</span>'
+    );
+}
     chips.push('<span class="chip" data-chip="groupBySub" style="cursor:pointer;' + (SV.groupBySub ? 'border-color:var(--a);background:rgba(0,176,240,.12);' : '') + '" title="Группировать по подкатегориям">📂 Группы</span>');
     const av = gAV();
     if (av) {
