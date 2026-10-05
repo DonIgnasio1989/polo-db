@@ -7,7 +7,8 @@
   <meta name="theme-color" content="#0a1830">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>VW Polo/Caddy 1995–2003 — База Мастера</title>
-  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/app.css?v=1.2.4">
+  
 </head>
 
 <body class="theme-aurora">
@@ -70,10 +71,13 @@
     <details class="gb" id="garageBox" open>
       <summary class="gb-header">
         <span>🚗 Гараж <span class="gc" id="gc"></span></span>
+        <span id="vinBar" onclick="event.stopPropagation()"></span>
       </summary>
       <div class="gl" id="gl"></div>
       <button class="gab" id="gab">+ Добавить VIN</button>
     </details>
+
+    <ul class="nl" id="nl"></ul>
 
     <ul class="nl" id="nl"></ul>
 
@@ -646,8 +650,7 @@
           <div class="up-sec-h">📦 База данных (каталог)</div>
           <div class="fg">
             <label>URL источника обновления (JSON)</label>
-            <input type="url" id="up_url" placeholder="https://example.com/polo_db.json"
-            value="data/parts.json">
+            <input type="url" id="up_url" placeholder="https://example.com/polo_db.json" value="data/parts.json">
             <div class="fh">Прямая ссылка на JSON с позициями каталога. Источник должен поддерживать CORS.</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -1065,7 +1068,7 @@
 
   <!-- ============ ПЛАШКА «ЧТО НОВОГО» ============ -->
   <div class="whatsnew" id="whatsnew"></div>
-  <script src="js/app.js?v=2" defer></script>
+  <script src="js/app.js?v=3" defer></script>
 </body>
 
 </html>
