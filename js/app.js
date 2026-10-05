@@ -20,8 +20,9 @@ const BASE_CATS = [
 
     // ─── Ходовая часть ───────────────────────
     { id: 'Suspension', label: 'Подвеска', icon: '🌀' },
-    { id: 'Steering', label: 'Рулевое управление', icon: '⎈' },
+    { id: 'Steering', label: 'Рулевое управление', icon: '⎈', parent: 'Suspension' },
     { id: 'Brakes', label: 'Тормозная система', icon: '🛑' },
+    { id: 'RearAxle', label: 'Задняя ось', icon: '🔗' },       // ← ДОБАВЛЕНО
     { id: 'Controls', label: 'Приводы управления', icon: '🎛️' },
 
     // ─── Кузов и салон ───────────────────────
@@ -31,7 +32,7 @@ const BASE_CATS = [
     // ─── Электрика и климат ──────────────────
     { id: 'Electrical', label: 'Электрика', icon: '⚡' },
     { id: 'Bulbs', label: 'Освещение', icon: '💡', parent: 'Electrical' },
-    { id: 'Climate', label: 'Климат', icon: '🌡️' },
+    { id: 'Heating', label: 'Отопление / Климат', icon: '🌡️' }, // ← ЗАМЕНА Climate
 
     // ─── Расходники ──────────────────────────
     { id: 'Fluids', label: 'Жидкости', icon: '🛢️' },
@@ -75,17 +76,28 @@ const GENERATIONS = {
 const TRIMS = ['Base', 'CL', 'GL', 'Trendline', 'Comfortline', 'Highline', 'Open Air'];
 
 const BASE_EK = {
-    Maintenance: { g: 'Регламент ТО', s: 'Обслуживание' }, RoadKit: { g: 'С собой в дорогу', s: 'Аварийный набор' },
-    Engine: { g: 'Двигатель', s: 'ГРМ / Ремни' }, Fuel: { g: 'Топливная', s: 'Подача / Фильтры' },
-    Ignition: { g: 'Зажигание', s: 'Свечи / Катушки' }, Cooling: { g: 'Охлаждение', s: 'Радиатор / Термостат' },
-    Heating: { g: 'Отопление', s: 'Печка / Климат' }, Suspension: { g: 'Подвеска', s: 'Передняя / Задняя' },
-    Brakes: { g: 'Тормоза', s: 'Передние / Задние' }, Transmission: { g: 'Трансмиссия', s: 'КПП / Привод' },
-    Exhaust: { g: 'Выхлоп', s: 'Глушитель' }, Electrical: { g: 'Электрика', s: 'Генератор / Стартер' },
-    Bulbs: { g: 'Лампы', s: 'Освещение' }, Body: { g: 'Кузов', s: 'Наружные панели' },
-    Interior: { g: 'Интерьер', s: 'Панель / Сиденья' }, Tires: { g: 'Колёса', s: 'Шины и давление' },
-    Fluids: { g: 'Жидкости', s: 'Эксплуатационные' },
-    RearAxle: { g: 'Задняя ось', s: 'Балка / Ступица' }, Controls: { g: 'Управление', s: 'Педали / Кулиса' }
+    Maintenance: { g: 'Регламент ТО', s: 'Обслуживание' },
+    RoadKit:     { g: 'С собой в дорогу', s: 'Аварийный набор' },
+    Engine:      { g: 'Двигатель', s: 'ГРМ / Ремни' },
+    Fuel:        { g: 'Топливная', s: 'Подача / Фильтры' },
+    Ignition:    { g: 'Зажигание', s: 'Свечи / Катушки' },
+    Cooling:     { g: 'Охлаждение', s: 'Радиатор / Термостат' },
+    Heating:     { g: 'Отопление', s: 'Печка / Климат' },
+    Suspension:  { g: 'Подвеска', s: 'Передняя / Задняя' },
+    Steering:    { g: 'Рулевое', s: 'Рейка / Тяги' },              // ← ДОБАВЛЕНО
+    Brakes:      { g: 'Тормоза', s: 'Передние / Задние' },
+    Transmission:{ g: 'Трансмиссия', s: 'КПП / Привод' },
+    Exhaust:     { g: 'Выхлоп', s: 'Глушитель' },
+    Electrical:  { g: 'Электрика', s: 'Генератор / Стартер' },
+    Bulbs:       { g: 'Лампы', s: 'Освещение' },
+    Body:        { g: 'Кузов', s: 'Наружные панели' },
+    Interior:    { g: 'Интерьер', s: 'Панель / Сиденья' },
+    Tires:       { g: 'Колёса', s: 'Шины и давление' },
+    Fluids:      { g: 'Жидкости', s: 'Эксплуатационные' },
+    RearAxle:    { g: 'Задняя ось', s: 'Балка / Ступица' },        // ← уже было
+    Controls:    { g: 'Управление', s: 'Педали / Кулиса' }
 };
+
 /* ============================================================
    ГРУППЫ КАТЕГОРИЙ — порядок и состав блоков в сайдбаре
    Порядок соответствует физической логике автомобиля:
@@ -105,7 +117,7 @@ const CAT_GROUPS = [
     {
         id: 'chassis',
         label: 'Ходовая часть',
-        cats: ['Suspension', 'Steering', 'Brakes', 'Controls']
+        cats: ['Suspension', 'Brakes', 'RearAxle', 'Controls']   // RearAxle добавлен
     },
     {
         id: 'body',
@@ -115,7 +127,7 @@ const CAT_GROUPS = [
     {
         id: 'electro',
         label: 'Электрика и климат',
-        cats: ['Electrical', 'Climate']
+        cats: ['Electrical', 'Heating']                            // Heating вместо Climate
     },
     {
         id: 'consumables',
@@ -126,7 +138,7 @@ const CAT_GROUPS = [
         id: 'refs',
         label: 'Справочники',
         cats: ['Torque', 'Diagnostics', 'Workshops', 'Log'],
-        virtual: true   // ← эти ID не в CATS, обрабатываются отдельно
+        virtual: true
     }
 ];
 

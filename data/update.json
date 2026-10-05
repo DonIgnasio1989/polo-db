@@ -82,6 +82,7 @@
     }
   ],
   "files": [
+    "data/engine-composition.json",
     "data/parts-01-engine-fuel-ignition.json",
     "data/parts-02-cooling-heating-brakes-suspension.json",
     "data/parts-03-trans-exh-elec-bulbs.json",
