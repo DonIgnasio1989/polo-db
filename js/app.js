@@ -22,7 +22,7 @@ const BASE_CATS = [
     { id: 'Suspension', label: 'Подвеска', icon: '🌀' },
     { id: 'Steering', label: 'Рулевое управление', icon: '⎈', parent: 'Suspension' },
     { id: 'Brakes', label: 'Тормозная система', icon: '🛑' },
-    { id: 'RearAxle', label: 'Задняя ось', icon: '🔗' },       // ← ДОБАВЛЕНО
+    { id: 'RearAxle', label: 'Задняя ось', icon: '🔗' },
     { id: 'Controls', label: 'Приводы управления', icon: '🎛️' },
 
     // ─── Кузов и салон ───────────────────────
@@ -32,7 +32,7 @@ const BASE_CATS = [
     // ─── Электрика и климат ──────────────────
     { id: 'Electrical', label: 'Электрика', icon: '⚡' },
     { id: 'Bulbs', label: 'Освещение', icon: '💡', parent: 'Electrical' },
-    { id: 'Heating', label: 'Отопление / Климат', icon: '🌡️' }, // ← ЗАМЕНА Climate
+    { id: 'Heating', label: 'Отопление / Климат', icon: '🌡️' },
 
     // ─── Расходники ──────────────────────────
     { id: 'Fluids', label: 'Жидкости', icon: '🛢️' },
@@ -75,16 +75,304 @@ const GENERATIONS = {
 };
 const TRIMS = ['Base', 'CL', 'GL', 'Trendline', 'Comfortline', 'Highline', 'Open Air'];
 
+/* ============ АЛИАСЫ ПОДКАТЕГОРИЙ (по категориям) ============ */
+const SUB_ALIASES = {
+    _all: {
+        '': 'Прочее',
+        'Разное': 'Прочее',
+        'Прочее': 'Прочее',
+        'Крепёж': 'Крепёж',
+        'Крепёж и прокладки': 'Крепёж',
+        'Болты и гайки': 'Крепёж',
+    },
+
+    Engine: {
+        'Двигатель в сборе': 'Двигатель в сборе и блок цилиндров',
+        'Блок цилиндров в сборе': 'Двигатель в сборе и блок цилиндров',
+        'Блок цилиндров — детали': 'Двигатель в сборе и блок цилиндров',
+        'Блок цилиндров и поршневая': 'Двигатель в сборе и блок цилиндров',
+        'Поршни': 'Двигатель в сборе и блок цилиндров',
+        'Шатуны': 'Двигатель в сборе и блок цилиндров',
+        'Вкладыши': 'Двигатель в сборе и блок цилиндров',
+        'ГБЦ': 'ГБЦ и клапаны',
+        'ГБЦ и клапанный механизм': 'ГБЦ и клапаны',
+        'Клапаны': 'ГБЦ и клапаны',
+        'Распредвал': 'ГБЦ и клапаны',
+        'Пружины и тарелки': 'ГБЦ и клапаны',
+        'Направляющие втулки': 'ГБЦ и клапаны',
+        'Маслосъёмные колпачки': 'ГБЦ и клапаны',
+        'ГРМ и приводы': 'ГРМ',
+        'Привод ГРМ': 'ГРМ',
+        'Система смазки': 'Смазка и охлаждение',
+        'Система охлаждения': 'Смазка и охлаждение',
+        'Фильтры': 'Воздух и топливо',
+        'Форсунки': 'Воздух и топливо',
+        'Бак / Насос': 'Воздух и топливо',
+        'Экология': 'Воздух и топливо',
+        'Система впрыска': 'Воздух и топливо',
+        'Система впрыска и зажигания': 'Зажигание и датчики',
+        'Впускной коллектор': 'Воздух и топливо',
+        'Свечи': 'Зажигание и датчики',
+        'Катушка': 'Зажигание и датчики',
+        'Провода': 'Зажигание и датчики',
+        'Трамблёр': 'Зажигание и датчики',
+        'Датчики': 'Зажигание и датчики',
+        'Система зажигания': 'Зажигание и датчики',
+        'Навесное': 'Навесное оборудование',
+        'Гидроусилитель руля (опция)': 'Навесное оборудование',
+        'Насос ГУР и приводной ремень': 'Навесное оборудование',
+        'Навесное оборудование и приводы': 'Навесное оборудование',
+        'Опоры двигателя': 'Опоры и сцепление',
+        'Прокладки': 'Прокладки и крепёж',
+        'Сальники': 'Прокладки и крепёж',
+        'Крепёж и прокладки': 'Прокладки и крепёж',
+    },
+
+    Fuel: {
+        'Форсунки': 'Форсунки',
+        'Бак / Насос': 'Бак и насос',
+        'Экология': 'Экология (EVAP)',
+        'Датчики': 'Датчики',
+        'Система впрыска': 'Форсунки',
+        'Система впрыска и зажигания': 'Форсунки',
+    },
+
+    Ignition: {
+        'Свечи': 'Свечи',
+        'Катушка': 'Катушка',
+        'Провода': 'Провода',
+        'Трамблёр': 'Трамблёр',
+        'Датчики': 'Датчики',
+        'Система зажигания': 'Прочее',
+    },
+
+    Cooling: {
+        'Термостат / Помпа': 'Помпа и термостат',
+        'Помпа': 'Помпа и термостат',
+        'Радиатор': 'Радиатор',
+        'Датчики': 'Датчики',
+        'Патрубки': 'Патрубки и шланги',
+        'Шланги ОЖ': 'Патрубки и шланги',
+        'Трубопроводы': 'Патрубки и шланги',
+        'Фитинги': 'Патрубки и шланги',
+        'Хомуты': 'Патрубки и шланги',
+        'Вентилятор': 'Вентилятор',
+        'Расширительный бачок': 'Расширительный бачок',
+        'Система охлаждения': 'Прочее',
+        'Кондиционер': 'Кондиционер',
+    },
+
+    Heating: {
+        'Радиатор печки': 'Радиатор печки',
+        'Резистор': 'Резистор и моторчик',
+        'Моторчик': 'Резистор и моторчик',
+    },
+
+    Brakes: {
+        'Передние': 'Передние тормоза',
+        'Передние тормоза': 'Передние тормоза',
+        'Передний суппорт': 'Передние тормоза',
+        'Задние': 'Задние тормоза',
+        'Задние тормоза': 'Задние тормоза',
+        'ГТЦ': 'ГТЦ и ВУТ',
+        'ГТЦ и ВУТ': 'ГТЦ и ВУТ',
+        'ABS': 'ABS',
+        'Тормозная система с ABS': 'ABS',
+        'Шланги': 'Шланги и трубки',
+        'Шланги и трубки': 'Шланги и трубки',
+        'Трубки и штуцеры': 'Шланги и трубки',
+    },
+
+    Suspension: {
+        'Передняя': 'Передняя подвеска',
+        'Передняя подвеска': 'Передняя подвеска',
+        'Рычаги': 'Передняя подвеска',
+        'Стабилизатор': 'Передняя подвеска',
+        'Задняя': 'Задняя подвеска',
+        'Задняя подвеска': 'Задняя подвеска',
+        'Ступица': 'Ступица',
+        'ШРУС': 'Приводы и ШРУС',
+        'Крепёж подвески': 'Крепёж подвески',
+        'Болты и гайки': 'Крепёж подвески',
+        'Инструмент': 'Инструмент',
+        'Рулевое': 'ПЕРЕКИНУТЬ→Steering',
+        'Рулевое управление': 'ПЕРЕКИНУТЬ→Steering',
+    },
+
+    Steering: {
+        'Рулевое': 'Рейка и тяги',
+        'Рулевое управление': 'Рейка и тяги',
+        'Рейка': 'Рейка и тяги',
+        'Тяги': 'Рейка и тяги',
+        'ГУР': 'ГУР',
+    },
+
+    RearAxle: {
+        'Балка': 'Балка',
+        'Сайлентблоки': 'Сайлентблоки',
+        'Пружины': 'Пружины',
+        'Амортизаторы': 'Амортизаторы',
+        'Ступица': 'Ступица',
+        'Барабаны / Колодки': 'Барабаны и колодки',
+        'Ремкомплект': 'Ремкомплект',
+        'Тросы / Шланги': 'Тросы и шланги',
+    },
+
+    Transmission: {
+        'Сцепление': 'Сцепление',
+        'КПП / Масла': 'КПП и масла',
+        'КПП': 'КПП и масла',
+        'Первичный вал': 'Валы и подшипники',
+        'Вторичный вал': 'Валы и подшипники',
+        'Валы': 'Валы и подшипники',
+        'Дифференциал': 'Дифференциал',
+        'Шток переключения': 'Кулиса',
+        'Тяги и шарниры': 'Кулиса',
+        'Трос КПП': 'Кулиса',
+        'Кольца': 'Синхронизаторы',
+        'Стопорные кольца': 'Синхронизаторы',
+        'Прокладки': 'Прокладки и крепёж',
+        'Приводы': 'Приводы и ШРУС',
+        'ШРУС': 'Приводы и ШРУС',
+    },
+
+    Exhaust: {
+        'Глушитель': 'Глушитель',
+        'Крепёж': 'Крепёж',
+        'Выхлопная система': 'Глушитель',
+    },
+
+    Electrical: {
+        'Питание': 'Питание',
+        'Генератор': 'Генератор и стартер',
+        'Стартер': 'Генератор и стартер',
+        'Генератор и стартер': 'Генератор и стартер',
+        'Замок': 'Замок зажигания',
+        'Датчики': 'Датчики',
+        'Реле': 'Реле и предохранители',
+        'Реле и предохранители': 'Реле и предохранители',
+        'Приборная панель': 'Приборная панель',
+        'Стеклоподъёмники': 'Стеклоподъёмники',
+        'Центральный замок': 'Центральный замок',
+        'Подогрев сидений': 'Подогрев сидений',
+        'Бортовой компьютер': 'Бортовой компьютер',
+        'Иммобилайзер': 'Иммобилайзер',
+        'Магнитола': 'Магнитола и динамики',
+        'Динамики': 'Магнитола и динамики',
+        'Обогрев стёкол': 'Обогрев стёкол',
+        'Сигнализация': 'Сигнализация',
+        'Прикуриватель': 'Прикуриватель',
+        'Освещение': 'Освещение',
+    },
+
+    Bulbs: {
+        'Освещение': 'Лампы',
+        'Оптика': 'Оптика',
+    },
+
+    Body: {
+        'Обвес GTI': 'Обвес',
+        'Зеркала': 'Зеркала',
+        'Стёкла': 'Стёкла',
+        'Капот / Двери': 'Наружные панели',
+        'Решётка радиатора': 'Наружные панели',
+        'Крылья': 'Наружные панели',
+        'Бампер': 'Наружные панели',
+        'Передняя часть': 'Наружные панели',
+        'Задняя часть': 'Наружные панели',
+        'Боковая часть': 'Наружные панели',
+        'Кузовные элементы': 'Наружные панели',
+        'Замки': 'Замки и ручки',
+        'Уплотнители': 'Уплотнители',
+        'Двери': 'Двери',
+        'Люк (сдвижной верх)': 'Люк',
+        'Люк (универсальный)': 'Люк',
+        'Тюнинг/аксессуары': 'Аксессуары',
+        'ВАЗ-совместимость': 'ВАЗ-совместимость',
+        'Электрические зеркала': 'Зеркала',
+        'Крепёж и декор': 'Крепёж',
+    },
+
+    Interior: {
+        'Сиденья': 'Сиденья',
+        'Обшивка': 'Обшивка дверей',
+        'Обшивка дверей': 'Обшивка дверей',
+        'Освещение': 'Освещение салона',
+        'Руль': 'Руль',
+        'Прочее': 'Прочее',
+        'Безопасность': 'Безопасность',
+        'Накладки и консоль': 'Панель и консоль',
+        'Панель приборов': 'Панель и консоль',
+        'Бардачок и вещевые ящики': 'Панель и консоль',
+        'Пепельница': 'Панель и консоль',
+        'Консоль': 'Панель и консоль',
+        'Каркас и направляющие': 'Сиденья',
+        'Обивка и накладки': 'Сиденья',
+        'Накладки': 'Сиденья',
+        'Ручки и замки': 'Ручки и замки',
+        'Плафоны': 'Освещение салона',
+        'Выключатели': 'Освещение салона',
+        'Потолок': 'Потолок',
+        'Ручки': 'Потолок',
+        'Петли и крепления': 'Потолок',
+        'Ковры и накладки': 'Ковры',
+        'Аксессуары': 'Аксессуары',
+    },
+
+    Maintenance: {
+        'Фильтры': 'Фильтры',
+        'Регламент': 'Регламент ТО',
+        'Жидкости': 'Жидкости',
+        'Прокачка': 'Жидкости',
+        'Шины': 'Шины',
+        'Моторные масла': 'Моторные масла',
+        'Смазки': 'Смазки',
+        'Стеклоочиститель': 'Стеклоочиститель',
+    },
+
+    Fluids: {
+        'Моторные масла': 'Моторные масла',
+        'Антифриз': 'Антифриз',
+        'Смазки': 'Смазки',
+        'Кондиционер': 'Фреон и масло кондиционера',
+        'Гидроусилитель руля': 'Жидкость ГУР',
+        'Тормозная жидкость': 'Тормозная жидкость',
+    },
+
+    RoadKit: {
+        'Аварийный набор': 'Аварийный набор',
+    },
+
+    Tires: {
+        'Шины — Хэтчбек 3d/5d': 'Хэтчбек 3d/5d',
+        'Шины — Classic (седан)': 'Classic (седан)',
+        'Шины — Estate / Variant (универсал)': 'Estate / Variant',
+        'Шины — Caddy Van / Kombi': 'Caddy Van / Kombi',
+        'Шины — Сводная таблица': 'Сводная таблица',
+        'Шины': 'Общее',
+    },
+
+    Controls: {
+        'Педаль газа': 'Педаль газа',
+        'Трос газа': 'Трос газа',
+        'Педаль сцепления': 'Педаль сцепления',
+        'Трос сцепления': 'Трос сцепления',
+        'Кронштейн педалей': 'Кронштейн педалей',
+        'Кулиса КПП': 'Кулиса КПП',
+        'Трос КПП': 'Кулиса КПП',
+        'Выключатель': 'Выключатели',
+    },
+};
 const BASE_EK = {
     Maintenance: { g: 'Регламент ТО', s: 'Обслуживание' },
     RoadKit: { g: 'С собой в дорогу', s: 'Аварийный набор' },
-    Engine: { g: 'Двигатель', s: 'ГРМ / Ремни' },
+    Engine: { g: 'Двигатель', s: 'Разное' },
     Fuel: { g: 'Топливная', s: 'Подача / Фильтры' },
     Ignition: { g: 'Зажигание', s: 'Свечи / Катушки' },
     Cooling: { g: 'Охлаждение', s: 'Радиатор / Термостат' },
     Heating: { g: 'Отопление', s: 'Печка / Климат' },
     Suspension: { g: 'Подвеска', s: 'Передняя / Задняя' },
-    Steering: { g: 'Рулевое', s: 'Рейка / Тяги' },              // ← ДОБАВЛЕНО
+    Steering: { g: 'Рулевое', s: 'Рейка и тяги' },
     Brakes: { g: 'Тормоза', s: 'Передние / Задние' },
     Transmission: { g: 'Трансмиссия', s: 'КПП / Привод' },
     Exhaust: { g: 'Выхлоп', s: 'Глушитель' },
@@ -94,14 +382,12 @@ const BASE_EK = {
     Interior: { g: 'Интерьер', s: 'Панель / Сиденья' },
     Tires: { g: 'Колёса', s: 'Шины и давление' },
     Fluids: { g: 'Жидкости', s: 'Эксплуатационные' },
-    RearAxle: { g: 'Задняя ось', s: 'Балка / Ступица' },        // ← уже было
-    Controls: { g: 'Управление', s: 'Педали / Кулиса' }
+    RearAxle: { g: 'Задняя ось', s: 'Балка и ступица' },
+    Controls: { g: 'Управление', s: 'Педали и кулиса' },
 };
 
 /* ============================================================
    ГРУППЫ КАТЕГОРИЙ — порядок и состав блоков в сайдбаре
-   Порядок соответствует физической логике автомобиля:
-   мотор → трансмиссия → ходовая → кузов → электрика → расходники
    ============================================================ */
 const CAT_GROUPS = [
     {
@@ -117,7 +403,7 @@ const CAT_GROUPS = [
     {
         id: 'chassis',
         label: 'Ходовая часть',
-        cats: ['Suspension', 'Brakes', 'RearAxle', 'Controls']   // RearAxle добавлен
+        cats: ['Suspension', 'Steering', 'Brakes', 'RearAxle', 'Controls']
     },
     {
         id: 'body',
@@ -127,7 +413,7 @@ const CAT_GROUPS = [
     {
         id: 'electro',
         label: 'Электрика и климат',
-        cats: ['Electrical', 'Heating']                            // Heating вместо Climate
+        cats: ['Electrical', 'Heating']
     },
     {
         id: 'consumables',
@@ -138,7 +424,6 @@ const CAT_GROUPS = [
         id: 'refs',
         label: 'Справочники',
         cats: ['Torque', 'Diagnostics', 'Workshops', 'Log'],
-
         virtual: true
     }
 ];
@@ -228,7 +513,7 @@ let SV = {
     bodyFilter: 'all', trimFilter: 'all', transFilter: 'all', genFilter: 'all',
     sidebarCollapsed: false,
     theme: 'aurora', sortBy: 'default', view: 'grid', activeVinId: null,
-    groupBySub: false, vinStrictFilter: false
+    groupBySub: false, vinStrictFilter: false, expandedCats: {}
 };
 let USER = { name: '', email: '', city: '', initials: '', color: '#00b0f0' };
 let CUSTOM = { categories: [], sections: {} };
@@ -510,10 +795,22 @@ function nP(p) {
     const ALL_GENS = Object.keys(GENERATIONS);
     const gens = Array.isArray(p.gens) ? p.gens.filter(x => ALL_GENS.includes(x)) : [];
 
+    const rawSub = String(p.sub || p.subcategory || '').trim();
+    const catMap = SUB_ALIASES[cat] || {};
+    const globMap = SUB_ALIASES._all || {};
+    const mapped = catMap[rawSub] || globMap[rawSub] || rawSub;
+
+    let finalCat = cat;
+    let sub = mapped;
+    if (typeof mapped === 'string' && mapped.startsWith('ПЕРЕКИНУТЬ→')) {
+        finalCat = mapped.split('→')[1];
+        sub = rawSub;
+    }
+
     return {
         id: p.id || uid(),
-        cat,
-        sub: String(p.sub || p.subcategory || ''),
+        cat: finalCat,
+        sub,
         name: rawName,
         oem: String(p.o || p.oem || ''),
         verified: !!(p.v || p.verified),
@@ -662,7 +959,6 @@ function lMeta() {
                     });
                 }
             }
-
         }
     } catch (e) { }
 }
@@ -698,6 +994,7 @@ function lU() {
             const p = JSON.parse(r);
             SV = Object.assign(SV, p);
             if (!SV.expandedTree || typeof SV.expandedTree !== 'object') SV.expandedTree = {};
+            if (!SV.expandedCats || typeof SV.expandedCats !== 'object') SV.expandedCats = {};
             if (!CATS.some(c => c.id === SV.activeCat) && !['Favorites', 'Workshops', 'Log'].includes(SV.activeCat)) SV.activeCat = 'All';
         }
     } catch (e) { }
@@ -866,7 +1163,7 @@ function rGar() {
 
     if (!G.length) {
         l.innerHTML = '<div class="ge">Нет сохранённых машин</div>';
-        rVinBar();                      // ← очистит плашку
+        rVinBar();
         return;
     }
 
@@ -942,7 +1239,6 @@ function setAV(id) {
     const wasActive = !!SV.activeVinId;
     SV.activeVinId = SV.activeVinId === id ? null : id;
 
-    // При выборе VIN — включаем строгий режим; при снятии — выключаем
     if (!wasActive && SV.activeVinId) SV.vinStrictFilter = true;
     if (wasActive && !SV.activeVinId) SV.vinStrictFilter = false;
 
@@ -1361,6 +1657,7 @@ async function lAll() {
             { path: 'data/parts-04-body-interior-maint-fluids-roadkit.json', type: 'parts' },
             { path: 'data/parts-05-rear-axle-controls.json', type: 'parts' },
             { path: 'data/parts-07-engine-composition.json', type: 'parts' },
+            { path: 'data/parts-08-from-html.json', type: 'parts' },
             { path: 'data/categories.json', type: 'categories' },
             { path: 'data/sections.json', type: 'sections' },
             { path: 'data/workshops.json', type: 'workshops' }
@@ -1513,20 +1810,15 @@ const VIRTUAL_CATS = {
     Log: { label: 'Журнал обслуживания', icon: '📖' },
     Diagnostics: { label: 'Диагностика (OBD)', icon: '🩺' },
     Torque: { label: 'Моменты затяжки', icon: '🔩' },
-
-
 };
 
 /* ============================================================
    Отфильтрованный список для счётчиков в сайдбаре.
-   Учитывает: VIN-строго, статус, мотор, кузов, КПП,
-   поколение, поисковый запрос.
    ============================================================ */
 function computeFilteredForSidebar() {
     const t = nz(SV.searchQuery).split(/\s+/).filter(Boolean);
     let f = D;
 
-    // VIN-строго
     if (SV.activeVinId && SV.vinStrictFilter) {
         f = f.filter(p => {
             if (!p.donors || !p.donors.length) return true;
@@ -1567,8 +1859,10 @@ function computeFilteredForSidebar() {
 }
 
 function rSB() {
-    const n = $('nl'); n.innerHTML = '';
-    if (!SV.expandedCats) SV.expandedCats = {};
+    const n = $('nl');
+    if (!n) return;
+    n.innerHTML = '';
+    if (!SV.expandedCats || typeof SV.expandedCats !== 'object') SV.expandedCats = {};
 
     // ── Фильтрованный список + раскладка по категориям ────────
     const filtered = computeFilteredForSidebar();
@@ -1584,7 +1878,6 @@ function rSB() {
         const sec = CUSTOM.sections && CUSTOM.sections[id];
         if (sec && Array.isArray(sec.rows)) return sec.rows.length;
 
-        // Виртуальные разделы — не подлежат фильтрации
         if (id === 'Workshops') return W.length;
         if (id === 'Log') return LOG.length;
         if (id === 'Diagnostics')
@@ -1598,14 +1891,14 @@ function rSB() {
         return byCat[id] || 0;
     };
 
-    // ── Отрисовка пункта ─────────────────────────────────────
+    // ── Отрисовка плоского пункта ─────────────────────────────
     const addItem = (id, icon, label, count, cls, sub) => {
         const li = document.createElement('li');
-        li.className = 'ni ' + (SV.activeCat === id ? 'active ' : '') + (cls || '') + (sub ? ' sub' : '');
+        li.className = 'ni ' + (SV.activeCat === id && !SV.activeSub ? 'active ' : '') + (cls || '') + (sub ? ' sub' : '');
         li.setAttribute('tabindex', '-1');
         li.onclick = () => {
             SV.activeCat = id;
-            SV.activeSub = null;         // ← сброс подкатегории
+            SV.activeSub = null;
             sU(); rSB(); rC();
             if (window.innerWidth <= 900) cMM();
             $('ca').scrollTop = 0;
@@ -1618,12 +1911,38 @@ function rSB() {
         n.appendChild(li);
     };
 
-    // ── Папка с вложениями ───────────────────────────────────
-    const addFolder = (c, kids) => {
-        const expanded = !!SV.expandedCats[c.id];
-        const total = cnt(c.id) + kids.reduce((s, k) => s + cnt(k.id), 0);
+    // ── Заголовок группы ─────────────────────────────────────
+    const addSection = label => {
         const li = document.createElement('li');
-        li.className = 'ni folder' + (expanded ? ' open' : '') + (SV.activeCat === c.id ? ' active' : '');
+        li.className = 'nd-label';
+        li.textContent = label;
+        n.appendChild(li);
+    };
+
+    // ── Папка категории с подкатегориями и/или дочерними категориями ──
+    const addCatFolder = (c) => {
+        // 1. Собираем уникальные sub у деталей этой категории (из отфильтрованного списка)
+        const subs = new Map();
+        for (const p of filtered) {
+            if (p.cat !== c.id) continue;
+            const s = (p.sub || '').trim();
+            if (!s) continue;
+            subs.set(s, (subs.get(s) || 0) + 1);
+        }
+        const subList = Array.from(subs.entries())
+            .sort((a, b) => a[0].localeCompare(b[0], 'ru'));
+
+        // 2. Дочерние категории (по parent)
+        const kids = CATS.filter(k => k.parent === c.id);
+
+        // 3. Итоговый счётчик = своя категория + все дочерние
+        const total = cnt(c.id) + kids.reduce((s, k) => s + cnt(k.id), 0);
+
+        const expanded = !!SV.expandedCats[c.id];
+        const isAllActive = SV.activeCat === c.id && !SV.activeSub;
+
+        const li = document.createElement('li');
+        li.className = 'ni folder' + (expanded ? ' open' : '') + (isAllActive ? ' active' : '');
         li.setAttribute('tabindex', '-1');
         li.innerHTML =
             '<span class="fold-arr">▶</span>' +
@@ -1634,15 +1953,68 @@ function rSB() {
             sU(); rSB();
         };
         n.appendChild(li);
-        if (expanded) kids.forEach(k => addItem(k.id, k.icon, k.label, cnt(k.id), '', true));
-    };
 
-    // ── Заголовок группы ─────────────────────────────────────
-    const addSection = label => {
-        const li = document.createElement('li');
-        li.className = 'nd-label';
-        li.textContent = label;
-        n.appendChild(li);
+        if (!expanded) return;
+
+        // Пункт «Все разделы» — сброс подкатегории
+        const allLi = document.createElement('li');
+        allLi.className = 'ni sub' + (isAllActive ? ' active' : '');
+        allLi.setAttribute('tabindex', '-1');
+        allLi.innerHTML =
+            '<span style="flex:1;min-width:0">📦 Все разделы</span>' +
+            '<span class="bdg">' + total + '</span>';
+        allLi.onclick = (e) => {
+            e.stopPropagation();
+            SV.activeCat = c.id;
+            SV.activeSub = null;
+            sU(); rSB(); rC();
+            if (window.innerWidth <= 900) cMM();
+            $('ca').scrollTop = 0;
+        };
+        n.appendChild(allLi);
+
+        // Сами подкатегории (sub)
+        subList.forEach(([sub, count]) => {
+            const subActive = SV.activeCat === c.id && SV.activeSub === sub;
+            const sli = document.createElement('li');
+            sli.className = 'ni sub' + (subActive ? ' active' : '');
+            sli.setAttribute('tabindex', '-1');
+            sli.innerHTML =
+                '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+                + esc(sub) + '</span>' +
+                '<span class="bdg"' + (count === 0 ? ' style="opacity:.45"' : '') + '>' + count + '</span>';
+            sli.onclick = (e) => {
+                e.stopPropagation();
+                SV.activeCat = c.id;
+                SV.activeSub = sub;
+                sU(); rSB(); rC();
+                if (window.innerWidth <= 900) cMM();
+                $('ca').scrollTop = 0;
+            };
+            n.appendChild(sli);
+        });
+
+        // Дочерние категории (например, Cooling, Ignition внутри Engine)
+        kids.forEach(k => {
+            const kidActive = SV.activeCat === k.id && !SV.activeSub;
+            const kli = document.createElement('li');
+            kli.className = 'ni sub' + (kidActive ? ' active' : '');
+            kli.setAttribute('tabindex', '-1');
+            const kc = cnt(k.id);
+            kli.innerHTML =
+                '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+                + k.icon + ' ' + esc(k.label) + '</span>' +
+                '<span class="bdg"' + (kc === 0 ? ' style="opacity:.45"' : '') + '>' + kc + '</span>';
+            kli.onclick = (e) => {
+                e.stopPropagation();
+                SV.activeCat = k.id;
+                SV.activeSub = null;
+                sU(); rSB(); rC();
+                if (window.innerWidth <= 900) cMM();
+                $('ca').scrollTop = 0;
+            };
+            n.appendChild(kli);
+        });
     };
 
     // ── ПИН-БЛОК (всегда сверху) ─────────────────
@@ -1651,76 +2023,6 @@ function rSB() {
 
     // ── ГРУППЫ ───────────────────────────────────────────────
     for (const grp of CAT_GROUPS) {
-        // ── Папка «Двигатель» с подкатегориями из данных ──────────
-        const addEngineFolder = (c) => {
-            // Собираем уникальные sub у деталей категории Engine
-            const subs = new Map();
-            for (const p of filtered) {
-                if (p.cat !== 'Engine') continue;
-                const s = (p.sub || '').trim();
-                if (!s) continue;
-                subs.set(s, (subs.get(s) || 0) + 1);
-            }
-            const subList = Array.from(subs.entries())
-                .sort((a, b) => a[0].localeCompare(b[0], 'ru'));
-
-            const total = cnt(c.id);
-            const expanded = !!SV.expandedCats[c.id];
-            const isAllActive = SV.activeCat === 'Engine' && !SV.activeSub;
-
-            const li = document.createElement('li');
-            li.className = 'ni folder' + (expanded ? ' open' : '') + (isAllActive ? ' active' : '');
-            li.setAttribute('tabindex', '-1');
-            li.innerHTML =
-                '<span class="fold-arr">▶</span>' +
-                '<span class="fold-lb">' + c.icon + ' ' + esc(c.label) + '</span>' +
-                '<span class="bdg"' + (total === 0 ? ' style="opacity:.45"' : '') + '>' + total + '</span>';
-            li.onclick = () => {
-                SV.expandedCats[c.id] = !SV.expandedCats[c.id];
-                sU(); rSB();
-            };
-            n.appendChild(li);
-
-            if (!expanded) return;
-
-            // Пункт «Все разделы» — сброс подкатегории
-            const allLi = document.createElement('li');
-            allLi.className = 'ni sub' + (isAllActive ? ' active' : '');
-            allLi.setAttribute('tabindex', '-1');
-            allLi.innerHTML =
-                '<span style="flex:1;min-width:0">📦 Все разделы</span>' +
-                '<span class="bdg">' + total + '</span>';
-            allLi.onclick = (e) => {
-                e.stopPropagation();
-                SV.activeCat = 'Engine';
-                SV.activeSub = null;
-                sU(); rSB(); rC();
-                if (window.innerWidth <= 900) cMM();
-                $('ca').scrollTop = 0;
-            };
-            n.appendChild(allLi);
-
-            // Сами подкатегории
-            subList.forEach(([sub, count]) => {
-                const subActive = SV.activeCat === 'Engine' && SV.activeSub === sub;
-                const sli = document.createElement('li');
-                sli.className = 'ni sub' + (subActive ? ' active' : '');
-                sli.setAttribute('tabindex', '-1');
-                sli.innerHTML =
-                    '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
-                    + esc(sub) + '</span>' +
-                    '<span class="bdg"' + (count === 0 ? ' style="opacity:.45"' : '') + '>' + count + '</span>';
-                sli.onclick = (e) => {
-                    e.stopPropagation();
-                    SV.activeCat = 'Engine';
-                    SV.activeSub = sub;
-                    sU(); rSB(); rC();
-                    if (window.innerWidth <= 900) cMM();
-                    $('ca').scrollTop = 0;
-                };
-                n.appendChild(sli);
-            });
-        };
         addSection(grp.label);
 
         for (const cid of grp.cats) {
@@ -1732,14 +2034,21 @@ function rSB() {
             const c = CATS.find(x => x.id === cid);
             if (!c) continue;
 
-            if (cid === 'Engine') {          // ← НОВАЯ ветка
-                addEngineFolder(c);
-                continue;
-            }
+            // Пропускаем вложенные категории — они рендерятся как kids своего родителя
+            if (c.parent) continue;
 
-            const kids = CATS.filter(k => k.parent === cid);
-            if (kids.length) addFolder(c, kids);
-            else addItem(c.id, c.icon, c.label, cnt(c.id));
+            // Есть ли у категории свои sub'ы в отфильтрованном списке?
+            const hasSubs = filtered.some(p =>
+                p.cat === cid && (p.sub || '').trim()
+            );
+            // Есть ли дочерние категории (по parent)?
+            const hasKids = CATS.some(k => k.parent === cid);
+
+            if (hasSubs || hasKids) {
+                addCatFolder(c);
+            } else {
+                addItem(c.id, c.icon, c.label, cnt(c.id));
+            }
         }
     }
 }
@@ -1900,11 +2209,11 @@ function rC() {
     if (SV.statusFilter && SV.statusFilter !== 'all') chips.push('<span class="chip">🏷 ' + esc(SV.statusFilter) + '</span>');
     if (SV.searchQuery) chips.push('<span class="chip">🔍 "' + esc(SV.searchQuery) + '"</span>');
     if (SV.activeSub) {
-    chips.push(
-        '<span class="chip" data-chip="clearSub" style="cursor:pointer" title="Показать весь раздел">'
-        + '📂 ' + esc(SV.activeSub) + ' ✕</span>'
-    );
-}
+        chips.push(
+            '<span class="chip" data-chip="clearSub" style="cursor:pointer" title="Показать весь раздел">'
+            + '📂 ' + esc(SV.activeSub) + ' ✕</span>'
+        );
+    }
     chips.push('<span class="chip" data-chip="groupBySub" style="cursor:pointer;' + (SV.groupBySub ? 'border-color:var(--a);background:rgba(0,176,240,.12);' : '') + '" title="Группировать по подкатегориям">📂 Группы</span>');
     const av = gAV();
     if (av) {
@@ -2147,9 +2456,11 @@ function rET(parts) {
     const t = {};
     for (const p of parts) {
         const m = EK[p.cat] || { g: 'Прочее', s: 'Прочее' };
-        if (!t[m.g]) t[m.g] = {};
-        if (!t[m.g][m.s]) t[m.g][m.s] = [];
-        t[m.g][m.s].push(p);
+        const g = m.g;
+        const s = (p.sub || '').trim() || m.s;
+        if (!t[g]) t[g] = {};
+        if (!t[g][s]) t[g][s] = [];
+        t[g][s].push(p);
     }
     if (!SV.expandedTree || typeof SV.expandedTree !== 'object') SV.expandedTree = {};
     const exp = SV.expandedTree;
@@ -2289,7 +2600,7 @@ function oCC(e) {
             sU(); rC();
         } else if (k === 'vinStrict') {
             SV.vinStrictFilter = !SV.vinStrictFilter;
-            sU(); rGar(); rSB(); rC();   // ← rGar обновит метку «СТРОГО»
+            sU(); rGar(); rSB(); rC();
         }
         return;
     }
@@ -2707,9 +3018,11 @@ function eET() {
         let lg = '', ct = 0;
         for (const p of srt) {
             const m = EK[p.cat] || { g: 'Прочее', s: 'Прочее' };
-            if (m.g !== lg) { ct = 1; lg = m.g; } else ct++;
+            const g = m.g;
+            const s = (p.sub || '').trim() || m.s;
+            if (g !== lg) { ct = 1; lg = g; } else ct++;
             const n = (p.inst || []).map(i => IL[IM[i.type] || 'n'] + ': ' + i.text).join(' | ');
-            rows.push([m.g, m.s, String(ct).padStart(3, '0'), p.oem || '', p.name || '', p.verified ? 'Да' : '—', '1', n]);
+            rows.push([g, s, String(ct).padStart(3, '0'), p.oem || '', p.name || '', p.verified ? 'Да' : '—', '1', n]);
         }
         const csv = '\ufeff' + [H, ...rows].map(r => r.map(csvE).join(',')).join('\r\n');
         dl('etka_' + new Date().toISOString().slice(0, 10) + '.csv', csv, 'text/csv;charset=utf-8');

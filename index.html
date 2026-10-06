@@ -7,8 +7,29 @@
   <meta name="theme-color" content="#0a1830">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>VW Polo/Caddy 1995–2003 — База Мастера</title>
-  <link rel="stylesheet" href="css/app.css?v=1.2.4">
-  
+  <script>
+    /* ────── АВТО-КЕШБАСТИНГ ─────────────────────────────────
+       Читаем appVersion из data/update.json и подставляем в ?v=
+       у CSS и JS. При выпуске новой версии достаточно поменять
+       appVersion в update.json — все клиенты получат свежак. */
+    (function () {
+      var v;
+      try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'data/update.json?t=' + Date.now(), false); // sync
+        xhr.send();
+        var m = (xhr.status === 200 || xhr.status === 0)
+          ? JSON.parse(xhr.responseText) : null;
+        v = (m && m.appVersion) ? String(m.appVersion) : String(Date.now());
+      } catch (e) {
+        v = String(Date.now());
+      }
+      document.write(
+        '<link rel="stylesheet" href="css/app.css?v=' + v + '">' +
+        '<script src="js/app.js?v=' + v + '" defer><\/script>'
+      );
+    })();
+  </script>
 </head>
 
 <body class="theme-aurora">
@@ -76,8 +97,6 @@
       <div class="gl" id="gl"></div>
       <button class="gab" id="gab">+ Добавить VIN</button>
     </details>
-
-    <ul class="nl" id="nl"></ul>
 
     <ul class="nl" id="nl"></ul>
 
@@ -1068,7 +1087,6 @@
 
   <!-- ============ ПЛАШКА «ЧТО НОВОГО» ============ -->
   <div class="whatsnew" id="whatsnew"></div>
-  <script src="js/app.js?v=3" defer></script>
 </body>
 
 </html>
