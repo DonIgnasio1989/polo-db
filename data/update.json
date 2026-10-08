@@ -137,6 +137,10 @@
     {
   "path": "data/parts-08-from-html.json",
   "type": "parts"
+},
+{
+  "path": "data/parts-09-transmission-detailed.json",
+  "type": "parts"
 }
   ]
 }
