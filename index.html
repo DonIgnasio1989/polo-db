@@ -7,29 +7,69 @@
   <meta name="theme-color" content="#0a1830">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>VW Polo/Caddy 1995–2003 — База Мастера</title>
-  <script>
-    /* ────── АВТО-КЕШБАСТИНГ ─────────────────────────────────
+   <script>
+    /* ────── АВТО-КЕШБАСТИНГ (асинхронный) ─────────────────────
        Читаем appVersion из data/update.json и подставляем в ?v=
        у CSS и JS. При выпуске новой версии достаточно поменять
-       appVersion в update.json — все клиенты получат свежак. */
+       appVersion в update.json — все клиенты получат свежак.
+
+       Раньше здесь был синхронный XMLHttpRequest, который блокировал
+       парсинг страницы и вызывал предупреждение браузера.
+       Теперь — async fetch + динамическая вставка link/script в head. */
     (function () {
-      var v;
-      try {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'data/update.json?t=' + Date.now(), false); // sync
-        xhr.send();
-        var m = (xhr.status === 200 || xhr.status === 0)
-          ? JSON.parse(xhr.responseText) : null;
-        v = (m && m.appVersion) ? String(m.appVersion) : String(Date.now());
-      } catch (e) {
-        v = String(Date.now());
+      var injected = false;
+      var FALLBACK_VERSION = 'dev';
+
+      function inject(v) {
+        if (injected) return;
+        injected = true;
+        var head = document.head;
+
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'css/app.css?v=' + v;
+        head.appendChild(link);
+
+        var script = document.createElement('script');
+        script.src = 'js/app.js?v=' + v;
+        script.defer = true;
+        head.appendChild(script);
       }
-      document.write(
-        '<link rel="stylesheet" href="css/app.css?v=' + v + '">' +
-        '<script src="js/app.js?v=' + v + '" defer><\/script>'
-      );
+
+      // Страховка: если update.json не ответит за 2 секунды — грузим
+      // с fallback-версией, чтобы не заставлять пользователя ждать.
+      var safetyTimer = setTimeout(function () {
+        inject(FALLBACK_VERSION);
+      }, 2000);
+
+      try {
+        fetch('data/update.json?t=' + Date.now(), { cache: 'no-store' })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (m) {
+            clearTimeout(safetyTimer);
+            var v = (m && m.appVersion) ? String(m.appVersion) : FALLBACK_VERSION;
+            inject(v);
+          })
+          .catch(function () {
+            clearTimeout(safetyTimer);
+            inject(FALLBACK_VERSION);
+          });
+      } catch (e) {
+        clearTimeout(safetyTimer);
+        inject(FALLBACK_VERSION);
+      }
     })();
   </script>
+
+  <!-- METRIKA · инлайн-стили для мгновенного фона, пока грузится app.css -->
+  <style>
+    html, body {
+      margin: 0;
+      background: #0a1830;
+      color: #eef2f9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    }
+  </style>
 
   <!-- METRIKA · Яндекс.Метрика — в <head>, чтобы загрузиться раньше и поймать все визиты -->
   <script type="text/javascript">
@@ -154,7 +194,48 @@
         <div class="ew" id="sftSettingsWrap">
           <button class="sft-btn" type="button" id="btnSettings" onclick="tMMenu(event)" title="Меню">⚙️</button>
           <div class="em" id="em">
-            <!-- ... содержимое меню без изменений ... -->
+            <div class="em-title">⚙️ Настройки</div>
+
+            <details class="em-sec">
+              <summary><span>📦 База данных</span></summary>
+              <button onclick="tI();cEM()">📥 <span>Импорт JSON</span></button>
+              <button onclick="eD();cEM()">📄 <span>Экспорт — JSON</span></button>
+              <button onclick="eCSV(false);cEM()">📊 <span>CSV — все позиции</span></button>
+              <button onclick="eCSV(true);cEM()">⭐ <span>CSV — избранное</span></button>
+              <button onclick="eET();cEM()">🗂 <span>CSV — ETKA</span></button>
+              <button onclick="eWCSV();cEM()">🔧 <span>CSV — мастерские</span></button>
+              <button onclick="rD();cEM()">♻️ <span>Пересобрать БД (сброс)</span></button>
+            </details>
+
+            <details class="em-sec">
+              <summary><span>🛠 Обслуживание</span></summary>
+              <button onclick="oAM();cEM()">➕ <span>Добавить деталь</span></button>
+              <button onclick="oLogNew();cEM()">📖 <span>Запись в журнал</span></button>
+              <button onclick="oShopList();cEM()">🛒 <span>Список покупок на ТО</span></button>
+              <button onclick="oTO();cEM()">🛠 <span>Настройки ТО</span></button>
+              <button onclick="oWM();cEM()">🔧 <span>Добавить мастерскую</span></button>
+            </details>
+
+            <details class="em-sec">
+              <summary><span>🎨 Интерфейс</span></summary>
+              <button onclick="oTheme();cEM()">🎨 <span>Тема оформления</span></button>
+              <button onclick="resetFilters();cEM()">🔄 <span>Сбросить фильтры</span></button>
+            </details>
+
+            <details class="em-sec">
+              <summary><span>⚙️ Прочее</span></summary>
+              <button onclick="oSM();cEM()">🔑 <span>VIN-API ключ</span></button>
+              <button onclick="oProfileSoon();cEM()">👤 <span>Профиль <span class="em-soon">скоро</span></span></button>
+              <button onclick="oFaq();cEM()">❓ <span>Помощь — что делают кнопки</span></button>
+              <button onclick="oBug();cEM()">🐛 <span>Сообщить о баге</span></button>
+            </details>
+
+            <details class="em-sec">
+              <summary><span>ℹ️ О программе</span></summary>
+              <button onclick="oAbout();cEM()">📜 <span>Лицензия</span></button>
+              <button onclick="oUp();cEM()">📜 <span>История версий</span></button>
+              <button onclick="openM('apkmo');cEM()">📱 <span>Скачать APK</span></button>
+            </details>
           </div>
         </div>
         <!-- /⚙️ -->
@@ -347,7 +428,14 @@
       </div>
     </header>
 
-    <div class="ca" id="ca"></div>
+        <div class="ca" id="ca">
+      <div style="display:flex;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:24px">
+        <div>
+          <div style="font-size:2.5rem;margin-bottom:12px;opacity:.55">📦</div>
+          <div style="font-size:.95rem;opacity:.75">Загрузка базы…</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ============ СКРЫТЫЕ FILE-INPUT ============ -->
