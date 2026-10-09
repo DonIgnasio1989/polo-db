@@ -4432,4 +4432,7 @@ body.theme-cosmos .sft-stats:hover { opacity: 1; }
         backdrop-filter: none !important;
     }
 }
-body.sidebar-collapsed .sft .sft-btns .ew > .em { left: 64px !important; }
+
+body.sidebar-collapsed .sft .sft-btns .ew > .em {
+    left: 64px !important;
+}
