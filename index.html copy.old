@@ -30,43 +30,30 @@
       );
     })();
   </script>
-
-  <!-- METRIKA · Яндекс.Метрика — в <head>, чтобы загрузиться раньше и поймать все визиты -->
-  <script type="text/javascript">
-    (function (m, e, t, r, i, k, a) {
-      m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments) };
-      m[i].l = 1 * new Date();
-      for (var j = 0; j < document.scripts.length; j++) {
-        if (document.scripts[j].src === r) { return; }
-      }
-      k = e.createElement(t), a = e.getElementsByTagName(t)[0],
-        k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
-    })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=113577489', 'ym');
-
-    ym(113577489, 'init', {
-      webvisor: true,
-      clickmap: true,
-      ecommerce: 'dataLayer',
-      referrer: document.referrer,
-      url: location.href,
-      accurateTrackBounce: true,
-      trackLinks: true,
-      trackHash: true
-    });
-
-    /* METRIKA · безопасный хелпер для целей — не сломает приложение,
-       если счётчик ещё не загрузился или заблокирован uBlock'ом */
-    window.ymGoal = function (goal, params) {
-      try {
-        if (typeof ym === 'function') ym(113577489, 'reachGoal', goal, params || {});
-      } catch (e) { /* тихий fail */ }
-    };
-  </script>
-  <noscript>
-    <div><img src="https://mc.yandex.ru/watch/113577489" style="position:absolute; left:-9999px;" alt="" /></div>
-  </noscript>
-  <!-- /METRIKA -->
 </head>
+<!-- Yandex.Metrika informer -->
+<a href="https://metrika.yandex.ru/stat/?id=113577489&amp;from=informer" target="_blank" rel="nofollow">
+  <img src="https://informer.yandex.ru/informer/113577489/3_1_EFEFEFFF_EFEFEFFF_0_uniques"
+    style="width:88px; height:31px; border:0;" alt="Яндекс.Метрика"
+    title="Яндекс.Метрика: данные за сегодня (просмотры, визиты и уникальные посетители)" />
+</a>
+<!-- /Yandex.Metrika informer -->
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+  (function (m, e, t, r, i, k, a) {
+    m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments) };
+    m[i].l = 1 * new Date();
+    for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
+    k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
+  })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=113577489', 'ym');
+
+  ym(113577489, 'init', { ssr: true, webvisor: true, clickmap: true, ecommerce: "dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce: true, trackLinks: true });
+</script>
+<noscript>
+  <div><img src="https://mc.yandex.ru/watch/113577489" style="position:absolute; left:-9999px;" alt="" /></div>
+</noscript>
+<!-- /Yandex.Metrika counter -->
 
 <body class="theme-aurora">
 
@@ -81,14 +68,6 @@
         <h4>О программе</h4>
         <p>Неофициальный каталог запчастей и регламентов по автомобилям VW Polo/Caddy (6N1/6N2, Classic, Estate, Caddy)
           1995–2003 гг.</p>
-
-        <!-- METRIKA · уведомление об аналитике -->
-        <h4>📊 Аналитика</h4>
-        <p>Приложение использует Яндекс.Метрику для анализа посещаемости: собираются обезличенные данные
-          (просмотры страниц, тип устройства, регион, поведение в интерфейсе). Персональные данные не передаются
-          третьим лицам. Отключить аналитику можно через блокировщик рекламы.</p>
-        <!-- /METRIKA -->
-
         <h4>⚠️ Важно</h4>
         <p><b>Всегда сверяйте артикулы перед заказом</b> по оригинальному каталогу ETKA, у дилера или в официальном
           сервисе.</p>
