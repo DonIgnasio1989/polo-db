@@ -114,24 +114,101 @@
     }
   ],
   "files": [
-    { "path": "data/parts-01-engine-fuel-ignition.json", "type": "parts" },
-    { "path": "data/parts-02-cooling-heating-brakes-suspension.json", "type": "parts" },
-    { "path": "data/parts-03-trans-exh-elec-bulbs.json", "type": "parts" },
-    { "path": "data/parts-04-body-interior-maint-fluids-roadkit.json", "type": "parts" },
-    { "path": "data/parts-05-rear-axle-controls.json", "type": "parts" },
-    { "path": "data/parts-07-engine-composition.json", "type": "parts" },
-    { "path": "data/categories.json", "type": "categories" },
-    { "path": "data/sections.json", "type": "sections" },
-    { "path": "data/workshops.json", "type": "workshops" },
-    { "path": "data/parts-08-from-html.json", "type": "parts" },
-    { "path": "data/parts-09-transmission-detailed.json", "type": "parts" },
-    { "path": "data/parts-10-suspension-detailed.json", "type": "parts" },
-    { "path": "data/parts-11-drives-steering.json", "type": "parts" },
-    { "path": "data/parts-12-rear-axle-detailed.json", "type": "parts" },
-    { "path": "data/parts-13-brakes-wheels-detailed.json", "type": "parts" },
-    { "path": "data/parts-14-transmission-shifter-pedals.json", "type": "parts" },
-    { "path": "data/parts-15-body-heating-detailed.json", "type": "parts" },
-    { "path": "data/parts-16-body-interior-trim.json", "type": "parts" },
-    { "path": "data/parts-17-seats-detailed.json", "type": "parts" }
+    {
+      "path": "data/parts-01-engine-fuel-ignition.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-02-cooling-heating-brakes-suspension.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-03-trans-exh-elec-bulbs.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-04-body-interior-maint-fluids-roadkit.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-05-rear-axle-controls.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-07-engine-composition.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/categories.json",
+      "type": "categories"
+    },
+    {
+      "path": "data/sections.json",
+      "type": "sections"
+    },
+    {
+      "path": "data/workshops.json",
+      "type": "workshops"
+    },
+    {
+      "path": "data/parts-08-from-html.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-09-transmission-detailed.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-10-suspension-detailed.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-11-drives-steering.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-12-rear-axle-detailed.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-13-brakes-wheels-detailed.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-14-transmission-shifter-pedals.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-15-body-heating-detailed.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-16-body-interior-trim.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-17-seats-detailed.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-18-washers-fans-wiring.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-19-wiring-harnesses.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-20-interior-wiring-harnesses.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-21-wiring-saloon-rear.json",
+      "type": "parts"
+    },
+    {
+      "path": "data/parts-22-interior-wiring-extended.json",
+      "type": "parts"
+    }
   ]
 }

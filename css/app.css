@@ -6383,3 +6383,68 @@ body.theme-light .em-title {
             rgba(255, 255, 255, 0) 100%);
 }
 .rSec td { white-space: pre-line; }
+/* ============================================================
+   📊 Яндекс.Метрика — публичный бейдж посещаемости в подвале
+   ============================================================ */
+.sft-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0 6px;
+    opacity: .82;
+    transition: opacity var(--tr), transform var(--tr);
+}
+
+.sft-stats:hover {
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+.sft-stats a {
+    display: inline-block;
+    line-height: 0;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, .22),
+        0 0 0 1px rgba(255, 255, 255, .10);
+    transition: box-shadow var(--tr);
+}
+
+.sft-stats a:hover {
+    box-shadow:
+        0 4px 14px rgba(0, 0, 0, .35),
+        0 0 0 1px rgba(255, 255, 255, .20);
+}
+
+.sft-stats img {
+    display: block;
+    width: 88px;
+    height: 31px;
+    border: 0;
+}
+
+/* В светлых темах фон сайдбара и так тёмный — бейдж смотрится отлично.
+   В тёмных — можно чуть приглушить, чтобы не «светил» белым пятном: */
+body.theme-dark .sft-stats,
+body.theme-aurora .sft-stats,
+body.theme-cyberpunk .sft-stats,
+body.theme-sunset .sft-stats,
+body.theme-cosmos .sft-stats {
+    opacity: .7;
+}
+
+body.theme-dark .sft-stats:hover,
+body.theme-aurora .sft-stats:hover,
+body.theme-cyberpunk .sft-stats:hover,
+body.theme-sunset .sft-stats:hover,
+body.theme-cosmos .sft-stats:hover {
+    opacity: 1;
+}
+
+/* Мобильный — чуть компактнее */
+@media (max-width: 900px) {
+    .sft-stats {
+        margin: 8px 0 4px;
+    }
+}
