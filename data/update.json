@@ -1,6 +1,10 @@
 {
-  "appVersion": "1.2.5",
+  "appVersion": "1.2.6",
   "changelog": [
+{ "version": "1.2.6",
+  "date": "2026-10-09",
+  "changes": ["Пополнение базы трансмиссии"]
+},
     {
   "version": "1.2.5",
   "date": "2026-10-06",
@@ -136,6 +140,10 @@
     },
     {
   "path": "data/parts-08-from-html.json",
+  "type": "parts"
+},
+{
+  "path": "data/parts-09-transmission-detailed.json",
   "type": "parts"
 }
   ]
