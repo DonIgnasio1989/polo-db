@@ -6477,3 +6477,142 @@ body.theme-cosmos .sft-stats:hover {
 body.sidebar-collapsed .sft .sft-btns .ew > .em {
     left: 64px !important;
 }
+/* ============================================================
+   ⚡ PERFORMANCE PATCH — глобальная оптимизация
+   Убивает тяжёлые GPU-эффекты на всех платформах.
+   ============================================================ */
+
+/* 1. Убираем backdrop-filter везде — главный пожиратель GPU */
+.sb, .sb::before, .sb::after,
+.cd, .cd::before, .cd::after,
+.cd .ctb,
+.em, .em::before,
+.mo, .mdl, .mh, .mf,
+.gi, .gi::before, .gi::after,
+.sft, .sft-btn, .gb, .gb-header, .ni,
+.tbd, #mob, .to-chip, .bn, .fs,
+.lic-box .lic-cc, .th-preview, .gdr,
+.lb2 .lb-nav, .lb2 .lb-close, .lb2 .lb-counter,
+.whatsnew, .sh {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+/* 2. Убираем mix-blend-mode — каждая карточка перестаёт быть blend-слоем */
+.sb::after, .gi::after, .cd::after {
+    mix-blend-mode: normal !important;
+}
+
+/* 3. Отключаем «призму» полностью — она и даёт больше всего слоёв */
+.cd::after,
+.cd::before,
+.gi::after,
+.gi::before,
+.sb::after,
+.sb::before {
+    display: none !important;
+}
+
+/* 4. Фон body — вместо 4 радиальных градиентов + текстуры делаем простой градиент */
+body.theme-dark,
+body.theme-aurora,
+body.theme-cyberpunk,
+body.theme-sunset,
+body.theme-cosmos {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--bg) 96%, #fff 4%) 0%,
+        var(--bg) 55%,
+        color-mix(in srgb, var(--bg) 96%, #000 4%) 100%) !important;
+}
+body.theme-light {
+    background: linear-gradient(180deg, #eae8e1 0%, #e3e0d8 55%, #dbd8cf 100%) !important;
+}
+body.theme-paper {
+    background: linear-gradient(180deg, #ece2cc 0%, #e3d6bd 55%, #d8c8a8 100%) !important;
+}
+body.theme-paper .ca,
+body.theme-paper .sh {
+    background: var(--bg) !important;
+    background-image: none !important;
+}
+
+/* 5. Сайдбар — плотный фон вместо стекла */
+.sb {
+    background: linear-gradient(180deg,
+        var(--b) 0%,
+        color-mix(in srgb, var(--b) 88%, #000) 100%) !important;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .22) !important;
+}
+
+/* 6. Карточки — плотный фон, лёгкая тень, без анимации входа */
+.cd {
+    background: var(--cd) !important;
+    animation: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .14) !important;
+    transition: border-color var(--tr), transform .12s ease !important;
+    contain: layout style paint;
+}
+.cd:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .18) !important;
+}
+.cd.fav,
+.cd.fav:hover {
+    box-shadow: inset 4px 0 0 var(--sr), 0 1px 3px rgba(0, 0, 0, .14) !important;
+}
+
+/* 7. content-visibility — браузер не рисует то, что за экраном.
+      Даёт самый большой прирост на длинных списках. */
+.gr > .cd,
+.et .ep,
+.log-entry,
+.wc {
+    content-visibility: auto;
+    contain-intrinsic-size: 220px;
+}
+
+/* 8. Каскадные задержки анимации больше не нужны */
+.gr > .cd:nth-child(n) {
+    animation-delay: 0s !important;
+}
+
+/* 9. Убираем smooth-скролл — ощущается как лаг */
+.ca {
+    scroll-behavior: auto !important;
+}
+
+/* 10. .sh — убираем липкое стекло */
+.sh {
+    background: var(--cd) !important;
+    box-shadow: 0 1px 0 var(--bd) !important;
+}
+
+/* 11. Кнопки/магазины — плоско, без свечения */
+.bn.p, .tbd, #mob, .psl.ad, .psl.ex, .psl.av,
+.psl.op1, .psl.op3, .psl.op7,
+.tp.on[data-status=want], .tp.on[data-status=bought], .tp.on[data-status=installed] {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .2) !important;
+    filter: none !important;
+}
+.sft-btn:hover,
+.bn:hover,
+.ctb:hover {
+    transform: none !important;
+}
+
+/* 12. На мобиле — вообще без трансформаций */
+@media (max-width: 900px) {
+    .cd, .cd:hover {
+        transform: none !important;
+    }
+}
+
+/* 13. Принудительно уважаем prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
