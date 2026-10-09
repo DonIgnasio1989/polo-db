@@ -6448,3 +6448,32 @@ body.theme-cosmos .sft-stats:hover {
         margin: 8px 0 4px;
     }
 }
+/* ⚙️ ФИКС меню настроек в подвале сайдбара — десктоп */
+@media (min-width: 901px) {
+    body .sft .sft-btns .ew > .em {
+        position: fixed !important;
+        top: auto !important;
+        right: auto !important;
+        bottom: 20px !important;
+        left: calc(var(--sw) + 10px) !important;
+        margin: 0 !important;
+        transform: none !important;
+        min-width: 280px !important;
+        max-width: 340px !important;
+        max-height: calc(100vh - 60px) !important;
+        overflow-y: auto !important;
+        z-index: 9000 !important;
+        background: var(--cd) !important;
+        border: 1px solid var(--bd) !important;
+        border-radius: 10px !important;
+        box-shadow:
+            0 16px 48px rgba(0, 0, 0, .40),
+            0 0 0 1px rgba(0, 0, 0, .04) !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+}
+
+body.sidebar-collapsed .sft .sft-btns .ew > .em {
+    left: 64px !important;
+}

@@ -1614,6 +1614,7 @@ async function checkUpdate() {
 
 function doFullUpdate() {
     toast('Загружаем свежую версию…', 'success');
+    try { localStorage.removeItem('vw_polo_data_ver'); } catch (e) { }
     setTimeout(() => location.replace(location.pathname + '?v=' + Date.now()), 300);
 }
 
@@ -1641,8 +1642,64 @@ function _guessType(path) {
     if (/workshops\.json/.test(p)) return 'workshops';
     return 'unknown';
 }
+/* ============ СЛИЯНИЕ И ДЕДУПЛИКАЦИЯ ДЕТАЛЕЙ ============ */
+function _mergeParts(a, b) {
+    const out = { ...a };
+    if (!out.name && b.name) out.name = b.name;
+    if (!out.oem && b.oem) out.oem = b.oem;
+    if (!out.sub && b.sub) out.sub = b.sub;
+    if (b.verified) out.verified = true;
+    if (!out.price && b.price != null) out.price = b.price;
+    if (b.favorite) out.favorite = true;
+    if (!out.notes && b.notes) out.notes = b.notes;
+    if (!out.shopUrl && b.shopUrl) out.shopUrl = b.shopUrl;
+    if (!out.status && b.status) out.status = b.status;
 
+    const uniq = (x, y) => Array.from(new Set([...(x || []), ...(y || [])]));
+    out.analogs = uniq(a.analogs, b.analogs);
+    out.donors = uniq(a.donors, b.donors);
+    out.engines = uniq(a.engines, b.engines);
+    out.bodies = uniq(a.bodies, b.bodies);
+    out.transmissions = uniq(a.transmissions, b.transmissions);
+    out.trims = uniq(a.trims, b.trims);
+    out.gens = uniq(a.gens, b.gens);
+
+    const im = new Map();
+    [...(a.inst || []), ...(b.inst || [])].forEach(i => { if (i.text && !im.has(i.text)) im.set(i.text, i); });
+    out.inst = Array.from(im.values());
+
+    out.photos = Array.from(new Set([...(a.photos || []), ...(b.photos || [])])).slice(0, 12);
+
+    if (Array.isArray(b.parts) && b.parts.length) {
+        const pm = new Map();
+        [...(a.parts || []), ...b.parts].forEach(p => {
+            const k = (p.oem || '') + '|' + (p.name || '');
+            if (!pm.has(k)) pm.set(k, p);
+        });
+        out.parts = Array.from(pm.values());
+    }
+
+    const hm = new Map();
+    [...(a.priceHistory || []), ...(b.priceHistory || [])].forEach(h => hm.set(h.ts, h));
+    out.priceHistory = Array.from(hm.values()).sort((x, y) => x.ts - y.ts).slice(-50);
+
+    return out;
+}
+
+function _dedupeParts(parts) {
+    const map = new Map();
+    const keyOf = p => (p.oem || '').toLowerCase() + '|' + (p.name || '').toLowerCase();
+    for (const p of parts) {
+        if (!p) continue;
+        const k = keyOf(p);
+        if (!k || k === '|') continue;
+        if (map.has(k)) map.set(k, _mergeParts(map.get(k), p));
+        else map.set(k, p);
+    }
+    return Array.from(map.values());
+}
 async function lAll() {
+    // 1. Локальные данные из IndexedDB / localStorage
     try {
         const p = await iAll(SP), w = await iAll(SW);
         D = p.map(nP).filter(Boolean);
@@ -1650,102 +1707,119 @@ async function lAll() {
     } catch (e) { useIDB = false; lLS(); }
 
     const base = location.origin + location.pathname.replace(/[^/]*$/, '');
+
+    // 2. Мета update.json (версия + список файлов)
+    let remoteVersion = '';
     let files = [];
     try {
         const r = await fetch(base + 'data/update.json?t=' + Date.now(), { cache: 'no-store' });
         if (r.ok) {
             const m = await r.json();
+            remoteVersion = String(m.appVersion || '');
             if (Array.isArray(m.files) && m.files.length) files = m.files;
             if (Array.isArray(m.changelog)) _setChangelog(m.changelog);
         }
-    } catch (e) { console.warn('update.json не загрузился', e); }
+    } catch (e) { console.warn('update.json недоступен', e); }
+
     if (!files.length) {
         files = [
+            { path: 'data/parts.json',        type: 'parts' },
             { path: 'data/parts-01-engine-fuel-ignition.json', type: 'parts' },
             { path: 'data/parts-02-cooling-heating-brakes-suspension.json', type: 'parts' },
             { path: 'data/parts-03-trans-exh-elec-bulbs.json', type: 'parts' },
             { path: 'data/parts-04-body-interior-maint-fluids-roadkit.json', type: 'parts' },
             { path: 'data/parts-05-rear-axle-controls.json', type: 'parts' },
-            { path: 'data/parts-07-engine-composition.json', type: 'parts' },
-            { path: 'data/parts-08-from-html.json', type: 'parts' },
-            { path: 'data/categories.json', type: 'categories' },
-            { path: 'data/sections.json', type: 'sections' },
-            { path: 'data/workshops.json', type: 'workshops' }
+            { path: 'data/categories.json',   type: 'categories' },
+            { path: 'data/sections.json',     type: 'sections' },
+            { path: 'data/workshops.json',    type: 'workshops' }
         ];
     }
 
-    let serverParts = [], cats = null, secs = null, wss = null;
-    for (const item of files) {
-        const f = typeof item === 'string' ? item : item.path;
-        const type = typeof item === 'string' ? _guessType(f) : item.type;
+    // 3. Пропуск сети, если версия базы не менялась и данные есть
+    let lastDataVer = '';
+    try { lastDataVer = localStorage.getItem('vw_polo_data_ver') || ''; } catch (e) { }
+    const skipFetch = D.length > 50 && remoteVersion && remoteVersion === lastDataVer;
 
-        try {
-            const r = await fetch(f + '?t=' + Date.now(), { cache: 'no-store' });
-            if (!r.ok) { console.warn('Не найден:', f); continue; }
-            const data = await r.json();
+    if (skipFetch) {
+        console.log('[lAll] data v' + remoteVersion + ' cached · ' + D.length + ' items');
+    } else {
+        const t0 = performance.now();
 
-            switch (type) {
-                case 'parts':
-                    if (Array.isArray(data)) serverParts = serverParts.concat(data);
-                    break;
-                case 'categories':
-                    if (Array.isArray(data)) cats = data;
-                    break;
+        // 4. ПАРАЛЛЕЛЬНАЯ загрузка всех файлов
+        const results = await Promise.all(files.map(async (item) => {
+            const f = typeof item === 'string' ? item : item.path;
+            const type = typeof item === 'string' ? _guessType(f) : item.type;
+            try {
+                const r = await fetch(f + '?t=' + Date.now(), { cache: 'no-store' });
+                if (!r.ok) return null;
+                return { type, data: await r.json() };
+            } catch (e) { console.warn('fetch fail:', f, e); return null; }
+        }));
+
+        let serverParts = [], cats = null, secs = null, wss = null;
+        for (const res of results) {
+            if (!res) continue;
+            switch (res.type) {
+                case 'parts':      if (Array.isArray(res.data)) serverParts = serverParts.concat(res.data); break;
+                case 'categories': if (Array.isArray(res.data)) cats = res.data; break;
                 case 'sections':
-                    if (data && typeof data === 'object' && !Array.isArray(data)) {
-                        secs = Object.assign(secs || {}, data);
-                    }
+                    if (res.data && typeof res.data === 'object' && !Array.isArray(res.data))
+                        secs = Object.assign(secs || {}, res.data);
                     break;
-                case 'workshops':
-                    if (Array.isArray(data)) wss = data;
-                    break;
-                default:
-                    console.warn('Неизвестный тип файла:', f, '→', type);
-            }
-        } catch (e) { console.warn('Ошибка ' + f, e); }
-    }
-
-    if (serverParts.length) {
-        const map = new Map(D.map(x => [(x.oem || '') + '||' + (x.name || ''), x]));
-        let add = 0, upd = 0;
-        for (const raw of serverParts) {
-            const np = nP(raw); if (!np) continue;
-            const k = (np.oem || '') + '||' + (np.name || '');
-            if (!map.has(k)) { D.push(np); map.set(k, np); add++; }
-            else {
-                const old = map.get(k);
-                const user = {
-                    id: old.id,
-                    status: old.status,
-                    favorite: old.favorite,
-                    notes: old.notes,
-                    price: old.price,
-                    currency: old.currency,
-                    priceHistory: old.priceHistory,
-                    shopUrl: old.shopUrl,
-                    photos: old.photos
-                };
-                Object.assign(old, np, user);
-                upd++;
+                case 'workshops':  if (Array.isArray(res.data)) wss = res.data; break;
             }
         }
-        console.log('С сервера: +' + add + ', ~' + upd + ' | Итого:', D.length);
-        if (useIDB) try { await iMany(SP, D); } catch (e) { }
-        else sD();
+
+        // 5. Нормализация + дедупликация всего серверного массива
+        const normalized = serverParts.map(nP).filter(Boolean);
+        const deduped = _dedupeParts(normalized);
+        console.log('[lAll] files:' + files.length + ' · raw:' + serverParts.length +
+            ' · after dedupe:' + deduped.length +
+            ' · ' + Math.round(performance.now() - t0) + 'ms');
+
+        // 6. Мерджим в локальную D — сохраняем правки пользователя
+        if (deduped.length) {
+            const keyOf = x => (x.oem || '').toLowerCase() + '|' + (x.name || '').toLowerCase();
+            const localMap = new Map(D.map(x => [keyOf(x), x]));
+            let add = 0, upd = 0;
+            for (const np of deduped) {
+                const k = keyOf(np);
+                if (!localMap.has(k)) { D.push(np); localMap.set(k, np); add++; }
+                else {
+                    const old = localMap.get(k);
+                    const user = {
+                        id: old.id, status: old.status, favorite: old.favorite,
+                        notes: old.notes, price: old.price, currency: old.currency,
+                        priceHistory: old.priceHistory, shopUrl: old.shopUrl, photos: old.photos
+                    };
+                    Object.assign(old, np, user);
+                    upd++;
+                }
+            }
+            console.log('[lAll] add:' + add + ' · update:' + upd);
+        }
+
+        // 7. Финальный проход по объединённому массиву + сохранение
+        D = _dedupeParts(D);
+        if (useIDB) try { await iMany(SP, D); } catch (e) { } else sD();
+
+        if (remoteVersion) {
+            try { localStorage.setItem('vw_polo_data_ver', remoteVersion); } catch (e) { }
+        }
+
+        if (cats) for (const c of cats) {
+            if (!c || !c.id) continue;
+            if (!CATS.find(x => x.id === c.id))
+                CATS.push({ id: c.id, label: c.label || c.id, icon: c.icon || '📁' });
+        }
+        if (secs) { CUSTOM.sections = Object.assign({}, secs); sMeta(); }
+        if (wss && wss.length) {
+            W = wss.map(nW).filter(Boolean);
+            if (useIDB) await iMany(SW, W); else sWk();
+        }
     }
 
-    if (cats) for (const c of cats) {
-        if (!c || !c.id) continue;
-        if (!CATS.find(x => x.id === c.id)) CATS.push({ id: c.id, label: c.label || c.id, icon: c.icon || '📁' });
-    }
-
-    if (secs) { CUSTOM.sections = Object.assign({}, secs); sMeta(); }
-
-    if (wss && wss.length) {
-        W = wss.map(nW).filter(Boolean);
-        if (useIDB) await iMany(SW, W); else sWk();
-    }
-
+    // 8. Гараж, мета, профиль, ТО, логи
     lG(); lMeta(); lU(); lProfile(); lTO(); await lLogs();
     if (SV.activeVinId && !G.some(g => g.id === SV.activeVinId)) SV.activeVinId = null;
     try { vk = localStorage.getItem(VK) || ''; } catch (e) { }
@@ -3910,7 +3984,7 @@ function bindUI() {
 }
 
 /* ============ СТАРТ ============ */
-window.addEventListener('DOMContentLoaded', async () => {
+async function bootApp() {
     try {
         const base = location.origin + location.pathname.replace(/[^/]*$/, '');
         const r = await fetch(base + 'data/update.json?t=' + Date.now(), { cache: 'no-store' });
@@ -3925,4 +3999,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
     fCS();
     checkLicense();
-});
+}
+
+if (document.readyState === 'loading') {
+    // Скрипт вставился до окончания парсинга — ждём DOMContentLoaded
+    window.addEventListener('DOMContentLoaded', bootApp, { once: true });
+} else {
+    // Скрипт загрузился ПОСЛЕ DOMContentLoaded (динамическая вставка) — стартуем сразу
+    bootApp();
+}
