@@ -1279,6 +1279,8 @@ function sGarV() {
     applyVinFilters();
     sU(); rGar(); rSB(); rC();
     cGM(); toast('VIN сохранён', 'success');
+    /* METRIKA · цель: VIN добавлен в гараж */
+    window.ymGoal && window.ymGoal('vin_added');
 }
 
 function remV(id) {
@@ -1299,6 +1301,8 @@ function oGM() {
     $('g_sb').disabled = true;
     $('gmo').classList.add('show');
     setTimeout(() => $('g_vi').focus(), 50);
+    /* METRIKA · цель: пользователь открыл форму VIN */
+    window.ymGoal && window.ymGoal('vin_form_opened');
 }
 const cGM = () => { $('gmo').classList.remove('show'); pGV = null; };
 
@@ -1392,7 +1396,11 @@ function updateProfPreview() {
 }
 
 /* ============ ДОНАТ / О ПРОГРАММЕ / БАГ ============ */
-function oDonate() { $('donmo').classList.add('show'); }
+function oDonate() {
+    $('donmo').classList.add('show');
+    /* METRIKA · цель: открыто окно доната */
+    window.ymGoal && window.ymGoal('donate_opened');
+}
 function cDonate() { $('donmo').classList.remove('show'); }
 const oAbout = () => { $('aboutmo').classList.add('show'); };
 const cAbout = () => { $('aboutmo').classList.remove('show'); };
@@ -1426,6 +1434,8 @@ const oBug = () => {
             'Что получил: \n'
         );
     $('bugmo').classList.add('show');
+    /* METRIKA · цель: открыта форма баг-репорта */
+    window.ymGoal && window.ymGoal('bug_opened');
 };
 const cBug = () => { $('bugmo').classList.remove('show'); };
 
@@ -1769,8 +1779,9 @@ function sTheme(id) {
     renderThemeGrid();
     const t = THEMES.find(x => x.id === id);
     toast('🎨 Тема: ' + t.label, 'success');
+    /* METRIKA · цель: смена темы оформления */
+    window.ymGoal && window.ymGoal('theme_changed', { theme: id });
 }
-
 /* ============ UI / САЙДБАР / АДАПТИВ ============ */
 function setV(v, s) {
     SV.view = v;
@@ -2646,6 +2657,8 @@ function tF(id) {
     rSB(); rC();
     if (partmoId === id) oPC(id);
     toast(p.favorite ? '⭐ Добавлено' : 'Убрано');
+    /* METRIKA · цель: добавление в избранное */
+    if (p.favorite) window.ymGoal && window.ymGoal('favorite_added');
 }
 function sPS(id, st) {
     const p = D.find(x => x.id === id);
@@ -2657,6 +2670,8 @@ function sPS(id, st) {
     if (partmoId === id) oPC(id);
     const L = { want: '🛒 Хочу', bought: '📦 Куплено', installed: '✅ Установлено' };
     toast(same ? 'Статус снят' : L[st], same ? '' : 'success');
+    /* METRIKA · цель: статус установлен (без снятия) */
+    if (!same) window.ymGoal && window.ymGoal('status_' + st);
     if (!same && st === 'installed' && typeof confetti === 'function') confetti();
 }
 
@@ -2791,6 +2806,8 @@ function sPt() {
         });
         if (useIDB) iPut(SP, D[i]).catch(() => { });
         toast('Сохранено', 'success');
+        /* METRIKA · цель: деталь отредактирована */
+        window.ymGoal && window.ymGoal('part_edited');
     } else {
         const np = {
             id: uid(), cat, sub: '', name, oem, verified, analogs, donors,
@@ -2800,6 +2817,8 @@ function sPt() {
         D.push(np);
         if (useIDB) iPut(SP, np).catch(() => { });
         toast('Добавлено', 'success');
+        /* METRIKA · цель: деталь добавлена вручную */
+        window.ymGoal && window.ymGoal('part_added');
     }
     if (!useIDB) sD();
     rSB(); rC(); cM();
@@ -2981,6 +3000,8 @@ function eD() {
         const photoCount = D.reduce((s, x) => s + (Array.isArray(x.photos) ? x.photos.length : 0), 0);
         dl('vw_polo_caddy_' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(p, null, 2), 'application/json');
         toast('Экспорт: ' + D.length + ' поз., ' + W.length + ' СТО, ' + photoCount + ' фото', 'success');
+        /* METRIKA · цель: экспорт базы в JSON */
+        window.ymGoal && window.ymGoal('export_json', { parts: D.length });
     } catch (e) { toast('Ошибка: ' + e.message, 'danger'); }
 }
 const statL = s => ({ want: 'Хочу купить', bought: 'Куплено', installed: 'Установлено' }[s] || '');
@@ -3271,6 +3292,8 @@ function sLog() {
     _rebuildLogIndex();
     cLog(); rC();
     toast(id ? 'Запись обновлена' : 'Запись добавлена', 'success');
+    /* METRIKA · цель: запись в журнал (новая или правка) */
+    window.ymGoal && window.ymGoal(id ? 'log_edited' : 'log_added');
 }
 function dLog(id) {
     if (!confirm('Удалить запись?')) return;
@@ -3395,6 +3418,8 @@ function oShopList() {
         });
     });
     openM('shopmo');
+    /* METRIKA · цель: открыт список покупок на ТО */
+    window.ymGoal && window.ymGoal('shop_list_opened');
 }
 const cShop = () => closeM('shopmo');
 function pShop() {
@@ -3422,6 +3447,8 @@ function pShop() {
     h += '</body></html>';
     w.document.write(h);
     w.document.close();
+    /* METRIKA · цель: список покупок распечатан */
+    window.ymGoal && window.ymGoal('shop_list_printed', { items: items.length });
 }
 function eShopCSV() {
     if (!shopPick.size) { toast('Ничего не выбрано', 'danger'); return; }
@@ -3457,6 +3484,8 @@ function findCheaper(oem, name) {
         document.body.removeChild(a);
     });
     toast('Открыто 3 магазина', 'success');
+    /* METRIKA · цель: поиск в 3 магазинах */
+    window.ymGoal && window.ymGoal('find_cheaper', { oem: c });
 }
 
 /* ============ ЮMONEY ============ */
