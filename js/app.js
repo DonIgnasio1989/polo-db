@@ -100,13 +100,13 @@ const BASE_EK = {
 };
 
 const CAT_GROUPS = [
-    { id: 'service',     label: 'Сервис',            cats: ['Maintenance', 'RoadKit'] },
-    { id: 'powertrain',  label: 'Силовой агрегат',   cats: ['Engine', 'Fuel', 'Transmission'] },
-    { id: 'chassis',     label: 'Ходовая часть',     cats: ['Suspension', 'Steering', 'Brakes', 'RearAxle', 'Controls'] },
-    { id: 'body',        label: 'Кузов и салон',     cats: ['Body', 'Interior'] },
-    { id: 'electro',     label: 'Электрика и климат',cats: ['Electrical', 'Heating'] },
-    { id: 'consumables', label: 'Расходники',        cats: ['Fluids', 'Tires'] },
-    { id: 'refs',        label: 'Справочники',       cats: ['Torque', 'Diagnostics', 'Workshops', 'Log'], virtual: true }
+    { id: 'service', label: 'Сервис', cats: ['Maintenance', 'RoadKit'] },
+    { id: 'powertrain', label: 'Силовой агрегат', cats: ['Engine', 'Fuel', 'Transmission'] },
+    { id: 'chassis', label: 'Ходовая часть', cats: ['Suspension', 'Steering', 'Brakes', 'RearAxle', 'Controls'] },
+    { id: 'body', label: 'Кузов и салон', cats: ['Body', 'Interior'] },
+    { id: 'electro', label: 'Электрика и климат', cats: ['Electrical', 'Heating'] },
+    { id: 'consumables', label: 'Расходники', cats: ['Fluids', 'Tires'] },
+    { id: 'refs', label: 'Справочники', cats: ['Torque', 'Diagnostics', 'Workshops', 'Log'], virtual: true }
 ];
 
 let EK = Object.assign({}, BASE_EK);
@@ -176,13 +176,13 @@ const UK = 'vw_polo_ui_v186', PK = 'vw_polo_db_v181', WK = 'vw_polo_workshops_v1
     WNKEY = 'vw_polo_last_seen_version_v1';
 
 const THEMES = [
-    { id: 'light',     label: 'Светлая',    icon: '☀️', cls: 'theme-light',     preview: '#f3f5f9' },
-    { id: 'dark',      label: 'Тёмная',     icon: '🌙', cls: 'theme-dark',      preview: 'linear-gradient(135deg, #0e1525 0%, #131a28 100%)' },
-    { id: 'aurora',    label: 'Аврора',     icon: '🌌', cls: 'theme-aurora',    preview: 'linear-gradient(135deg, #0e1525 0%, #14b8a6 60%, #8b5cf6 100%)' },
-    { id: 'cyberpunk', label: 'Киберпанк',  icon: '🌸', cls: 'theme-cyberpunk', preview: 'linear-gradient(135deg, #100a1c 0%, #ec4899 55%, #22d3ee 100%)' },
-    { id: 'sunset',    label: 'Закат',      icon: '🌅', cls: 'theme-sunset',    preview: 'linear-gradient(135deg, #1a0a14 0%, #ec4899 40%, #f59e0b 100%)' },
-    { id: 'cosmos',    label: 'Космос',     icon: '🌠', cls: 'theme-cosmos',    preview: 'linear-gradient(135deg, #0d0a24 0%, #6366f1 60%, #38bdf8 100%)' },
-    { id: 'paper',     label: 'Крафт',      icon: '📜', cls: 'theme-paper',     preview: 'linear-gradient(135deg, #ece2cc 0%, #b45f2e 55%, #3a2a18 100%)' }
+    { id: 'light', label: 'Светлая', icon: '☀️', cls: 'theme-light', preview: '#f3f5f9' },
+    { id: 'dark', label: 'Тёмная', icon: '🌙', cls: 'theme-dark', preview: 'linear-gradient(135deg, #0e1525 0%, #131a28 100%)' },
+    { id: 'aurora', label: 'Аврора', icon: '🌌', cls: 'theme-aurora', preview: 'linear-gradient(135deg, #0e1525 0%, #14b8a6 60%, #8b5cf6 100%)' },
+    { id: 'cyberpunk', label: 'Киберпанк', icon: '🌸', cls: 'theme-cyberpunk', preview: 'linear-gradient(135deg, #100a1c 0%, #ec4899 55%, #22d3ee 100%)' },
+    { id: 'sunset', label: 'Закат', icon: '🌅', cls: 'theme-sunset', preview: 'linear-gradient(135deg, #1a0a14 0%, #ec4899 40%, #f59e0b 100%)' },
+    { id: 'cosmos', label: 'Космос', icon: '🌠', cls: 'theme-cosmos', preview: 'linear-gradient(135deg, #0d0a24 0%, #6366f1 60%, #38bdf8 100%)' },
+    { id: 'paper', label: 'Крафт', icon: '📜', cls: 'theme-paper', preview: 'linear-gradient(135deg, #ece2cc 0%, #b45f2e 55%, #3a2a18 100%)' }
 ];
 
 /* ============ СОСТОЯНИЕ ============ */
@@ -1339,15 +1339,15 @@ async function lAll() {
 
     if (!files.length) {
         files = [
-            { path: 'data/parts.json',        type: 'parts' },
+            { path: 'data/parts.json', type: 'parts' },
             { path: 'data/parts-01-engine-fuel-ignition.json', type: 'parts' },
             { path: 'data/parts-02-cooling-heating-brakes-suspension.json', type: 'parts' },
             { path: 'data/parts-03-trans-exh-elec-bulbs.json', type: 'parts' },
             { path: 'data/parts-04-body-interior-maint-fluids-roadkit.json', type: 'parts' },
             { path: 'data/parts-05-rear-axle-controls.json', type: 'parts' },
-            { path: 'data/categories.json',   type: 'categories' },
-            { path: 'data/sections.json',     type: 'sections' },
-            { path: 'data/workshops.json',    type: 'workshops' }
+            { path: 'data/categories.json', type: 'categories' },
+            { path: 'data/sections.json', type: 'sections' },
+            { path: 'data/workshops.json', type: 'workshops' }
         ];
     }
 
@@ -1373,13 +1373,13 @@ async function lAll() {
         for (const res of results) {
             if (!res) continue;
             switch (res.type) {
-                case 'parts':      if (Array.isArray(res.data)) serverParts = serverParts.concat(res.data); break;
+                case 'parts': if (Array.isArray(res.data)) serverParts = serverParts.concat(res.data); break;
                 case 'categories': if (Array.isArray(res.data)) cats = res.data; break;
                 case 'sections':
                     if (res.data && typeof res.data === 'object' && !Array.isArray(res.data))
                         secs = Object.assign(secs || {}, res.data);
                     break;
-                case 'workshops':  if (Array.isArray(res.data)) wss = res.data; break;
+                case 'workshops': if (Array.isArray(res.data)) wss = res.data; break;
             }
         }
 
@@ -3417,7 +3417,7 @@ function bindUI() {
                 const id = t.dataset.notesId;
                 if (!id) return;
                 const p = D.find(x => x.id === id);
-                                if (!p) return;
+                if (!p) return;
                 if (p.notes !== t.value) {
                     p.notes = t.value;
                     useIDB ? iPut(SP, p).catch(() => { }) : sD();
@@ -3478,7 +3478,7 @@ function bindGlobalUI() {
     onClick('tbtn2', oTheme);
     onClick('sft_avatar', oProfile);
     onClick('sft_username', oProfile);
-       onClick('toChip', oTO);
+    onClick('toChip', oTO);
     onClick('mb_cart', () => {
         if (window.innerWidth <= 900) cMM();
         oShopList();
@@ -3492,7 +3492,7 @@ function bindGlobalUI() {
                срабатывает дважды (inline + addEventListener) и тумблер
                гасит сам себя. */
     onClick('dtgl', tSB);
-    onClick('mob',  tMM);
+    onClick('mob', tMM);
 
     /* Гараж: «+ Добавить VIN» */
     onClick('gab', oGM);
@@ -3528,7 +3528,7 @@ function bindGlobalUI() {
     onClick('gmo_close', cGM);
     onClick('g_db', decG);
     onClick('g_sb', sGarV);
-    onClick('g_vi', () => {});
+    onClick('g_vi', () => { });
     on('g_vi', 'keydown', e => { if (e.key === 'Enter') { e.preventDefault(); decG(); } });
 
     onClick('profmo_close', cProfile);
