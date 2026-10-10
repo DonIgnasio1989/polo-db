@@ -1,30 +1,45 @@
 /* ============================================================
-VW Polo/Caddy 6N — База Мастера · app.js (Clean & Fixed)
-============================================================ */
+   VW Polo/Caddy 6N — База Мастера · app.js
+   ============================================================ */
+
+/* ============ СПРАВОЧНИКИ ============ */
 const BASE_CATS = [
     { id: 'All', label: 'Все системы', icon: '📦' },
+
+    // ─── Сервис ──────────────────────────────
     { id: 'Maintenance', label: 'Регламент ТО', icon: '🔧' },
     { id: 'RoadKit', label: 'С собой в дорогу', icon: '🎒' },
+
+    // ─── Силовой агрегат ─────────────────────
     { id: 'Engine', label: 'Двигатель', icon: '⚙️' },
     { id: 'Cooling', label: 'Охлаждение', icon: '❄️', parent: 'Engine' },
     { id: 'Ignition', label: 'Зажигание', icon: '🔥', parent: 'Engine' },
     { id: 'Fuel', label: 'Топливная система', icon: '⛽' },
     { id: 'Exhaust', label: 'Выпуск ОГ', icon: '💨', parent: 'Fuel' },
     { id: 'Transmission', label: 'Трансмиссия', icon: '🔄' },
+
+    // ─── Ходовая часть ───────────────────────
     { id: 'Suspension', label: 'Подвеска', icon: '🌀' },
     { id: 'Steering', label: 'Рулевое управление', icon: '⎈', parent: 'Suspension' },
     { id: 'Brakes', label: 'Тормозная система', icon: '🛑' },
     { id: 'RearAxle', label: 'Задняя ось', icon: '🔗' },
     { id: 'Controls', label: 'Приводы управления', icon: '🎛️' },
+
+    // ─── Кузов и салон ───────────────────────
     { id: 'Body', label: 'Кузов', icon: '🚗' },
     { id: 'Interior', label: 'Салон', icon: '🪑' },
+
+    // ─── Электрика и климат ──────────────────
     { id: 'Electrical', label: 'Электрика', icon: '⚡' },
     { id: 'Bulbs', label: 'Освещение', icon: '💡', parent: 'Electrical' },
     { id: 'Heating', label: 'Отопление / Климат', icon: '🌡️' },
+
+    // ─── Расходники ──────────────────────────
     { id: 'Fluids', label: 'Жидкости', icon: '🛢️' },
     { id: 'Tires', label: 'Шины и давление', icon: '🛞' }
 ];
 let CATS = BASE_CATS.slice();
+
 const ENGINES = {
     'AER': { v: '1.0', hp: 50, f: 'P' }, 'ALL': { v: '1.0', hp: 50, f: 'P' }, 'AEV': { v: '1.0', hp: 50, f: 'P' },
     'ALD': { v: '1.0', hp: 50, f: 'P' }, 'ANV': { v: '1.0', hp: 50, f: 'P' }, 'AUC': { v: '1.0', hp: 50, f: 'P' },
@@ -59,68 +74,407 @@ const GENERATIONS = {
     '6N2': '6N2 — рестайлинг (1999–2001)'
 };
 const TRIMS = ['Base', 'CL', 'GL', 'Trendline', 'Comfortline', 'Highline', 'Open Air'];
+
+/* ============ АЛИАСЫ ПОДКАТЕГОРИЙ (по категориям) ============ */
 const SUB_ALIASES = {
-    _all: { '': 'Прочее', 'Разное': 'Прочее', 'Прочее': 'Прочее', 'Крепёж': 'Крепёж', 'Крепёж и прокладки': 'Крепёж', 'Болты и гайки': 'Крепёж' }
+    _all: {
+        '': 'Прочее',
+        'Разное': 'Прочее',
+        'Прочее': 'Прочее',
+        'Крепёж': 'Крепёж',
+        'Крепёж и прокладки': 'Крепёж',
+        'Болты и гайки': 'Крепёж',
+    },
+
+    Engine: {
+        'Двигатель в сборе': 'Двигатель в сборе и блок цилиндров',
+        'Блок цилиндров в сборе': 'Двигатель в сборе и блок цилиндров',
+        'Блок цилиндров — детали': 'Двигатель в сборе и блок цилиндров',
+        'Блок цилиндров и поршневая': 'Двигатель в сборе и блок цилиндров',
+        'Поршни': 'Двигатель в сборе и блок цилиндров',
+        'Шатуны': 'Двигатель в сборе и блок цилиндров',
+        'Вкладыши': 'Двигатель в сборе и блок цилиндров',
+        'ГБЦ': 'ГБЦ и клапаны',
+        'ГБЦ и клапанный механизм': 'ГБЦ и клапаны',
+        'Клапаны': 'ГБЦ и клапаны',
+        'Распредвал': 'ГБЦ и клапаны',
+        'Пружины и тарелки': 'ГБЦ и клапаны',
+        'Направляющие втулки': 'ГБЦ и клапаны',
+        'Маслосъёмные колпачки': 'ГБЦ и клапаны',
+        'ГРМ и приводы': 'ГРМ',
+        'Привод ГРМ': 'ГРМ',
+        'Система смазки': 'Смазка и охлаждение',
+        'Система охлаждения': 'Смазка и охлаждение',
+        'Фильтры': 'Воздух и топливо',
+        'Форсунки': 'Воздух и топливо',
+        'Бак / Насос': 'Воздух и топливо',
+        'Экология': 'Воздух и топливо',
+        'Система впрыска': 'Воздух и топливо',
+        'Система впрыска и зажигания': 'Зажигание и датчики',
+        'Впускной коллектор': 'Воздух и топливо',
+        'Свечи': 'Зажигание и датчики',
+        'Катушка': 'Зажигание и датчики',
+        'Провода': 'Зажигание и датчики',
+        'Трамблёр': 'Зажигание и датчики',
+        'Датчики': 'Зажигание и датчики',
+        'Система зажигания': 'Зажигание и датчики',
+        'Навесное': 'Навесное оборудование',
+        'Гидроусилитель руля (опция)': 'Навесное оборудование',
+        'Насос ГУР и приводной ремень': 'Навесное оборудование',
+        'Навесное оборудование и приводы': 'Навесное оборудование',
+        'Опоры двигателя': 'Опоры и сцепление',
+        'Прокладки': 'Прокладки и крепёж',
+        'Сальники': 'Прокладки и крепёж',
+        'Крепёж и прокладки': 'Прокладки и крепёж',
+    },
+
+    Fuel: {
+        'Форсунки': 'Форсунки',
+        'Бак / Насос': 'Бак и насос',
+        'Экология': 'Экология (EVAP)',
+        'Датчики': 'Датчики',
+        'Система впрыска': 'Форсунки',
+        'Система впрыска и зажигания': 'Форсунки',
+    },
+
+    Ignition: {
+        'Свечи': 'Свечи',
+        'Катушка': 'Катушка',
+        'Провода': 'Провода',
+        'Трамблёр': 'Трамблёр',
+        'Датчики': 'Датчики',
+        'Система зажигания': 'Прочее',
+    },
+
+    Cooling: {
+        'Термостат / Помпа': 'Помпа и термостат',
+        'Помпа': 'Помпа и термостат',
+        'Радиатор': 'Радиатор',
+        'Датчики': 'Датчики',
+        'Патрубки': 'Патрубки и шланги',
+        'Шланги ОЖ': 'Патрубки и шланги',
+        'Трубопроводы': 'Патрубки и шланги',
+        'Фитинги': 'Патрубки и шланги',
+        'Хомуты': 'Патрубки и шланги',
+        'Вентилятор': 'Вентилятор',
+        'Расширительный бачок': 'Расширительный бачок',
+        'Система охлаждения': 'Прочее',
+        'Кондиционер': 'Кондиционер',
+    },
+
+    Heating: {
+        'Радиатор печки': 'Радиатор печки',
+        'Резистор': 'Резистор и моторчик',
+        'Моторчик': 'Резистор и моторчик',
+    },
+
+    Brakes: {
+        'Передние': 'Передние тормоза',
+        'Передние тормоза': 'Передние тормоза',
+        'Передний суппорт': 'Передние тормоза',
+        'Задние': 'Задние тормоза',
+        'Задние тормоза': 'Задние тормоза',
+        'ГТЦ': 'ГТЦ и ВУТ',
+        'ГТЦ и ВУТ': 'ГТЦ и ВУТ',
+        'ABS': 'ABS',
+        'Тормозная система с ABS': 'ABS',
+        'Шланги': 'Шланги и трубки',
+        'Шланги и трубки': 'Шланги и трубки',
+        'Трубки и штуцеры': 'Шланги и трубки',
+    },
+
+    Suspension: {
+        'Передняя': 'Передняя подвеска',
+        'Передняя подвеска': 'Передняя подвеска',
+        'Рычаги': 'Передняя подвеска',
+        'Стабилизатор': 'Передняя подвеска',
+        'Задняя': 'Задняя подвеска',
+        'Задняя подвеска': 'Задняя подвеска',
+        'Ступица': 'Ступица',
+        'ШРУС': 'Приводы и ШРУС',
+        'Крепёж подвески': 'Крепёж подвески',
+        'Болты и гайки': 'Крепёж подвески',
+        'Инструмент': 'Инструмент',
+        'Рулевое': 'ПЕРЕКИНУТЬ→Steering',
+        'Рулевое управление': 'ПЕРЕКИНУТЬ→Steering',
+    },
+
+    Steering: {
+        'Рулевое': 'Рейка и тяги',
+        'Рулевое управление': 'Рейка и тяги',
+        'Рейка': 'Рейка и тяги',
+        'Тяги': 'Рейка и тяги',
+        'ГУР': 'ГУР',
+    },
+
+    RearAxle: {
+        'Балка': 'Балка',
+        'Сайлентблоки': 'Сайлентблоки',
+        'Пружины': 'Пружины',
+        'Амортизаторы': 'Амортизаторы',
+        'Ступица': 'Ступица',
+        'Барабаны / Колодки': 'Барабаны и колодки',
+        'Ремкомплект': 'Ремкомплект',
+        'Тросы / Шланги': 'Тросы и шланги',
+    },
+
+    Transmission: {
+        'Сцепление': 'Сцепление',
+        'КПП / Масла': 'КПП и масла',
+        'КПП': 'КПП и масла',
+        'Первичный вал': 'Валы и подшипники',
+        'Вторичный вал': 'Валы и подшипники',
+        'Валы': 'Валы и подшипники',
+        'Дифференциал': 'Дифференциал',
+        'Шток переключения': 'Кулиса',
+        'Тяги и шарниры': 'Кулиса',
+        'Трос КПП': 'Кулиса',
+        'Кольца': 'Синхронизаторы',
+        'Стопорные кольца': 'Синхронизаторы',
+        'Прокладки': 'Прокладки и крепёж',
+        'Приводы': 'Приводы и ШРУС',
+        'ШРУС': 'Приводы и ШРУС',
+    },
+
+    Exhaust: {
+        'Глушитель': 'Глушитель',
+        'Крепёж': 'Крепёж',
+        'Выхлопная система': 'Глушитель',
+    },
+
+    Electrical: {
+        'Питание': 'Питание',
+        'Генератор': 'Генератор и стартер',
+        'Стартер': 'Генератор и стартер',
+        'Генератор и стартер': 'Генератор и стартер',
+        'Замок': 'Замок зажигания',
+        'Датчики': 'Датчики',
+        'Реле': 'Реле и предохранители',
+        'Реле и предохранители': 'Реле и предохранители',
+        'Приборная панель': 'Приборная панель',
+        'Стеклоподъёмники': 'Стеклоподъёмники',
+        'Центральный замок': 'Центральный замок',
+        'Подогрев сидений': 'Подогрев сидений',
+        'Бортовой компьютер': 'Бортовой компьютер',
+        'Иммобилайзер': 'Иммобилайзер',
+        'Магнитола': 'Магнитола и динамики',
+        'Динамики': 'Магнитола и динамики',
+        'Обогрев стёкол': 'Обогрев стёкол',
+        'Сигнализация': 'Сигнализация',
+        'Прикуриватель': 'Прикуриватель',
+        'Освещение': 'Освещение',
+    },
+
+    Bulbs: {
+        'Освещение': 'Лампы',
+        'Оптика': 'Оптика',
+    },
+
+    Body: {
+        'Обвес GTI': 'Обвес',
+        'Зеркала': 'Зеркала',
+        'Стёкла': 'Стёкла',
+        'Капот / Двери': 'Наружные панели',
+        'Решётка радиатора': 'Наружные панели',
+        'Крылья': 'Наружные панели',
+        'Бампер': 'Наружные панели',
+        'Передняя часть': 'Наружные панели',
+        'Задняя часть': 'Наружные панели',
+        'Боковая часть': 'Наружные панели',
+        'Кузовные элементы': 'Наружные панели',
+        'Замки': 'Замки и ручки',
+        'Уплотнители': 'Уплотнители',
+        'Двери': 'Двери',
+        'Люк (сдвижной верх)': 'Люк',
+        'Люк (универсальный)': 'Люк',
+        'Тюнинг/аксессуары': 'Аксессуары',
+        'ВАЗ-совместимость': 'ВАЗ-совместимость',
+        'Электрические зеркала': 'Зеркала',
+        'Крепёж и декор': 'Крепёж',
+    },
+
+    Interior: {
+        'Сиденья': 'Сиденья',
+        'Обшивка': 'Обшивка дверей',
+        'Обшивка дверей': 'Обшивка дверей',
+        'Освещение': 'Освещение салона',
+        'Руль': 'Руль',
+        'Прочее': 'Прочее',
+        'Безопасность': 'Безопасность',
+        'Накладки и консоль': 'Панель и консоль',
+        'Панель приборов': 'Панель и консоль',
+        'Бардачок и вещевые ящики': 'Панель и консоль',
+        'Пепельница': 'Панель и консоль',
+        'Консоль': 'Панель и консоль',
+        'Каркас и направляющие': 'Сиденья',
+        'Обивка и накладки': 'Сиденья',
+        'Накладки': 'Сиденья',
+        'Ручки и замки': 'Ручки и замки',
+        'Плафоны': 'Освещение салона',
+        'Выключатели': 'Освещение салона',
+        'Потолок': 'Потолок',
+        'Ручки': 'Потолок',
+        'Петли и крепления': 'Потолок',
+        'Ковры и накладки': 'Ковры',
+        'Аксессуары': 'Аксессуары',
+    },
+
+    Maintenance: {
+        'Фильтры': 'Фильтры',
+        'Регламент': 'Регламент ТО',
+        'Жидкости': 'Жидкости',
+        'Прокачка': 'Жидкости',
+        'Шины': 'Шины',
+        'Моторные масла': 'Моторные масла',
+        'Смазки': 'Смазки',
+        'Стеклоочиститель': 'Стеклоочиститель',
+    },
+
+    Fluids: {
+        'Моторные масла': 'Моторные масла',
+        'Антифриз': 'Антифриз',
+        'Смазки': 'Смазки',
+        'Кондиционер': 'Фреон и масло кондиционера',
+        'Гидроусилитель руля': 'Жидкость ГУР',
+        'Тормозная жидкость': 'Тормозная жидкость',
+    },
+
+    RoadKit: {
+        'Аварийный набор': 'Аварийный набор',
+    },
+
+    Tires: {
+        'Шины — Хэтчбек 3d/5d': 'Хэтчбек 3d/5d',
+        'Шины — Classic (седан)': 'Classic (седан)',
+        'Шины — Estate / Variant (универсал)': 'Estate / Variant',
+        'Шины — Caddy Van / Kombi': 'Caddy Van / Kombi',
+        'Шины — Сводная таблица': 'Сводная таблица',
+        'Шины': 'Общее',
+    },
+
+    Controls: {
+        'Педаль газа': 'Педаль газа',
+        'Трос газа': 'Трос газа',
+        'Педаль сцепления': 'Педаль сцепления',
+        'Трос сцепления': 'Трос сцепления',
+        'Кронштейн педалей': 'Кронштейн педалей',
+        'Кулиса КПП': 'Кулиса КПП',
+        'Трос КПП': 'Кулиса КПП',
+        'Выключатель': 'Выключатели',
+    },
 };
 const BASE_EK = {
-    Maintenance: { g: 'Регламент ТО', s: 'Обслуживание' }, RoadKit: { g: 'С собой в дорогу', s: 'Аварийный набор' },
-    Engine: { g: 'Двигатель', s: 'Разное' }, Fuel: { g: 'Топливная', s: 'Подача / Фильтры' },
-    Ignition: { g: 'Зажигание', s: 'Свечи / Катушки' }, Cooling: { g: 'Охлаждение', s: 'Радиатор / Термостат' },
-    Heating: { g: 'Отопление', s: 'Печка / Климат' }, Suspension: { g: 'Подвеска', s: 'Передняя / Задняя' },
-    Steering: { g: 'Рулевое', s: 'Рейка и тяги' }, Brakes: { g: 'Тормоза', s: 'Передние / Задние' },
-    Transmission: { g: 'Трансмиссия', s: 'КПП / Привод' }, Exhaust: { g: 'Выхлоп', s: 'Глушитель' },
-    Electrical: { g: 'Электрика', s: 'Генератор / Стартер' }, Bulbs: { g: 'Лампы', s: 'Освещение' },
-    Body: { g: 'Кузов', s: 'Наружные панели' }, Interior: { g: 'Интерьер', s: 'Панель / Сиденья' },
-    Tires: { g: 'Колёса', s: 'Шины и давление' }, Fluids: { g: 'Жидкости', s: 'Эксплуатационные' },
-    RearAxle: { g: 'Задняя ось', s: 'Балка и ступица' }, Controls: { g: 'Управление', s: 'Педали и кулиса' },
+    Maintenance: { g: 'Регламент ТО', s: 'Обслуживание' },
+    RoadKit: { g: 'С собой в дорогу', s: 'Аварийный набор' },
+    Engine: { g: 'Двигатель', s: 'Разное' },
+    Fuel: { g: 'Топливная', s: 'Подача / Фильтры' },
+    Ignition: { g: 'Зажигание', s: 'Свечи / Катушки' },
+    Cooling: { g: 'Охлаждение', s: 'Радиатор / Термостат' },
+    Heating: { g: 'Отопление', s: 'Печка / Климат' },
+    Suspension: { g: 'Подвеска', s: 'Передняя / Задняя' },
+    Steering: { g: 'Рулевое', s: 'Рейка и тяги' },
+    Brakes: { g: 'Тормоза', s: 'Передние / Задние' },
+    Transmission: { g: 'Трансмиссия', s: 'КПП / Привод' },
+    Exhaust: { g: 'Выхлоп', s: 'Глушитель' },
+    Electrical: { g: 'Электрика', s: 'Генератор / Стартер' },
+    Bulbs: { g: 'Лампы', s: 'Освещение' },
+    Body: { g: 'Кузов', s: 'Наружные панели' },
+    Interior: { g: 'Интерьер', s: 'Панель / Сиденья' },
+    Tires: { g: 'Колёса', s: 'Шины и давление' },
+    Fluids: { g: 'Жидкости', s: 'Эксплуатационные' },
+    RearAxle: { g: 'Задняя ось', s: 'Балка и ступица' },
+    Controls: { g: 'Управление', s: 'Педали и кулиса' },
 };
+
+/* ============================================================
+   ГРУППЫ КАТЕГОРИЙ — порядок и состав блоков в сайдбаре
+   ============================================================ */
 const CAT_GROUPS = [
-    { id: 'service', label: 'Сервис', cats: ['Maintenance', 'RoadKit'] },
-    { id: 'powertrain', label: 'Силовой агрегат', cats: ['Engine', 'Fuel', 'Transmission'] },
-    { id: 'chassis', label: 'Ходовая часть', cats: ['Suspension', 'Steering', 'Brakes', 'RearAxle', 'Controls'] },
-    { id: 'body', label: 'Кузов и салон', cats: ['Body', 'Interior'] },
-    { id: 'electro', label: 'Электрика и климат', cats: ['Electrical', 'Heating'] },
-    { id: 'consumables', label: 'Расходники', cats: ['Fluids', 'Tires'] },
-    { id: 'refs', label: 'Справочники', cats: ['Torque', 'Diagnostics', 'Workshops', 'Log'], virtual: true }
+    {
+        id: 'service',
+        label: 'Сервис',
+        cats: ['Maintenance', 'RoadKit']
+    },
+    {
+        id: 'powertrain',
+        label: 'Силовой агрегат',
+        cats: ['Engine', 'Fuel', 'Transmission']
+    },
+    {
+        id: 'chassis',
+        label: 'Ходовая часть',
+        cats: ['Suspension', 'Steering', 'Brakes', 'RearAxle', 'Controls']
+    },
+    {
+        id: 'body',
+        label: 'Кузов и салон',
+        cats: ['Body', 'Interior']
+    },
+    {
+        id: 'electro',
+        label: 'Электрика и климат',
+        cats: ['Electrical', 'Heating']
+    },
+    {
+        id: 'consumables',
+        label: 'Расходники',
+        cats: ['Fluids', 'Tires']
+    },
+    {
+        id: 'refs',
+        label: 'Справочники',
+        cats: ['Torque', 'Diagnostics', 'Workshops', 'Log'],
+        virtual: true
+    }
 ];
+
 let EK = Object.assign({}, BASE_EK);
+
 const IL = { s: 'СПЕЦИФИКАЦИЯ', t: 'ИНСТРУМЕНТ', p: 'ПРОЦЕДУРА', w: 'ВНИМАНИЕ', n: 'ЗАМЕТКА', r: 'РЕКОМЕНДАЦИЯ' };
 const IC = { s: 'ts', t: 'tt', p: 'tp2', w: 'tw', n: 'tn', r: 'tr' };
 const IM = { spec: 's', tool: 't', proc: 'p', warn: 'w', note: 'n', recommendation: 'r' };
 const MI = { s: 'spec', t: 'tool', p: 'proc', w: 'warn', n: 'note', r: 'recommendation' };
+
 const SH = {
     ex: n => 'https://www.exist.ru/Price/?pcode=' + n,
     ad: n => 'https://www.autodoc.ru/price/657/' + n,
     av: (n, name) => {
         const cleanOem = String(n || '').replace(/\s+/g, '');
-        const cleanName = String(name || '').replace(/\b(?:vw|volkswagen)\s+polo\b/gi, ' ').replace(/\s+/g, ' ').trim();
+        const cleanName = String(name || '')
+            .replace(/\b(?:vw|volkswagen)\s+polo\b/gi, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
         const q = (cleanName ? cleanName + ' ' : '') + 'VW Polo ' + cleanOem;
         return 'https://www.avito.ru/rossiya/zapchasti_i_aksessuary?q=' + encodeURIComponent(q);
     }
 };
+
 const shopH = (o, name) => {
     if (!o) return '';
     const c = o.replace(/\s/g, '');
     if (!c) return '';
-    return '<div class="pr">' +
-        '<a class="psl ex" target="_blank" rel="noopener noreferrer" href="' + SH.ex(c) + '" title="Поиск Exist">🛒 Exist</a>' +
-        '<a class="psl ad" target="_blank" rel="noopener noreferrer" href="' + SH.ad(c) + '" title="Поиск Autodoc">🛒 Autodoc</a>' +
-        '<a class="psl av" target="_blank" rel="noopener noreferrer" href="' + SH.av(o, name) + '" title="Поиск Avito">🛒 Avito</a>' +
-        '</div>';
+    return '<div class="pr">'
+        + '<a class="psl ex" target="_blank" rel="noopener noreferrer" href="' + SH.ex(c) + '" title="Поиск Exist">🛒 Exist</a>'
+        + '<a class="psl ad" target="_blank" rel="noopener noreferrer" href="' + SH.ad(c) + '" title="Поиск Autodoc">🛒 Autodoc</a>'
+        + '<a class="psl av" target="_blank" rel="noopener noreferrer" href="' + SH.av(o, name) + '" title="Поиск Avito">🛒 Avito</a>'
+        + '</div>';
 };
 const ONLINE_CATALOGS = {
     emex: oem => 'https://emex.ru/f?detailNum=' + encodeURIComponent(oem) + '&packet=-1',
     zzap: oem => 'https://www.zzap.ru/public/search.aspx#rawdata=' + encodeURIComponent(oem)
 };
+
 const getPurchaseHtml = p => {
+    const av = (typeof gAV === 'function') ? gAV() : null;
     const prs = fP(p.price, p.currency);
     const su = p.shopUrl || '';
-    const hh = (p.priceHistory && p.priceHistory.length) ? ' <span class="hi" title="История цен">📊 ' + p.priceHistory.length + '</span>' : '';
+    const hh = (p.priceHistory && p.priceHistory.length)
+        ? '<span class="hi" title="История цен">📊 ' + p.priceHistory.length + '</span>' : '';
     let h = '';
     h += '<div class="prow">';
-    h += prs ? ' <span class="price-tag">' + esc(prs) + '</span>' : ' <span style="color:var(--mu);font-size:.7rem">цена не указана</span>';
+    h += prs ? '<span class="price-tag">' + esc(prs) + '</span>' : '<span style="color:var(--mu);font-size:.7rem">цена не указана</span>';
     h += hh;
-    if (su) h += ' <a class="sl" href="' + escA(su) + '" target="_blank" rel="noopener noreferrer">🛒 Свой магазин</a>';
+    if (su) h += '<a class="sl" href="' + escA(su) + '" target="_blank" rel="noopener noreferrer">🛒 Свой магазин</a>';
     h += '</div>';
     if (p.oem) h += '<div class="prow">' + shopH(p.oem, p.name) + '</div>';
     if (p.oem) {
@@ -133,11 +487,14 @@ const getPurchaseHtml = p => {
     return h;
 };
 
+/* ============ КЛЮЧИ ХРАНИЛИЩА ============ */
 const UK = 'vw_polo_ui_v186', PK = 'vw_polo_db_v181', WK = 'vw_polo_workshops_v181',
     VK = 'vw_polo_vincario_key_v18', GK = 'vw_polo_garage_v181', DN = 'vw_polo_v181', DV = 2,
     SP = 'parts', SW = 'workshops', METAKEY = 'vw_polo_meta_v1', TOKEY = 'vw_polo_to_v1',
     LICKEY = 'vw_polo_license_v1', UPKEY = 'vw_polo_update_url_v1', PROFKEY = 'vw_polo_profile_v1',
-    LOGKEY = 'vw_polo_logs_v1', WNKEY = 'vw_polo_last_seen_version_v1';
+    LOGKEY = 'vw_polo_logs_v1',
+    WNKEY = 'vw_polo_last_seen_version_v1';
+
 const THEMES = [
     { id: 'light', label: 'Светлая', icon: '☀️', cls: 'theme-light', preview: '#f3f5f9' },
     { id: 'dark', label: 'Тёмная', icon: '🌙', cls: 'theme-dark', preview: 'linear-gradient(135deg, #0e1525 0%, #131a28 100%)' },
@@ -148,18 +505,21 @@ const THEMES = [
     { id: 'paper', label: 'Крафт', icon: '📜', cls: 'theme-paper', preview: 'linear-gradient(135deg, #ece2cc 0%, #b45f2e 55%, #3a2a18 100%)' }
 ];
 
+/* ============ СОСТОЯНИЕ ============ */
 const DB = [];
 let D = [], W = [], G = [], LOG = [];
 let SV = {
     activeCat: 'All', activeSub: null, searchQuery: '', statusFilter: 'all', engineFilter: 'all',
     bodyFilter: 'all', trimFilter: 'all', transFilter: 'all', genFilter: 'all',
-    sidebarCollapsed: false, theme: 'aurora', sortBy: 'default', view: 'grid', activeVinId: null,
+    sidebarCollapsed: false,
+    theme: 'aurora', sortBy: 'default', view: 'grid', activeVinId: null,
     groupBySub: false, vinStrictFilter: false, expandedCats: {}
 };
 let USER = { name: '', email: '', city: '', initials: '', color: '#00b0f0' };
 let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastDate: null, interval: 15000 };
-let APP_VERSION = '1.3.0';
+
+let APP_VERSION = '1.2.5';
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -171,8 +531,10 @@ let _confirmCb = null;
 let _changelogCache = [];
 let _logByOem = new Map();
 let _visibleLimit = 40, _lastRenderSig = '';
+
 const PAGE_SIZE = 40;
 
+/* ============ ИНДЕКС ЛОГОВ ============ */
 function _rebuildLogIndex() {
     _logByOem.clear();
     for (const e of LOG) {
@@ -181,16 +543,19 @@ function _rebuildLogIndex() {
             const key = nz(it);
             if (!key) continue;
             const prev = _logByOem.get(key);
-            if (!prev || (e.date || '') > (prev.date || '')) _logByOem.set(key, e);
+            if (!prev || (e.date || '') > (prev.date || '')) {
+                _logByOem.set(key, e);
+            }
         }
     }
 }
 
+/* ============ УТИЛИТЫ ============ */
 const $ = id => document.getElementById(id);
 const uid = () => 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
 const nz = s => (s == null ? '' : String(s)).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 const esc = t => { if (t == null) return ''; const d = document.createElement('div'); d.textContent = String(t); return d.innerHTML; };
-const escA = t => esc(t).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+const escA = t => esc(t).replace(/"/g, '&quot;');
 const sImg = d => typeof d === 'string' && /^data:image\/(png|jpe?g|webp|gif);base64,/i.test(d) ? d : '';
 const sUrl = u => {
     if (typeof u !== 'string') return '';
@@ -211,36 +576,62 @@ const sl = v => String(v || '').split(',').map(s => s.trim()).filter(Boolean);
 const csvE = v => {
     if (v == null) return '';
     const s = String(v);
-    if (/[ ",\r\n;]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    if (/[",\r\n;]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
     return s;
 };
 
+/* ============ ЛОГИЧЕСКИЙ ПОРЯДОК ТО ============ */
 const MAINT_ORDER = [
-    'масло мотор', 'масло двс', 'масло двигател', 'масло в двигател', 'фильтр маслян', 'масляный фильтр', 'фильтр масл',
-    'воздушный фильтр', 'фильтр воздушн', 'салонн', 'фильтр салон', 'топливный фильтр', 'фильтр топливн',
-    'свеч', 'свечи зажиган', 'катушк', 'провод высоковольт', 'провода зажиган', 'ремень грм', 'грм', 'ролик грм', 'натяжитель грм',
-    'ремень генератор', 'ремень поликлин', 'ремень приводн', 'ремень кондиц', 'антифриз', 'охлаждающ', 'жидкость охлажд',
-    'тормозн жидк', 'жидкость тормозн', 'жидкость тормоз', 'жидкость гур', 'жидкость гидроусил', 'масло кпп', 'масло акпп',
-    'масло трансмисс', 'масло коробк', 'омывател', 'жидкость омыв', 'колодк', 'колодки', 'тормозн диск', 'диск тормозн',
-    'тормозн барабан', 'барабан', 'суппорт', 'шланг тормозн', 'амортизатор', 'стойк', 'пыльник', 'шрус', 'шаров', 'наконечник',
-    'тяга рулев', 'сайлентблок', 'втулк стабилиз', 'аккумулятор', 'акб', 'щетк', 'щётк', 'дворник', 'стеклоочист',
-    'предохранит', 'лампочк', 'лампы', 'сажев', 'катализатор', 'лямбда', 'датчик кислород'
+    'масло мотор', 'масло двс', 'масло двигател', 'масло в двигател',
+    'фильтр маслян', 'масляный фильтр', 'фильтр масл',
+    'воздушный фильтр', 'фильтр воздушн',
+    'салонн', 'фильтр салон',
+    'топливный фильтр', 'фильтр топливн',
+    'свеч', 'свечи зажиган', 'катушк', 'провод высоковольт', 'провода зажиган',
+    'ремень грм', 'грм', 'ролик грм', 'натяжитель грм',
+    'ремень генератор', 'ремень поликлин', 'ремень приводн', 'ремень кондиц',
+    'антифриз', 'охлаждающ', 'жидкость охлажд',
+    'тормозн жидк', 'жидкость тормозн', 'жидкость тормоз',
+    'жидкость гур', 'жидкость гидроусил',
+    'масло кпп', 'масло акпп', 'масло трансмисс', 'масло коробк',
+    'омывател', 'жидкость омыв',
+    'колодк', 'колодки',
+    'тормозн диск', 'диск тормозн',
+    'тормозн барабан', 'барабан',
+    'суппорт', 'шланг тормозн',
+    'амортизатор', 'стойк',
+    'пыльник', 'шрус', 'шаров', 'наконечник', 'тяга рулев',
+    'сайлентблок', 'втулк стабилиз',
+    'аккумулятор', 'акб',
+    'щетк', 'щётк', 'дворник', 'стеклоочист',
+    'предохранит', 'лампочк', 'лампы',
+    'сажев', 'катализатор', 'лямбда', 'датчик кислород'
 ];
+
 function _maintWeight(p) {
     const n = nz(p.name || '');
     if (!n) return 9999999;
-    let m = n.match(/(?:^|\s)то[\s-–—](\d+)/i);
-    if (m) { const num = parseInt(m[1], 10); if (!isNaN(num) && num > 0) return num; }
-    m = n.match(/(\d[\d\s]{2,})\sкм/);
-    if (m) { const km = parseInt(m[1].replace(/\s/g, ''), 10); if (!isNaN(km) && km > 0) return 1000 + km; }
+    let m = n.match(/(?:^|\s)то[\s\-–—]*(\d+)/i);
+    if (m) {
+        const num = parseInt(m[1], 10);
+        if (!isNaN(num) && num > 0) return num;
+    }
+    m = n.match(/(\d[\d\s]{2,})\s*км/);
+    if (m) {
+        const km = parseInt(m[1].replace(/\s/g, ''), 10);
+        if (!isNaN(km) && km > 0) return 1000 + km;
+    }
     if (/(?:раз в год|ежегодн|каждый год)/.test(n)) return 500000;
     if (/(?:^|\s)зим/.test(n)) return 900000;
     if (/(?:^|\s)лет/.test(n)) return 901000;
     if (/(?:^|\s)весн/.test(n)) return 902000;
     if (/(?:^|\s)осен/.test(n)) return 903000;
-    for (let i = 0; i < MAINT_ORDER.length; i++) { if (n.includes(MAINT_ORDER[i])) return 950000 + i; }
+    for (let i = 0; i < MAINT_ORDER.length; i++) {
+        if (n.includes(MAINT_ORDER[i])) return 950000 + i;
+    }
     return 9999999;
 }
+
 function fmtDate(d) {
     if (!d) return '';
     const s = String(d);
@@ -251,6 +642,7 @@ function fmtDate(d) {
 const openM = id => $(id).classList.add('show');
 const closeM = id => $(id).classList.remove('show');
 
+/* ============ КАСТОМНЫЙ CONFIRM ============ */
 function askConfirm(msg, onYes, opts) {
     opts = opts || {};
     $('confirm_title').textContent = opts.title || '⚠️ Подтверждение';
@@ -269,11 +661,16 @@ function cConfirm(ok) {
     if (ok && typeof cb === 'function') {
         try {
             const r = cb();
-            if (r && typeof r.catch === 'function') r.catch(e => toast('Ошибка: ' + ((e && e.message) || e), 'danger'));
-        } catch (e) { toast('Ошибка: ' + ((e && e.message) || e), 'danger'); }
+            if (r && typeof r.catch === 'function') {
+                r.catch(e => toast('Ошибка: ' + ((e && e.message) || e), 'danger'));
+            }
+        } catch (e) {
+            toast('Ошибка: ' + ((e && e.message) || e), 'danger');
+        }
     }
 }
 
+/* ============ ЛИЦЕНЗИЯ ============ */
 function checkLicense() {
     let st = '';
     try { st = localStorage.getItem(LICKEY) || ''; } catch (e) { }
@@ -302,6 +699,7 @@ function licReset() {
     $('licgate').classList.add('show');
 }
 
+/* ============ IndexedDB ============ */
 function oDB() {
     if (dbr) return dbr;
     dbr = new Promise((res, rej) => {
@@ -365,40 +763,56 @@ const iClr = async s => {
     });
 };
 
+/* ============ НОРМАЛИЗАТОРЫ ============ */
 function nP(p) {
     if (!p || typeof p !== 'object') return null;
     const cat = (typeof p.cat === 'string' && CATS.some(x => x.id === p.cat)) ? p.cat : 'Engine';
     const ALL_ENGINES = Object.keys(ENGINES);
     const ALL_BODIES = Object.keys(BODIES);
     const ALL_TRANS = Object.keys(TRANSMISSIONS);
+
     let rawName = String(p.n || p.name || '');
     if (cat === 'Maintenance') {
-        rawName = rawName.replace(/\bкаждые\b\s*/gi, '').replace(/\s{2,}/g, ' ').replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').trim();
+        rawName = rawName
+            .replace(/\bкаждые\b\s*/gi, '')
+            .replace(/\s{2,}/g, ' ')
+            .replace(/\(\s+/g, '(')
+            .replace(/\s+\)/g, ')')
+            .trim();
     }
+
     let inst;
     if (Array.isArray(p.inst)) {
         inst = p.inst.filter(i => i && i.text).map(i => ({ type: MI[IM[i.type]] || i.type, text: String(i.text) }));
     } else if (Array.isArray(p.i)) {
         inst = p.i.map(x => ({ type: MI[x[0]] || 'note', text: String(x[1] || '') })).filter(x => x.text);
     } else inst = [];
+
     const eng = Array.isArray(p.engines) ? p.engines.filter(x => ALL_ENGINES.includes(x)) : [];
     const bdy = Array.isArray(p.bodies) ? p.bodies.filter(x => ALL_BODIES.includes(x)) : [];
     const trn = Array.isArray(p.transmissions) ? p.transmissions.filter(x => ALL_TRANS.includes(x)) : [];
     const trm = Array.isArray(p.trims) ? p.trims.filter(x => TRIMS.includes(x)) : [];
     const ALL_GENS = Object.keys(GENERATIONS);
     const gens = Array.isArray(p.gens) ? p.gens.filter(x => ALL_GENS.includes(x)) : [];
+
     const rawSub = String(p.sub || p.subcategory || '').trim();
     const catMap = SUB_ALIASES[cat] || {};
     const globMap = SUB_ALIASES._all || {};
     const mapped = catMap[rawSub] || globMap[rawSub] || rawSub;
+
     let finalCat = cat;
     let sub = mapped;
     if (typeof mapped === 'string' && mapped.startsWith('ПЕРЕКИНУТЬ→')) {
         finalCat = mapped.split('→')[1];
         sub = rawSub;
     }
+
     return {
-        id: p.id || uid(), cat: finalCat, sub, name: rawName, oem: String(p.o || p.oem || ''),
+        id: p.id || uid(),
+        cat: finalCat,
+        sub,
+        name: rawName,
+        oem: String(p.o || p.oem || ''),
         verified: !!(p.v || p.verified),
         analogs: Array.isArray(p.a || p.analogs) ? (p.a || p.analogs).map(String).filter(Boolean) : [],
         donors: Array.isArray(p.d || p.donors) ? (p.d || p.donors).map(String).filter(Boolean) : [],
@@ -406,29 +820,49 @@ function nP(p) {
         price: (p.price == null || p.price === '') ? null : (isFinite(Number(p.price)) ? Number(p.price) : null),
         currency: p.currency || 'RUB',
         status: ['want', 'bought', 'installed'].includes(p.status) ? p.status : '',
-        favorite: !!p.favorite, notes: String(p.notes || ''), shopUrl: sUrl(p.shopUrl || ''),
+        favorite: !!p.favorite,
+        notes: String(p.notes || ''),
+        shopUrl: sUrl(p.shopUrl || ''),
         photos: (() => {
             const arr = [];
-            if (Array.isArray(p.photos)) { for (const x of p.photos) { const s = sImg(x); if (s) arr.push(s); } }
-            if (!arr.length && p.photo) { const s = sImg(p.photo); if (s) arr.push(s); }
+            if (Array.isArray(p.photos)) {
+                for (const x of p.photos) { const s = sImg(x); if (s) arr.push(s); }
+            }
+            if (!arr.length && p.photo) {
+                const s = sImg(p.photo);
+                if (s) arr.push(s);
+            }
             return arr.slice(0, 12);
         })(),
-        parts: Array.isArray(p.parts) ? p.parts.filter(x => x && (x.oem || x.o || x.name || x.n)).slice(0, 40).map(x => ({
-            name: String(x.name || x.n || ''), oem: String(x.oem || x.o || ''), note: String(x.note || x.note2 || '')
-        })) : [],
+        parts: Array.isArray(p.parts) ? p.parts
+            .filter(x => x && (x.oem || x.o || x.name || x.n))
+            .slice(0, 40)
+            .map(x => ({
+                name: String(x.name || x.n || ''),
+                oem: String(x.oem || x.o || ''),
+                note: String(x.note || x.note2 || '')
+            })) : [],
         inst,
-        priceHistory: Array.isArray(p.priceHistory) ? p.priceHistory.filter(h => h && typeof h === 'object' && h.ts && h.price != null).slice(-50) : []
+        priceHistory: Array.isArray(p.priceHistory)
+            ? p.priceHistory.filter(h => h && typeof h === 'object' && h.ts && h.price != null).slice(-50)
+            : []
     };
 }
 const nW = w => !w || typeof w !== 'object' ? null : {
     id: w.id || ('w_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7)),
-    name: String(w.name || ''), phone: String(w.phone || ''), address: String(w.address || ''),
-    spec: String(w.spec || ''), rating: Math.max(0, Math.min(5, Number(w.rating) || 0)), note: String(w.note || '')
+    name: String(w.name || ''),
+    phone: String(w.phone || ''),
+    address: String(w.address || ''),
+    spec: String(w.spec || ''),
+    rating: Math.max(0, Math.min(5, Number(w.rating) || 0)),
+    note: String(w.note || '')
 };
 
+/* ============ VIN-ДЕКОДЕР ============ */
 const VY = { 'A': 1980, 'B': 1981, 'C': 1982, 'D': 1983, 'E': 1984, 'F': 1985, 'G': 1986, 'H': 1987, 'J': 1988, 'K': 1989, 'L': 1990, 'M': 1991, 'N': 1992, 'P': 1993, 'R': 1994, 'S': 1995, 'T': 1996, 'V': 1997, 'W': 1998, 'X': 1999, 'Y': 2000, '1': 2001, '2': 2002, '3': 2003, '4': 2004, '5': 2005, '6': 2006, '7': 2007, '8': 2008, '9': 2009 };
 const VP = { 'A': ['Ingolstadt', 'DE'], 'B': ['Bruxelles', 'BE'], 'D': ['Dresden', 'DE'], 'E': ['Emden', 'DE'], 'H': ['Hannover', 'DE'], 'K': ['Osnabrück', 'DE'], 'M': ['Mexico', 'MX'], 'N': ['Neckarsulm', 'DE'], 'P': ['Pamplona', 'ES'], 'R': ['Moskau', 'RU'], 'S': ['Salzgitter', 'DE'], 'V': ['Westmoreland', 'US'], 'W': ['Wolfsburg', 'DE'], 'X': ['Poznań', 'PL'], 'Z': ['Zwickau', 'DE'] };
 const vV = v => typeof v === 'string' && v.length === 17 && /^[A-HJ-NPR-Z0-9]{17}$/i.test(v);
+
 function vD(v) {
     const x = String(v || '').toUpperCase();
     if (!vV(x)) return { ok: false, error: 'VIN должен быть 17 символов (без I, O, Q)' };
@@ -450,18 +884,21 @@ function vD(v) {
         else if (vp === '6NH') body = 'Classic Sedan';
         else if (vp === '6NX') body = 'Van';
         else body = 'Hatchback';
-    } else if (/^9N/.test(vp)) { model = 'Polo (9N)'; body = 'Hatchback'; }
+    }
+    else if (/^9N/.test(vp)) { model = 'Polo (9N)'; body = 'Hatchback'; }
     else if (/^6K/.test(vp)) { model = 'Polo (6K)'; body = 'Hatchback'; }
     else if (/^1J/.test(vp)) { model = 'Golf (1J)'; body = 'Hatchback'; }
     const year = VY[yc] || null, pl = VP[pc] || ['—', '—'];
     return {
         ok: true, vin: x, brand, country, model, body, year, gen,
         plant: pl[0], plantCountry: pl[1],
-        engines: /^6N/.test(vp) ? Object.keys(ENGINES) : ['—'], serial: sr
+        engines: /^6N/.test(vp) ? Object.keys(ENGINES) : ['—'],
+        serial: sr
     };
 }
 async function vR(v) { return vD(v); }
 
+/* ============ ХРАНИЛИЩЕ ============ */
 function lG() {
     try {
         const r = localStorage.getItem(GK);
@@ -469,18 +906,29 @@ function lG() {
             const a = JSON.parse(r);
             if (Array.isArray(a)) {
                 G = a.filter(x => x && x.vin && x.id).map(x => ({
-                    id: x.id, vin: String(x.vin).toUpperCase(), brand: String(x.brand || ''), model: String(x.model || ''),
-                    year: x.year || null, body: String(x.body || ''), gen: String(x.gen || ''), plant: String(x.plant || ''),
-                    engines: Array.isArray(x.engines) ? x.engines : [], prodDate: String(x.prodDate || ''),
-                    engineCode: String(x.engineCode || ''), transCode: String(x.transCode || ''),
-                    equipCode: String(x.equipCode || ''), bodyColor: String(x.bodyColor || ''),
-                    roofColor: String(x.roofColor || ''), addedAt: x.addedAt || Date.now()
+                    id: x.id,
+                    vin: String(x.vin).toUpperCase(),
+                    brand: String(x.brand || ''),
+                    model: String(x.model || ''),
+                    year: x.year || null,
+                    body: String(x.body || ''),
+                    gen: String(x.gen || ''),
+                    plant: String(x.plant || ''),
+                    engines: Array.isArray(x.engines) ? x.engines : [],
+                    prodDate: String(x.prodDate || ''),
+                    engineCode: String(x.engineCode || ''),
+                    transCode: String(x.transCode || ''),
+                    equipCode: String(x.equipCode || ''),
+                    bodyColor: String(x.bodyColor || ''),
+                    roofColor: String(x.roofColor || ''),
+                    addedAt: x.addedAt || Date.now()
                 }));
             }
         }
     } catch (e) { }
 }
 const sG = () => { try { localStorage.setItem(GK, JSON.stringify(G)); } catch (e) { } };
+
 function lMeta() {
     try {
         const r = localStorage.getItem(METAKEY); if (!r) return;
@@ -499,10 +947,16 @@ function lMeta() {
                 const s = m.sections[sid]; if (!s) continue;
                 const ex = CATS.find(x => x.id === sid);
                 if (ex) {
-                    ex.label = s.label || ex.label; ex.icon = s.icon || ex.icon;
+                    ex.label = s.label || ex.label;
+                    ex.icon = s.icon || ex.icon;
                     if (s.parent) ex.parent = s.parent;
                 } else {
-                    CATS.push({ id: sid, label: s.label || sid, icon: s.icon || '📋', parent: s.parent || null });
+                    CATS.push({
+                        id: sid,
+                        label: s.label || sid,
+                        icon: s.icon || '📋',
+                        parent: s.parent || null
+                    });
                 }
             }
         }
@@ -510,21 +964,29 @@ function lMeta() {
 }
 function sMeta() { try { localStorage.setItem(METAKEY, JSON.stringify(CUSTOM)); } catch (e) { } }
 function resetMeta() {
-    CATS = BASE_CATS.slice(); EK = Object.assign({}, BASE_EK); CUSTOM = { categories: [], sections: {} };
+    CATS = BASE_CATS.slice();
+    EK = Object.assign({}, BASE_EK);
+    CUSTOM = { categories: [], sections: {} };
     try { localStorage.removeItem(METAKEY); } catch (e) { }
 }
+
 function lProfile() {
     try {
         const r = localStorage.getItem(PROFKEY);
         if (r) {
             const p = JSON.parse(r);
             if (p && typeof p === 'object') {
-                USER = { name: String(p.name || ''), email: String(p.email || ''), city: String(p.city || ''), initials: String(p.initials || ''), color: String(p.color || '#00b0f0') };
+                USER = {
+                    name: String(p.name || ''), email: String(p.email || ''),
+                    city: String(p.city || ''), initials: String(p.initials || ''),
+                    color: String(p.color || '#00b0f0')
+                };
             }
         }
     } catch (e) { }
 }
 function sProfileStorage() { try { localStorage.setItem(PROFKEY, JSON.stringify(USER)); } catch (e) { } }
+
 function lU() {
     try {
         const r = localStorage.getItem(UK);
@@ -538,9 +1000,13 @@ function lU() {
     } catch (e) { }
 }
 const sU = () => { try { localStorage.setItem(UK, JSON.stringify(SV)); } catch (e) { } };
+
 const sD = () => {
     if (useIDB) iMany(SP, D).catch(() => toast('Ошибка IndexedDB', 'danger'));
-    else { try { localStorage.setItem(PK, JSON.stringify(D)); } catch (e) { toast('Хранилище переполнено', 'danger'); } }
+    else {
+        try { localStorage.setItem(PK, JSON.stringify(D)); }
+        catch (e) { toast('Хранилище переполнено', 'danger'); }
+    }
 };
 const sLogs = () => {
     if (useIDB) iMany('logs', LOG).catch(() => { });
@@ -550,6 +1016,7 @@ const sWk = () => {
     if (useIDB) iMany(SW, W).catch(() => { });
     else { try { localStorage.setItem(WK, JSON.stringify(W)); } catch (e) { } }
 };
+
 function lLS() {
     try {
         const r = localStorage.getItem(PK);
@@ -561,6 +1028,7 @@ function lLS() {
         if (r) { const a = JSON.parse(r); if (Array.isArray(a)) W = a.map(nW).filter(Boolean); }
     } catch (e) { }
 }
+
 function lTO() {
     try {
         const r = localStorage.getItem(TOKEY);
@@ -568,6 +1036,7 @@ function lTO() {
     } catch (e) { }
 }
 function sTOStorage() { try { localStorage.setItem(TOKEY, JSON.stringify(TO)); } catch (e) { } }
+
 async function lLogs() {
     try {
         const r = localStorage.getItem(LOGKEY);
@@ -585,6 +1054,7 @@ async function lLogs() {
     _rebuildLogIndex();
 }
 
+/* ============ ТОСТ ============ */
 function toast(m, k) {
     const kk = k === 'success' ? 's' : k === 'danger' ? 'd' : (k || '');
     const e = $('tt');
@@ -597,7 +1067,7 @@ function toast(m, k) {
 }
 function toastUndo(msg, onUndo) {
     const e = $('tt');
-    e.innerHTML = esc(msg) + '  <button id="tt_undo">↶ Вернуть</button><div id="tt_progress"></div>';
+    e.innerHTML = esc(msg) + ' <button id="tt_undo">↶ Вернуть</button><div id="tt_progress"></div>';
     e.className = 'tst show d';
     clearTimeout(tuT);
     const btn = $('tt_undo');
@@ -623,17 +1093,19 @@ const dRC = () => {
     rcT = setTimeout(() => { rSB(); rC(); }, 120);
 };
 
+/* ============ ГАРАЖ ============ */
 function gAV() {
     if (!SV.activeVinId) return null;
     const g = G.find(x => x.id === SV.activeVinId);
     return g ? Object.assign({ ok: true }, g) : null;
 }
+
 function pCompat(p) {
     const v = gAV(); if (!v || !v.ok) return null;
     const model = nz(v.model || '');
     const donors = (p.donors || []).map(nz).filter(Boolean);
     if (!donors.length) return { pct: 50, cls: 'u', label: 'нет данных' };
-    const tokens = model.split(/[\s()/-]+/).filter(t => t.length >= 2 && t !== 'vw' && t !== 'volkswagen' && t !== 'seat' && t !== 'skoda');
+    const tokens = model.split(/[\s()/\-]+/).filter(t => t.length >= 2 && t !== 'vw' && t !== 'volkswagen' && t !== 'seat' && t !== 'skoda');
     if (!tokens.length) return { pct: 50, cls: 'u', label: 'нет данных' };
     let best = 0;
     for (const d of donors) {
@@ -650,12 +1122,21 @@ function pCompat(p) {
     else { cls = 'n'; label = 'не подходит'; }
     return { pct: best, cls, label };
 }
+
+/* ============================================================
+   VIN-индикатор — рендерится в #vinBar (внутри заголовка гаража)
+   ============================================================ */
 function rVinBar() {
     const box = $('vinBar');
     if (!box) return;
+
     const av = gAV();
     if (!av || !av.ok) { box.innerHTML = ''; return; }
-    const strictMark = SV.vinStrictFilter ? '<span class="nd-vin-tag">строго</span>' : '';
+
+    const strictMark = SV.vinStrictFilter
+        ? '<span class="nd-vin-tag">строго</span>'
+        : '';
+
     box.innerHTML =
         '<span class="nd-vin">' +
         '<span class="nd-vin-ic">🔒</span>' +
@@ -663,6 +1144,7 @@ function rVinBar() {
         strictMark +
         '<button class="nd-vin-x" type="button" title="Снять VIN-фильтр">✕</button>' +
         '</span>';
+
     const btn = box.querySelector('.nd-vin-x');
     if (btn) btn.onclick = (e) => {
         e.stopPropagation();
@@ -673,33 +1155,43 @@ function rVinBar() {
         toast('VIN-фильтр снят');
     };
 }
+
 function rGar() {
     const l = $('gl'), c = $('gc');
     if (!l) return;
     c.textContent = G.length ? '(' + G.length + ')' : '';
+
     if (!G.length) {
         l.innerHTML = '<div class="ge">Нет сохранённых машин</div>';
         rVinBar();
         return;
     }
+
     l.innerHTML = G.map(g => {
         const act = SV.activeVinId === g.id;
         const desc = [g.brand, g.model, g.year].filter(Boolean).join(' ');
         let h = '<div class="gi' + (act ? ' active' : '') + '" data-gid="' + escA(g.id) + '">';
         h += '<div class="gi-top">';
-        h += '<div class="gii"><div class="giv">' + esc(g.vin) + '</div><div class="gid">' + esc(desc || '—') + '</div></div>';
+        h += '<div class="gii"><div class="giv">' + esc(g.vin) + '</div>'
+            + '<div class="gid">' + esc(desc || '—') + '</div></div>';
         h += '<button class="gix" data-vact="delete" data-gid="' + escA(g.id) + '" title="Удалить">✕</button>';
         h += '</div>';
         if (act) {
             const rows = [
-                ['Модель', g.model || '—'], ['Дата произв.', g.prodDate ? fmtDate(g.prodDate) : '—'],
-                ['Модельный год', g.year || '—'], ['VIN', g.vin || '—'], ['Двигатель', g.engineCode || '—'],
-                ['Код КПП', g.transCode || '—'], ['Код оснащения', g.equipCode || '—'],
-                ['Цвет кузова', g.bodyColor || '—'], ['Цвет крыши', g.roofColor || '—']
+                ['Модель', g.model || '—'],
+                ['Дата произв.', g.prodDate ? fmtDate(g.prodDate) : '—'],
+                ['Модельный год', g.year || '—'],
+                ['VIN', g.vin || '—'],
+                ['Двигатель', g.engineCode || '—'],
+                ['Код КПП', g.transCode || '—'],
+                ['Код оснащения', g.equipCode || '—'],
+                ['Цвет кузова', g.bodyColor || '—'],
+                ['Цвет крыши', g.roofColor || '—']
             ];
             h += '<div class="gi-info">';
             h += rows.map(r =>
-                '<div class="gi-info-row"><span class="gi-info-lb">' + esc(r[0]) + ':</span><span class="gi-info-val">' + esc(r[1]) + '</span></div>'
+                '<div class="gi-info-row"><span class="gi-info-lb">' + esc(r[0]) + ':</span>'
+                + '<span class="gi-info-val">' + esc(r[1]) + '</span></div>'
             ).join('');
             h += '<button class="veh-edit-btn" type="button" onclick="oVIN()">✎ Уточнить данные</button>';
             h += '</div>';
@@ -707,36 +1199,52 @@ function rGar() {
         h += '</div>';
         return h;
     }).join('');
+
     rVinBar();
 }
+
 const VIN_BODY_MAP = {
-    'Hatchback 3d': '3d', 'Hatchback 5d': '5d', 'Hatchback': '',
-    'Variant': 'estate', 'Classic Sedan': 'classic', 'Van': 'caddy-van'
+    'Hatchback 3d': '3d',
+    'Hatchback 5d': '5d',
+    'Hatchback': '',
+    'Variant': 'estate',
+    'Classic Sedan': 'classic',
+    'Van': 'caddy-van'
 };
+
 function applyVinFilters() {
     const fmtr = $('fmtr'), fbdy = $('fbdy'), ftr = $('ftr'), fgen = $('fgen');
     const av = gAV();
-    if (av) {
+    if (!av) {
+        SV.engineFilter = 'all';
+        SV.bodyFilter = 'all';
+        SV.transFilter = 'all';
+        SV.genFilter = 'all';
+    } else {
         SV.engineFilter = (av.engineCode && ENGINES[av.engineCode]) ? av.engineCode : 'all';
         SV.transFilter = (av.transCode && TRANSMISSIONS[av.transCode]) ? av.transCode : 'all';
         const bKey = VIN_BODY_MAP[av.body] || '';
         SV.bodyFilter = (bKey && BODIES[bKey]) ? bKey : 'all';
         SV.genFilter = (av.gen && GENERATIONS[av.gen]) ? av.gen : 'all';
     }
-    if (fmtr) fmtr.value = SV.engineFilter || 'all';
-    if (fbdy) fbdy.value = SV.bodyFilter || 'all';
-    if (ftr) ftr.value = SV.transFilter || 'all';
-    if (fgen) fgen.value = SV.genFilter || 'all';
+    if (fmtr) fmtr.value = SV.engineFilter;
+    if (fbdy) fbdy.value = SV.bodyFilter;
+    if (ftr) ftr.value = SV.transFilter;
+    if (fgen) fgen.value = SV.genFilter;
     updateFilterStyling();
     sU();
 }
+
 function setAV(id) {
     const wasActive = !!SV.activeVinId;
     SV.activeVinId = SV.activeVinId === id ? null : id;
+
     if (!wasActive && SV.activeVinId) SV.vinStrictFilter = true;
     if (wasActive && !SV.activeVinId) SV.vinStrictFilter = false;
+
     applyVinFilters();
     sU(); rGar(); rSB(); rC();
+
     const info = gAV();
     const av = gAV();
     let extra = '';
@@ -749,23 +1257,30 @@ function setAV(id) {
     }
     toast(info ? 'Активный VIN: …' + info.vin.slice(-6) + extra : 'VIN-фильтр снят');
 }
+
 function sGarV() {
     if (!pGV || !pGV.ok) return;
     if (G.some(g => g.vin === pGV.vin)) { toast('VIN уже в гараже', 'danger'); return; }
     const g = {
         id: 'g_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6),
-        vin: pGV.vin, brand: pGV.brand || '', model: pGV.model || '',
-        year: pGV.year || null, body: pGV.body || '', gen: pGV.gen || '', plant: pGV.plant || '',
+        vin: pGV.vin,
+        brand: pGV.brand || '',
+        model: pGV.model || '',
+        year: pGV.year || null,
+        body: pGV.body || '',
+        gen: pGV.gen || '',
+        plant: pGV.plant || '',
         engines: Array.isArray(pGV.engines) ? pGV.engines : [],
-        prodDate: '', engineCode: '', transCode: '', equipCode: '', bodyColor: '', roofColor: '',
+        prodDate: '', engineCode: '', transCode: '',
+        equipCode: '', bodyColor: '', roofColor: '',
         addedAt: Date.now()
     };
     G.push(g); sG(); SV.activeVinId = g.id;
     applyVinFilters();
     sU(); rGar(); rSB(); rC();
     cGM(); toast('VIN сохранён', 'success');
-    window.ymGoal && window.ymGoal('vin_added');
 }
+
 function remV(id) {
     const g = G.find(x => x.id === id); if (!g) return;
     if (!confirm('Удалить VIN ' + g.vin + '?')) return;
@@ -775,6 +1290,7 @@ function remV(id) {
     sG(); sU(); rGar(); rSB(); rC();
     toast('VIN удалён', 'danger');
 }
+
 function oGM() {
     pGV = null;
     $('g_vi').value = '';
@@ -783,9 +1299,9 @@ function oGM() {
     $('g_sb').disabled = true;
     $('gmo').classList.add('show');
     setTimeout(() => $('g_vi').focus(), 50);
-    window.ymGoal && window.ymGoal('vin_form_opened');
 }
 const cGM = () => { $('gmo').classList.remove('show'); pGV = null; };
+
 async function decG() {
     const raw = $('g_vi').value.trim().toUpperCase(), re = $('g_re'), sb = $('g_sb');
     re.style.display = 'block';
@@ -809,6 +1325,7 @@ async function decG() {
     } finally { btn.disabled = false; }
 }
 
+/* ============ ПРОФИЛЬ ============ */
 function renderProfile() {
     const av = $('sft_avatar'), un = $('sft_username');
     if (!av || !un) return;
@@ -874,22 +1391,29 @@ function updateProfPreview() {
     sub.textContent = parts.length ? parts.join(' · ') : 'Локальный профиль · не синхронизируется';
 }
 
-function oDonate() { $('donmo').classList.add('show'); window.ymGoal && window.ymGoal('donate_opened'); }
+/* ============ ДОНАТ / О ПРОГРАММЕ / БАГ ============ */
+function oDonate() { $('donmo').classList.add('show'); }
 function cDonate() { $('donmo').classList.remove('show'); }
 const oAbout = () => { $('aboutmo').classList.add('show'); };
 const cAbout = () => { $('aboutmo').classList.remove('show'); };
 function oAPK() {
     openM('aboutmo');
     setTimeout(() => {
-        const el = $('about_apk'); if (!el) return;
+        const el = $('about_apk');
+        if (!el) return;
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        const oldBg = el.style.background, oldShadow = el.style.boxShadow;
+        const oldBg = el.style.background;
+        const oldShadow = el.style.boxShadow;
         el.style.transition = 'all .3s ease';
         el.style.background = 'color-mix(in srgb, var(--a) 25%, transparent)';
         el.style.boxShadow = '0 0 0 3px color-mix(in srgb, var(--a) 30%, transparent)';
-        setTimeout(() => { el.style.background = oldBg || ''; el.style.boxShadow = oldShadow || ''; }, 1200);
+        setTimeout(() => {
+            el.style.background = oldBg || '';
+            el.style.boxShadow = oldShadow || '';
+        }, 1200);
     }, 80);
 }
+
 const oBug = () => {
     const ml = $('bug_mailto');
     if (ml) ml.href = 'mailto:donignasio@vk.com?subject='
@@ -902,19 +1426,21 @@ const oBug = () => {
             'Что получил: \n'
         );
     $('bugmo').classList.add('show');
-    window.ymGoal && window.ymGoal('bug_opened');
 };
 const cBug = () => { $('bugmo').classList.remove('show'); };
 
+/* ============ ИСТОРИЯ ВЕРСИЙ ============ */
 async function fetchUpdateMeta() {
-    const base = location.origin + location.pathname.replace(/[^/]$/, '');
+    const base = location.origin + location.pathname.replace(/[^/]*$/, '');
     const r = await fetch(base + 'data/update.json?t=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) throw new Error('update.json: ' + r.status);
     const lm = r.headers.get('Last-Modified');
     let fallbackDate = '';
     if (lm) {
         const d = new Date(lm);
-        if (!isNaN(d.getTime())) fallbackDate = d.toISOString().slice(0, 10);
+        if (!isNaN(d.getTime())) {
+            fallbackDate = d.toISOString().slice(0, 10);
+        }
     }
     const m = await r.json();
     return {
@@ -924,6 +1450,7 @@ async function fetchUpdateMeta() {
         fallbackDate: (m && m.releasedAt) || fallbackDate
     };
 }
+
 function _cmpVer(a, b) {
     const pa = String(a || '').split('.').map(n => parseInt(n, 10) || 0);
     const pb = String(b || '').split('.').map(n => parseInt(n, 10) || 0);
@@ -935,8 +1462,10 @@ function _cmpVer(a, b) {
     }
     return 0;
 }
+
 function renderChangelog(list, currentVersion, fallbackDate) {
-    const box = $('up_changelog'); if (!box) return;
+    const box = $('up_changelog');
+    if (!box) return;
     if (!Array.isArray(list) || !list.length) {
         box.innerHTML = '<div class="cl-empty">Список изменений не опубликован.</div>';
         return;
@@ -952,24 +1481,35 @@ function renderChangelog(list, currentVersion, fallbackDate) {
         const isCurrent = cmp === 0;
         const dt = rel.date || (idx === 0 ? fallbackDate : '');
         const ch = Array.isArray(rel.changes) ? rel.changes : [];
-        const head = '<div class="cl-head"><span class="cl-ver">v' + esc(rel.version) + '</span>' + (dt ? '<span class="cl-date">' + esc(dt) + '</span>' : '') + '</div>';
+        const head = '<div class="cl-head">'
+            + '<span class="cl-ver">v' + esc(rel.version) + '</span>'
+            + (dt ? '<span class="cl-date">' + esc(dt) + '</span>' : '')
+            + '</div>';
         const body = ch.length
             ? '<ul class="cl-list">' + ch.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>'
             : '<div class="cl-empty">— без описания —</div>';
-        if (isCurrent) h += '<div class="cl-release current">' + head + body + '</div>';
-        else h += '<details class="cl-release"><summary>' + head + '</summary>' + body + '</details>';
+        if (isCurrent) {
+            h += '<div class="cl-release current">' + head + body + '</div>';
+        } else {
+            h += '<details class="cl-release"><summary>' + head + '</summary>' + body + '</details>';
+        }
     });
     box.innerHTML = h;
 }
+
 function oUp() {
     const u = $('up_url');
     if (u && !u.value) {
         let def = 'data/parts.json';
         try {
             const stored = localStorage.getItem(UPKEY);
-            if (stored) def = stored;
-            else if (location.protocol === 'http:' || location.protocol === 'https:')
-                def = location.origin + location.pathname.replace(/[^/]*$/, '') + 'data/parts.json';
+            if (stored) {
+                def = stored;
+            } else if (location.protocol === 'http:' || location.protocol === 'https:') {
+                def = location.origin +
+                    location.pathname.replace(/[^/]*$/, '') +
+                    'data/parts.json';
+            }
         } catch (e) { }
         u.value = def;
     }
@@ -977,18 +1517,21 @@ function oUp() {
     const clBox = $('up_changelog');
     if (clBox) clBox.innerHTML = '<div class="cl-empty">⏳ Загружаем список изменений…</div>';
     $('upmo').classList.add('show');
+
     fetchUpdateMeta().then(meta => {
         renderChangelog(meta.changelog, APP_VERSION, meta.fallbackDate);
     }).catch(() => {
         renderChangelog(null, APP_VERSION, '');
     });
 }
+
 const cUp = () => { $('upmo').classList.remove('show'); window._upParts = null; };
 function sUpUrl() {
     const u = $('up_url').value.trim();
     try { localStorage.setItem(UPKEY, u); } catch (e) { }
     toast(u ? 'URL сохранён' : 'URL очищен', 'success');
 }
+
 async function checkUpdate() {
     const st = $('up_status');
     st.innerHTML = '<div class="up-load">⏳ Проверяем сервер…</div>';
@@ -998,6 +1541,7 @@ async function checkUpdate() {
         const r = await fetch(base + 'data/update.json?t=' + Date.now(), { cache: 'no-store' });
         if (r.ok) { const m = await r.json(); remoteVer = String(m.appVersion || ''); }
     } catch (e) { }
+
     const files = [
         'data/parts-01-engine-fuel-ignition.json',
         'data/parts-02-cooling-heating-brakes-suspension.json',
@@ -1015,10 +1559,19 @@ async function checkUpdate() {
         } catch (e) { }
     }
     window._upParts = parts;
-    const iKey = p => [p.cat || '', (p.sub || '').trim(), (p.oem || '').trim(), (p.name || '').trim()].join('|');
+
+    const iKey = p => [
+        p.cat || '',
+        (p.sub || '').trim(),
+        (p.oem || '').trim(),
+        (p.name || '').trim()
+    ].join('|');
+
     const seen = new Set(D.map(iKey));
     const serverSeen = new Set();
-    let newCnt = 0, dupCnt = 0;
+    let newCnt = 0;
+    let dupCnt = 0;
+
     for (const raw of parts) {
         const p = nP(raw); if (!p) continue;
         const k = iKey(p);
@@ -1026,6 +1579,7 @@ async function checkUpdate() {
         serverSeen.add(k);
         if (!seen.has(k)) newCnt++;
     }
+
     const appNewer = remoteVer && remoteVer !== APP_VERSION;
     let h = '<div class="up-ok">';
     h += '<div style="font-weight:700;margin-bottom:8px">✓ Проверка завершена</div>';
@@ -1035,7 +1589,10 @@ async function checkUpdate() {
     h += '</div>';
     h += '<div style="margin-bottom:4px">У вас: <b>' + D.length + '</b> позиций · На сервере: <b>' + parts.length + '</b></div>';
     if (dupCnt > 0) {
-        h += '<div style="margin-bottom:4px;font-size:.78rem;color:var(--mu)">В источнике <b>' + dupCnt + '</b> дубликатов — они не считаются новыми</div>';
+        h += '<div style="margin-bottom:4px;font-size:.78rem;color:var(--mu)">'
+            + 'В источнике <b>' + dupCnt + '</b> дубликатов (совпадают по категории+OEM+названию) — '
+            + 'они не считаются новыми'
+            + '</div>';
     }
     h += '<div style="margin-bottom:8px">Новых для добавления: <b>' + newCnt + '</b></div>';
     h += '<div class="up-actions">';
@@ -1044,11 +1601,12 @@ async function checkUpdate() {
     h += '</div></div>';
     st.innerHTML = h;
 }
+
 function doFullUpdate() {
     toast('Загружаем свежую версию…', 'success');
-    try { localStorage.removeItem('vw_polo_data_ver'); } catch (e) { }
     setTimeout(() => location.replace(location.pathname + '?v=' + Date.now()), 300);
 }
+
 function applyUpMerge() {
     const parts = window._upParts;
     if (!parts) { toast('Нет данных', 'danger'); return; }
@@ -1064,179 +1622,126 @@ function applyUpMerge() {
     toast('Добавлено: ' + add + ' из ' + cl.length, 'success');
 }
 
+/* ============ ЗАГРУЗКА ============ */
 function _guessType(path) {
     const p = String(path || '').toLowerCase();
     if (/parts-\d|parts\.json|\/parts\//.test(p)) return 'parts';
-    if (/categories.json/.test(p)) return 'categories';
-    if (/sections.json|composition.json/.test(p)) return 'sections';
-    if (/workshops.json/.test(p)) return 'workshops';
+    if (/categories\.json/.test(p)) return 'categories';
+    if (/sections\.json|composition\.json/.test(p)) return 'sections';
+    if (/workshops\.json/.test(p)) return 'workshops';
     return 'unknown';
 }
-function _mergeParts(a, b) {
-    const out = { ...a };
-    if (!out.name && b.name) out.name = b.name;
-    if (!out.oem && b.oem) out.oem = b.oem;
-    if (!out.sub && b.sub) out.sub = b.sub;
-    if (b.verified) out.verified = true;
-    if (!out.price && b.price != null) out.price = b.price;
-    if (b.favorite) out.favorite = true;
-    if (!out.notes && b.notes) out.notes = b.notes;
-    if (!out.shopUrl && b.shopUrl) out.shopUrl = b.shopUrl;
-    if (!out.status && b.status) out.status = b.status;
-    const uniq = (x, y) => Array.from(new Set([...(x || []), ...(y || [])]));
-    out.analogs = uniq(a.analogs, b.analogs);
-    out.donors = uniq(a.donors, b.donors);
-    out.engines = uniq(a.engines, b.engines);
-    out.bodies = uniq(a.bodies, b.bodies);
-    out.transmissions = uniq(a.transmissions, b.transmissions);
-    out.trims = uniq(a.trims, b.trims);
-    out.gens = uniq(a.gens, b.gens);
-    const im = new Map();
-    [...(a.inst || []), ...(b.inst || [])].forEach(i => { if (i.text && !im.has(i.text)) im.set(i.text, i); });
-    out.inst = Array.from(im.values());
-    out.photos = Array.from(new Set([...(a.photos || []), ...(b.photos || [])])).slice(0, 12);
-    if (Array.isArray(b.parts) && b.parts.length) {
-        const pm = new Map();
-        [...(a.parts || []), ...b.parts].forEach(p => {
-            const k = (p.oem || '') + '|' + (p.name || '');
-            if (!pm.has(k)) pm.set(k, p);
-        });
-        out.parts = Array.from(pm.values());
-    }
-    const hm = new Map();
-    [...(a.priceHistory || []), ...(b.priceHistory || [])].forEach(h => hm.set(h.ts, h));
-    out.priceHistory = Array.from(hm.values()).sort((x, y) => x.ts - y.ts).slice(-50);
-    return out;
-}
-function _dedupeParts(parts) {
-    const map = new Map();
-    const keyOf = p => (p.oem || '').toLowerCase() + '|' + (p.name || '').toLowerCase();
-    for (const p of parts) {
-        if (!p) continue;
-        const k = keyOf(p);
-        if (!k || k === '|') continue;
-        if (map.has(k)) map.set(k, _mergeParts(map.get(k), p));
-        else map.set(k, p);
-    }
-    return Array.from(map.values());
-}
+
 async function lAll() {
     try {
         const p = await iAll(SP), w = await iAll(SW);
         D = p.map(nP).filter(Boolean);
         W = w.map(nW).filter(Boolean);
     } catch (e) { useIDB = false; lLS(); }
+
     const base = location.origin + location.pathname.replace(/[^/]*$/, '');
-    let remoteVersion = '';
     let files = [];
     try {
         const r = await fetch(base + 'data/update.json?t=' + Date.now(), { cache: 'no-store' });
         if (r.ok) {
             const m = await r.json();
-            remoteVersion = String(m.appVersion || '');
             if (Array.isArray(m.files) && m.files.length) files = m.files;
             if (Array.isArray(m.changelog)) _setChangelog(m.changelog);
         }
-    } catch (e) { console.warn('update.json недоступен', e); }
+    } catch (e) { console.warn('update.json не загрузился', e); }
     if (!files.length) {
         files = [
-            { path: 'data/parts.json', type: 'parts' },
             { path: 'data/parts-01-engine-fuel-ignition.json', type: 'parts' },
             { path: 'data/parts-02-cooling-heating-brakes-suspension.json', type: 'parts' },
             { path: 'data/parts-03-trans-exh-elec-bulbs.json', type: 'parts' },
             { path: 'data/parts-04-body-interior-maint-fluids-roadkit.json', type: 'parts' },
             { path: 'data/parts-05-rear-axle-controls.json', type: 'parts' },
+            { path: 'data/parts-07-engine-composition.json', type: 'parts' },
+            { path: 'data/parts-08-from-html.json', type: 'parts' },
             { path: 'data/categories.json', type: 'categories' },
             { path: 'data/sections.json', type: 'sections' },
             { path: 'data/workshops.json', type: 'workshops' }
         ];
     }
-    let lastDataVer = '';
-    try { lastDataVer = localStorage.getItem('vw_polo_data_ver') || ''; } catch (e) { }
-    const skipFetch = D.length > 50 && remoteVersion && remoteVersion === lastDataVer;
-    if (skipFetch) {
-        console.log('[lAll] data v' + remoteVersion + ' cached · ' + D.length + ' items');
-    } else {
-        const t0 = performance.now();
-        const results = await Promise.all(files.map(async (item) => {
-            const f = typeof item === 'string' ? item : item.path;
-            const type = typeof item === 'string' ? _guessType(f) : item.type;
-            try {
-                const r = await fetch(f + '?t=' + Date.now(), { cache: 'no-store' });
-                if (!r.ok) return null;
-                return { type, data: await r.json() };
-            } catch (e) { console.warn('fetch fail:', f, e); return null; }
-        }));
-        let serverParts = [], cats = null, secs = null, wss = null;
-        for (const res of results) {
-            if (!res) continue;
-            switch (res.type) {
-                case 'parts': if (Array.isArray(res.data)) serverParts = serverParts.concat(res.data); break;
-                case 'categories': if (Array.isArray(res.data)) cats = res.data; break;
-                case 'sections':
-                    if (res.data && typeof res.data === 'object' && !Array.isArray(res.data))
-                        secs = Object.assign(secs || {}, res.data);
+
+    let serverParts = [], cats = null, secs = null, wss = null;
+    for (const item of files) {
+        const f = typeof item === 'string' ? item : item.path;
+        const type = typeof item === 'string' ? _guessType(f) : item.type;
+
+        try {
+            const r = await fetch(f + '?t=' + Date.now(), { cache: 'no-store' });
+            if (!r.ok) { console.warn('Не найден:', f); continue; }
+            const data = await r.json();
+
+            switch (type) {
+                case 'parts':
+                    if (Array.isArray(data)) serverParts = serverParts.concat(data);
                     break;
-                case 'workshops': if (Array.isArray(res.data)) wss = res.data; break;
+                case 'categories':
+                    if (Array.isArray(data)) cats = data;
+                    break;
+                case 'sections':
+                    if (data && typeof data === 'object' && !Array.isArray(data)) {
+                        secs = Object.assign(secs || {}, data);
+                    }
+                    break;
+                case 'workshops':
+                    if (Array.isArray(data)) wss = data;
+                    break;
+                default:
+                    console.warn('Неизвестный тип файла:', f, '→', type);
             }
-        }
-        const normalized = serverParts.map(nP).filter(Boolean);
-        const deduped = _dedupeParts(normalized);
-        console.log('[lAll] files:' + files.length + ' · raw:' + serverParts.length +
-            ' · after dedupe:' + deduped.length +
-            ' · ' + Math.round(performance.now() - t0) + 'ms');
-        if (deduped.length) {
-            const keyOf = x => (x.oem || '').toLowerCase() + '|' + (x.name || '').toLowerCase();
-            const localMap = new Map(D.map(x => [keyOf(x), x]));
-            let add = 0, upd = 0;
-            for (const np of deduped) {
-                const k = keyOf(np);
-                if (!localMap.has(k)) { D.push(np); localMap.set(k, np); add++; }
-                else {
-                    const old = localMap.get(k);
-                    const user = {
-                        id: old.id, status: old.status, favorite: old.favorite,
-                        notes: old.notes, price: old.price, currency: old.currency,
-                        priceHistory: old.priceHistory, shopUrl: old.shopUrl, photos: old.photos
-                    };
-                    Object.assign(old, np, user);
-                    upd++;
-                }
-            }
-            console.log('[lAll] add:' + add + ' · update:' + upd);
-        }
-        D = _dedupeParts(D);
-        if (useIDB) try { await iMany(SP, D); } catch (e) { } else sD();
-        if (remoteVersion) {
-            try { localStorage.setItem('vw_polo_data_ver', remoteVersion); } catch (e) { }
-        }
-        if (cats) for (const c of cats) {
-            if (!c || !c.id) continue;
-            if (!CATS.find(x => x.id === c.id))
-                CATS.push({ id: c.id, label: c.label || c.id, icon: c.icon || '📁' });
-        }
-        if (secs) {
-            CUSTOM.sections = Object.assign({}, CUSTOM.sections, secs);
-            sMeta();
-        }
-        if (wss && wss.length) {
-            const wsMap = new Map(W.map(w => [w.id || w.name, w]));
-            let wAdd = 0;
-            for (const w of wss.map(nW).filter(Boolean)) {
-                const k = w.id || w.name;
-                if (!wsMap.has(k)) { W.push(w); wsMap.set(k, w); wAdd++; }
-            }
-            if (wAdd) {
-                if (useIDB) await iMany(SW, W); else sWk();
-                console.log('[lAll] workshops +' + wAdd);
-            }
-        }
+        } catch (e) { console.warn('Ошибка ' + f, e); }
     }
+
+    if (serverParts.length) {
+        const map = new Map(D.map(x => [(x.oem || '') + '||' + (x.name || ''), x]));
+        let add = 0, upd = 0;
+        for (const raw of serverParts) {
+            const np = nP(raw); if (!np) continue;
+            const k = (np.oem || '') + '||' + (np.name || '');
+            if (!map.has(k)) { D.push(np); map.set(k, np); add++; }
+            else {
+                const old = map.get(k);
+                const user = {
+                    id: old.id,
+                    status: old.status,
+                    favorite: old.favorite,
+                    notes: old.notes,
+                    price: old.price,
+                    currency: old.currency,
+                    priceHistory: old.priceHistory,
+                    shopUrl: old.shopUrl,
+                    photos: old.photos
+                };
+                Object.assign(old, np, user);
+                upd++;
+            }
+        }
+        console.log('С сервера: +' + add + ', ~' + upd + ' | Итого:', D.length);
+        if (useIDB) try { await iMany(SP, D); } catch (e) { }
+        else sD();
+    }
+
+    if (cats) for (const c of cats) {
+        if (!c || !c.id) continue;
+        if (!CATS.find(x => x.id === c.id)) CATS.push({ id: c.id, label: c.label || c.id, icon: c.icon || '📁' });
+    }
+
+    if (secs) { CUSTOM.sections = Object.assign({}, secs); sMeta(); }
+
+    if (wss && wss.length) {
+        W = wss.map(nW).filter(Boolean);
+        if (useIDB) await iMany(SW, W); else sWk();
+    }
+
     lG(); lMeta(); lU(); lProfile(); lTO(); await lLogs();
     if (SV.activeVinId && !G.some(g => g.id === SV.activeVinId)) SV.activeVinId = null;
     try { vk = localStorage.getItem(VK) || ''; } catch (e) { }
 }
 
+/* ============ ТЕМА ============ */
 function aTh() {
     THEMES.forEach(t => document.body.classList.remove(t.cls));
     const t = THEMES.find(x => x.id === SV.theme) || THEMES[2];
@@ -1246,7 +1751,8 @@ function aTh() {
 function oTheme() { renderThemeGrid(); openM('thememmo'); }
 const cTheme = () => closeM('thememmo');
 function renderThemeGrid() {
-    const g = $('themeGrid'); if (!g) return;
+    const g = $('themeGrid');
+    if (!g) return;
     g.innerHTML = THEMES.map(t =>
         '<button type="button" class="th-card' + (SV.theme === t.id ? ' on' : '') + '" data-th="' + t.id + '">' +
         '<div class="th-preview" style="background:' + t.preview + '"></div>' +
@@ -1263,9 +1769,9 @@ function sTheme(id) {
     renderThemeGrid();
     const t = THEMES.find(x => x.id === id);
     toast('🎨 Тема: ' + t.label, 'success');
-    window.ymGoal && window.ymGoal('theme_changed', { theme: id });
 }
 
+/* ============ UI / САЙДБАР / АДАПТИВ ============ */
 function setV(v, s) {
     SV.view = v;
     if (!s) sU();
@@ -1297,15 +1803,22 @@ const tMM = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     $('sb').classList.contains('open-mobile') ? cMM() : oMM();
 };
+
+/* Виртуальные (не товарные) разделы — для сайдбара */
 const VIRTUAL_CATS = {
     Workshops: { label: 'Мастерские/СТО', icon: '🔧' },
     Log: { label: 'Журнал обслуживания', icon: '📖' },
     Diagnostics: { label: 'Диагностика (OBD)', icon: '🩺' },
     Torque: { label: 'Моменты затяжки', icon: '🔩' },
 };
+
+/* ============================================================
+   Отфильтрованный список для счётчиков в сайдбаре.
+   ============================================================ */
 function computeFilteredForSidebar() {
     const t = nz(SV.searchQuery).split(/\s+/).filter(Boolean);
     let f = D;
+
     if (SV.activeVinId && SV.vinStrictFilter) {
         f = f.filter(p => {
             if (!p.donors || !p.donors.length) return true;
@@ -1313,26 +1826,45 @@ function computeFilteredForSidebar() {
             return !cmp || cmp.cls !== 'n';
         });
     }
-    if (SV.statusFilter && SV.statusFilter !== 'all') f = f.filter(p => (p.status || '') === SV.statusFilter);
-    if (SV.engineFilter && SV.engineFilter !== 'all') f = f.filter(p => {
-        const arr = p.engines || []; return !arr.length || arr.includes(SV.engineFilter);
-    });
-    if (SV.bodyFilter && SV.bodyFilter !== 'all') f = f.filter(p => {
-        const arr = p.bodies || []; return !arr.length || arr.includes(SV.bodyFilter);
-    });
-    if (SV.transFilter && SV.transFilter !== 'all') f = f.filter(p => {
-        const arr = p.transmissions || []; return !arr.length || arr.includes(SV.transFilter);
-    });
-    if (SV.genFilter && SV.genFilter !== 'all') f = f.filter(p => {
-        const arr = p.gens || []; return !arr.length || arr.includes(SV.genFilter);
-    });
+
+    if (SV.statusFilter && SV.statusFilter !== 'all')
+        f = f.filter(p => (p.status || '') === SV.statusFilter);
+
+    if (SV.engineFilter && SV.engineFilter !== 'all')
+        f = f.filter(p => {
+            const arr = p.engines || [];
+            return !arr.length || arr.includes(SV.engineFilter);
+        });
+
+    if (SV.bodyFilter && SV.bodyFilter !== 'all')
+        f = f.filter(p => {
+            const arr = p.bodies || [];
+            return !arr.length || arr.includes(SV.bodyFilter);
+        });
+
+    if (SV.transFilter && SV.transFilter !== 'all')
+        f = f.filter(p => {
+            const arr = p.transmissions || [];
+            return !arr.length || arr.includes(SV.transFilter);
+        });
+
+    if (SV.genFilter && SV.genFilter !== 'all')
+        f = f.filter(p => {
+            const arr = p.gens || [];
+            return !arr.length || arr.includes(SV.genFilter);
+        });
+
     if (t.length) f = f.filter(p => mP(p, t));
     return f;
 }
+
 function rSB() {
-    const n = $('nl'); if (!n) return;
+    const n = $('nl');
+    if (!n) return;
     n.innerHTML = '';
     if (!SV.expandedCats || typeof SV.expandedCats !== 'object') SV.expandedCats = {};
+
+    // ── Фильтрованный список + раскладка по категориям ────────
     const filtered = computeFilteredForSidebar();
     const byCat = {};
     let favCount = 0;
@@ -1340,23 +1872,33 @@ function rSB() {
         byCat[p.cat] = (byCat[p.cat] || 0) + 1;
         if (p.favorite) favCount++;
     }
+
+    // ── Счётчики ──────────────────────────────────────────────
     const cnt = id => {
         const sec = CUSTOM.sections && CUSTOM.sections[id];
         if (sec && Array.isArray(sec.rows)) return sec.rows.length;
+
         if (id === 'Workshops') return W.length;
         if (id === 'Log') return LOG.length;
-        if (id === 'Diagnostics') return (CUSTOM.sections.Diagnostics && CUSTOM.sections.Diagnostics.rows || []).length;
-        if (id === 'Torque') return (CUSTOM.sections.Torque && CUSTOM.sections.Torque.rows || []).length;
+        if (id === 'Diagnostics')
+            return (CUSTOM.sections.Diagnostics && CUSTOM.sections.Diagnostics.rows || []).length;
+        if (id === 'Torque')
+            return (CUSTOM.sections.Torque && CUSTOM.sections.Torque.rows || []).length;
+
         if (id === 'All') return filtered.length;
         if (id === 'Favorites') return favCount;
+
         return byCat[id] || 0;
     };
+
+    // ── Отрисовка плоского пункта ─────────────────────────────
     const addItem = (id, icon, label, count, cls, sub) => {
         const li = document.createElement('li');
         li.className = 'ni ' + (SV.activeCat === id && !SV.activeSub ? 'active ' : '') + (cls || '') + (sub ? ' sub' : '');
         li.setAttribute('tabindex', '-1');
         li.onclick = () => {
-            SV.activeCat = id; SV.activeSub = null;
+            SV.activeCat = id;
+            SV.activeSub = null;
             sU(); rSB(); rC();
             if (window.innerWidth <= 900) cMM();
             $('ca').scrollTop = 0;
@@ -1368,13 +1910,18 @@ function rSB() {
             '</span><span class="bdg"' + dimStyle + '>' + count + '</span>';
         n.appendChild(li);
     };
+
+    // ── Заголовок группы ─────────────────────────────────────
     const addSection = label => {
         const li = document.createElement('li');
         li.className = 'nd-label';
         li.textContent = label;
         n.appendChild(li);
     };
+
+    // ── Папка категории с подкатегориями и/или дочерними категориями ──
     const addCatFolder = (c) => {
+        // 1. Собираем уникальные sub у деталей этой категории (из отфильтрованного списка)
         const subs = new Map();
         for (const p of filtered) {
             if (p.cat !== c.id) continue;
@@ -1382,11 +1929,18 @@ function rSB() {
             if (!s) continue;
             subs.set(s, (subs.get(s) || 0) + 1);
         }
-        const subList = Array.from(subs.entries()).sort((a, b) => a[0].localeCompare(b[0], 'ru'));
+        const subList = Array.from(subs.entries())
+            .sort((a, b) => a[0].localeCompare(b[0], 'ru'));
+
+        // 2. Дочерние категории (по parent)
         const kids = CATS.filter(k => k.parent === c.id);
+
+        // 3. Итоговый счётчик = своя категория + все дочерние
         const total = cnt(c.id) + kids.reduce((s, k) => s + cnt(k.id), 0);
+
         const expanded = !!SV.expandedCats[c.id];
         const isAllActive = SV.activeCat === c.id && !SV.activeSub;
+
         const li = document.createElement('li');
         li.className = 'ni folder' + (expanded ? ' open' : '') + (isAllActive ? ' active' : '');
         li.setAttribute('tabindex', '-1');
@@ -1399,7 +1953,10 @@ function rSB() {
             sU(); rSB();
         };
         n.appendChild(li);
+
         if (!expanded) return;
+
+        // Пункт «Все разделы» — сброс подкатегории
         const allLi = document.createElement('li');
         allLi.className = 'ni sub' + (isAllActive ? ' active' : '');
         allLi.setAttribute('tabindex', '-1');
@@ -1408,12 +1965,15 @@ function rSB() {
             '<span class="bdg">' + total + '</span>';
         allLi.onclick = (e) => {
             e.stopPropagation();
-            SV.activeCat = c.id; SV.activeSub = null;
+            SV.activeCat = c.id;
+            SV.activeSub = null;
             sU(); rSB(); rC();
             if (window.innerWidth <= 900) cMM();
             $('ca').scrollTop = 0;
         };
         n.appendChild(allLi);
+
+        // Сами подкатегории (sub)
         subList.forEach(([sub, count]) => {
             const subActive = SV.activeCat === c.id && SV.activeSub === sub;
             const sli = document.createElement('li');
@@ -1425,13 +1985,16 @@ function rSB() {
                 '<span class="bdg"' + (count === 0 ? ' style="opacity:.45"' : '') + '>' + count + '</span>';
             sli.onclick = (e) => {
                 e.stopPropagation();
-                SV.activeCat = c.id; SV.activeSub = sub;
+                SV.activeCat = c.id;
+                SV.activeSub = sub;
                 sU(); rSB(); rC();
                 if (window.innerWidth <= 900) cMM();
                 $('ca').scrollTop = 0;
             };
             n.appendChild(sli);
         });
+
+        // Дочерние категории (например, Cooling, Ignition внутри Engine)
         kids.forEach(k => {
             const kidActive = SV.activeCat === k.id && !SV.activeSub;
             const kli = document.createElement('li');
@@ -1444,7 +2007,8 @@ function rSB() {
                 '<span class="bdg"' + (kc === 0 ? ' style="opacity:.45"' : '') + '>' + kc + '</span>';
             kli.onclick = (e) => {
                 e.stopPropagation();
-                SV.activeCat = k.id; SV.activeSub = null;
+                SV.activeCat = k.id;
+                SV.activeSub = null;
                 sU(); rSB(); rC();
                 if (window.innerWidth <= 900) cMM();
                 $('ca').scrollTop = 0;
@@ -1452,10 +2016,15 @@ function rSB() {
             n.appendChild(kli);
         });
     };
+
+    // ── ПИН-БЛОК (всегда сверху) ─────────────────
     addItem('Favorites', '⭐', 'Избранное', cnt('Favorites'), 'fav');
     addItem('All', '📦', 'Все системы', cnt('All'));
+
+    // ── ГРУППЫ ───────────────────────────────────────────────
     for (const grp of CAT_GROUPS) {
         addSection(grp.label);
+
         for (const cid of grp.cats) {
             if (grp.virtual && VIRTUAL_CATS[cid]) {
                 const v = VIRTUAL_CATS[cid];
@@ -1464,15 +2033,27 @@ function rSB() {
             }
             const c = CATS.find(x => x.id === cid);
             if (!c) continue;
+
+            // Пропускаем вложенные категории — они рендерятся как kids своего родителя
             if (c.parent) continue;
-            const hasSubs = filtered.some(p => p.cat === cid && (p.sub || '').trim());
+
+            // Есть ли у категории свои sub'ы в отфильтрованном списке?
+            const hasSubs = filtered.some(p =>
+                p.cat === cid && (p.sub || '').trim()
+            );
+            // Есть ли дочерние категории (по parent)?
             const hasKids = CATS.some(k => k.parent === cid);
-            if (hasSubs || hasKids) addCatFolder(c);
-            else addItem(c.id, c.icon, c.label, cnt(c.id));
+
+            if (hasSubs || hasKids) {
+                addCatFolder(c);
+            } else {
+                addItem(c.id, c.icon, c.label, cnt(c.id));
+            }
         }
     }
 }
 
+/* ============ ПОИСК / ФИЛЬТРЫ ============ */
 const uSC = () => $('scl').classList.toggle('show', !!(SV.searchQuery || '').length);
 const cS = () => { SV.searchQuery = ''; $('sr').value = ''; uSC(); sU(); rC(); };
 function resetFilters() {
@@ -1495,6 +2076,7 @@ function rD() {
         { title: '♻️ Пересобрать базу?', yes: 'Да, пересобрать', no: 'Нет', showExport: true }
     );
 }
+
 async function doRebuild() {
     try {
         if (useIDB) { await iClr(SP); await iClr(SW); }
@@ -1507,11 +2089,12 @@ async function doRebuild() {
         toast('Загружено: ' + D.length + ' поз.', 'success');
     } catch (e) { toast('Ошибка: ' + e.message, 'danger'); }
 }
+
 function mP(p, t) {
     if (!t.length) return true;
     const h = nz([p.oem || '', p.name || '', ...(p.analogs || []), ...(p.donors || []),
     ...((p.inst || []).map(i => i.text)), p.notes || '',
-    ...(p.engines || []), ...(p.transmissions || []), ...(p.bodies || []), ...(p.gens || [])].join(' '));
+    ...(p.engines || []), ...(p.transmissions || []), ...(p.bodies || []), ...(p.gens || [])].join('  '));
     return t.every(x => h.includes(x));
 }
 function sP(a) {
@@ -1530,6 +2113,7 @@ function sP(a) {
     if (s === 'favorite') return a.slice().sort((x, y) => (y.favorite ? 1 : 0) - (x.favorite ? 1 : 0));
     return a;
 }
+
 function gF() {
     const t = nz(SV.searchQuery).split(/\s+/).filter(Boolean);
     let f = D;
@@ -1540,22 +2124,29 @@ function gF() {
             return !cmp || cmp.cls !== 'n';
         });
     }
-    if (SV.activeCat === 'Favorites') f = f.filter(p => p.favorite);
-    else if (SV.activeCat !== 'All' && SV.activeCat !== 'Workshops' && SV.activeCat !== 'Log') {
+    if (SV.activeCat === 'Favorites') {
+        f = f.filter(p => p.favorite);
+    } else if (SV.activeCat !== 'All' && SV.activeCat !== 'Workshops' && SV.activeCat !== 'Log') {
         f = f.filter(p => p.cat === SV.activeCat);
-        if (SV.activeSub) f = f.filter(p => (p.sub || '').trim() === SV.activeSub);
+        if (SV.activeSub) {
+            f = f.filter(p => (p.sub || '').trim() === SV.activeSub);
+        }
     }
     if (SV.engineFilter && SV.engineFilter !== 'all') f = f.filter(p => {
-        const arr = p.engines || []; return !arr.length || arr.includes(SV.engineFilter);
+        const arr = p.engines || [];
+        return !arr.length || arr.includes(SV.engineFilter);
     });
     if (SV.bodyFilter && SV.bodyFilter !== 'all') f = f.filter(p => {
-        const arr = p.bodies || []; return !arr.length || arr.includes(SV.bodyFilter);
+        const arr = p.bodies || [];
+        return !arr.length || arr.includes(SV.bodyFilter);
     });
     if (SV.transFilter && SV.transFilter !== 'all') f = f.filter(p => {
-        const arr = p.transmissions || []; return !arr.length || arr.includes(SV.transFilter);
+        const arr = p.transmissions || [];
+        return !arr.length || arr.includes(SV.transFilter);
     });
     if (SV.genFilter && SV.genFilter !== 'all') f = f.filter(p => {
-        const arr = p.gens || []; return !arr.length || arr.includes(SV.genFilter);
+        const arr = p.gens || [];
+        return !arr.length || arr.includes(SV.genFilter);
     });
     if (t.length) f = f.filter(p => mP(p, t));
     return sP(f);
@@ -1579,20 +2170,25 @@ function updSearchSuggest() {
     dl.innerHTML = items.map(x => '<option value="' + escA(x) + '">').join('');
 }
 
+/* ============ КОНТЕНТ ============ */
 function _renderSignature() {
     return [
-        SV.activeCat, SV.activeSub, SV.searchQuery, SV.statusFilter,
+        SV.activeCat, SV.searchQuery, SV.statusFilter,
         SV.engineFilter, SV.bodyFilter, SV.transFilter, SV.genFilter,
-        SV.sortBy, SV.groupBySub, SV.vinStrictFilter, SV.view
+        SV.sortBy, SV.groupBySub, SV.vinStrictFilter
     ].join('|');
 }
+
 function rC() {
     if (SV.activeCat === 'Workshops') { rW(); return; }
     if (SV.activeCat === 'Log') { rLog(); return; }
     if (CUSTOM.sections[SV.activeCat]) { rSec(SV.activeCat); return; }
+
     const sig = _renderSignature();
     if (sig !== _lastRenderSig) { _visibleLimit = PAGE_SIZE; _lastRenderSig = sig; }
+
     const ar = $('ca'), f = gF();
+
     let title, icon;
     if (SV.activeCat === 'Favorites') { title = 'Избранное'; icon = '⭐'; }
     else if (SV.activeCat === 'All') { title = 'Все системы'; icon = '📦'; }
@@ -1603,6 +2199,7 @@ function rC() {
         if (SV.activeSub) title += ' → ' + SV.activeSub;
     }
     let h = '<h2 class="sh">' + icon + ' ' + esc(title) + '</h2>';
+
     const chips = [];
     chips.push('<span class="chip">найдено: <b>' + f.length + '</b></span>');
     if (SV.engineFilter && SV.engineFilter !== 'all') chips.push('<span class="chip">⚙️ ' + esc(SV.engineFilter) + '</span>');
@@ -1624,6 +2221,7 @@ function rC() {
         chips.push('<span class="chip" data-chip="vinStrict" style="cursor:pointer;' + (SV.vinStrictFilter ? 'border-color:var(--dg);background:rgba(220,53,69,.12);' : '') + '" title="Скрыть детали, несовместимые с VIN">🔒 VIN-строго</span>');
     }
     h += '<div class="ri">' + chips.join('') + '</div>';
+
     if (!f.length) {
         let ei, em;
         if (SV.activeCat === 'Favorites') { ei = '⭐'; em = 'Пока нет избранного.'; }
@@ -1633,11 +2231,13 @@ function rC() {
         ar.innerHTML = h;
         return;
     }
+
     if (SV.view === 'tree') {
         h += rET(f);
         ar.innerHTML = h;
         return;
     }
+
     if (SV.groupBySub) {
         const groups = {};
         for (const p of f) {
@@ -1647,6 +2247,7 @@ function rC() {
         const keys = Object.keys(groups).sort((a, b) =>
             (a === '— без подкатегории —' ? 1 : b === '— без подкатегории —' ? -1 : 0)
             || a.localeCompare(b));
+
         let rendered = 0;
         for (const k of keys) {
             if (rendered >= _visibleLimit) break;
@@ -1667,6 +2268,7 @@ function rC() {
         for (const p of slice) h += cH(p);
         h += '</div>';
     }
+
     if (f.length > _visibleLimit) {
         h += '<div style="text-align:center;padding:22px 0">'
             + '<button class="bn p" onclick="_showMore()">▾ Показать ещё ('
@@ -1695,6 +2297,7 @@ window.toggleTreeAll = function () {
         btn.dataset.treeall = anyOpen ? 'expand' : 'collapse';
     }
 };
+
 function cH(p) {
     const o = p.oem || '';
     const anInline = (p.analogs || []).length
@@ -1726,7 +2329,7 @@ function cH(p) {
     let partsHtml = '';
     if (p.parts && p.parts.length) {
         partsHtml = '<div class="cd-to-parts">'
-            + '<div class="cd-to-parts-h">🛒 Купить запчасти для ТО</div>'
+            + '<div class="cd-to-parts-h">🛒 Купить запчасти для ТО </div>'
             + '<div class="tp-parts">'
             + p.parts.map(it => {
                 const c = (it.oem || '').replace(/\s+/g, '');
@@ -1751,7 +2354,7 @@ function cH(p) {
     const phh = phList.length
         ? '<div class="cd-sec" style="padding-top:4px"><div class="cd-gallery">'
         + phList.map((src, i) =>
-            '<img class="cd-photo" src="' + src + '" alt="" loading="lazy" decoding="async" '
+            '<img class="cd-photo" src="' + src + '" alt="" '
             + 'data-lightbox-pid="' + escA(p.id) + '" data-lightbox-idx="' + i + '">'
         ).join('')
         + '</div></div>'
@@ -1770,6 +2373,7 @@ function cH(p) {
             .map(x =>
                 '<button class="tp' + (st === x[0] ? ' on' : '') + '" data-action="set-status" data-status="' + x[0] + '" data-id="' + escA(p.id) + '">' + x[1] + ' ' + x[2] + '</button>'
             ).join('');
+
     return '<div class="cd' + (f ? ' fav' : '') + '" data-id="' + escA(p.id) + '">'
         + '<div class="cd-top">'
         + '<h3 class="cd-nm">' + esc(p.name || '(без названия)') + '</h3>'
@@ -1787,7 +2391,7 @@ function cH(p) {
         + (partsHtml
             ? partsHtml
             : '<div class="cd-purchase">' + getPurchaseHtml(p) + '</div>'
-            + (o ? '<div class="cd-meta"><button class="bn" data-action="find-cheaper" data-oem="' + escA(o) + '" data-name="' + escA(p.name || '') + '" style="padding:4px 8px;font-size:.7rem" title="Открыть Exist + Autodoc + Avito">🔍 Найти дешевле</button></div>' : ''))
+            + (o ? '<div class="cd-meta"><button class="bn" style="padding:4px 8px;font-size:.7rem" onclick="findCheaper(\'' + escA(o) + '\', \'' + escA(p.name) + '\')" title="Открыть Exist + Autodoc + Avito">🔍 Найти дешевле</button></div>' : ''))
         + lastLogBadge(o)
         + '<div class="cd-st">' + stBar + '</div>'
         + '<details class="cd-body"><summary>Подробности</summary><div class="cd-content">'
@@ -1805,8 +2409,10 @@ function cH(p) {
         + '</div></details>'
         + '</div>';
 }
+
 function oPC(id) {
-    const p = D.find(x => x.id === id); if (!p) return;
+    const p = D.find(x => x.id === id);
+    if (!p) return;
     partmoId = id;
     $('partmo_title').textContent = p.name || p.oem || 'Деталь';
     let html = cH(p);
@@ -1819,6 +2425,7 @@ function oPC(id) {
     openM('partmo');
 }
 const cPC = () => { closeM('partmo'); partmoId = null; };
+
 function rSec(sid) {
     const ar = $('ca');
     const s = CUSTOM.sections[sid] || {};
@@ -1844,6 +2451,7 @@ function rSec(sid) {
     h += '</tbody></table></div>';
     ar.innerHTML = h;
 }
+
 function rET(parts) {
     const t = {};
     for (const p of parts) {
@@ -1858,6 +2466,7 @@ function rET(parts) {
     const exp = SV.expandedTree;
     const groupKeys = Object.keys(t).sort();
     const anyOpen = groupKeys.some(g => exp['g:' + g]);
+
     let h = '<div class="et">';
     h += '<div class="et-tools">'
         + '<button type="button" class="bn et-tgl-btn" onclick="toggleTreeAll()" data-treeall="' + (anyOpen ? 'collapse' : 'expand') + '">'
@@ -1865,14 +2474,17 @@ function rET(parts) {
         + '</button>'
         + '<span class="et-hint">Нажми на папку 📁, чтобы раскрыть</span>'
         + '</div>';
+
     for (const g of groupKeys) {
         const sg = t[g];
         let tot = 0;
         for (const s of Object.keys(sg)) tot += sg[s].length;
         const gKey = 'g:' + g;
         const gOpen = !!exp[gKey];
+
         h += '<details class="et-group"' + (gOpen ? ' open' : '') + ' data-etkey="' + escA(gKey) + '">';
         h += '<summary>📁 ' + esc(g) + '<span class="gc">' + tot + '</span></summary>';
+
         for (const s of Object.keys(sg).sort()) {
             const a = sg[s];
             const sKey = 's:' + g + '|' + s;
@@ -1889,13 +2501,13 @@ function rET(parts) {
                 return (x.oem || '').localeCompare(y.oem || '');
             });
             for (const p of sorted) {
-                const w = p.verified ? '' : '<span style="color:var(--wn);font-size:.68rem">⚠</span>';
+                const w = p.verified ? '' : ' <span style="color:var(--wn);font-size:.68rem">⚠</span>';
                 const cm = pCompat(p);
                 let sm = '';
                 if (cm) {
                     const col = cm.cls === 'y' ? 'var(--ok)' : cm.cls === 'n' ? 'var(--dg)' : 'var(--mu)';
                     const ic = cm.cls === 'y' ? '✓' : cm.cls === 'n' ? '✗' : '?';
-                    sm = '<span style="color:' + col + ';font-weight:700;font-size:.68rem">' + ic + cm.pct + '%</span>';
+                    sm = ' <span style="color:' + col + ';font-weight:700;font-size:.68rem">' + ic + cm.pct + '%</span>';
                 }
                 let pm = '';
                 if (p.status === 'want') pm = ' 🛒';
@@ -1910,6 +2522,7 @@ function rET(parts) {
     }
     return h + '</div>';
 }
+
 function toggleAllDetails() {
     const ar = $('ca');
     const anyOpen = ar.querySelector('.cd-body[open]');
@@ -1918,6 +2531,7 @@ function toggleAllDetails() {
         else d.setAttribute('open', '');
     });
 }
+
 function rW() {
     const ar = $('ca');
     let h = '<h2 class="sh">🔧 Мастерские</h2>';
@@ -1942,6 +2556,7 @@ function wH(w) {
     return '<div class="wc" data-wid="' + escA(w.id) + '"><div class="chr"><div class="wn">' + esc(w.name || '(без названия)') + '</div><div class="cto"><button class="ctb" data-wact="edit" title="Ред.">✎</button><button class="ctb dg" data-wact="delete" title="Удалить">✕</button></div></div>' + l + n + '</div>';
 }
 
+/* ============ КОПИРОВАНИЕ ============ */
 function cT(t, b) {
     const x = String(t || '');
     const done = () => {
@@ -1968,6 +2583,7 @@ function fC(t, d) {
     } catch (e) { toast('Не удалось скопировать', 'danger'); }
 }
 
+/* ============ КЛИКИ ============ */
 function oCC(e) {
     const img = e.target.closest('[data-lightbox-pid]');
     if (img) {
@@ -1985,12 +2601,10 @@ function oCC(e) {
         } else if (k === 'vinStrict') {
             SV.vinStrictFilter = !SV.vinStrictFilter;
             sU(); rGar(); rSB(); rC();
-        } else if (k === 'clearSub') {
-            SV.activeSub = null;
-            sU(); rSB(); rC();
         }
         return;
     }
+
     if (e.target.classList && e.target.classList.contains('cn')) return;
     const wb = e.target.closest('[data-wact]');
     if (wb) {
@@ -2013,7 +2627,6 @@ function oCC(e) {
         if (a === 'favorite' && id) return tF(id);
         if (a === 'edit' && id) return oEM(id);
         if (a === 'delete' && id) return dPt(id);
-        if (a === 'find-cheaper') return findCheaper(b.dataset.oem, b.dataset.name);
     }
     const la = e.target.closest('[data-lac]');
     if (la) {
@@ -2033,7 +2646,6 @@ function tF(id) {
     rSB(); rC();
     if (partmoId === id) oPC(id);
     toast(p.favorite ? '⭐ Добавлено' : 'Убрано');
-    if (p.favorite) window.ymGoal && window.ymGoal('favorite_added');
 }
 function sPS(id, st) {
     const p = D.find(x => x.id === id);
@@ -2045,9 +2657,9 @@ function sPS(id, st) {
     if (partmoId === id) oPC(id);
     const L = { want: '🛒 Хочу', bought: '📦 Куплено', installed: '✅ Установлено' };
     toast(same ? 'Статус снят' : L[st], same ? '' : 'success');
-    if (!same) window.ymGoal && window.ymGoal('status_' + st);
     if (!same && st === 'installed' && typeof confetti === 'function') confetti();
 }
+
 function oL(list, idx) {
     _lbPhotos = Array.isArray(list) ? list.slice() : [];
     _lbIdx = Math.max(0, Math.min(_lbPhotos.length - 1, parseInt(idx, 10) || 0));
@@ -2075,8 +2687,10 @@ const cL = () => {
     _lbPhotos = []; _lbIdx = 0;
 };
 
+/* ============ ФОРМА ДЕТАЛИ ============ */
 const fCS = () => $('f_cat').innerHTML = CATS.filter(c => c.id !== 'All')
     .map(c => '<option value="' + c.id + '">' + c.icon + ' ' + esc(c.label) + '</option>').join('');
+
 function aIR(t, x) {
     const ed = $('ie'), r = document.createElement('div');
     r.className = 'ier';
@@ -2139,6 +2753,7 @@ function oEM(id) {
     setTimeout(() => $('f_name').focus(), 50);
 }
 const cM = () => { $('mo').classList.remove('show'); edId = null; pPhs = []; };
+
 function sPt() {
     const name = $('f_name').value.trim(), cat = $('f_cat').value;
     if (!name) { toast('Введите название', 'danger'); $('f_name').focus(); return; }
@@ -2176,7 +2791,6 @@ function sPt() {
         });
         if (useIDB) iPut(SP, D[i]).catch(() => { });
         toast('Сохранено', 'success');
-        window.ymGoal && window.ymGoal('part_edited');
     } else {
         const np = {
             id: uid(), cat, sub: '', name, oem, verified, analogs, donors,
@@ -2186,7 +2800,6 @@ function sPt() {
         D.push(np);
         if (useIDB) iPut(SP, np).catch(() => { });
         toast('Добавлено', 'success');
-        window.ymGoal && window.ymGoal('part_added');
     }
     if (!useIDB) sD();
     rSB(); rC(); cM();
@@ -2207,6 +2820,7 @@ function dPt(id) {
     });
 }
 
+/* ============ МАСТЕРСКИЕ ============ */
 const oWM = () => {
     ewId = null;
     $('wmt').textContent = 'Добавить мастерскую';
@@ -2262,7 +2876,9 @@ function dWsh(id) {
     toast('Удалено', 'danger');
 }
 
+/* ============ ФОТО ============ */
 const pkP = () => $('pf').click();
+
 function rmPI(i) {
     if (!Array.isArray(pPhs)) return;
     pPhs.splice(i, 1);
@@ -2275,7 +2891,7 @@ function uPP() {
     if (cnt) cnt.textContent = String(pPhs.length);
     g.innerHTML = pPhs.map((src, i) =>
         '<div class="pgrid-item">' +
-        '<img src="' + sImg(src) + '" alt="" loading="lazy" decoding="async">' +
+        '<img src="' + sImg(src) + '" alt="">' +
         '<button type="button" class="rm" data-rmp="' + i + '" title="Удалить">✕</button>' +
         '</div>'
     ).join('');
@@ -2321,6 +2937,7 @@ const cI = (f, ms, q) => new Promise((res, rej) => {
     r.readAsDataURL(f);
 });
 
+/* ============ VIN-КЛЮЧ ============ */
 const oSM = () => { $('s_vk').value = vk || ''; $('smo').classList.add('show'); };
 const cSM = () => { $('smo').classList.remove('show'); };
 const sSet = () => {
@@ -2330,6 +2947,7 @@ const sSet = () => {
     cSM();
 };
 
+/* ============ МЕНЮ ⚙️ ============ */
 const cEM = () => $('em').classList.remove('show');
 window.tMMenu = function (e) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
@@ -2339,6 +2957,7 @@ window.tMMenu = function (e) {
 };
 const tMMenu = window.tMMenu;
 
+/* ============ ЭКСПОРТ ============ */
 function dl(f, c, m) {
     const b = new Blob([c], { type: m });
     const u = URL.createObjectURL(b);
@@ -2362,11 +2981,11 @@ function eD() {
         const photoCount = D.reduce((s, x) => s + (Array.isArray(x.photos) ? x.photos.length : 0), 0);
         dl('vw_polo_caddy_' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(p, null, 2), 'application/json');
         toast('Экспорт: ' + D.length + ' поз., ' + W.length + ' СТО, ' + photoCount + ' фото', 'success');
-        window.ymGoal && window.ymGoal('export_json', { parts: D.length });
     } catch (e) { toast('Ошибка: ' + e.message, 'danger'); }
 }
 const statL = s => ({ want: 'Хочу купить', bought: 'Куплено', installed: 'Установлено' }[s] || '');
 const catL = id => { const c = CATS.find(x => x.id === id); return c ? c.label : id; };
+
 function eCSV(of) {
     try {
         const src = of ? D.filter(p => p.favorite) : D;
@@ -2421,6 +3040,7 @@ function eWCSV() {
     } catch (e) { toast('Ошибка: ' + e.message, 'danger'); }
 }
 
+/* ============ ИМПОРТ ============ */
 const tI = () => $('if').click();
 function oIF(e) {
     const f = e.target.files && e.target.files[0];
@@ -2448,6 +3068,7 @@ function aI(parts, ws, gs, meta) {
     const m = mode.trim().toLowerCase();
     const cl = parts.map(nP).filter(Boolean);
     if (!cl.length) { toast('Нет валидных позиций', 'danger'); return; }
+
     if (m === 'replace') {
         if (!confirm('Заменить базу?')) return;
         D = cl;
@@ -2462,8 +3083,10 @@ function aI(parts, ws, gs, meta) {
             G = gs.filter(x => x && x.vin).map(x => ({
                 id: x.id || ('g_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6)),
                 vin: String(x.vin).toUpperCase(),
-                brand: String(x.brand || ''), model: String(x.model || ''),
-                year: x.year || null, body: String(x.body || ''),
+                brand: String(x.brand || ''),
+                model: String(x.model || ''),
+                year: x.year || null,
+                body: String(x.body || ''),
                 plant: String(x.plant || ''),
                 engines: Array.isArray(x.engines) ? x.engines : [],
                 addedAt: x.addedAt || Date.now()
@@ -2477,8 +3100,9 @@ function aI(parts, ws, gs, meta) {
         let add = 0, merged = 0;
         for (const p of cl) {
             const k = keyOf(p);
-            if (!map.has(k)) { D.push(p); map.set(k, p); add++; }
-            else {
+            if (!map.has(k)) {
+                D.push(p); map.set(k, p); add++;
+            } else {
                 const old = map.get(k);
                 let touched = false;
                 if (Array.isArray(p.photos) && p.photos.length) {
@@ -2497,6 +3121,7 @@ function aI(parts, ws, gs, meta) {
         }
         if (useIDB) iMany(SP, D).catch(() => { });
         else sD();
+
         let wa = 0;
         if (ws && ws.length) {
             const wsn = new Set(W.map(w => w.name || ''));
@@ -2514,8 +3139,10 @@ function aI(parts, ws, gs, meta) {
                     G.push({
                         id: g.id || ('g_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6)),
                         vin: String(g.vin).toUpperCase(),
-                        brand: String(g.brand || ''), model: String(g.model || ''),
-                        year: g.year || null, body: String(g.body || ''),
+                        brand: String(g.brand || ''),
+                        model: String(g.model || ''),
+                        year: g.year || null,
+                        body: String(g.body || ''),
                         plant: String(g.plant || ''),
                         engines: Array.isArray(g.engines) ? g.engines : [],
                         addedAt: g.addedAt || Date.now()
@@ -2534,6 +3161,7 @@ function aI(parts, ws, gs, meta) {
         toast('Неизвестный режим', 'danger');
         return;
     }
+
     if (meta && typeof meta === 'object') {
         if (Array.isArray(meta.categories)) {
             for (const c of meta.categories) {
@@ -2556,6 +3184,7 @@ function aI(parts, ws, gs, meta) {
     rGar(); rSB(); rC();
 }
 
+/* ============ ЖУРНАЛ ============ */
 function rLog() {
     const ar = $('ca');
     let h = '<h2 class="sh">📖 Журнал обслуживания</h2>';
@@ -2642,7 +3271,6 @@ function sLog() {
     _rebuildLogIndex();
     cLog(); rC();
     toast(id ? 'Запись обновлена' : 'Запись добавлена', 'success');
-    window.ymGoal && window.ymGoal(id ? 'log_edited' : 'log_added');
 }
 function dLog(id) {
     if (!confirm('Удалить запись?')) return;
@@ -2664,6 +3292,7 @@ function lastLogBadge(oem) {
     return '<div class="cd-meta"><span class="hi" style="cursor:default" title="Последняя замена: ' + escA(l.title) + '">🔧 Меняли: ' + esc(l.date) + (l.km ? ' · ' + l.km.toLocaleString('ru-RU') + ' км' : '') + '</span></div>';
 }
 
+/* ============ ТО ============ */
 function nextTO() {
     if (TO.km == null || !TO.lastDate) return null;
     const last = new Date(TO.lastDate);
@@ -2719,6 +3348,7 @@ function sTO() {
     toast('Настройки ТО сохранены', 'success');
 }
 
+/* ============ СПИСОК ПОКУПОК ============ */
 function oShopList() {
     shopPick = new Set();
     const t = nextTO();
@@ -2765,7 +3395,6 @@ function oShopList() {
         });
     });
     openM('shopmo');
-    window.ymGoal && window.ymGoal('shop_list_opened');
 }
 const cShop = () => closeM('shopmo');
 function pShop() {
@@ -2789,11 +3418,10 @@ function pShop() {
         h += '</table>';
     }
     h += '<p style="margin-top:20px;font-size:11px;color:#666">Всего: ' + items.length + ' позиций.</p>';
-    h += '<script>window.onload=function(){setTimeout(function(){window.print()},300)}</script>';
+    h += '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>';
     h += '</body></html>';
     w.document.write(h);
     w.document.close();
-    window.ymGoal && window.ymGoal('shop_list_printed', { items: items.length });
 }
 function eShopCSV() {
     if (!shopPick.size) { toast('Ничего не выбрано', 'danger'); return; }
@@ -2805,6 +3433,7 @@ function eShopCSV() {
     toast('CSV: ' + items.length + ' позиций', 'success');
 }
 
+/* ============ НАЙТИ ДЕШЕВЛЕ ============ */
 function findCheaper(oem, name) {
     if (!oem) { toast('Нет артикула', 'danger'); return; }
     const c = String(oem).replace(/\s/g, '');
@@ -2828,9 +3457,9 @@ function findCheaper(oem, name) {
         document.body.removeChild(a);
     });
     toast('Открыто 3 магазина', 'success');
-    window.ymGoal && window.ymGoal('find_cheaper', { oem: c });
 }
 
+/* ============ ЮMONEY ============ */
 function copyYm() {
     const num = '410017195918895';
     const done = () => toast('📋 ЮMoney: 4100 1719 5918 895', 'success');
@@ -2841,6 +3470,7 @@ function copyYm() {
     }
 }
 
+/* ============ PWA ============ */
 function iPWA() {
     try {
         const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="96" fill="#001e50"/><text x="256" y="320" font-family="Arial" font-size="200" font-weight="bold" fill="#00b0f0" text-anchor="middle">VW</text></svg>';
@@ -2870,6 +3500,7 @@ function iPWA() {
     } catch (e) { }
 }
 
+/* ============ РЕДАКТОР VIN ============ */
 function oVIN() {
     const av = gAV();
     if (!av || !av.ok) { toast('VIN не выбран', 'danger'); return; }
@@ -2911,8 +3542,10 @@ function sVIN() {
     toast('Данные сохранены', 'success');
 }
 
+/* ============ SKELETON ============ */
 function showSkeleton() {
-    const ar = $('ca'); if (!ar) return;
+    const ar = $('ca');
+    if (!ar) return;
     let h = '<div class="gr">';
     for (let i = 0; i < 6; i++) {
         h += '<div class="sk-card">' +
@@ -2926,6 +3559,7 @@ function showSkeleton() {
     ar.innerHTML = h;
 }
 
+/* ============ КОНФЕТТИ ============ */
 function confetti() {
     const canvas = $('confetti-canvas');
     if (!canvas) return;
@@ -2982,6 +3616,7 @@ function confetti() {
     tick();
 }
 
+/* ============ ПЛАШКА «ЧТО НОВОГО» ============ */
 function _setChangelog(list) {
     if (Array.isArray(list)) _changelogCache = list;
 }
@@ -2998,7 +3633,8 @@ function checkWhatsNew() {
     showWhatsNew(APP_VERSION, changes);
 }
 function showWhatsNew(version, changes) {
-    const el = $('whatsnew'); if (!el) return;
+    const el = $('whatsnew');
+    if (!el) return;
     let h = '';
     h += '<div class="wn-head">';
     h += '<span class="wn-icon">🎉</span>';
@@ -3021,18 +3657,23 @@ function showWhatsNew(version, changes) {
     el.classList.add('show');
 }
 function closeWhatsNew(markSeen) {
-    const el = $('whatsnew'); if (!el) return;
+    const el = $('whatsnew');
+    if (!el) return;
     el.classList.remove('show');
-    if (markSeen) { try { localStorage.setItem(WNKEY, APP_VERSION); } catch (e) { } }
+    if (markSeen) {
+        try { localStorage.setItem(WNKEY, APP_VERSION); } catch (e) { }
+    }
 }
 function openWhatsNewDetails() {
     closeWhatsNew(true);
     oUp();
 }
 
+/* ============ FAQ ============ */
 function oFaq() { openM('faqmo'); }
 function cFaq() { closeM('faqmo'); }
 
+/* ============ INIT ============ */
 async function init() {
     if (licAppReady) return;
     licAppReady = true;
@@ -3055,20 +3696,25 @@ async function init() {
 
 function bindUI() {
     if (window._uiAttached) return;
+    window._uiAttached = true;
+
     const si = $('sr');
     if (!si) return;
     si.value = SV.searchQuery || '';
     uSC();
+
     si.addEventListener('input', e => { SV.searchQuery = e.target.value; uSC(); sUS(); dRC(); });
     $('sf').addEventListener('change', e => { SV.statusFilter = e.target.value; sU(); rSB(); rC(); });
     $('ss').addEventListener('change', e => { SV.sortBy = e.target.value; sU(); rC(); });
     $('fmtr').addEventListener('change', e => { SV.engineFilter = e.target.value; updateFilterStyling(); sU(); rSB(); rC(); });
     $('fbdy').addEventListener('change', e => { SV.bodyFilter = e.target.value; updateFilterStyling(); sU(); rSB(); rC(); });
     $('ftr').addEventListener('change', e => { SV.transFilter = e.target.value; updateFilterStyling(); sU(); rSB(); rC(); });
+
     const _fgen = $('fgen');
     if (_fgen) _fgen.addEventListener('change', e => { SV.genFilter = e.target.value; sU(); rSB(); rC(); });
     $('if').addEventListener('change', oIF);
     $('pf').addEventListener('change', oPF);
+
     $('sf').value = SV.statusFilter || 'all';
     $('ss').value = SV.sortBy || 'default';
     $('fmtr').value = SV.engineFilter || 'all';
@@ -3077,9 +3723,11 @@ function bindUI() {
     if (_fgen) _fgen.value = SV.genFilter || 'all';
     updateFilterStyling();
     setV(SV.view || 'grid', true);
+
     ['pf_name', 'pf_ini', 'pf_city', 'pf_email'].forEach(id => {
         const el = $(id); if (el) el.addEventListener('input', updateProfPreview);
     });
+
     const ca = $('ca');
     ca.addEventListener('click', oCC);
     ca.addEventListener('click', e => {
@@ -3133,281 +3781,119 @@ function bindUI() {
             }
         });
     }
-    window._uiAttached = true;
-}
-
-function bindGlobalUI() {
-    if (window._globalBound) return;
-    const q = (id) => $(id);
-    const on = (id, ev, fn) => { const el = q(id); if (el) el.addEventListener(ev, fn); };
-    const onClick = (id, fn) => on(id, 'click', fn);
-    onClick('scl', cS);
-    on('sr', 'keydown', e => {
-        if (e.key === 'Escape') { cS(); }
-        if (e.key === 'Enter') { e.preventDefault(); rC(); if (window.innerWidth <= 900) cMM(); }
-    });
-    onClick('mbtn', tMMenu);
-    document.addEventListener('click', (e) => {
-        const em = $('em');
-        if (!em || !em.classList.contains('show')) return;
-        if (!e.target.closest('#em') && !e.target.closest('#mbtn')) cEM();
-    });
-    onClick('m_add', () => { cEM(); oAM(); });
-    onClick('m_import', () => { cEM(); tI(); });
-    onClick('m_export', () => { cEM(); eD(); });
-    onClick('m_csv', () => { cEM(); eCSV(false); });
-    onClick('m_csvfav', () => { cEM(); eCSV(true); });
-    onClick('m_etka', () => { cEM(); eET(); });
-    onClick('m_wcsv', () => { cEM(); eWCSV(); });
-    onClick('m_rebuild', () => { cEM(); rD(); });
-    onClick('m_theme', () => { cEM(); oTheme(); });
-    onClick('m_up', () => { cEM(); oUp(); });
-    onClick('m_about', () => { cEM(); oAbout(); });
-    onClick('m_donate', () => { cEM(); oDonate(); });
-    onClick('m_bug', () => { cEM(); oBug(); });
-    onClick('m_faq', () => { cEM(); oFaq(); });
-    onClick('m_profile', () => { cEM(); oProfile(); });
-    onClick('vinc', () => { oGM(); });
-    onClick('tbtn', oTheme);
-    onClick('tbtn2', oTheme);
-    onClick('sft_avatar', oProfile);
-    onClick('sft_username', oProfile);
-    onClick('toChip', oTO);
-    onClick('mb_cart', () => {
-        if (window.innerWidth <= 900) cMM();
-        oShopList();
-    });
-    onClick('dtgl', tSB);
-    onClick('mob', tMM);
-<<<<<<< Updated upstream:js/app.js
-
-    /* Гараж: «+ Добавить VIN» */
-=======
->>>>>>> Stashed changes:app.js
-    onClick('gab', oGM);
-    on('viewToggle', 'change', e => setV(e.target.checked ? 'tree' : 'grid'));
-    onClick('ov', cMM);
-    onClick('mburger', tMM);
-    onClick('mburger2', tMM);
-    document.querySelectorAll('.mo').forEach(m => {
-        m.addEventListener('click', e => {
-            if (e.target === m && !m.classList.contains('mo-static')) m.classList.remove('show');
-        });
-    });
-    document.addEventListener('keydown', e => {
-        if (e.key !== 'Escape') return;
-        document.querySelectorAll('.mo.show, .tst.show, .lbt.show, #whatsnew.show').forEach(el => {
-            if (el.id === 'confirmmo') { cConfirm(false); return; }
-            el.classList.remove('show');
-        });
-    });
-    onClick('gmo_close', cGM);
-    onClick('g_db', decG);
-    onClick('g_sb', sGarV);
-    onClick('g_vi', () => { });
-    on('g_vi', 'keydown', e => { if (e.key === 'Enter') { e.preventDefault(); decG(); } });
-    onClick('profmo_close', cProfile);
-    onClick('pf_save', sProfile);
-    onClick('pf_reset', resetProfile);
-    onClick('thememmo_close', cTheme);
-    onClick('upmo_close', cUp);
-    onClick('up_check', checkUpdate);
-    onClick('up_saveurl', sUpUrl);
-    onClick('up_url_apply', sUpUrl);
-    onClick('aboutmo_close', cAbout);
-    onClick('about_apk_btn', oAPK);
-    onClick('about_lic_reset', licReset);
-    onClick('donmo_close', cDonate);
-    onClick('don_copy', copyYm);
-    onClick('bugmo_close', cBug);
-    onClick('faqmo_close', cFaq);
-    onClick('mo_close', cM);
-    onClick('f_save', sPt);
-    onClick('wmo_close', cWM);
-    onClick('w_save', sWsh);
-    onClick('logmo_close', cLog);
-    onClick('l_save', sLog);
-    onClick('tomo_close', cTO);
-    onClick('t_save', sTO);
-    onClick('t_reset', resetTO);
-    onClick('shopmo_close', cShop);
-    onClick('shop_print', pShop);
-    onClick('shop_csv', eShopCSV);
-    onClick('shop_check_all', () => {
-        document.querySelectorAll('#shopBody [data-shop-id]').forEach(cb => {
-            if (!cb.checked) { cb.checked = true; shopPick.add(cb.dataset.shopId); }
-        });
-        const t = $('shopTotal'); if (t) t.innerHTML = 'Выбрано: <b>' + shopPick.size + '</b> позиций';
-    });
-    onClick('vinmo_close', cVIN);
-    onClick('v_save', sVIN);
-    onClick('confirm_no', () => cConfirm(false));
-    onClick('confirm_yes', () => cConfirm(true));
-    onClick('confirm_export', () => { cConfirm(false); eD(); });
-    onClick('partmo_close', cPC);
-    onClick('lbt_close', cL);
-    onClick('lbPrev', () => lbNav(-1));
-    onClick('lbNext', () => lbNav(1));
-    document.addEventListener('keydown', e => {
-        if (!$('lbt') || !$('lbt').classList.contains('show')) return;
-        if (e.key === 'ArrowLeft') lbNav(-1);
-        else if (e.key === 'ArrowRight') lbNav(1);
-        else if (e.key === 'Escape') cL();
-    });
-    onClick('addPartBtn', oAM);
-    onClick('addPartBtn2', oAM);
-    onClick('resetFiltersBtn', resetFilters);
-    onClick('expandAllBtn', toggleAllDetails);
-    onClick('logNewBtn', oLogNew);
-    onClick('addWshBtn', oWM);
-    document.addEventListener('keydown', e => {
-        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
-        if (e.ctrlKey || e.metaKey || e.altKey) return;
-        if (e.key === '/') { e.preventDefault(); const si = $('sr'); if (si) si.focus(); }
-        else if (e.key === 't' || e.key === 'T' || e.key === 'е' || e.key === 'Е') { if (!e.shiftKey) { e.preventDefault(); oTheme(); } }
-        else if (e.key === 'n' || e.key === 'N' || e.key === 'т' || e.key === 'Т') { if (!e.shiftKey) { e.preventDefault(); oAM(); } }
-        else if (e.key === 'g' || e.key === 'G' || e.key === 'п' || e.key === 'П') { if (!e.shiftKey) { e.preventDefault(); oGM(); } }
-    });
-    window._globalBound = true;
-}
-
-function bindGarage() {
     const gl = $('gl');
-    if (!gl || gl._bound) return;
-    gl.addEventListener('click', e => {
-        const del = e.target.closest('[data-vact="delete"]');
-        if (del) {
-            e.stopPropagation();
-            remV(del.dataset.gid);
-            return;
+    if (gl) gl.addEventListener('click', e => {
+        const d = e.target.closest('[data-vact="delete"]');
+        if (d) { e.stopPropagation(); remV(d.dataset.gid); return; }
+        if (e.target.closest('.gi-info')) return;
+        const i = e.target.closest('.gi');
+        if (i && i.dataset.gid) setAV(i.dataset.gid);
+    });
+    const gab = $('gab'); if (gab) gab.addEventListener('click', oGM);
+
+    const modalClose = {
+        mo: cM, wmo: cWM, gmo: cGM, smo: cSM, aboutmo: cAbout, bugmo: cBug,
+        donmo: cDonate, profmo: cProfile, upmo: cUp, partmo: cPC,
+        logmo: cLog, tomo: cTO, shopmo: cShop, vinmo: cVIN, thememmo: cTheme,
+        faqmo: cFaq, apkmo: () => closeM('apkmo'),
+        confirmmo: () => cConfirm(false)
+    };
+    Object.keys(modalClose).forEach(id => {
+        const el = $(id); if (!el) return;
+        el.addEventListener('click', e => { if (e.target.id === id) modalClose[id](); });
+    });
+
+    document.addEventListener('keydown', e => {
+        if ($('lbt').classList.contains('show')) {
+            if (e.key === 'ArrowLeft') { e.preventDefault(); lbNav(-1); return; }
+            if (e.key === 'ArrowRight') { e.preventDefault(); lbNav(1); return; }
         }
-        const card = e.target.closest('[data-gid]');
-        if (card && !e.target.closest('.veh-edit-btn')) {
-            setAV(card.dataset.gid);
+        if (e.key === 'Escape') {
+            if ($('confirmmo') && $('confirmmo').classList.contains('show')) return cConfirm(false);
+            if ($('apkmo') && $('apkmo').classList.contains('show')) return closeM('apkmo');
+            if ($('faqmo').classList.contains('show')) return cFaq();
+            if ($('whatsnew') && $('whatsnew').classList.contains('show')) return closeWhatsNew(true);
+            if ($('thememmo').classList.contains('show')) return cTheme();
+            if ($('vinmo').classList.contains('show')) return cVIN();
+            if ($('shopmo').classList.contains('show')) return cShop();
+            if ($('tomo').classList.contains('show')) return cTO();
+            if ($('logmo').classList.contains('show')) return cLog();
+            if ($('partmo').classList.contains('show')) return cPC();
+            if ($('lbt').classList.contains('show')) return cL();
+            if ($('aboutmo').classList.contains('show')) return cAbout();
+            if ($('bugmo').classList.contains('show')) return cBug();
+            if ($('donmo').classList.contains('show')) return cDonate();
+            if ($('profmo').classList.contains('show')) return cProfile();
+            if ($('upmo').classList.contains('show')) return cUp();
+            if ($('mo').classList.contains('show')) return cM();
+            if ($('wmo').classList.contains('show')) return cWM();
+            if ($('gmo').classList.contains('show')) return cGM();
+            if ($('smo').classList.contains('show')) return cSM();
+            if ($('sb').classList.contains('open-mobile')) return cMM();
+            cEM();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+            e.preventDefault();
+            si.focus(); si.select();
         }
     });
-    gl._bound = true;
+
+    document.addEventListener('click', e => {
+        const m = $('em');
+        if (m.classList.contains('show') && !e.target.closest('.ew')) cEM();
+    });
+
+    let rz;
+    window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(rSz, 120); });
+
+    const dt = $('dtgl');
+    if (dt) dt.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tSB(); });
+
+    const vtg = $('viewToggle');
+    if (vtg) vtg.addEventListener('change', () => setV(vtg.checked ? 'tree' : 'grid'));
+
+    const gv = $('g_vi');
+    if (gv) {
+        const vmLimit = 17;
+        gv.setAttribute('autocapitalize', 'off');
+        gv.setAttribute('autocomplete', 'off');
+        gv.setAttribute('autocorrect', 'off');
+        gv.setAttribute('spellcheck', 'false');
+        gv.addEventListener('keydown', e => {
+            if (e.key === 'Enter') { e.preventDefault(); decG(); }
+        });
+        ['paste', 'blur'].forEach(ev => gv.addEventListener(ev, () => {
+            const f = () => {
+                const r = gv.value, c = r.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '').slice(0, vmLimit);
+                if (c !== r) gv.value = c;
+            };
+            if (ev === 'paste') setTimeout(f, 0); else f();
+        }));
+    }
+
+    const box = $('garageBox');
+    if (box) {
+        try { if (localStorage.getItem('vw_garage_collapsed') === '1') box.removeAttribute('open'); } catch (e) { }
+        box.addEventListener('toggle', () => {
+            try { localStorage.setItem('vw_garage_collapsed', box.open ? '0' : '1'); } catch (e) { }
+        });
+    }
 }
 
-function bootApp() {
-    iPWA();
-    bindGlobalUI();
-    bindGarage();
-    renderProfile();
+/* ============ СТАРТ ============ */
+window.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const base = location.origin + location.pathname.replace(/[^/]*$/, '');
+        const r = await fetch(base + 'data/update.json?t=' + Date.now(), { cache: 'no-store' });
+        if (r.ok) {
+            const m = await r.json();
+            if (m.appVersion) APP_VERSION = String(m.appVersion);
+        }
+    } catch (e) { }
+    ['ver_gate', 'ver_footer', 'ver_about', 'ver_bug'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = APP_VERSION;
+    });
+    fCS();
     checkLicense();
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bootApp);
-} else {
-    bootApp();
-}
-
-window.openM = openM;
-window.closeM = closeM;
-window.toast = toast;
-window.cConfirm = cConfirm;
-window.askConfirm = askConfirm;
-window.oAM = oAM;
-window.oEM = oEM;
-window.cM = cM;
-window.sPt = sPt;
-window.dPt = dPt;
-window.tF = tF;
-window.sPS = sPS;
-window.oPC = oPC;
-window.cPC = cPC;
-window.oGM = oGM;
-window.cGM = cGM;
-window.decG = decG;
-window.sGarV = sGarV;
-window.remV = remV;
-window.setAV = setAV;
-window.oProfile = oProfile;
-window.cProfile = cProfile;
-window.sProfile = sProfile;
-window.resetProfile = resetProfile;
-window.oTheme = oTheme;
-window.cTheme = cTheme;
-window.sTheme = sTheme;
-window.oUp = oUp;
-window.cUp = cUp;
-window.checkUpdate = checkUpdate;
-window.doFullUpdate = doFullUpdate;
-window.applyUpMerge = applyUpMerge;
-window.sUpUrl = sUpUrl;
-window.oAbout = oAbout;
-window.cAbout = cAbout;
-window.oAPK = oAPK;
-window.oDonate = oDonate;
-window.cDonate = cDonate;
-window.oBug = oBug;
-window.cBug = cBug;
-window.oFaq = oFaq;
-window.cFaq = cFaq;
-window.oWM = oWM;
-window.cWM = cWM;
-window.sWsh = sWsh;
-window.dWsh = dWsh;
-window.oEMW = oEMW;
-window.oLogNew = oLogNew;
-window.oLogEdit = oLogEdit;
-window.cLog = cLog;
-window.sLog = sLog;
-window.dLog = dLog;
-window.oTO = oTO;
-window.cTO = cTO;
-window.sTO = sTO;
-window.resetTO = resetTO;
-window.oShopList = oShopList;
-window.cShop = cShop;
-window.pShop = pShop;
-window.eShopCSV = eShopCSV;
-window.findCheaper = findCheaper;
-window.copyYm = copyYm;
-window.eD = eD;
-window.eCSV = eCSV;
-window.eET = eET;
-window.eWCSV = eWCSV;
-window.tI = tI;
-window.oVIN = oVIN;
-window.cVIN = cVIN;
-window.sVIN = sVIN;
-window.oL = oL;
-window.cL = cL;
-window.lbNav = lbNav;
-window.resetFilters = resetFilters;
-window.rD = rD;
-window.doRebuild = doRebuild;
-window.toggleAllDetails = toggleAllDetails;
-window.oSM = oSM;
-window.cSM = cSM;
-window.sSet = sSet;
-window.cEM = cEM;
-window.aIR = aIR;
-window.rmPI = rmPI;
-window.pkP = pkP;
-window.closeWhatsNew = closeWhatsNew;
-window.openWhatsNewDetails = openWhatsNewDetails;
-window.licAccept = licAccept;
-window.licDecline = licDecline;
-window.licReset = licReset;
-window.checkLicense = checkLicense;
-
-window.addEventListener('beforeunload', () => {
-    try { sU(); } catch (e) { }
-    try { sProfileStorage(); } catch (e) { }
-    try { sTOStorage(); } catch (e) { }
-    try { if (!useIDB) sD(); } catch (e) { }
 });
-
-window.addEventListener('resize', () => {
-    clearTimeout(window._rszT);
-    window._rszT = setTimeout(rSz, 150);
-});
-window.addEventListener('orientationchange', () => {
-    setTimeout(rSz, 250);
-});
-
-console.log('%c VW Polo/Caddy 6N — База Мастера v' + APP_VERSION,
-    'background:#001e50;color:#00b0f0;padding:4px 8px;border-radius:3px;font-weight:700');
