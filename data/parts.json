@@ -112423,15 +112423,13 @@
   "priceHistory": []
  },
  {
-  "cat": "Electrical",
+    "cat": "Electrical",
   "sub": "Стеклоочиститель заднего стекла",
   "name": "Колпачок поводка (чёрный satinschwarz)",
   "oem": "6N0 955 435 A 01C",
   "verified": false,
   "analogs": [],
-  "donors": [
-   "VW Polo 6N"
-  ],
+  "donors": ["VW Polo 6N"],
   "engines": [],
   "bodies": [],
   "transmissions": [],
@@ -112444,15 +112442,10 @@
   "notes": "",
   "shopUrl": "",
   "photos": [],
-  "inst": [
-   {
-    "type": "s",
-    "text": "11/96 — 12/99. F 6N-S-045 001>>*."
-   }
-  ],
+  "inst": [],
   "parts": [],
   "priceHistory": []
- },
+},
  {
   "cat": "Electrical",
   "sub": "Стеклоочиститель заднего стекла",
