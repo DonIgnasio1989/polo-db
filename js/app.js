@@ -3968,6 +3968,8 @@ function bindUI() {
 
     const dt = $('dtgl');
     if (dt) dt.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tSB(); });
+    const mb = $('mob');
+    if (mb) mb.addEventListener('click', tMM);
 
     const vtg = $('viewToggle');
     if (vtg) vtg.addEventListener('change', () => setV(vtg.checked ? 'tree' : 'grid'));
