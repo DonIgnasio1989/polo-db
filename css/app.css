@@ -2395,6 +2395,17 @@ body:not(.theme-light) .cd-purchase .price-tag {
     transition: all var(--tr);
 }
 
+.psl.opE {
+    color: #fff;
+    border-color: transparent;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1.4;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    transition: all var(--tr);
+}
+
 .psl.op1::before {
     content: '🔷';
     margin-right: 3px;
@@ -2407,6 +2418,11 @@ body:not(.theme-light) .cd-purchase .price-tag {
 
 .psl.op7::before {
     content: '🔵';
+    margin-right: 3px;
+}
+
+.psl.opE::before {
+    content: '🟡';
     margin-right: 3px;
 }
 
@@ -2438,6 +2454,13 @@ body:not(.theme-light) .cd-purchase .price-tag {
     background: linear-gradient(135deg, #38bdf8, #0284c7);
     transform: translateY(-1px);
     box-shadow: 0 6px 14px rgba(14, 165, 233, .45);
+}
+
+.psl.opE:hover {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(245, 158, 11, .45);
+    color: #fff;
 }
 
 /* На мобильном — чуть компактнее, чтобы всё влезало в один ряд */
@@ -6382,4 +6405,7 @@ body.theme-light .em-title {
             rgba(255, 255, 255, .55) 0%,
             rgba(255, 255, 255, 0) 100%);
 }
-.rSec td { white-space: pre-line; }
+
+.rSec td {
+    white-space: pre-line;
+}

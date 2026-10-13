@@ -436,15 +436,52 @@ const IM = { spec: 's', tool: 't', proc: 'p', warn: 'w', note: 'n', recommendati
 const MI = { s: 'spec', t: 'tool', p: 'proc', w: 'warn', n: 'note', r: 'recommendation' };
 
 const SH = {
-    ex: n => 'https://www.exist.ru/Price/?pcode=' + n,
-    ad: n => 'https://www.autodoc.ru/price/657/' + n,
+    ex: n => 'https://www.exist.ru/Price/?pcode=' + encodeURIComponent(n),
+    ad: n => 'https://www.autodoc.ru/price/657/' + encodeURIComponent(n),
     av: (n, name) => {
         const cleanOem = String(n || '').replace(/\s+/g, '');
-        const cleanName = String(name || '')
+
+        let cleanName = String(name || '')
             .replace(/\b(?:vw|volkswagen)\s+polo\b/gi, ' ')
+            .replace(/\+/g, ' ')
+            .replace(/[()[\]{}«»"'`]/g, ' ')
+            .replace(/[\/\\|]/g, ' ')   // ← уже есть, слэш и бэкслэш режутся
             .replace(/\s+/g, ' ')
             .trim();
-        const q = (cleanName ? cleanName + ' ' : '') + 'VW Polo ' + cleanOem;
+
+        // Обрезаем до 4 слов — Avito не любит длинные запросы
+        cleanName = cleanName.split(' ').filter(Boolean).slice(0, 4).join(' ');
+
+        // ── Определяем модель для поиска ──────────────────────
+        let model = '';
+
+        // 1) Активный VIN из гаража
+        if (typeof gAV === 'function') {
+            const av = gAV();
+            if (av && av.ok) {
+                const m = String(av.model || '').replace(/\(6N\)/i, '').replace(/\//g, ' ').replace(/\s+/g, ' ').trim();
+                if (m) model = m;
+                if (av.gen) model = (model + ' ' + av.gen).trim();
+            }
+        }
+
+        // 2) Если VIN нет — берём из доноров детали
+        if (!model && typeof D !== 'undefined') {
+            const p = D.find(x => (x.oem || '').replace(/\s+/g, '') === cleanOem);
+            if (p && Array.isArray(p.donors) && p.donors.length) {
+                model = p.donors[0].split(/\s+/).slice(0, 3).join(' ');
+            }
+        }
+        // ──────────────────────────────────────────────────────
+
+        // Собираем: [название] [модель] [OEM]
+        const parts = [];
+        if (cleanName) parts.push(cleanName);
+        if (model) parts.push(model);
+        if (cleanOem) parts.push(cleanOem);
+
+        const q = parts.join(' ').trim() || 'автозапчасти VW';
+
         return 'https://www.avito.ru/rossiya/zapchasti_i_aksessuary?q=' + encodeURIComponent(q);
     }
 };
@@ -459,13 +496,14 @@ const shopH = (o, name) => {
         + '<a class="psl av" target="_blank" rel="noopener noreferrer" href="' + SH.av(o, name) + '" title="Поиск Avito">🛒 Avito</a>'
         + '</div>';
 };
+
 const ONLINE_CATALOGS = {
     emex: oem => 'https://emex.ru/f?detailNum=' + encodeURIComponent(oem) + '&packet=-1',
-    zzap: oem => 'https://www.zzap.ru/public/search.aspx#rawdata=' + encodeURIComponent(oem)
+    zzap: oem => 'https://www.zzap.ru/public/search.aspx#rawdata=' + encodeURIComponent(oem),
+    elcats: oem => 'https://elcats.ru/vw/'
 };
 
 const getPurchaseHtml = p => {
-    const av = (typeof gAV === 'function') ? gAV() : null;
     const prs = fP(p.price, p.currency);
     const su = p.shopUrl || '';
     const hh = (p.priceHistory && p.priceHistory.length)
@@ -482,6 +520,7 @@ const getPurchaseHtml = p => {
         h += '<div class="prow op-b">';
         h += '<a class="psl op1" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.emex(c) + '" title="Поиск в Emex по артикулу">Emex</a>';
         h += '<a class="psl op7" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.zzap(c) + '" title="Поиск в ZZap по артикулу">ZZap</a>';
+        h += '<a class="psl opE" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.elcats() + '" title="Открыть каталог Elcats (выберите VW → Polo → введите артикул)">Elcats</a>';
         h += '</div>';
     }
     return h;
@@ -520,7 +559,7 @@ let USER = { name: '', email: '', city: '', initials: '', color: '#00b0f0' };
 let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastDate: null, interval: 15000 };
 
-let APP_VERSION = '1.4.0';
+let APP_VERSION = '1.4.1';
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -3564,7 +3603,8 @@ function findCheaper(oem, name) {
         'https://www.exist.ru/Price/?pcode=' + c,
         'https://www.autodoc.ru/price/657/' + c,
         'https://www.avito.ru/rossiya/zapchasti_i_aksessuary?q=' +
-        encodeURIComponent((cleanName ? cleanName + ' ' : '') + 'VW Polo ' + c)
+        encodeURIComponent((cleanName ? cleanName + ' ' : '') + 'VW Polo ' + c),
+        'https://elcats.ru/vw/'
     ];
     urls.forEach(u => {
         const a = document.createElement('a');
