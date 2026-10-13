@@ -74,41 +74,10 @@
         }
     </style>
 
-    <!-- METRIKA · Яндекс.Метрика — в <head>, чтобы загрузиться раньше и поймать все визиты -->
-    <script type="text/javascript">
-        (function (m, e, t, r, i, k, a) {
-            m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments) };
-            m[i].l = 1 * new Date();
-            for (var j = 0; j < document.scripts.length; j++) {
-                if (document.scripts[j].src === r) { return; }
-            }
-            k = e.createElement(t), a = e.getElementsByTagName(t)[0],
-                k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
-        })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=113577489', 'ym');
-
-        ym(113577489, 'init', {
-            webvisor: true,
-            clickmap: true,
-            ecommerce: 'dataLayer',
-            referrer: document.referrer,
-            url: location.href,
-            accurateTrackBounce: true,
-            trackLinks: true,
-            trackHash: true
-        });
-
-        /* METRIKA · безопасный хелпер для целей — не сломает приложение,
-           если счётчик ещё не загрузился или заблокирован uBlock'ом */
-        window.ymGoal = function (goal, params) {
-            try {
-                if (typeof ym === 'function') ym(113577489, 'reachGoal', goal, params || {});
-            } catch (e) { /* тихий fail */ }
-        };
-    </script>
-    <noscript>
-        <div><img src="https://mc.yandex.ru/watch/113577489" style="position:absolute; left:-9999px;" alt="" /></div>
-    </noscript>
-    <!-- /METRIKA -->
+    <!-- ymGoal — заглушка. Раньше здесь была Яндекс.Метрика, убрана по просьбе пользователей. -->
+<script>
+  window.ymGoal = function () { /* no-op */ };
+</script>
 </head>
 
 <body class="theme-aurora">
