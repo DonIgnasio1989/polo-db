@@ -1,5 +1,5 @@
 /* ============================================================
-   VW Polo / Caddy 6N — База Мастера · Redesign v23 (clean)
+   VW Polo / Caddy 6N — База Мастера · Redesign v22 (clean)
    ============================================================ */
 
 /* ---------- БАЗА — светлая тема ---------- */
@@ -976,19 +976,22 @@ body.theme-light .ni.active {
     border-radius: 1px;
 }
 
+/* Первый заголовок группы — отступ сверху поменьше */
 .nl>.ni+.nd-label,
 .nl>.nd+.nd-label {
     padding-top: 10px;
 }
 
 /* ============================================================
-   VIN-индикатор
+   VIN-индикатор — встроен в заголовок гаража (справа от «Гараж»)
    ============================================================ */
 .gb-header>#vinBar {
     margin-left: auto;
+    /* прижать вправо */
     display: inline-flex;
     align-items: center;
     padding: 0;
+    /* сбрасываем «наследство» от .gb-header */
     font-size: initial;
     letter-spacing: normal;
     text-transform: none;
@@ -1048,6 +1051,7 @@ body.theme-light .ni.active {
     text-overflow: ellipsis;
     white-space: nowrap;
     min-width: 0;
+    /* сбрасываем uppercase и letter-spacing от .gb-header */
     text-transform: none;
     letter-spacing: .3px;
     font-size: .64rem;
@@ -1245,6 +1249,7 @@ body.theme-light .ni.active {
     overflow: hidden;
     transition: margin-left var(--tr-slow);
     position: relative;
+    /* ← якорь для absolute-кнопки #mob */
 }
 
 body.sidebar-collapsed .mw {
@@ -1708,6 +1713,7 @@ body.theme-light .em .em-sec>summary::after {
     background: rgba(40, 40, 38, .10);
 }
 
+/* Крафт-меню */
 body.theme-paper .em {
     background: rgba(244, 236, 217, .86);
     border-color: rgba(58, 42, 24, .14);
@@ -1750,8 +1756,7 @@ body.theme-paper .em button:hover {
     align-items: center;
     gap: 10px;
     position: sticky;
-    top: 0;
-    /* ← П.1: было top: -20px */
+    top: -20px;
     padding: 12px 8px;
     background: rgba(255, 255, 255, .045);
     -webkit-backdrop-filter: blur(14px) saturate(160%);
@@ -1774,6 +1779,7 @@ body.theme-light .sh {
     box-shadow: inset 0 -1px 0 rgba(40, 40, 38, .08), 0 4px 14px rgba(40, 40, 38, .05);
 }
 
+/* Крафт — финальное оформление .sh */
 body.theme-paper .sh {
     color: var(--a-h);
     background:
@@ -1794,6 +1800,7 @@ body.theme-paper .sh {
         0 4px 14px rgba(58, 42, 24, .10);
 }
 
+/* Крафт-рабочая область */
 body.theme-paper .ca {
     background:
         url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 0.36  0 0 0 0 0.25  0 0 0 0 0.14  0 0 0 0.28 0'/></filter><rect width='240' height='240' filter='url(%23n)'/></svg>"),
@@ -1855,7 +1862,8 @@ body.theme-paper .ca {
     background: color-mix(in srgb, var(--cd) 72%, transparent);
     border: 1px solid color-mix(in srgb, var(--bd) 60%, transparent);
     border-radius: var(--r-lg);
-    /* П.10: backdrop-filter убран (оставлен только на hover) */
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(160%);
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, .12),
         inset 0 -1px 0 rgba(0, 0, 0, .08),
@@ -1866,9 +1874,6 @@ body.theme-paper .ca {
     overflow: hidden;
     transition: transform var(--tr), box-shadow var(--tr), border-color var(--tr), background var(--tr);
     animation: cdIn .35s cubic-bezier(.4, 0, .2, 1) backwards;
-    /* П.8: оптимизация рендера карточек */
-    content-visibility: auto;
-    contain-intrinsic-size: 240px;
 }
 
 @keyframes cdIn {
@@ -1926,15 +1931,12 @@ body.theme-paper .ca {
 .cd:hover {
     background: color-mix(in srgb, var(--cd) 82%, transparent);
     border-color: var(--a);
-    /* П.9: transform убран */
+    transform: translateY(-4px);
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, .20),
         inset 0 -1px 0 rgba(0, 0, 0, .08),
         0 8px 22px rgba(0, 0, 0, .18),
         0 22px 48px rgba(0, 0, 0, .20);
-    /* П.10: backdrop-filter только при hover */
-    -webkit-backdrop-filter: blur(16px) saturate(160%);
-    backdrop-filter: blur(16px) saturate(160%);
 }
 
 .cd:hover::after {
@@ -2008,6 +2010,7 @@ body.theme-light .cd:hover::after {
     opacity: .75;
 }
 
+/* Крафт — карточки-наклейки, без стекла и призмы */
 body.theme-paper .cd {
     background: #e6d8bc;
     -webkit-backdrop-filter: none;
@@ -2379,6 +2382,7 @@ body:not(.theme-light) .cd-purchase .price-tag {
     color: #fff;
 }
 
+/* Кнопки каталогов — цветные, как у магазинов */
 .psl.op1,
 .psl.op3,
 .psl.op7 {
@@ -2436,6 +2440,7 @@ body:not(.theme-light) .cd-purchase .price-tag {
     box-shadow: 0 6px 14px rgba(14, 165, 233, .45);
 }
 
+/* На мобильном — чуть компактнее, чтобы всё влезало в один ряд */
 @media (max-width: 900px) {
     .cd-purchase .prow.op-b .psl {
         font-size: .62rem;
@@ -3321,6 +3326,7 @@ body.theme-paper .mh h3 {
     }
 }
 
+/* Результат декодирования VIN */
 .gdr {
     margin-top: 14px;
     padding: 14px 16px;
@@ -3908,6 +3914,7 @@ body.theme-paper #licgate .gate-body h4 {
 }
 
 /* Донат */
+
 body:not(.theme-light) .don-test {
     color: #fbbf24;
 }
@@ -4441,9 +4448,11 @@ body.theme-light .th-card {
 }
 
 /* ============================================================
-   МОБИЛЬНЫЙ (≤900px)
+   МОБИЛЬНЫЙ (≤900px) — единый блок, без конфликтов
    ============================================================ */
 @media (max-width: 900px) {
+
+    /* Сайдбар-шторка */
     .sb {
         width: 300px;
         transform: translateX(-100%);
@@ -4463,6 +4472,7 @@ body.theme-light .th-card {
         display: none !important;
     }
 
+    /* Топбар — колонка, слева отступ под absolute-кнопку #mob */
     .tb {
         flex-direction: column !important;
         align-items: stretch !important;
@@ -4471,6 +4481,7 @@ body.theme-light .th-card {
         min-height: auto !important;
     }
 
+    /* Мобильный гамбургер — absolute поверх шапки, чуть выше прежнего */
     #mob {
         display: flex !important;
         position: absolute !important;
@@ -4500,6 +4511,7 @@ body.theme-light .th-card {
         padding: 4px 6px !important;
     }
 
+    /* Лента фильтров — на всю ширину, обычный wrap */
     .tb-filters {
         display: flex !important;
         flex-wrap: wrap !important;
@@ -4525,6 +4537,7 @@ body.theme-light .th-card {
         font-size: .68rem !important;
     }
 
+    /* Кнопка ТО — всегда с остатком км/дней */
     .to-chip .to-lb {
         display: inline-block !important;
         max-width: 170px;
@@ -4545,6 +4558,7 @@ body.theme-light .th-card {
         font-size: .68rem;
     }
 
+    /* Кнопки действий — в общей ленте, переносятся только когда реально нет места */
     .ac {
         display: flex !important;
         flex-wrap: wrap !important;
@@ -4591,6 +4605,7 @@ body.theme-light .th-card {
         display: inline !important;
     }
 
+    /* Меню ⚙️ — bottom sheet */
     .em {
         position: fixed !important;
         top: auto !important;
@@ -4644,6 +4659,7 @@ body.theme-light .th-card {
         }
     }
 
+    /* Сетка, формы */
     .gr {
         grid-template-columns: 1fr;
         gap: 12px;
@@ -4671,7 +4687,6 @@ body.theme-light .th-card {
     .sh {
         font-size: 1.1rem;
         position: static;
-        /* на мобиле уже static */
         padding: 6px 8px;
         margin-bottom: 12px;
     }
@@ -4701,6 +4716,7 @@ body.theme-light .th-card {
         padding-right: 14px;
     }
 
+    /* Тост */
     .tst {
         bottom: 16px;
         padding: 10px 16px;
@@ -4712,6 +4728,7 @@ body.theme-light .th-card {
         font-size: .76rem;
     }
 
+    /* Модалки — bottom sheet */
     .mo {
         padding: 0;
         align-items: flex-end;
@@ -4775,6 +4792,7 @@ body.theme-light .th-card {
     }
 }
 
+/* Очень узкий мобильный */
 @media (max-width: 480px) {
     .fr {
         grid-template-columns: 1fr;
@@ -4796,7 +4814,7 @@ body.theme-light .th-card {
     }
 }
 
-/* Десктоп ≥901px */
+/* Десктоп ≥901px — всё в одну строку */
 @media (min-width: 901px) {
     .tb {
         flex-wrap: nowrap !important;
@@ -4805,6 +4823,7 @@ body.theme-light .th-card {
         min-height: 60px !important;
     }
 
+    /* Поиск — фиксированной ширины, не жмётся */
     .sc {
         flex: 0 0 260px !important;
         max-width: 260px !important;
@@ -4831,6 +4850,7 @@ body.theme-light .th-card {
         right: 8px !important;
     }
 
+    /* Фильтры — сжимаются первыми, с горизонтальной прокруткой при нехватке */
     .tb-filters {
         flex: 1 1 auto !important;
         flex-wrap: nowrap !important;
@@ -4866,6 +4886,7 @@ body.theme-light .th-card {
         max-width: none !important;
     }
 
+    /* Кнопки справа — НЕ сжимаются, прижаты вправо */
     .ac {
         gap: 6px !important;
         flex-wrap: nowrap !important;
@@ -4879,6 +4900,7 @@ body.theme-light .th-card {
         height: 36px !important;
     }
 
+    /* Подписи у кнопок Журнал/OEM — на десктопе оставляем */
     .ac .bn .bl {
         display: inline !important;
     }
@@ -4968,7 +4990,6 @@ body.theme-light .th-card {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
         background: #fff !important;
-        content-visibility: visible;
     }
 
     .cd::before,
@@ -4996,7 +5017,7 @@ body.theme-light .th-card {
 }
 
 /* ============================================================
-   ОБНОВЛЕНИЕ — секции
+   ОБНОВЛЕНИЕ — секции (программа / база)
    ============================================================ */
 .up-sec {
     margin-bottom: 18px;
@@ -5034,7 +5055,7 @@ body.theme-light .th-card {
 }
 
 /* ============================================================
-   FAQ
+   FAQ — помощь по кнопкам
    ============================================================ */
 .faq-sec {
     margin-bottom: 22px;
@@ -5135,7 +5156,7 @@ body.theme-light .faq-item {
 }
 
 /* ============================================================
-   ЧТО НОВОГО — changelog
+   ОБНОВЛЕНИЕ — блок «Что нового»
    ============================================================ */
 .changelog {
     display: flex;
@@ -5243,6 +5264,7 @@ body.theme-light .faq-item {
    ============================================================ */
 @media (max-width: 900px) {
 
+    /* 1. Убиваем backdrop-filter — главный тормоз на мобиле */
     .sb,
     .sb::before,
     .sb::after,
@@ -5273,6 +5295,7 @@ body.theme-light .faq-item {
         backdrop-filter: none !important;
     }
 
+    /* 2. Плотные фоны вместо «стекла» */
     .sb {
         background: linear-gradient(180deg,
                 var(--b) 0%,
@@ -5294,6 +5317,7 @@ body.theme-light .faq-item {
         border-color: var(--bd) !important;
     }
 
+    /* 3. Убираем призму и blend-mode */
     .cd::before,
     .cd::after,
     .gi::before,
@@ -5305,6 +5329,7 @@ body.theme-light .faq-item {
         display: none !important;
     }
 
+    /* 4. Убираем анимации входа у карточек */
     .cd {
         animation: none !important;
     }
@@ -5321,6 +5346,7 @@ body.theme-light .faq-item {
         animation: none !important;
     }
 
+    /* 5. Упрощаем фон body — только однотонный/линейный */
     body,
     body.theme-light,
     body.theme-dark,
@@ -5332,6 +5358,7 @@ body.theme-light .faq-item {
         background: var(--bg) !important;
     }
 
+    /* 6. Лёгкие тени */
     .cd,
     .cd:hover,
     .cd.fav,
@@ -5358,11 +5385,14 @@ body.theme-light .faq-item {
         transform: none !important;
     }
 
+    /* 7. content-visibility — браузер не рисует то, что за экраном.
+        Дает самый большой прирост при списке из сотен карточек. */
     .gr>.cd {
         content-visibility: auto;
         contain-intrinsic-size: 240px;
     }
 
+    /* 8. Плоские градиенты у кнопок */
     .bn.p,
     .tbd,
     #mob,
@@ -5377,6 +5407,7 @@ body.theme-light .faq-item {
         box-shadow: none !important;
     }
 
+    /* Уважение prefers-reduced-motion */
     @media (prefers-reduced-motion: reduce) {
 
         *,
@@ -5389,215 +5420,238 @@ body.theme-light .faq-item {
         }
     }
 
-    /* MOBILE COMPACT TOOLBAR */
-    .tb {
-        padding: 4px 6px 6px 46px !important;
-        gap: 3px !important;
+    /* ============================================================
+   MOBILE COMPACT TOOLBAR — сжать шапку, чтобы влезала в 1-2 строки
+   ============================================================ */
+    @media (max-width: 900px) {
+
+        /* --- Топбар целиком: минимальные отступы --- */
+        .tb {
+            padding: 4px 6px 6px 46px !important;
+            gap: 3px !important;
+        }
+
+        /* --- Поиск: не на всю высоту, компактнее --- */
+        .sc {
+            margin-bottom: 2px !important;
+            height: 32px !important;
+        }
+
+        .sr {
+            padding: 5px 28px 5px 30px !important;
+            font-size: .78rem !important;
+            border-width: 1px !important;
+            border-radius: 6px !important;
+            height: 32px !important;
+        }
+
+        .si {
+            left: 8px !important;
+            font-size: .78rem !important;
+        }
+
+        .scl {
+            right: 4px !important;
+            padding: 4px 5px !important;
+            font-size: .78rem !important;
+        }
+
+        /* --- Лента фильтров: одна горизонтальная прокрутка, всё в строку --- */
+        /* --- Лента фильтров: перенос строк, всё видно --- */
+        .tb-filters {
+            flex-wrap: wrap !important;
+            overflow: visible !important;
+            padding-bottom: 1px !important;
+            gap: 4px !important;
+        }
+
+        .tb-filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* --- Селекты и чипы: узкие, маленькие, в одну строку --- */
+        .fs,
+        .fs.flt.mtr,
+        .fs.flt.bdy,
+        .fs.flt.trn {
+            font-size: .66rem !important;
+            padding: 5px 6px !important;
+            height: 28px !important;
+            line-height: 1 !important;
+            max-width: none !important;
+            width: auto !important;
+            flex: 0 0 auto !important;
+            border-radius: 5px !important;
+        }
+
+        .to-chip {
+            font-size: .64rem !important;
+            padding: 4px 7px !important;
+            height: 28px !important;
+            flex: 0 0 auto !important;
+            border-radius: 5px !important;
+        }
+
+        .to-chip .to-lb {
+            max-width: 100px !important;
+        }
+
+        /* --- Кнопки действий: только иконка, без подписи --- */
+        .ac {
+            flex: 0 0 auto !important;
+            gap: 3px !important;
+            margin-left: 0 !important;
+        }
+
+        .ac>.bn {
+            padding: 4px 7px !important;
+            font-size: .72rem !important;
+            height: 28px !important;
+            min-width: 28px !important;
+            justify-content: center !important;
+            border-radius: 5px !important;
+        }
+
+        /* Все подписи .bl скрыть — уже скрыто в твоём CSS, но усилим */
+        .ac .bn .bl {
+            display: none !important;
+        }
+
+        /* У кнопки «OEM» оставим только плюс, без слова */
+        .ac .bn.p .bl {
+            display: none !important;
+        }
+
+        /* Переключатель плитка/дерево — сжать */
+        .vt-switch {
+            padding: 3px 6px !important;
+            height: 28px !important;
+            font-size: .64rem !important;
+        }
+
+        .vt-track {
+            width: 26px !important;
+            height: 14px !important;
+        }
+
+        .vt-thumb {
+            width: 10px !important;
+            height: 10px !important;
+        }
+
+        .vt-switch input:checked~.vt-track .vt-thumb {
+            transform: translateX(12px) !important;
+        }
+
+        .vt-lbl {
+            min-width: 42px;
+            font-size: .62rem !important;
+        }
+
+        /* --- Гамбургер --- */
+        #mob {
+            top: 3.1px !important;
+            left: 8px !important;
+            width: 32px !important;
+            height: 34px !important;
+            font-size: .95rem !important;
+        }
     }
 
-    .sc {
-        margin-bottom: 2px !important;
-        height: 32px !important;
+    /* Очень узкие экраны — ещё плотнее */
+    @media (max-width: 380px) {
+        .fs {
+            font-size: .62rem !important;
+            padding: 4px 5px !important;
+        }
+
+        .to-chip {
+            font-size: .6rem !important;
+            padding: 3px 6px !important;
+        }
+
+        .ac>.bn {
+            padding: 3px 6px !important;
+        }
+
+        .to-chip .to-lb {
+            max-width: 70px !important;
+        }
     }
 
-    .sr {
-        padding: 5px 28px 5px 30px !important;
-        font-size: .78rem !important;
-        border-width: 1px !important;
-        border-radius: 6px !important;
-        height: 32px !important;
+    /* ============================================================
+   ETKA TREE — кнопка «Развернуть всё» + индикация открытых папок
+   ============================================================ */
+    .et-tools {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding-bottom: 10px;
+        margin-bottom: 6px;
+        border-bottom: 1px dashed var(--bd);
     }
 
-    .si {
-        left: 8px !important;
-        font-size: .78rem !important;
+    .et-tgl-btn {
+        padding: 6px 12px;
+        font-size: .78rem;
     }
 
-    .scl {
-        right: 4px !important;
-        padding: 4px 5px !important;
-        font-size: .78rem !important;
+    .et-hint {
+        font-size: .72rem;
+        color: var(--mu);
+        font-style: italic;
     }
 
-    .tb-filters {
-        flex-wrap: wrap !important;
-        overflow: visible !important;
-        padding-bottom: 1px !important;
-        gap: 4px !important;
+    /* Открытая папка — подсветка + акцентная полоса слева */
+    .et details.et-group[open]>summary {
+        background: color-mix(in srgb, var(--a) 10%, transparent);
+        box-shadow: inset 3px 0 0 var(--a);
+        border-radius: var(--r-sm);
     }
 
-    .tb-filters::-webkit-scrollbar {
-        display: none;
+    .et details.et-sub[open]>summary {
+        background: color-mix(in srgb, var(--a) 6%, transparent);
+        box-shadow: inset 3px 0 0 color-mix(in srgb, var(--a) 55%, transparent);
+        border-radius: var(--r-sm);
     }
 
-    .fs,
-    .fs.flt.mtr,
-    .fs.flt.bdy,
-    .fs.flt.trn {
-        font-size: .66rem !important;
-        padding: 5px 6px !important;
-        height: 28px !important;
-        line-height: 1 !important;
-        max-width: none !important;
-        width: auto !important;
-        flex: 0 0 auto !important;
-        border-radius: 5px !important;
+    /* Чуть больше отступ у вложенных подгрупп — видно иерархию */
+    .et>details>details {
+        margin-left: 14px;
+        padding-left: 6px;
+        border-left: 1px dashed color-mix(in srgb, var(--a) 20%, transparent);
     }
 
-    .to-chip {
-        font-size: .64rem !important;
-        padding: 4px 7px !important;
-        height: 28px !important;
-        flex: 0 0 auto !important;
-        border-radius: 5px !important;
+    /* Поколение — коричневатый чип */
+    .tg.gn {
+        background: color-mix(in srgb, #a16207 12%, transparent);
+        color: #a16207;
+        border-color: color-mix(in srgb, #a16207 30%, transparent);
+        font-family: var(--ff-mono);
     }
 
-    .to-chip .to-lb {
-        max-width: 100px !important;
+    body:not(.dark) .tg.gn,
+    body.theme-dark .tg.gn,
+    body.theme-aurora .tg.gn {
+        color: #fbbf24;
     }
 
-    .ac {
-        flex: 0 0 auto !important;
-        gap: 3px !important;
-        margin-left: 0 !important;
+    body.theme-light .tg.gn,
+    body.theme-paper .tg.gn {
+        color: #92400e;
     }
 
-    .ac>.bn {
-        padding: 4px 7px !important;
-        font-size: .72rem !important;
-        height: 28px !important;
-        min-width: 28px !important;
-        justify-content: center !important;
-        border-radius: 5px !important;
+    .fs.flt.gen {
+        color: #a16207;
     }
-
-    .ac .bn .bl {
-        display: none !important;
-    }
-
-    .ac .bn.p .bl {
-        display: none !important;
-    }
-
-    .vt-switch {
-        padding: 3px 6px !important;
-        height: 28px !important;
-        font-size: .64rem !important;
-    }
-
-    .vt-track {
-        width: 26px !important;
-        height: 14px !important;
-    }
-
-    .vt-thumb {
-        width: 10px !important;
-        height: 10px !important;
-    }
-
-    .vt-switch input:checked~.vt-track .vt-thumb {
-        transform: translateX(12px) !important;
-    }
-
-    .vt-lbl {
-        min-width: 42px;
-        font-size: .62rem !important;
-    }
-
-    #mob {
-        top: 3.1px !important;
-        left: 8px !important;
-        width: 32px !important;
-        height: 34px !important;
-        font-size: .95rem !important;
-    }
-}
-
-@media (max-width: 380px) {
-    .fs {
-        font-size: .62rem !important;
-        padding: 4px 5px !important;
-    }
-
-    .to-chip {
-        font-size: .6rem !important;
-        padding: 3px 6px !important;
-    }
-
-    .ac>.bn {
-        padding: 3px 6px !important;
-    }
-
-    .to-chip .to-lb {
-        max-width: 70px !important;
-    }
-}
-
-/* ETKA TREE — кнопки и индикация */
-.et-tools {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    padding-bottom: 10px;
-    margin-bottom: 6px;
-    border-bottom: 1px dashed var(--bd);
-}
-
-.et-tgl-btn {
-    padding: 6px 12px;
-    font-size: .78rem;
-}
-
-.et-hint {
-    font-size: .72rem;
-    color: var(--mu);
-    font-style: italic;
-}
-
-.et details.et-group[open]>summary {
-    background: color-mix(in srgb, var(--a) 10%, transparent);
-    box-shadow: inset 3px 0 0 var(--a);
-    border-radius: var(--r-sm);
-}
-
-.et details.et-sub[open]>summary {
-    background: color-mix(in srgb, var(--a) 6%, transparent);
-    box-shadow: inset 3px 0 0 color-mix(in srgb, var(--a) 55%, transparent);
-    border-radius: var(--r-sm);
-}
-
-.et>details>details {
-    margin-left: 14px;
-    padding-left: 6px;
-    border-left: 1px dashed color-mix(in srgb, var(--a) 20%, transparent);
-}
-
-.tg.gn {
-    background: color-mix(in srgb, #a16207 12%, transparent);
-    color: #a16207;
-    border-color: color-mix(in srgb, #a16207 30%, transparent);
-    font-family: var(--ff-mono);
-}
-
-body:not(.dark) .tg.gn,
-body.theme-dark .tg.gn,
-body.theme-aurora .tg.gn {
-    color: #fbbf24;
-}
-
-body.theme-light .tg.gn,
-body.theme-paper .tg.gn {
-    color: #92400e;
-}
-
-.fs.flt.gen {
-    color: #a16207;
 }
 
 /* ============================================================
-   ⚙️ Настройки в подвале сайдбара
+   ⚙️ Настройки в подвале сайдбара — одна строка + рабочее меню
    ============================================================ */
+
+/* 7 иконок в один ряд, все равные, ничего не переносится */
 .sft-btns {
     flex-wrap: nowrap;
     gap: 4px;
@@ -5614,6 +5668,7 @@ body.theme-paper .tg.gn {
     min-width: 0;
 }
 
+/* Обёртка ⚙️ — тоже flex-ячейка, как и остальные кнопки */
 .sft-btns .ew {
     display: inline-flex;
     position: relative;
@@ -5628,6 +5683,7 @@ body.theme-paper .tg.gn {
     flex: none;
 }
 
+/* На десктопе меню выезжает СПРАВА от кнопки, выровнено по её низу. */
 @media (min-width: 901px) {
     .sft-btns .em {
         position: absolute !important;
@@ -5641,21 +5697,28 @@ body.theme-paper .tg.gn {
         max-height: 80vh;
         overflow-y: auto;
         z-index: 2500 !important;
+
+        /* НЕПРОЗРАЧНЫЙ фон — иначе меню «просвечивает» поверх контента */
         background: var(--cd) !important;
         border: 1px solid var(--bd) !important;
         box-shadow:
             0 12px 40px rgba(0, 0, 0, .35),
             0 0 0 1px rgba(0, 0, 0, .04) !important;
+
+        /* Убираем вложенный blur — он конфликтует с .sft и .sb */
         -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
     }
 
+    /* Верхний светлый градиент .em::before на непрозрачном фоне оставим,
+       он добавляет глубину и не мешает читаемости. */
     .sft-btns .em::before {
         background: linear-gradient(180deg,
                 rgba(255, 255, 255, .06) 0%,
                 rgba(255, 255, 255, 0) 40%) !important;
     }
 
+    /* В тёмных темах подсветка сверху — наоборот, чуть ярче */
     body:not(.theme-light):not(.theme-paper) .sft-btns .em::before {
         background: linear-gradient(180deg,
                 rgba(255, 255, 255, .10) 0%,
@@ -5664,8 +5727,9 @@ body.theme-paper .tg.gn {
 }
 
 /* ============================================================
-   🔍 Поиск + кнопка +OEM
+   🔍 Поиск + кнопка +OEM — в одной связке
    ============================================================ */
+
 .sc-wrap {
     display: flex;
     align-items: center;
@@ -5675,17 +5739,22 @@ body.theme-paper .tg.gn {
     margin-left: 0;
 }
 
+/* Внутри обёртки поле поиска больше не отступает само по себе */
 .sc-wrap .sc {
     margin-left: 0 !important;
     margin-right: 0 !important;
 }
 
+/* Кнопка +OEM рядом с поиском — по высоте как поле */
 .sc-oem-btn {
     flex-shrink: 0;
     white-space: nowrap;
 }
 
+/* ---------- Десктоп ---------- */
 @media (min-width: 901px) {
+
+    /* При свёрнутом сайдбаре сдвигаем всю связку, а не только поле */
     body.sidebar-collapsed .sc-wrap {
         margin-left: 52px !important;
     }
@@ -5695,6 +5764,7 @@ body.theme-paper .tg.gn {
     }
 }
 
+/* ---------- Мобильный ---------- */
 @media (max-width: 900px) {
     .sc-wrap {
         width: 100% !important;
@@ -5703,8 +5773,10 @@ body.theme-paper .tg.gn {
         margin-bottom: 4px !important;
         gap: 4px !important;
         order: -1;
+        /* поиск остаётся сверху */
     }
 
+    /* Внутри связки поле сжимается, а не растягивается на 100% */
     .sc-wrap .sc {
         flex: 1 1 auto !important;
         width: auto !important;
@@ -5720,11 +5792,13 @@ body.theme-paper .tg.gn {
         font-size: .72rem !important;
     }
 
+    /* На узких — только «➕», без слова OEM */
     .sc-oem-btn .bl {
         display: none !important;
     }
 }
 
+/* Очень узкие экраны — минимальный отступ */
 @media (max-width: 380px) {
     .sc-oem-btn {
         padding: 4px 8px !important;
@@ -5732,7 +5806,7 @@ body.theme-paper .tg.gn {
 }
 
 /* ============================================================
-   🎉 ПЛАШКА «ЧТО НОВОГО»
+   🎉 ПЛАШКА «ЧТО НОВОГО» (при обновлении версии)
    ============================================================ */
 .whatsnew {
     position: fixed;
@@ -5846,6 +5920,7 @@ body.theme-paper .tg.gn {
     justify-content: flex-end;
 }
 
+/* Мобильный — плашка превращается в ленту снизу */
 @media (max-width: 900px) {
     .whatsnew {
         right: 10px;
@@ -5877,8 +5952,10 @@ body.theme-paper .tg.gn {
 }
 
 /* ============================================================
-   📷 ГАЛЕРЕЯ ФОТО
+   📷 ГАЛЕРЕЯ ФОТО (несколько снимков на позицию)
    ============================================================ */
+
+/* Сетка превью в форме редактирования */
 .pgrid {
     display: flex;
     flex-wrap: wrap;
@@ -5928,6 +6005,7 @@ body.theme-paper .tg.gn {
     transform: scale(1.1);
 }
 
+/* Галерея в карточке детали */
 .cd-gallery {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -5941,6 +6019,7 @@ body.theme-paper .tg.gn {
     object-fit: cover;
 }
 
+/* Лайтбокс — навигация */
 .lb2 img {
     cursor: default;
 }
@@ -6007,6 +6086,7 @@ body.theme-paper .tg.gn {
     background: rgba(255, 255, 255, .15);
 }
 
+/* Мобильный — компактнее */
 @media (max-width: 900px) {
     .pgrid-item {
         width: 76px;
@@ -6036,6 +6116,7 @@ body.theme-paper .tg.gn {
     }
 }
 
+/* Крестик закрытия лайтбокса */
 .lb2 .lb-close {
     position: fixed;
     top: 20px;
@@ -6075,7 +6156,7 @@ body.theme-paper .tg.gn {
 }
 
 /* ============================================================
-   🛒 Блок «Купить запчасти для ТО»
+   🛒 Блок «Купить запчасти для ТО» в карточке регламента
    ============================================================ */
 .cd-to-parts {
     padding: 12px 16px 14px;
@@ -6173,7 +6254,7 @@ body.theme-paper .tg.gn {
     padding: 4px 10px;
 }
 
-/* История версий */
+/* История версий — принудительно вписываем в экран */
 #upmo .mdl {
     max-width: 640px;
     max-height: calc(100vh - 48px);
@@ -6201,10 +6282,12 @@ body.theme-paper .tg.gn {
     }
 }
 
+/* Свёрнутые релизы в истории версий */
 details.cl-release>summary {
     cursor: pointer;
     list-style: none;
     display: flex;
+    /* ← ключевое: arrow + head в одну строку */
     align-items: center;
     gap: 6px;
     padding: 0;
@@ -6219,6 +6302,7 @@ details.cl-release>summary::marker {
     content: '';
 }
 
+/* Внутри summary у .cl-head убираем flex-grow и margin */
 details.cl-release>summary .cl-head {
     flex: 1 1 auto;
     margin-bottom: 0;
@@ -6243,6 +6327,7 @@ details.cl-release[open]>summary {
     margin-bottom: 8px;
 }
 
+/* Сам свёрнутый релиз — визуально как обычный, но с курсором */
 details.cl-release:not([open]) {
     padding-bottom: 8px;
 }
@@ -6259,6 +6344,7 @@ details.cl-release:not([open]):hover {
     gap: 8px;
     padding: 10px 12px 10px;
     margin: -6px -6px 6px;
+    /* растянуть на всю ширину .em с учётом его padding */
     font-size: .82rem;
     font-weight: 800;
     text-transform: uppercase;
@@ -6271,6 +6357,7 @@ details.cl-release:not([open]):hover {
     border-radius: var(--r-sm) var(--r-sm) 0 0;
 }
 
+/* На мобиле (bottom sheet) отступы чуть другие */
 @media (max-width: 900px) {
     .em-title {
         padding: 12px 14px;
@@ -6279,6 +6366,7 @@ details.cl-release:not([open]):hover {
     }
 }
 
+/* Крафт-тема — тёплый акцент */
 body.theme-paper .em-title {
     color: var(--a-h);
     border-bottom-color: rgba(58, 42, 24, .18);
@@ -6287,102 +6375,11 @@ body.theme-paper .em-title {
             rgba(255, 255, 255, 0) 100%);
 }
 
+/* Светлая тема — мягче */
 body.theme-light .em-title {
     border-bottom-color: rgba(40, 40, 38, .12);
     background: linear-gradient(180deg,
             rgba(255, 255, 255, .55) 0%,
             rgba(255, 255, 255, 0) 100%);
 }
-
-.rSec td {
-    white-space: pre-line;
-}
-
-/* Метрика-бейдж */
-.sft-stats {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 10px 0 6px;
-    opacity: .82;
-    transition: opacity var(--tr), transform var(--tr);
-}
-
-.sft-stats:hover {
-    opacity: 1;
-    transform: translateY(-1px);
-}
-
-.sft-stats a {
-    display: inline-block;
-    line-height: 0;
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow:
-        0 2px 8px rgba(0, 0, 0, .22),
-        0 0 0 1px rgba(255, 255, 255, .10);
-    transition: box-shadow var(--tr);
-}
-
-.sft-stats a:hover {
-    box-shadow: 0 4px 14px rgba(0, 0, 0, .35), 0 0 0 1px rgba(255, 255, 255, .20);
-}
-
-.sft-stats img {
-    display: block;
-    width: 88px;
-    height: 31px;
-    border: 0;
-}
-
-body.theme-dark .sft-stats,
-body.theme-aurora .sft-stats,
-body.theme-cyberpunk .sft-stats,
-body.theme-sunset .sft-stats,
-body.theme-cosmos .sft-stats {
-    opacity: .7;
-}
-
-body.theme-dark .sft-stats:hover,
-body.theme-aurora .sft-stats:hover,
-body.theme-cyberpunk .sft-stats:hover,
-body.theme-sunset .sft-stats:hover,
-body.theme-cosmos .sft-stats:hover {
-    opacity: 1;
-}
-
-@media (max-width: 900px) {
-    .sft-stats {
-        margin: 8px 0 4px;
-    }
-}
-
-/* ⚙️ ФИКС меню настроек в подвале */
-@media (min-width: 901px) {
-    body .sft .sft-btns .ew>.em {
-        position: fixed !important;
-        top: auto !important;
-        right: auto !important;
-        bottom: 20px !important;
-        left: calc(var(--sw) + 10px) !important;
-        margin: 0 !important;
-        transform: none !important;
-        min-width: 280px !important;
-        max-width: 340px !important;
-        max-height: calc(100vh - 60px) !important;
-        overflow-y: auto !important;
-        z-index: 9000 !important;
-        background: var(--cd) !important;
-        border: 1px solid var(--bd) !important;
-        border-radius: 10px !important;
-        box-shadow:
-            0 16px 48px rgba(0, 0, 0, .40),
-            0 0 0 1px rgba(0, 0, 0, .04) !important;
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-    }
-}
-
-body.sidebar-collapsed .sft .sft-btns .ew>.em {
-    left: 64px !important;
-}
+.rSec td { white-space: pre-line; }
