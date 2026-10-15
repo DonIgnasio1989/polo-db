@@ -1,3 +1,4 @@
+
 /* ============================================================
    VW Polo / Caddy 6N — База Мастера · Redesign v22 (clean)
    ============================================================ */
@@ -719,6 +720,48 @@ body.theme-light .gi {
     background: var(--dg);
     color: #fff;
     transform: scale(1.15) rotate(90deg);
+}
+
+/* Кнопки карточки машины + сворачивание */
+.gi-btns {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.gi-tgl {
+    background: rgba(255, 255, 255, .06);
+    border: none;
+    color: rgba(255, 255, 255, .65);
+    cursor: pointer;
+    font-size: .72rem;
+    line-height: 1;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all var(--tr-fast);
+}
+
+.gi-tgl:hover {
+    background: color-mix(in srgb, var(--a) 35%, transparent);
+    color: #fff;
+}
+
+.gi-tgl.collapsed {
+    transform: rotate(-90deg);
+}
+
+.gi-mini {
+    margin-top: 6px;
+    font-family: var(--ff-mono);
+    font-size: .64rem;
+    color: rgba(255, 255, 255, .75);
+    letter-spacing: .3px;
 }
 
 .gi-info {
@@ -1445,6 +1488,7 @@ body.sidebar-collapsed .mw {
     color: var(--a);
 }
 
+
 .fs.flt.bdy {
     color: var(--ok);
 }
@@ -1452,6 +1496,7 @@ body.sidebar-collapsed .mw {
 .fs.flt.trn {
     color: var(--wn);
 }
+
 
 /* Кнопки действий */
 .ac {
@@ -2733,6 +2778,53 @@ body:not(.theme-light) .cd-purchase .price-tag {
     background: color-mix(in srgb, var(--wn) 12%, transparent);
     color: var(--wn);
     border-color: color-mix(in srgb, var(--wn) 30%, transparent);
+    font-family: var(--ff-mono);
+}
+
+/* Буквенный код КПП (CHL, DXB…) — тот же цвет, что у семейства, но пунктир */
+.tg.trc {
+    background: color-mix(in srgb, var(--wn) 18%, transparent);
+    color: var(--wn);
+    border-color: color-mix(in srgb, var(--wn) 45%, transparent);
+    border-style: dashed;
+    font-family: var(--ff-mono);
+    font-weight: 700;
+}
+
+/* Подсказка «код → семейство + с чем ставили» в редакторе VIN */
+.gb-hint {
+    padding: 8px 10px;
+    background: var(--hv);
+    border: 1px solid var(--bd);
+    border-radius: 4px;
+    font-size: .75rem;
+    line-height: 1.55;
+    margin: -4px 0 2px;
+}
+
+/* Вступление-обучение в начале FAQ */
+.faq-intro {
+    padding: 12px 14px;
+    background: color-mix(in srgb, var(--a) 10%, var(--hv));
+    border: 1px solid color-mix(in srgb, var(--a) 35%, var(--bd));
+    border-radius: 8px;
+    margin: 0 0 14px;
+    font-size: .82rem;
+    line-height: 1.6;
+}
+
+.faq-intro p {
+    margin: 6px 0 0;
+}
+
+.faq-intro-h {
+    font-weight: 800;
+    font-size: .9rem;
+    color: var(--a);
+}
+
+.gb-hint b {
+    color: var(--a);
     font-family: var(--ff-mono);
 }
 
@@ -6408,4 +6500,4 @@ body.theme-light .em-title {
 
 .rSec td {
     white-space: pre-line;
-}
+}

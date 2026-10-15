@@ -60,15 +60,271 @@ const ENGINES = {
     'AKU': { v: '1.7 SDI', hp: 57, f: 'D' }, 'AHG': { v: '1.7 SDI', hp: 57, f: 'D' },
     'AGD': { v: '1.9 SDI', hp: 64, f: 'D' }, 'AEF': { v: '1.9 SDI', hp: 64, f: 'D' }
 };
+/* ============ СЕМЕЙСТВА ДВИГАТЕЛЕЙ ============
+   Зеркальная структура к семействам КПП: у каждого мотора
+   (буквенного кода) есть своё семейство. Используется в фильтре
+   «Семейство ДВС», в редакторе VIN (группировка списка моторов +
+   справка) и в поиске.
+
+   Классификация: бензиновые малолитражки R4 1.0–1.6 — EA111;
+   бензиновые 1.6/1.8 «взрослой» архитектуры — EA827;
+   дизели R4 1.7–1.9 (D/SDI/TDI) — архитектура EA827
+   (по классификации VAG 1.9 TD/TDI входят в семейство EA827). */
+const ENGINE_FAMILIES = {
+    'EA111': {
+        label: 'EA111 — бензин R4 1.0–1.6 (8V/16V)',
+        fuel: 'P',
+        note: 'Малолитражная бензиновая серия для платформы A0: Polo 6N/6N2, Lupo, Seat Arosa/Ibiza, Caddy, Golf. Сюда входят 1.0 50 (AER/ALL/AEV/ALD/ANV/AUC), 1.3 55 (ADX), 1.4 8V 60–75 (ABU/AEX/APQ/AKV/ANX/AKK/ANW/AUD/AHT), 1.4 16V 75–100 (AHW/AKQ/AFK/ANM/APE/AUA/AFH), 1.6 75–100 (AEA/AHS/AEE/ALM/AUR/AFT/AKL) и GTI 1.6 16V 120 (AJV). Основа бензиновой линейки Polo III.',
+        codes: ['AER', 'ALL', 'AEV', 'ALD', 'ANV', 'AUC', 'ADX', 'ABU', 'AEX', 'APQ', 'AKV', 'ANX', 'AKK', 'ANW', 'AUD', 'AHT', 'AHW', 'AKQ', 'AFK', 'ANM', 'APE', 'AUA', 'AFH', 'AEA', 'AHS', 'AEE', 'ALM', 'AUR', 'AFT', 'AKL', 'AJV']
+    },
+    'EA827': {
+        label: 'EA827 — бензин R4 1.6/1.8',
+        fuel: 'P',
+        note: '«Взрослая» бензиновая серия родом из Golf/Passat. В линейке Polo встречается редко: 1.6 75 (1F) и 1.8 90 л.с. (ADZ).',
+        codes: ['1F', 'ADZ']
+    },
+    'EA827-D': {
+        label: 'EA827-D — дизель R4 1.7–1.9 (D/SDI/TDI)',
+        fuel: 'D',
+        note: 'Дизельные R4 на архитектуре EA827 («1.9 R4»): 1.7 SDI 57–60 (AKU/AHG/AKW/AHB), 1.9 D/SDI 64–68 (1Y, AEY/AYQ/AGD/AEF, AGP/AQM), 1.9 TDI 90–110 (AHU/ALE/AGR/ALH, AFN/ASV). Ставились на Polo 6N, Classic, Variant и Caddy; славятся огромным ресурсом.',
+        codes: ['AKU', 'AHG', 'AKW', 'AHB', '1Y', 'AEY', 'AYQ', 'AGD', 'AEF', 'AGP', 'AQM', 'ASV', 'AHU', 'ALE', 'AGR', 'ALH', 'AFN']
+    }
+};
+/* код мотора → семейство */
+const ENGINE_CODE_FAM = (() => {
+    const m = {};
+    Object.keys(ENGINE_FAMILIES).forEach(fam => {
+        ENGINE_FAMILIES[fam].codes.forEach(c => { m[c] = fam; });
+    });
+    return m;
+})();
+const engineFamOf = code => ENGINE_CODE_FAM[String(code || '').trim().toUpperCase()] || '';
+
 const BODIES = {
     '3d': 'Hatchback 3д', '5d': 'Hatchback 5д', 'classic': 'Polo Classic (седан)',
     'estate': 'Polo Estate (универсал)', 'caddy-van': 'Caddy Van',
     'caddy-kombi': 'Caddy Kombi', 'caddy-pickup': 'Caddy Pickup'
 };
 const TRANSMISSIONS = {
-    '085': 'МКПП 085 (5-ст)', '020': 'МКПП 020 (5-ст)', '02K': 'МКПП 02K (5-ст)',
-    '01M': 'АКПП 01M (4-ст)', '01N': 'АКПП 01N (4-ст)'
+    '084': 'МКПП 084 (4-ст)',
+    '085': 'МКПП 085 (5-ст)',
+    '002': 'МКПП 002 (5-ст)',
+    '020': 'МКПП 020 (5-ст)',
+    '02K': 'МКПП 02K (5-ст)',
+    '01M': 'АКПП 01M (4-ст)',
+    '01N': 'АКПП 01N (4-ст)'
 };
+
+/* ============ КПП: СЕМЕЙСТВА И БУКВЕННЫЕ КОДЫ ============
+   Буквенный код выбит на корпусе КПП и указан на наклейке в
+   багажнике / в сервисной книжке (рядом с кодом двигателя).
+   Один код = конкретный набор передаточных чисел под мотор. */
+const GEARBOX = {
+    '084': {
+        label: 'МКПП 084 (4-ст)',
+        speeds: 4,
+        note: 'С чем ставили: ранние Polo III (1994–1999) с малолитражными моторами (чаще 1.0–1.4 MPI). Простая и крепкая коробка, но без «экономичной» пятой передачи.',
+        codes: ['ADX', 'AGX', 'AHK', 'AKV', 'AKW', 'AKX', 'AKY', 'APY', 'AUD', 'CDK', 'CED', 'CEL', 'CEN', 'CEX', 'CEY', 'CFJ', 'CFK', 'CFL', 'CFM', 'CFN', 'CFO', 'CFP', 'CFQ', 'CFR', 'CFS', 'CFT', 'CFU', 'CFV', 'CFW', 'CFX', 'CFY', 'CFZ', 'CGA', 'CGB', 'CGC', 'CGD', 'CGE', 'CGF', 'CGG', 'CGH', 'CGI', 'CGJ', 'CGK', 'CGL', 'CGM', 'CGN', 'CGO', 'CGP', 'CGQ', 'CGR', 'CGS', 'CGT', 'CGU', 'CGW', 'CGX', 'CGY', 'CGZ', 'CHA', 'CHB', 'CHC', 'CHD', 'CHE', 'CHF', 'CHG', 'CHH', 'CHI', 'CHJ', 'CHK', 'CHL', 'CHM', 'CHN', 'CHO', 'CHP', 'CHQ', 'CHR', 'CHS', 'CHT', 'CHU', 'CHV', 'CHW', 'CHX', 'CHY', 'CHZ']
+    },
+    '085': {
+        label: 'МКПП 085 (5-ст)',
+        speeds: 5,
+        note: 'С чем ставили: самая массовая 5-ступка на Polo III. Разные буквенные индексы — разные передаточные числа под двигатели 1.4, 1.6, 1.9 TDI и т. п. Версии с индексами FF* и DX* часто шли на версиях с повышенным крутящим моментом.',
+        special: {
+            'DKE085': 'Модификация 085 с изменёнными передаточными числами (под более тяговитые моторы или для лучшей динамики).',
+            'DKE': 'Буквенный код семейства 085 (в каталогах также записывается как DKE085) — ставился с 1.6 AEE.'
+        },
+        codes: ['AEB', 'AFA', 'AGY', 'AHD', 'AHL', 'AHZ', 'ATV', 'AUE', 'AYZ', 'CCK', 'CEC', 'CEE', 'CEF', 'CEG', 'CEH', 'CEK', 'CEM', 'CHL', 'CHX', 'CJB', 'CJC', 'CJG', 'CKE', 'CKM', 'CKN', 'CKP', 'CKR', 'CKS', 'CKT', 'CLJ', 'CMC', 'CNU', 'CPZ', 'CRA', 'CRX', 'CSD', 'CTW', 'CTY', 'CWL', 'CWM', 'CWN', 'CWP', 'CWR', 'CWS', 'CWT', 'CWU', 'CWV', 'CWW', 'CWX', 'CZG', 'DCA', 'DCC', 'DCD', 'DCE', 'DCG', 'DCH', 'DCJ', 'DCK', 'DCT', 'DDH', 'DDJ', 'DEB', 'DED', 'DHB', 'DKC', 'DKD', 'DKF', 'DKG', 'DPE', 'DPX', 'DQW', 'DQX', 'DRC', 'DSK', 'DSP', 'DSQ', 'DTX', 'DUQ', 'DUY', 'DUZ', 'DWY', 'DWZ', 'DXB', 'DXC', 'DXD', 'DXE', 'DXF', 'DXG', 'DXH', 'DXJ', 'DXK', 'DXL', 'DXM', 'DXN', 'DXP', 'DXQ', 'DYF', 'DYG', 'DYH', 'DYJ', 'DYK', 'DYL', 'EKY', 'ENA', 'ENB', 'EQV', 'EQW', 'EQX', 'EQY', 'EQZ', 'ERA', 'ERB', 'ERC', 'ERD', 'ESY', 'ESZ', 'ETA', 'ETB', 'ETC', 'ETD', 'ETE', 'ETF', 'ETG', 'EUX', 'EUY', 'FCC', 'FCD', 'FDQ', 'FDY', 'FFC', 'FFD', 'FFE', 'FFF', 'FFG', 'FFH', 'FFJ', 'FFK', 'FFL', 'FFM', 'FFN', 'FFP', 'FFQ', 'FFR', 'FFS', 'FFT', 'FFU', 'FFV', 'FFW', 'FFX', 'FGF', 'FHX', 'FHY', 'FHZ', 'FJA', 'FJB', 'FJD', 'FJE', 'FLE', 'FPQ', 'GJE']
+    },
+    '002': {
+        label: 'МКПП 002 (5-ст)',
+        speeds: 5,
+        note: 'С чем ставили: чаще всего Polo Classic (кузов 6V2) и родственные версии (в т. ч. Caddy на базе Polo). Буквенные суффиксы определяют совместимость с конкретным мотором и годом выпуска.',
+        codes: ['DTP', 'DTQ', 'DVM', 'DWT', 'DWU', 'DWV', 'DWW', 'DYR', 'DYS', 'DYT', 'DYU', 'DYV', 'DYW', 'DYX', 'DYY', 'DYZ', 'DZA', 'EDA', 'EDK', 'EDL', 'EFM', 'EMH', 'FCM', 'FJQ', 'FNK', 'GCG']
+    }
+};
+
+/* Отдельные коды — вне основных семейств (или с особыми пометками) */
+const GEARBOX_MISC = {
+    'DCD': 'Отдельная версия, ставилась на Polo в 1990-х. По некоторым каталогам относится к семейству 085.',
+    'DCH': 'Отдельная версия, ставилась на Polo в 1990-х. Также применялась на Seat Arosa и Cordoba. По некоторым каталогам относится к семейству 085.',
+    'FFU': '5-ступка, встречалась на Polo III (1994–2002). Входит в список кодов семейства 085.',
+    'FMC': '5-ступка, применялась примерно с 2003 года. Семейство не уточнено.'
+};
+
+/* code -> [семейства]; у CHL/CHX два семейства (084 и 085) */
+const GEARBOX_CODE_FAMS = (() => {
+    const m = {};
+    const add = (c, f) => { if (!m[c]) m[c] = []; if (!m[c].includes(f)) m[c].push(f); };
+    Object.keys(GEARBOX).forEach(fam => {
+        GEARBOX[fam].codes.forEach(c => add(c, fam));
+        Object.keys(GEARBOX[fam].special || {}).forEach(c => add(c, fam));
+    });
+    return m;
+})();
+const GEARBOX_CODES_ALL = Array.from(new Set(
+    Object.keys(GEARBOX_CODE_FAMS).concat(Object.keys(GEARBOX_MISC))
+)).sort();
+
+/* ============ СПРАВОЧНИК «МОТОР → КПП» ============
+   Какие КПП ставились с каждым двигателем. Используется в
+   редакторе VIN: при выборе мотора список семейств и буквенных
+   кодов сужается до реально ставившихся.
+
+   Источники: VW ETKA, сводная таблица ti-lo.de / polomagazin.de
+   (проверенные буквенные коды для хэтчбеков 6N1/6N2), данные
+   форума vwcaddy-forum.de (Caddy 9K: SDI — 020, TDI — 02A/020).
+
+   fams  — семейства КПП (первое = самое частое);
+   codes — проверенные буквенные коды (для хэтчбека/универсала 6N).
+   Справочник ориентировочный: если кода машины в списке нет —
+   это не ошибка, введите его вручную (поле допускает свободный ввод). */
+const ENGINE_GEARBOX = {
+    // ── Бензин 1.0 (50 л.с.) ──
+    'AER': { fams: ['084', '085'], codes: ['DKC', 'DKG', 'DWZ', 'DXD'] },
+    'ALL': { fams: ['084', '085'], codes: ['DWZ', 'DXD', 'EQW'] },
+    'AEV': { fams: ['084', '085'], codes: ['CWL', 'CWN', 'DCA', 'DCD'] },
+    'ALD': { fams: ['085'], codes: [] },
+    'ANV': { fams: ['085'], codes: ['ESY'] },
+    'AUC': { fams: ['085'], codes: ['FDY', 'FFD'] },
+    // ── Бензин 1.3 / 1.4 ──
+    'ADX': { fams: ['084', '085'], codes: ['CJC', 'CWU', 'DCJ', 'DXK'] },
+    'ABU': { fams: ['084', '085'], codes: [] },
+    'AEX': { fams: ['084', '085'], codes: ['DDH', 'DHB', 'DKF', 'DQW', 'DXP'] },
+    'APQ': { fams: ['085'], codes: [] },
+    'AKV': { fams: ['085'], codes: [] },
+    'ANX': { fams: ['085'], codes: ['ERD'] },
+    'AKK': { fams: ['085'], codes: [] },
+    'ANW': { fams: ['085'], codes: [] },
+    'AUD': { fams: ['085'], codes: ['ERD'] },
+    'AHT': { fams: ['085'], codes: [] },
+    // ── Бензин 1.4 16V ──
+    'AHW': { fams: ['085'], codes: ['ETE', 'FFR', 'FFS'] },
+    'AKQ': { fams: ['085'], codes: ['DUY', 'DXP'] },
+    'AFK': { fams: ['085'], codes: ['ETB', 'ETC', 'FHZ'] },
+    'ANM': { fams: ['085'], codes: [] },
+    'APE': { fams: ['085'], codes: [] },
+    'AUA': { fams: ['085'], codes: [] },
+    'AFH': { fams: ['085'], codes: ['CWX', 'DSP', 'DXJ', 'DXM'] },
+    // ── Бензин 1.6 / 1.8 ──
+    'AEA': { fams: ['085'], codes: ['CKE', 'CLJ', 'CWS', 'CWV'] },
+    'AHS': { fams: ['085'], codes: [] },
+    'AEE': { fams: ['085', '01M'], codes: ['CZG', 'DCC', 'DCG', 'DDJ', 'DKE', 'DKE085', 'DSQ', 'DXE', 'DXH', 'EQY', 'EQZ'] },
+    'ALM': { fams: ['085', '01M'], codes: [] },
+    'AUR': { fams: ['085'], codes: [] },
+    '1F': { fams: ['085', '002', '020'], codes: [] },
+    'AFT': { fams: ['085'], codes: [] },
+    'AKL': { fams: ['085'], codes: [] },
+    'AJV': { fams: ['085'], codes: ['DTX'] },   // GTI 1.6 16V — только 085 (DTX)
+    'ADZ': { fams: ['085'], codes: [] },
+    // ── Дизель 1.7 ──
+    'AKU': { fams: ['085'], codes: ['DED', 'DXQ', 'ETA', 'ETF', 'FDQ'] },
+    'AHG': { fams: ['085'], codes: ['DXG'] },
+    'AKW': { fams: ['085'], codes: [] },
+    'AHB': { fams: ['085'], codes: [] },
+    // ── Дизель 1.9 D / SDI / TDI ──
+    'AEY': { fams: ['085'], codes: [] },
+    'AYQ': { fams: ['085'], codes: [] },
+    '1Y': { fams: ['085', '020'], codes: [] },
+    'AGD': { fams: ['085'], codes: ['DPX', 'DXF', 'EQX'] },
+    'AEF': { fams: ['085'], codes: ['CWT', 'DCH', 'DCT', 'DED'] },
+    'AGP': { fams: ['085', '020'], codes: [] },
+    'AQM': { fams: ['085'], codes: [] },
+    'ASV': { fams: ['085', '020'], codes: [] },
+    'AHU': { fams: ['085', '020'], codes: [] },
+    'ALE': { fams: ['085', '020'], codes: [] },
+    'AGR': { fams: ['085', '020'], codes: [] },
+    'ALH': { fams: ['085', '020'], codes: [] },
+    'AFN': { fams: ['020', '085'], codes: [] }
+};
+
+/* Classic (6V2/6KV) и Caddy (9K) — платформа Seat Ibiza/Cordoba 6K:
+   к «хэтчбековым» семействам добавляются 002 и 020;
+   на Polo Classic (6V2) также ставилась 02K (по данным vwts.ru) */
+const PLATFORM_EXTRA_FAMS = {
+    classic: ['002', '020', '02K'],
+    caddy: ['002', '020']
+};
+
+/* Определение платформы по кузову/модели гаражной записи */
+function platformOf(bodyStr, modelStr) {
+    const b = nz(bodyStr), m = nz(modelStr);
+    if (b.includes('classic') || b.includes('sedan')) return 'classic';
+    if (b.includes('van') || b.includes('pickup')) return 'caddy';
+    if (b.includes('variant') || b.includes('estate')) return 'estate';
+    if (b.includes('hatch')) return 'hatch';
+    if (m.includes('classic')) return 'classic';
+    if (m.includes('caddy')) return 'caddy';
+    if (m.includes('variant') || m.includes('estate')) return 'estate';
+    if (m.includes('polo') || m.includes('6n')) return 'hatch';
+    return '';
+}
+
+/* Какие КПП ставились с мотором на данной платформе.
+   Пустой fams = данных нет (не ограничиваем выбор).
+   Проверенные буквенные коды отдаются только для 6N-хэтчбека/универсала. */
+function gearboxForEngine(engineCode, platform) {
+    const e = ENGINE_GEARBOX[String(engineCode || '').trim().toUpperCase()];
+    if (!e) return { fams: [], codes: [] };
+    if (platform === 'classic' || platform === 'caddy') {
+        const fams = Array.from(new Set(e.fams.concat(PLATFORM_EXTRA_FAMS[platform] || [])));
+        return { fams, codes: [] };
+    }
+    return { fams: e.fams.slice(), codes: e.codes ? e.codes.slice() : [] };
+}
+
+const gearboxFamsOf = code => GEARBOX_CODE_FAMS[String(code || '').trim().toUpperCase()] || [];
+/* Справка по коду: { fams, note, special } — для подсказок в UI */
+function gearboxInfo(code) {
+    const c = String(code || '').trim().toUpperCase();
+    if (!c) return null;
+    const fams = gearboxFamsOf(c);
+    let note = GEARBOX_MISC[c] || '';
+    let special = '';
+    fams.forEach(f => {
+        const g = GEARBOX[f];
+        if (g && g.special && g.special[c]) special = g.special[c];
+        if (!note && g && g.note) note = g.note;
+    });
+    return { fams, note, special };
+}
+/* Нормализация пользовательского ввода кода КПП */
+const normGb = v => {
+    const s = String(v || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+    return s || 'all';
+};
+/* Заполняет <datalist> кодами КПП.
+   opts.codes — явный список кодов (может быть пустым = пустой datalist);
+   opts.fams  — массив семейств (объединение их кодов);
+   opts.family — одно семейство;
+   ничего не задано — все известные коды. */
+function fillGearboxDatalist(dlId, opts) {
+    opts = opts || {};
+    const dl = $(dlId); if (!dl) return;
+    let codes;
+    if (Array.isArray(opts.codes)) {
+        codes = opts.codes.slice();
+    } else {
+        const explicit = (Array.isArray(opts.fams) && opts.fams.length)
+            ? opts.fams.filter(f => GEARBOX[f])
+            : (opts.family && GEARBOX[opts.family] ? [opts.family] : []);
+        const full = !explicit.length;
+        const fams = full ? Object.keys(GEARBOX) : explicit;
+        codes = [];
+        fams.forEach(f => { codes = codes.concat(GEARBOX[f].codes, Object.keys(GEARBOX[f].special || {})); });
+        // Отдельные коды: DCD/DCH/FFU — если в списке их семейство; FMC — только в полном режиме
+        Object.keys(GEARBOX_MISC).forEach(c => {
+            const cf = gearboxFamsOf(c);
+            if (cf.length ? cf.some(f => fams.includes(f)) : full) codes.push(c);
+        });
+    }
+    codes = Array.from(new Set(codes)).sort();
+    dl.innerHTML = codes.map(c => {
+        const f = gearboxFamsOf(c);
+        const lb = f.length ? f.join('/') : 'отдельный';
+        return '<option value="' + c + '">' + lb + '</option>';
+    }).join('');
+}
 const GENERATIONS = {
     '6N1': '6N1 — дорестайл (1994–1999)',
     '6N2': '6N2 — рестайлинг (1999–2001)'
@@ -532,7 +788,8 @@ const UK = 'vw_polo_ui_v186', PK = 'vw_polo_db_v181', WK = 'vw_polo_workshops_v1
     SP = 'parts', SW = 'workshops', METAKEY = 'vw_polo_meta_v1', TOKEY = 'vw_polo_to_v1',
     LICKEY = 'vw_polo_license_v1', UPKEY = 'vw_polo_update_url_v1', PROFKEY = 'vw_polo_profile_v1',
     LOGKEY = 'vw_polo_logs_v1',
-    WNKEY = 'vw_polo_last_seen_version_v1';
+    WNKEY = 'vw_polo_last_seen_version_v1',
+    ONBKEY = 'vw_polo_faq_onboarded_v1';
 
 const THEMES = [
     { id: 'light', label: 'Светлая', icon: '☀️', cls: 'theme-light', preview: '#f3f5f9' },
@@ -549,17 +806,19 @@ const DB = [];
 let D = [], W = [], G = [], LOG = [];
 let SV = {
     activeCat: 'All', activeSub: null, searchQuery: '', statusFilter: 'all', engineFilter: 'all',
-    bodyFilter: 'all', trimFilter: 'all', transFilter: 'all', genFilter: 'all',
+    engFamFilter: 'all',
+    bodyFilter: 'all', trimFilter: 'all', transFilter: 'all', gearboxFilter: 'all', genFilter: 'all',
     sidebarCollapsed: false,
     theme: 'aurora', sortBy: 'default', view: 'grid', activeVinId: null,
     groupBySub: false, vinStrictFilter: false, expandedCats: {},
+    garCollapsed: {},
     _vinApplied: false
 };
 let USER = { name: '', email: '', city: '', initials: '', color: '#00b0f0' };
 let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastDate: null, interval: 15000 };
 
-let APP_VERSION = '1.4.1';
+let APP_VERSION = '1.6.0';
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -831,7 +1090,16 @@ function nP(p) {
 
     const eng = Array.isArray(p.engines) ? p.engines.filter(x => ALL_ENGINES.includes(x)) : [];
     const bdy = Array.isArray(p.bodies) ? p.bodies.filter(x => ALL_BODIES.includes(x)) : [];
-    const trn = Array.isArray(p.transmissions) ? p.transmissions.filter(x => ALL_TRANS.includes(x)) : [];
+    /* КПП: семейства — в transmissions; буквенные коды — в transCodes.
+       Если в источнике буквенный код лежал в transmissions — переносим. */
+    const isGbCode = x => /^[A-Z]{3}$/.test(x) || /^[A-Z]{3}\d{3}$/.test(x);
+    const trnRaw = Array.isArray(p.transmissions) ? p.transmissions.map(x => String(x || '').trim()) : [];
+    const trn = trnRaw.filter(x => ALL_TRANS.includes(x));
+    const trcMigrated = trnRaw.map(x => x.toUpperCase()).filter(x => !ALL_TRANS.includes(x) && isGbCode(x));
+    const trcOwn = Array.isArray(p.transCodes)
+        ? p.transCodes.map(x => String(x || '').trim().toUpperCase()).filter(isGbCode)
+        : [];
+    const trc = Array.from(new Set(trcMigrated.concat(trcOwn))).slice(0, 50);
     const trm = Array.isArray(p.trims) ? p.trims.filter(x => TRIMS.includes(x)) : [];
     const ALL_GENS = Object.keys(GENERATIONS);
     const gens = Array.isArray(p.gens) ? p.gens.filter(x => ALL_GENS.includes(x)) : [];
@@ -857,7 +1125,7 @@ function nP(p) {
         verified: !!(p.v || p.verified),
         analogs: Array.isArray(p.a || p.analogs) ? (p.a || p.analogs).map(String).filter(Boolean) : [],
         donors: Array.isArray(p.d || p.donors) ? (p.d || p.donors).map(String).filter(Boolean) : [],
-        engines: eng, bodies: bdy, transmissions: trn, trims: trm, gens,
+        engines: eng, bodies: bdy, transmissions: trn, transCodes: trc, trims: trm, gens,
         price: (p.price == null || p.price === '') ? null : (isFinite(Number(p.price)) ? Number(p.price) : null),
         currency: p.currency || 'RUB',
         status: ['want', 'bought', 'installed'].includes(p.status) ? p.status : '',
@@ -901,7 +1169,40 @@ const nW = w => !w || typeof w !== 'object' ? null : {
 
 /* ============ VIN-ДЕКОДЕР ============ */
 const VY = { 'A': 1980, 'B': 1981, 'C': 1982, 'D': 1983, 'E': 1984, 'F': 1985, 'G': 1986, 'H': 1987, 'J': 1988, 'K': 1989, 'L': 1990, 'M': 1991, 'N': 1992, 'P': 1993, 'R': 1994, 'S': 1995, 'T': 1996, 'V': 1997, 'W': 1998, 'X': 1999, 'Y': 2000, '1': 2001, '2': 2002, '3': 2003, '4': 2004, '5': 2005, '6': 2006, '7': 2007, '8': 2008, '9': 2009 };
-const VP = { 'A': ['Ingolstadt', 'DE'], 'B': ['Bruxelles', 'BE'], 'D': ['Dresden', 'DE'], 'E': ['Emden', 'DE'], 'H': ['Hannover', 'DE'], 'K': ['Osnabrück', 'DE'], 'M': ['Mexico', 'MX'], 'N': ['Neckarsulm', 'DE'], 'P': ['Pamplona', 'ES'], 'R': ['Moskau', 'RU'], 'S': ['Salzgitter', 'DE'], 'V': ['Westmoreland', 'US'], 'W': ['Wolfsburg', 'DE'], 'X': ['Poznań', 'PL'], 'Z': ['Zwickau', 'DE'] };
+/* Заводы (символ 11 VIN). Источник: clubvw.org.au/vwreference/vwvin + ETKA.
+   Для кодов с двумя значениями завод уточняется по WMI/региону. */
+const VP = {
+    'A': ['Ingolstadt', 'DE'], 'B': ['Bruxelles', 'BE'], 'C': ['Chattanooga', 'US'],
+    'D': ['Bratislava', 'SK'], 'E': ['Emden', 'DE'], 'F': ['Resende', 'BR'],
+    'G': ['Graz', 'AT'], 'H': ['Hannover', 'DE'], 'K': ['Osnabrück', 'DE'],
+    'L': ['Lagos', 'NG'], 'M': ['Puebla', 'MX'], 'N': ['Neckarsulm', 'DE'],
+    'P': ['Mosel / Anchieta', 'DE/BR'], 'R': ['Martorell', 'ES'], 'S': ['Salzgitter', 'DE'],
+    'T': ['Taubaté / Sarajevo', 'BR/BA'], 'U': ['Uitenhage', 'ZA'],
+    'V': ['Palmela / Westmoreland', 'PT/US'], 'W': ['Wolfsburg', 'DE'],
+    'X': ['Poznań', 'PL'], 'Y': ['Pamplona', 'ES'], 'Z': ['Zwickau', 'DE'],
+    '1': ['Győr', 'HU'], '2': ['Anting', 'CN'], '3': ['Changchun', 'CN'],
+    '4': ['Curitiba', 'BR'], '8': ['Dresden / Pacheco', 'DE/AR'], '9': ['Września', 'PL']
+};
+/* Модели VW по коду (символы 7–8 VIN). Источник: clubvw.org.au/vwreference/vwvin.
+   Коды каталога (6N/6V/6K/9K/9U) обрабатываются отдельными ветками в vD(). */
+const VW_MODELS = {
+    '11': 'Beetle (Бразилия/Мексика)', '13': 'Scirocco / Corrado', '14': 'Caddy 1 (пикап на Golf 1)',
+    '15': 'Cabriolet (Beetle/Golf 1)', '16': 'Jetta 1/2 (ранние) · Beetle (с 2012)', '17': 'Golf 1',
+    '18': 'Iltis', '19': 'Golf 2 (ранний)', '1C': 'New Beetle (США)', '1E': 'Golf 3 Cabriolet',
+    '1F': 'Eos', '1G': 'Golf/Jetta 2 (поздний)', '1H': 'Golf/Vento 3', '1J': 'Golf/Bora 4',
+    '1K': 'Golf/Jetta 5/6', '1T': 'Touran', '1Y': 'New Beetle Cabriolet',
+    '24': 'T3 пикап', '25': 'T3 Van/Bus/Caravelle', '28': 'LT 1', '2D': 'LT 2', '2E': 'Crafter 1',
+    '2H': 'Amarok', '2K': 'Caddy 3 / Caddy Maxi', '30': 'Fox (США)', '31': 'Passat 2', '32': 'Santana',
+    '33': 'Passat 2 Variant', '3A': 'Passat 3/4', '3B': 'Passat 5', '3C': 'Passat 6/7/8/CC',
+    '3D': 'Phaeton', '3H': 'Arteon', '50': 'Corrado (ранний)', '53': 'Scirocco 1/2',
+    '5K': 'Golf/Jetta 6', '5M': 'Golf Plus', '5N': 'Tiguan', '5Z': 'Fox (Европа)',
+    '60': 'Corrado (поздний)', '6K': 'Polo Classic/Variant (6K)', '6N': 'Polo 3 (6N)', '6R': 'Polo 5 (6R)',
+    '6X': 'Lupo', '70': 'T4', '74': 'Taro', '7H': 'T5/T6.1', '7J': 'T6', '7L': 'Touareg 1',
+    '7M': 'Sharan', '7P': 'Touareg 2', '86': 'Polo/Derby 1/2', '87': 'Polo Coupe (86C)',
+    '9C': 'New Beetle', '9K': 'Caddy 2 (9K)', '9N': 'Polo 4 (9N)', '9U': 'Caddy 2 Pickup (9U)',
+    'A1': 'T-Roc', 'AA': 'Up!', 'AU': 'Golf 7', 'AW': 'Polo 6 (AW)', 'C1': 'T-Cross', 'CD': 'Golf 8',
+    'SK': 'Caddy 4', 'SY': 'Crafter 2'
+};
 const vV = v => typeof v === 'string' && v.length === 17 && /^[A-HJ-NPR-Z0-9]{17}$/i.test(v);
 
 function vD(v) {
@@ -911,29 +1212,54 @@ function vD(v) {
     let brand = 'Неизвестно', country = '—';
     if (w === 'WVW') { brand = 'Volkswagen'; country = 'Германия'; }
     else if (w === 'WV1') { brand = 'Volkswagen (коммер.)'; country = 'Германия'; }
-    else if (w === 'WV2') { brand = 'Volkswagen'; country = 'Германия'; }
-    else if (w.startsWith('9BW') || w.startsWith('9BV')) { brand = 'VW do Brasil'; country = 'Бразилия'; }
+    else if (w === 'WV2') { brand = 'Volkswagen (автобус/фургон)'; country = 'Германия'; }
+    else if (w === 'WV3') { brand = 'Volkswagen (грузовики)'; country = 'Германия'; }
+    else if (w === 'WVG') { brand = 'Volkswagen (SUV)'; country = 'Германия'; }
+    else if (w === '1VW') { brand = 'Volkswagen USA'; country = 'США'; }
+    else if (w === '1V1') { brand = 'Volkswagen USA (коммер.)'; country = 'США'; }
     else if (w === '3VW') { brand = 'VW Mexico'; country = 'Мексика'; }
+    else if (w === '8AW') { brand = 'VW Argentina'; country = 'Аргентина'; }
+    else if (w === '9BW' || w === '9BV') { brand = 'VW do Brasil'; country = 'Бразилия'; }
+    else if (w === 'AAV') { brand = 'VW South Africa'; country = 'ЮАР'; }
+    else if (w === 'VSS' || w === 'VSK') { brand = 'SEAT'; country = 'Испания'; }
+    else if (w === 'WAU') { brand = 'Audi'; country = 'Германия'; }
+    else if (w === 'TRU') { brand = 'Audi'; country = 'Венгрия'; }
+    else if (w === '93V') { brand = 'Audi Brazil'; country = 'Бразилия'; }
+    else if (/^TM/.test(w)) { brand = 'Škoda'; country = 'Чехия'; }
+    else if (w[0] === 'W') { brand = 'Volkswagen Group (Германия)'; country = 'Германия'; }
     let vp = x.slice(6, 9);
     if (!/^[0-9A-Z]{3}$/.test(vp) || /^ZZZ$/.test(vp)) vp = x.slice(3, 6);
-    let model = '—', body = '—', gen = '';
+    let model = '—', body = '—', gen = '', note = '';
+    /* Каталог охватывает Polo/Caddy 1994–2003:
+       6N1/6N2 — Polo (хэтчбек), 6V2 — Polo Classic (седан),
+       6V5 — Polo Variant (универсал), 6KV/6K — Classic/Variant
+       (перелицованные Seat Córdoba, платформа 6K),
+       9K — Caddy (фургон/комби), 9U — Caddy Pickup. */
     if (/^6N/.test(vp)) {
-        model = 'Polo/Caddy (6N)';
-        if (vp === '6N1') { body = 'Hatchback'; gen = '6N1'; }
-        else if (vp === '6N2') { body = 'Hatchback'; gen = '6N2'; }
-        else if (vp === '6NF') body = 'Variant';
-        else if (vp === '6NH') body = 'Classic Sedan';
-        else if (vp === '6NX') body = 'Van';
-        else body = 'Hatchback';
+        if (vp === '6N1') { model = 'Polo (6N1)'; body = 'Hatchback'; gen = '6N1'; }
+        else if (vp === '6N2') { model = 'Polo (6N2)'; body = 'Hatchback'; gen = '6N2'; }
+        else { model = 'Polo (6N)'; body = 'Hatchback'; }
     }
-    else if (/^9N/.test(vp)) { model = 'Polo (9N)'; body = 'Hatchback'; }
-    else if (/^6K/.test(vp)) { model = 'Polo (6K)'; body = 'Hatchback'; }
-    else if (/^1J/.test(vp)) { model = 'Golf (1J)'; body = 'Hatchback'; }
+    else if (/^6V/.test(vp)) {
+        if (vp === '6V2') { model = 'Polo Classic (6V2)'; body = 'Classic Sedan'; }
+        else if (vp === '6V5') { model = 'Polo Variant (6V5)'; body = 'Variant'; }
+        else { model = 'Polo Classic/Variant (6V)'; body = '—'; }
+    }
+    else if (/^6K/.test(vp)) {
+        if (/^VSS/.test(w)) { model = 'Seat Ibiza/Cordoba (6K)'; body = '—'; note = 'Донорская платформа — не VW; сверяйте применимость деталей'; }
+        else { model = 'Polo Classic/Variant (6KV)'; body = '—'; note = 'Седан/универсал на платформе Seat Córdoba — уточните кузов в «✎ Уточнить данные»'; }
+    }
+    else if (/^9K/.test(vp)) { model = 'Caddy (9K)'; body = 'Van'; note = 'Фургон/комби на платформе Seat Ibiza 6K'; }
+    else if (/^9U/.test(vp)) { model = 'Caddy Pickup (9U)'; body = 'Pickup'; note = 'На базе Škoda Felicia Pickup'; }
+    else if (/^9N/.test(vp)) { model = 'Polo (9N)'; body = 'Hatchback'; note = 'Следующее поколение (2001–2009) — каталог покрывает частично'; }
+    else if (VW_MODELS[vp.slice(0, 2)]) { model = VW_MODELS[vp.slice(0, 2)]; note = 'Вне рамок каталога (Polo/Caddy 1994–2003)'; }
+    else if (vp && !/^ZZZ/.test(vp)) { model = 'Неизвестная модель (код ' + vp + ')'; }
     const year = VY[yc] || null, pl = VP[pc] || ['—', '—'];
     return {
-        ok: true, vin: x, brand, country, model, body, year, gen,
+        ok: true, vin: x, brand, country, model, body, year, gen, note,
+        modelCode: vp,
         plant: pl[0], plantCountry: pl[1],
-        engines: /^6N/.test(vp) ? Object.keys(ENGINES) : ['—'],
+        engines: /^(6N|6V|6K|9K|9U)/.test(vp) ? Object.keys(ENGINES) : ['—'],
         serial: sr
     };
 }
@@ -959,6 +1285,7 @@ function lG() {
                     prodDate: String(x.prodDate || ''),
                     engineCode: String(x.engineCode || ''),
                     transCode: String(x.transCode || ''),
+                    gearboxCode: String(x.gearboxCode || '').toUpperCase(),
                     equipCode: String(x.equipCode || ''),
                     bodyColor: String(x.bodyColor || ''),
                     roofColor: String(x.roofColor || ''),
@@ -1036,6 +1363,7 @@ function lU() {
             SV = Object.assign(SV, p);
             if (!SV.expandedTree || typeof SV.expandedTree !== 'object') SV.expandedTree = {};
             if (!SV.expandedCats || typeof SV.expandedCats !== 'object') SV.expandedCats = {};
+            if (!SV.garCollapsed || typeof SV.garCollapsed !== 'object') SV.garCollapsed = {};
             if (typeof SV._vinApplied !== 'boolean') SV._vinApplied = false;
             if (!CATS.some(c => c.id === SV.activeCat) && !['Favorites', 'Workshops', 'Log'].includes(SV.activeCat)) SV.activeCat = 'All';
         }
@@ -1166,6 +1494,57 @@ function pCompat(p) {
 }
 
 /* ============================================================
+   ФИЛЬТРЫ КПП — семейство и буквенный код
+   partMatchesTrans: деталь проходит, если
+     · семейство не выбрано, или
+     · у детали пусто и то и другое (= «для всех»), или
+     · семейство указано явно и совпало, или
+     · у детали только буквенные коды — и хотя бы один
+       относится к выбранному семейству.
+   ============================================================ */
+function partMatchesTrans(p, filter) {
+    if (!filter || filter === 'all') return true;
+    const fams = p.transmissions || [];
+    const codes = p.transCodes || [];
+    if (fams.length) return fams.includes(filter);
+    if (codes.length) return codes.some(c => gearboxFamsOf(c).includes(filter));
+    return true;
+}
+/* Фильтр по семейству двигателей (EA111 / EA827 / EA827-D):
+   деталь проходит, если моторы не указаны (= все) или хотя бы
+   один из её моторов относится к выбранному семейству. */
+function partMatchesEngFam(p, filter) {
+    if (!filter || filter === 'all') return true;
+    const arr = p.engines || [];
+    if (!arr.length) return true;
+    return arr.some(e => engineFamOf(e) === filter);
+}
+/* partMatchesGearbox: фильтр по конкретному буквенному коду.
+   Если у детали заявлены свои коды — нужно точное совпадение.
+   Если кодов нет — проверяем семейство детали против семейства кода. */
+function partMatchesGearbox(p, gb) {
+    if (!gb || gb === 'all') return true;
+    const codes = p.transCodes || [];
+    if (codes.length) return codes.includes(gb);
+    const fams = p.transmissions || [];
+    const cf = gearboxFamsOf(gb);
+    if (fams.length) return cf.length ? fams.some(f => cf.includes(f)) : true;
+    return true;
+}
+/* VIN-строго: доноры + буквенный код КПП активного VIN */
+function vinStrictOk(p) {
+    const av = gAV();
+    if (av) {
+        const gb = normGb(av.gearboxCode);
+        const codes = p.transCodes || [];
+        if (gb !== 'all' && codes.length && !codes.includes(gb)) return false;
+    }
+    if (!p.donors || !p.donors.length) return true;
+    const cmp = pCompat(p);
+    return !cmp || cmp.cls !== 'n';
+}
+
+/* ============================================================
    VIN-индикатор — рендерится в #vinBar (внутри заголовка гаража)
    ============================================================ */
 function rVinBar() {
@@ -1211,21 +1590,36 @@ function rGar() {
 
     l.innerHTML = G.map(g => {
         const act = SV.activeVinId === g.id;
+        const collapsed = !!(SV.garCollapsed && SV.garCollapsed[g.id]);
         const desc = [g.brand, g.model, g.year].filter(Boolean).join(' ');
         let h = '<div class="gi' + (act ? ' active' : '') + '" data-gid="' + escA(g.id) + '">';
         h += '<div class="gi-top">';
         h += '<div class="gii"><div class="giv">' + esc(g.vin) + '</div>'
             + '<div class="gid">' + esc(desc || '—') + '</div></div>';
-        h += '<button class="gix" data-vact="delete" data-gid="' + escA(g.id) + '" title="Удалить">✕</button>';
-        h += '</div>';
+        h += '<div class="gi-btns">';
         if (act) {
+            h += '<button class="gi-tgl' + (collapsed ? ' collapsed' : '') + '" type="button" data-vact="collapse" data-gid="'
+                + escA(g.id) + '" title="' + (collapsed ? 'Развернуть карточку' : 'Свернуть карточку') + '">▾</button>';
+        }
+        h += '<button class="gix" data-vact="delete" data-gid="' + escA(g.id) + '" title="Удалить">✕</button>';
+        h += '</div></div>';
+        if (act && !collapsed) {
+            const gbFams = gearboxFamsOf(g.gearboxCode);
+            const gbVal = g.gearboxCode
+                ? g.gearboxCode + (gbFams.length ? ' · сем. ' + gbFams.join('/') : '')
+                : '—';
             const rows = [
                 ['Модель', g.model || '—'],
                 ['Дата произв.', g.prodDate ? fmtDate(g.prodDate) : '—'],
                 ['Модельный год', g.year || '—'],
                 ['VIN', g.vin || '—'],
-                ['Двигатель', g.engineCode || '—'],
-                ['Код КПП', g.transCode || '—'],
+                ['Двигатель', g.engineCode
+                    ? g.engineCode
+                    + (ENGINES[g.engineCode] ? ' — ' + ENGINES[g.engineCode].v + ' ' + ENGINES[g.engineCode].hp + ' л.с.' : '')
+                    + (engineFamOf(g.engineCode) ? ' · ' + engineFamOf(g.engineCode) : '')
+                    : '—'],
+                ['КПП', g.transCode ? (TRANSMISSIONS[g.transCode] || g.transCode) : '—'],
+                ['Букв. код КПП', gbVal],
                 ['Код оснащения', g.equipCode || '—'],
                 ['Цвет кузова', g.bodyColor || '—'],
                 ['Цвет крыши', g.roofColor || '—']
@@ -1237,6 +1631,13 @@ function rGar() {
             ).join('');
             h += '<button class="veh-edit-btn" type="button" data-vact="edit" data-gid="' + escA(g.id) + '">✎ Уточнить данные</button>';
             h += '</div>';
+        } else if (act && collapsed) {
+            // Свёрнутая активная карточка — компактная сводка в одну строку
+            const bits = [];
+            if (g.engineCode) bits.push('⚙️ ' + g.engineCode);
+            if (g.transCode) bits.push('🔄 ' + g.transCode);
+            if (g.gearboxCode) bits.push('🔤 ' + g.gearboxCode);
+            h += '<div class="gi-mini">' + (bits.length ? esc(bits.join(' · ')) : 'данные не уточнены — нажмите ▾') + '</div>';
         }
         h += '</div>';
         return h;
@@ -1251,34 +1652,184 @@ const VIN_BODY_MAP = {
     'Hatchback': '',
     'Variant': 'estate',
     'Classic Sedan': 'classic',
-    'Van': 'caddy-van'
+    'Van': 'caddy-van',
+    'Pickup': 'caddy-pickup'
 };
+
+/* ============================================================
+   ОБЪЕДИНЁННЫЕ ФИЛЬТРЫ ШАПКИ
+   Один select на «семейство + код»:
+   · fmtr — ДВС: optgroup по семействам (EA111…), внутри —
+     пункт «вся семья» (value fam:X) и коды моторов;
+   · ftr — КПП: optgroup по семействам (084/085/002), внутри —
+     пункт «вся семья» (value 084) и буквенные коды (value gb:CHL).
+   Состояние по-прежнему хранится раздельно (SV.engineFilter/
+   SV.engFamFilter, SV.transFilter/SV.gearboxFilter) — логика
+   фильтрации не меняется, select лишь объединяет два контроля.
+   ============================================================ */
+function buildEngineSelect() {
+    const sel = $('fmtr'); if (!sel) return;
+    let h = '<option value="all">⚙️ Мотор: все</option>';
+    Object.keys(ENGINE_FAMILIES).forEach(fam => {
+        const F = ENGINE_FAMILIES[fam];
+        const codes = F.codes.filter(k => ENGINES[k]);
+        if (!codes.length) return;
+        codes.sort((a, b) => {
+            const ea = ENGINES[a], eb = ENGINES[b];
+            return (parseFloat(ea.v) - parseFloat(eb.v)) || ea.v.localeCompare(eb.v)
+                || (ea.hp - eb.hp) || a.localeCompare(b);
+        });
+        h += '<optgroup label="🧬 ' + escA(F.label) + '">';
+        h += '<option value="fam:' + fam + '">— вся семья ' + fam + ' (' + codes.length + ' моторов) —</option>';
+        codes.forEach(k => {
+            const e = ENGINES[k];
+            h += '<option value="' + k + '">' + k + ' · ' + esc(e.v) + ' ' + e.hp + ' л.с.' + (e.f === 'D' ? ' · дизель' : '') + '</option>';
+        });
+        h += '</optgroup>';
+    });
+    sel.innerHTML = h;
+    syncEngineSelect();
+}
+function syncEngineSelect() {
+    const sel = $('fmtr'); if (!sel) return;
+    if (SV.engineFilter && SV.engineFilter !== 'all' && ENGINES[SV.engineFilter]) sel.value = SV.engineFilter;
+    else if (SV.engFamFilter && SV.engFamFilter !== 'all' && ENGINE_FAMILIES[SV.engFamFilter]) sel.value = 'fam:' + SV.engFamFilter;
+    else sel.value = 'all';
+}
+function buildTransSelect() {
+    const sel = $('ftr'); if (!sel) return;
+    let h = '<option value="all">🔄 КПП: все</option>';
+    // Механика с базой буквенных кодов
+    Object.keys(GEARBOX).forEach(fam => {
+        const F = GEARBOX[fam];
+        h += '<optgroup label="🔧 ' + escA(F.label) + '">';
+        h += '<option value="' + fam + '">— вся семья ' + fam + ' —</option>';
+        const codes = F.codes.concat(Object.keys(F.special || {})).sort();
+        codes.forEach(c => { h += '<option value="gb:' + c + '">' + c + '</option>'; });
+        h += '</optgroup>';
+    });
+    // Остальная механика (без базы кодов) + отдельные коды
+    h += '<optgroup label="🔧 Механика — прочие">';
+    ['020', '02K'].forEach(f => { if (TRANSMISSIONS[f]) h += '<option value="' + f + '">' + esc(TRANSMISSIONS[f]) + '</option>'; });
+    Object.keys(GEARBOX_MISC).forEach(c => {
+        if (!gearboxFamsOf(c).length) h += '<option value="gb:' + c + '">' + c + ' — отдельный код</option>';
+    });
+    h += '</optgroup>';
+    // Автомат
+    h += '<optgroup label="⚡ Автомат">';
+    ['01M', '01N'].forEach(f => { if (TRANSMISSIONS[f]) h += '<option value="' + f + '">' + esc(TRANSMISSIONS[f]) + '</option>'; });
+    h += '</optgroup>';
+    sel.innerHTML = h;
+    syncTransSelect();
+}
+function syncTransSelect() {
+    const sel = $('ftr'); if (!sel) return;
+    if (SV.gearboxFilter && SV.gearboxFilter !== 'all') {
+        const val = 'gb:' + SV.gearboxFilter;
+        // Код не из базы (введён через VIN вручную) — добавляем временную опцию
+        if (!Array.from(sel.options).some(o => o.value === val)) {
+            const o = document.createElement('option');
+            o.value = val; o.textContent = SV.gearboxFilter + ' (вне базы)';
+            sel.appendChild(o);
+        }
+        sel.value = val;
+    } else if (SV.transFilter && SV.transFilter !== 'all' && TRANSMISSIONS[SV.transFilter]) {
+        sel.value = SV.transFilter;
+    } else {
+        sel.value = 'all';
+    }
+}
+
+/* ============================================================
+   ОБЪЕДИНЁННЫЙ ФИЛЬТР «КУЗОВ / ПОКОЛЕНИЕ» (fbdy)
+   Один select на два измерения:
+   · поколения Polo (gen:6N1, gen:6N2) и кузова 3д/5д;
+   · Classic (6V2/6KV) и Variant (6V5/6KV) — платформа 6K;
+   · Caddy Van/Kombi (9K) и Pickup (9U).
+   Значения: 'all' | 'gen:X' (поколение) | ключ BODIES (кузов).
+   ============================================================ */
+const BODY_FULL_LABELS = {
+    '3d': 'Polo хэтчбек 3д (6N)',
+    '5d': 'Polo хэтчбек 5д (6N)',
+    'classic': 'Polo Classic (6V2/6KV седан)',
+    'estate': 'Polo Variant (6V5/6KV универсал)',
+    'caddy-van': 'Caddy Van (9K)',
+    'caddy-kombi': 'Caddy Kombi (9K)',
+    'caddy-pickup': 'Caddy Pickup (9U)'
+};
+function buildBodyGenSelect() {
+    const sel = $('fbdy'); if (!sel) return;
+    const bodyOpt = b => (BODIES[b] ? '<option value="' + b + '">' + esc(BODY_FULL_LABELS[b] || BODIES[b]) + '</option>' : '');
+    let h = '<option value="all">🚗 Кузов/поколение: все</option>';
+    // Polo (6N) — поколения и кузова хэтчбека
+    h += '<optgroup label="🚘 Polo (6N) — поколения и кузова">';
+    Object.keys(GENERATIONS).forEach(g => {
+        h += '<option value="gen:' + g + '">' + esc(GENERATIONS[g]) + '</option>';
+    });
+    h += bodyOpt('3d') + bodyOpt('5d');
+    h += '</optgroup>';
+    // Classic / Variant — платформа Seat Córdoba (6K)
+    h += '<optgroup label="🚗 Classic / Variant (платформа 6K)">';
+    h += bodyOpt('classic') + bodyOpt('estate');
+    h += '</optgroup>';
+    // Caddy (9K / 9U)
+    h += '<optgroup label="📦 Caddy (9K / 9U)">';
+    h += bodyOpt('caddy-van') + bodyOpt('caddy-kombi') + bodyOpt('caddy-pickup');
+    h += '</optgroup>';
+    // Страховка: кузовы, не попавшие в группы (если BODIES когда-то расширят)
+    const placed = ['3d', '5d', 'classic', 'estate', 'caddy-van', 'caddy-kombi', 'caddy-pickup'];
+    const rest = Object.keys(BODIES).filter(b => !placed.includes(b));
+    if (rest.length) {
+        h += '<optgroup label="🚗 Прочие кузова">';
+        rest.forEach(b => { h += bodyOpt(b); });
+        h += '</optgroup>';
+    }
+    sel.innerHTML = h;
+    syncBodyGenSelect();
+}
+function syncBodyGenSelect() {
+    const sel = $('fbdy'); if (!sel) return;
+    if (SV.genFilter && SV.genFilter !== 'all' && GENERATIONS[SV.genFilter]) sel.value = 'gen:' + SV.genFilter;
+    else if (SV.bodyFilter && SV.bodyFilter !== 'all' && BODIES[SV.bodyFilter]) sel.value = SV.bodyFilter;
+    else sel.value = 'all';
+}
 
 /* ✅ Правка №5: не сбрасывать фильтры, если они не были выставлены VIN'ом */
 function applyVinFilters() {
-    const fmtr = $('fmtr'), fbdy = $('fbdy'), ftr = $('ftr'), fgen = $('fgen');
     const av = gAV();
     if (!av) {
         // Сбрасываем только если до этого фильтры были выставлены VIN'ом
         if (SV._vinApplied) {
             SV.engineFilter = 'all';
+            SV.engFamFilter = 'all';
             SV.bodyFilter = 'all';
             SV.transFilter = 'all';
+            SV.gearboxFilter = 'all';
             SV.genFilter = 'all';
             SV._vinApplied = false;
         }
     } else {
+        // Буквенный код КПП из «Уточнить данные»
+        const gb = normGb(av.gearboxCode);
+        // Семейство КПП: явный выбор или авто-вывод из буквенного кода
+        let fam = (av.transCode && TRANSMISSIONS[av.transCode]) ? av.transCode : 'all';
+        if (fam === 'all' && gb !== 'all') {
+            const fs = gearboxFamsOf(gb);
+            if (fs.length >= 1) fam = fs[0]; // у CHL/CHX два семейства — берём первое (084)
+        }
         SV.engineFilter = (av.engineCode && ENGINES[av.engineCode]) ? av.engineCode : 'all';
-        SV.transFilter = (av.transCode && TRANSMISSIONS[av.transCode]) ? av.transCode : 'all';
+        // Семейство ДВС — выводим из кода мотора
+        SV.engFamFilter = (av.engineCode && engineFamOf(av.engineCode)) || 'all';
+        SV.transFilter = fam;
+        SV.gearboxFilter = gb;
         const bKey = VIN_BODY_MAP[av.body] || '';
         SV.bodyFilter = (bKey && BODIES[bKey]) ? bKey : 'all';
         SV.genFilter = (av.gen && GENERATIONS[av.gen]) ? av.gen : 'all';
         SV._vinApplied = true;
     }
-    if (fmtr) fmtr.value = SV.engineFilter;
-    if (fbdy) fbdy.value = SV.bodyFilter;
-    if (ftr) ftr.value = SV.transFilter;
-    if (fgen) fgen.value = SV.genFilter;
+    syncEngineSelect();
+    syncTransSelect();
+    syncBodyGenSelect();
     updateFilterStyling();
     sU();
 }
@@ -1298,9 +1849,11 @@ function setAV(id) {
     let extra = '';
     if (av) {
         const bits = [];
-        if (SV.engineFilter !== 'all') bits.push('⚙️ ' + SV.engineFilter);
+        if (SV.engineFilter !== 'all') bits.push('⚙️ ' + SV.engineFilter + (engineFamOf(SV.engineFilter) ? ' · ' + engineFamOf(SV.engineFilter) : ''));
+        else if (SV.engFamFilter !== 'all') bits.push('🧬 ' + SV.engFamFilter);
         if (SV.bodyFilter !== 'all') bits.push('🚗 ' + (BODIES[SV.bodyFilter] || SV.bodyFilter));
         if (SV.transFilter !== 'all') bits.push('🔄 ' + SV.transFilter);
+        if (SV.gearboxFilter !== 'all') bits.push('🔤 ' + SV.gearboxFilter);
         if (bits.length) extra = ' · ' + bits.join(' · ');
     }
     toast(info ? 'Активный VIN: …' + info.vin.slice(-6) + extra : 'VIN-фильтр снят');
@@ -1319,7 +1872,7 @@ function sGarV() {
         gen: pGV.gen || '',
         plant: pGV.plant || '',
         engines: Array.isArray(pGV.engines) ? pGV.engines : [],
-        prodDate: '', engineCode: '', transCode: '',
+        prodDate: '', engineCode: '', transCode: '', gearboxCode: '',
         equipCode: '', bodyColor: '', roofColor: '',
         addedAt: Date.now()
     };
@@ -1365,10 +1918,13 @@ async function decG() {
         pGV = info;
         const L = [];
         L.push('<b>' + esc(info.brand) + '</b> ' + esc(info.model));
-        if (info.year) L.push('Год: <b>' + info.year + '</b>');
-        if (info.body && info.body !== '—') L.push('Кузов: ' + esc(info.body));
-        if (info.plant) L.push('Завод: ' + esc(info.plant));
-        if (info.engines && info.engines[0] !== '—') L.push('Двигатели: ' + esc(info.engines.slice(0, 8).join(', ')));
+        if (info.note) L.push('<span style="opacity:.75">ℹ️ ' + esc(info.note) + '</span>');
+        if (info.year) L.push('Модельный год: <b>' + info.year + '</b> <span style="opacity:.6">(модельный год VW: август–июль)</span>');
+        if (info.body && info.body !== '—') L.push('Кузов: ' + esc(info.body) + (info.gen ? ' · поколение ' + esc(info.gen) : ''));
+        if (info.plant && info.plant !== '—') L.push('Завод: ' + esc(info.plant) + (info.plantCountry && info.plantCountry !== '—' ? ' (' + esc(info.plantCountry) + ')' : ''));
+        if (info.modelCode) L.push('Код модели (символы 7–9 VIN): <b>' + esc(info.modelCode) + '</b>' + (info.serial ? ' · серийный № ' + esc(info.serial) : ''));
+        if (info.engines && info.engines[0] !== '—') L.push('Возможные моторы: ' + info.engines.length + ' кодов — точный укажите через ✎ после сохранения');
+        L.push('<span style="opacity:.7">🔤 Буквенные коды мотора/КПП в VIN не кодируются — они на наклейке в багажнике, в СТС и сервисной книжке</span>');
         re.innerHTML = L.join('<br>'); sb.disabled = false;
     } catch (e) {
         re.innerHTML = '<span class="er">Ошибка: ' + esc(e.message) + '</span>'; sb.disabled = true;
@@ -1705,6 +2261,7 @@ function _mergeParts(a, b) {
     out.engines = uniq(a.engines, b.engines);
     out.bodies = uniq(a.bodies, b.bodies);
     out.transmissions = uniq(a.transmissions, b.transmissions);
+    out.transCodes = uniq(a.transCodes, b.transCodes);
     out.trims = uniq(a.trims, b.trims);
     out.gens = uniq(a.gens, b.gens);
 
@@ -1968,13 +2525,7 @@ function computeFilteredForSidebar() {
     const t = nz(SV.searchQuery).split(/\s+/).filter(Boolean);
     let f = D;
 
-    if (SV.activeVinId && SV.vinStrictFilter) {
-        f = f.filter(p => {
-            if (!p.donors || !p.donors.length) return true;
-            const cmp = pCompat(p);
-            return !cmp || cmp.cls !== 'n';
-        });
-    }
+    if (SV.activeVinId && SV.vinStrictFilter) f = f.filter(vinStrictOk);
 
     if (SV.statusFilter && SV.statusFilter !== 'all')
         f = f.filter(p => (p.status || '') === SV.statusFilter);
@@ -1985,6 +2536,9 @@ function computeFilteredForSidebar() {
             return !arr.length || arr.includes(SV.engineFilter);
         });
 
+    if (SV.engFamFilter && SV.engFamFilter !== 'all')
+        f = f.filter(p => partMatchesEngFam(p, SV.engFamFilter));
+
     if (SV.bodyFilter && SV.bodyFilter !== 'all')
         f = f.filter(p => {
             const arr = p.bodies || [];
@@ -1992,10 +2546,10 @@ function computeFilteredForSidebar() {
         });
 
     if (SV.transFilter && SV.transFilter !== 'all')
-        f = f.filter(p => {
-            const arr = p.transmissions || [];
-            return !arr.length || arr.includes(SV.transFilter);
-        });
+        f = f.filter(p => partMatchesTrans(p, SV.transFilter));
+
+    if (SV.gearboxFilter && SV.gearboxFilter !== 'all')
+        f = f.filter(p => partMatchesGearbox(p, SV.gearboxFilter));
 
     if (SV.genFilter && SV.genFilter !== 'all')
         f = f.filter(p => {
@@ -2192,10 +2746,15 @@ const cS = () => { SV.searchQuery = ''; $('sr').value = ''; uSC(); sU(); rC(); }
 function resetFilters() {
     SV.searchQuery = ''; $('sr').value = ''; uSC();
     SV.statusFilter = 'all'; $('sf').value = 'all';
-    SV.engineFilter = 'all'; $('fmtr').value = 'all';
-    SV.bodyFilter = 'all'; $('fbdy').value = 'all';
-    SV.transFilter = 'all'; $('ftr').value = 'all';
-    SV.genFilter = 'all'; if ($('fgen')) $('fgen').value = 'all';
+    SV.engineFilter = 'all';
+    SV.engFamFilter = 'all';
+    syncEngineSelect();
+    SV.bodyFilter = 'all';
+    SV.genFilter = 'all';
+    syncBodyGenSelect();
+    SV.transFilter = 'all';
+    SV.gearboxFilter = 'all';
+    syncTransSelect();
     SV.sortBy = 'default'; $('ss').value = 'default';
     SV._vinApplied = false;
     updateFilterStyling(); sU(); rSB(); rC();
@@ -2228,7 +2787,8 @@ function mP(p, t) {
     if (!t.length) return true;
     const h = nz([p.oem || '', p.name || '', ...(p.analogs || []), ...(p.donors || []),
     ...((p.inst || []).map(i => i.text)), p.notes || '',
-    ...(p.engines || []), ...(p.transmissions || []), ...(p.bodies || []), ...(p.gens || [])].join('  '));
+    ...(p.engines || []), ...((p.engines || []).map(e => engineFamOf(e)).filter(Boolean)),
+    ...(p.transmissions || []), ...(p.transCodes || []), ...(p.bodies || []), ...(p.gens || [])].join('  '));
     return t.every(x => h.includes(x));
 }
 function sP(a) {
@@ -2251,13 +2811,7 @@ function sP(a) {
 function gF() {
     const t = nz(SV.searchQuery).split(/\s+/).filter(Boolean);
     let f = D;
-    if (SV.activeVinId && SV.vinStrictFilter) {
-        f = f.filter(p => {
-            if (!p.donors || !p.donors.length) return true;
-            const cmp = pCompat(p);
-            return !cmp || cmp.cls !== 'n';
-        });
-    }
+    if (SV.activeVinId && SV.vinStrictFilter) f = f.filter(vinStrictOk);
     if (SV.activeCat === 'Favorites') {
         f = f.filter(p => p.favorite);
     } else if (SV.activeCat !== 'All' && SV.activeCat !== 'Workshops' && SV.activeCat !== 'Log') {
@@ -2270,14 +2824,13 @@ function gF() {
         const arr = p.engines || [];
         return !arr.length || arr.includes(SV.engineFilter);
     });
+    if (SV.engFamFilter && SV.engFamFilter !== 'all') f = f.filter(p => partMatchesEngFam(p, SV.engFamFilter));
     if (SV.bodyFilter && SV.bodyFilter !== 'all') f = f.filter(p => {
         const arr = p.bodies || [];
         return !arr.length || arr.includes(SV.bodyFilter);
     });
-    if (SV.transFilter && SV.transFilter !== 'all') f = f.filter(p => {
-        const arr = p.transmissions || [];
-        return !arr.length || arr.includes(SV.transFilter);
-    });
+    if (SV.transFilter && SV.transFilter !== 'all') f = f.filter(p => partMatchesTrans(p, SV.transFilter));
+    if (SV.gearboxFilter && SV.gearboxFilter !== 'all') f = f.filter(p => partMatchesGearbox(p, SV.gearboxFilter));
     if (SV.genFilter && SV.genFilter !== 'all') f = f.filter(p => {
         const arr = p.gens || [];
         return !arr.length || arr.includes(SV.genFilter);
@@ -2309,7 +2862,7 @@ function updSearchSuggest() {
 function _renderSignature() {
     return [
         SV.activeCat, SV.activeSub, SV.searchQuery, SV.statusFilter,
-        SV.engineFilter, SV.bodyFilter, SV.transFilter, SV.genFilter,
+        SV.engineFilter, SV.engFamFilter, SV.bodyFilter, SV.transFilter, SV.gearboxFilter, SV.genFilter,
         SV.sortBy, SV.groupBySub, SV.view, SV.vinStrictFilter
     ].join('|');
 }
@@ -2337,9 +2890,19 @@ function rC() {
 
     const chips = [];
     chips.push('<span class="chip">найдено: <b>' + f.length + '</b></span>');
-    if (SV.engineFilter && SV.engineFilter !== 'all') chips.push('<span class="chip">⚙️ ' + esc(SV.engineFilter) + '</span>');
+    if (SV.engineFilter && SV.engineFilter !== 'all') {
+        const _ef = engineFamOf(SV.engineFilter);
+        chips.push('<span class="chip">⚙️ ' + esc(SV.engineFilter) + (_ef ? ' · ' + esc(_ef) : '') + '</span>');
+    } else if (SV.engFamFilter && SV.engFamFilter !== 'all') {
+        chips.push('<span class="chip" data-chip="clearEngFam" style="cursor:pointer" title="Фильтр по семейству ДВС — клик, чтобы снять">🧬 ' + esc(SV.engFamFilter) + ' ✕</span>');
+    }
     if (SV.bodyFilter && SV.bodyFilter !== 'all') chips.push('<span class="chip">🚗 ' + esc(BODIES[SV.bodyFilter] || SV.bodyFilter) + '</span>');
     if (SV.transFilter && SV.transFilter !== 'all') chips.push('<span class="chip">🔄 ' + esc(TRANSMISSIONS[SV.transFilter] || SV.transFilter) + '</span>');
+    if (SV.gearboxFilter && SV.gearboxFilter !== 'all') {
+        const gbi = gearboxInfo(SV.gearboxFilter);
+        const gbTitle = gbi && gbi.fams.length ? 'Семейство: ' + gbi.fams.map(f => TRANSMISSIONS[f] || f).join(' / ') : 'Буквенный код КПП';
+        chips.push('<span class="chip" data-chip="clearGearbox" style="cursor:pointer;border-color:var(--wn)" title="' + escA(gbTitle + ' — клик, чтобы снять') + '">🔤 ' + esc(SV.gearboxFilter) + ' ✕</span>');
+    }
     if (SV.genFilter && SV.genFilter !== 'all') chips.push('<span class="chip">🚘 ' + esc(GENERATIONS[SV.genFilter] || SV.genFilter) + '</span>');
     if (SV.statusFilter && SV.statusFilter !== 'all') chips.push('<span class="chip">🏷 ' + esc(SV.statusFilter) + '</span>');
     if (SV.searchQuery) chips.push('<span class="chip">🔍 "' + esc(SV.searchQuery) + '"</span>');
@@ -2441,12 +3004,21 @@ function cH(p) {
     const dn = (p.donors || []).map(d => '<span class="tg dn">' + esc(d) + '</span>').join('')
         || '<span style="color:var(--mu);font-size:.72rem">— нет данных —</span>';
     const eng = (p.engines || []).length
-        ? p.engines.map(e => '<span class="tg eg">' + esc(e) + '</span>').join('')
+        ? p.engines.map(e => {
+            const ef = engineFamOf(e);
+            return '<span class="tg eg" title="' + escA(ef ? 'Серия ' + ef + ' — ' + ENGINE_FAMILIES[ef].label : 'Код двигателя') + '">' + esc(e) + '</span>';
+        }).join('')
         : '<span style="color:var(--mu);font-size:.72rem">— не указано —</span>';
     const bdy = (p.bodies || []).length
         ? p.bodies.map(b => '<span class="tg bd">' + esc(BODIES[b] || b) + '</span>').join('')
         : '<span style="color:var(--mu);font-size:.72rem">— не указано —</span>';
     const trn = (p.transmissions || []).map(t => '<span class="tg tr">' + esc(TRANSMISSIONS[t] || t) + '</span>').join('');
+    const trc = (p.transCodes || []).map(c => {
+        const f = gearboxFamsOf(c);
+        const ttl = f.length ? 'Семейство ' + f.join('/') : 'Отдельный код КПП';
+        return '<span class="tg trc" title="' + escA(ttl) + '">' + esc(c) + '</span>';
+    }).join('');
+    const trnAll = trn + trc;
     const trm = (p.trims || []).map(t => '<span class="tg tm">' + esc(t) + '</span>').join('');
     const gn = (p.gens || []).map(g => '<span class="tg gn">' + esc(GENERATIONS[g] || g) + '</span>').join('');
     let ih = '';
@@ -2541,7 +3113,7 @@ function cH(p) {
         + '<div class="rw"><span class="lb">Двигатели</span><div class="tgs">' + eng + '</div></div>'
         + '<div class="rw"><span class="lb">Кузова</span><div class="tgs">' + bdy + '</div></div>'
         + (gn ? '<div class="rw"><span class="lb">Поколение</span><div class="tgs">' + gn + '</div></div>' : '')
-        + (trn ? '<div class="rw"><span class="lb">КПП</span><div class="tgs">' + trn + '</div></div>' : '')
+        + (trnAll ? '<div class="rw"><span class="lb">КПП</span><div class="tgs">' + trnAll + '</div></div>' : '')
         + (trm ? '<div class="rw"><span class="lb">Комплектации</span><div class="tgs">' + trm + '</div></div>' : '')
         + '<div class="rw"><span class="lb">Доноры</span><div class="tgs">' + dn + '</div></div>'
         + '</div>'
@@ -2745,6 +3317,17 @@ function oCC(e) {
         } else if (k === 'clearSub') {
             SV.activeSub = null;
             sU(); rSB(); rC();
+        } else if (k === 'clearGearbox') {
+            SV.gearboxFilter = 'all';
+            SV._vinApplied = false;
+            syncTransSelect();
+            updateFilterStyling(); sU(); rSB(); rC();
+        } else if (k === 'clearEngFam') {
+            SV.engFamFilter = 'all';
+            SV.engineFilter = 'all';
+            SV._vinApplied = false;
+            syncEngineSelect();
+            updateFilterStyling(); sU(); rSB(); rC();
         }
         return;
     }
@@ -2866,7 +3449,7 @@ function oAM() {
     $('f_id').value = '';
     $('f_cat').value = (SV.activeCat !== 'All' && SV.activeCat !== 'Favorites' && SV.activeCat !== 'Workshops' && SV.activeCat !== 'Log')
         ? SV.activeCat : 'Engine';
-    ['f_name', 'f_oem', 'f_an', 'f_dn', 'f_pr', 'f_su', 'f_notes', 'f_eng', 'f_trn', 'f_bdy', 'f_trm', 'f_gen'].forEach(id => { if ($(id)) $(id).value = ''; });
+    ['f_name', 'f_oem', 'f_an', 'f_dn', 'f_pr', 'f_su', 'f_notes', 'f_eng', 'f_trn', 'f_trnc', 'f_bdy', 'f_trm', 'f_gen'].forEach(id => { if ($(id)) $(id).value = ''; });
     $('f_ver').checked = false; $('f_cu').value = 'RUB'; $('f_sts').value = ''; $('f_fav').value = '0';
     $('ie').innerHTML = ''; aIR('proc', '');
     uPP(); rPH([]);
@@ -2886,6 +3469,7 @@ function oEM(id) {
     $('f_dn').value = (p.donors || []).join(', ');
     $('f_eng').value = (p.engines || []).join(', ');
     $('f_trn').value = (p.transmissions || []).join(', ');
+    if ($('f_trnc')) $('f_trnc').value = (p.transCodes || []).join(', ');
     $('f_bdy').value = (p.bodies || []).join(', ');
     $('f_gen').value = (p.gens || []).join(', ');
     $('f_trm').value = (p.trims || []).join(', ');
@@ -2910,8 +3494,24 @@ function sPt() {
     if (!name) { toast('Введите название', 'danger'); $('f_name').focus(); return; }
     const oem = $('f_oem').value.trim(), verified = $('f_ver').checked;
     const analogs = sl($('f_an').value), donors = sl($('f_dn').value);
-    const engs = sl($('f_eng').value).map(s => s.toUpperCase()).filter(x => ENGINES[x]);
-    const trns = sl($('f_trn').value).filter(x => TRANSMISSIONS[x]);
+    const engsRaw = sl($('f_eng').value).map(s => s.toUpperCase());
+    const engs = engsRaw.filter(x => ENGINES[x]);
+    const engsIgnored = engsRaw.filter(x => !ENGINES[x]);
+    if (engsIgnored.length) toast('Двигатели: неизвестные коды проигнорированы — ' + engsIgnored.join(', '), 'danger');
+    /* КПП: поле семейств + поле буквенных кодов.
+       Буквенный код, попавший в поле семейств, автоматически переносится в коды. */
+    const isGbCode = x => /^[A-Z]{3}$/.test(x) || /^[A-Z]{3}\d{3}$/.test(x);
+    const trnRaw = sl($('f_trn').value).map(s => s.toUpperCase());
+    const trns = trnRaw.filter(x => TRANSMISSIONS[x]);
+    const trnAsCodes = trnRaw.filter(x => !TRANSMISSIONS[x] && isGbCode(x));
+    const trcRaw = $('f_trnc') ? sl($('f_trnc').value).map(s => s.toUpperCase()) : [];
+    const trcs = Array.from(new Set(trnAsCodes.concat(trcRaw.filter(isGbCode)))).slice(0, 50);
+    const trnIgnored = trnRaw.filter(x => !TRANSMISSIONS[x] && !isGbCode(x))
+        .concat(trcRaw.filter(x => !isGbCode(x)));
+    if (trnIgnored.length) toast('КПП: неизвестные значения проигнорированы — ' + trnIgnored.join(', '), 'danger');
+    // Коды не из базы сохраняем (могли снять с живой коробки), но предупреждаем
+    const trcUnknown = trcs.filter(c => !gearboxFamsOf(c).length && !GEARBOX_MISC[c]);
+    if (trcUnknown.length) toast('Коды КПП не найдены в базе (сохранены как есть): ' + trcUnknown.join(', '), 'info');
     const bdys = sl($('f_bdy').value).filter(x => BODIES[x]);
     const trms = sl($('f_trm').value).filter(x => TRIMS.includes(x));
     const gens = sl($('f_gen').value).map(s => s.toUpperCase()).filter(x => GENERATIONS[x]);
@@ -2936,7 +3536,7 @@ function sPt() {
         }
         D[i] = Object.assign({}, o, {
             cat, sub: o.sub || '', name, oem, verified, analogs, donors,
-            engines: engs, bodies: bdys, transmissions: trns, trims: trms, gens,
+            engines: engs, bodies: bdys, transmissions: trns, transCodes: trcs, trims: trms, gens,
             price, currency, status, favorite, notes, shopUrl, inst, photos: photosArr,
             priceHistory: h
         });
@@ -2946,7 +3546,7 @@ function sPt() {
     } else {
         const np = {
             id: uid(), cat, sub: '', name, oem, verified, analogs, donors,
-            engines: engs, bodies: bdys, transmissions: trns, trims: trms, gens,
+            engines: engs, bodies: bdys, transmissions: trns, transCodes: trcs, trims: trms, gens,
             price, currency, status, favorite, notes, shopUrl, inst, photos: photosArr, priceHistory: []
         };
         D.push(np);
@@ -3145,10 +3745,11 @@ function eCSV(of) {
     try {
         const src = of ? D.filter(p => p.favorite) : D;
         if (!src.length) { toast('Нет данных', 'danger'); return; }
-        const H = ['Категория', 'Название', 'OEM', 'Подтверждён', 'Двигатели', 'КПП', 'Кузова', 'Комплектации', 'Аналоги', 'Доноры', 'Цена', 'Валюта', 'Статус', 'Избранное', 'Магазин', 'Заметки'];
+        const H = ['Категория', 'Название', 'OEM', 'Подтверждён', 'Двигатели', 'КПП', 'Коды КПП', 'Кузова', 'Комплектации', 'Аналоги', 'Доноры', 'Цена', 'Валюта', 'Статус', 'Избранное', 'Магазин', 'Заметки'];
         const rows = src.map(p => [
             catL(p.cat), p.name || '', p.oem || '', p.verified ? 'Да' : '',
             (p.engines || []).join('; '), (p.transmissions || []).join('; '),
+            (p.transCodes || []).join('; '),
             (p.bodies || []).join('; '), (p.trims || []).join('; '),
             (p.analogs || []).join('; '), (p.donors || []).join('; '),
             p.price != null ? p.price : '', p.currency || '',
@@ -3666,20 +4267,152 @@ function oVIN() {
     if (!av || !av.ok) { toast('VIN не выбран', 'danger'); return; }
     vinEdId = av.id;
     const engSel = $('v_engine');
-    engSel.innerHTML = '<option value="">— не указан —</option>'
-        + Object.keys(ENGINES).map(k => '<option value="' + k + '">' + k + ' — ' + ENGINES[k].v + ' ' + ENGINES[k].hp + ' л.с.</option>').join('');
+    let eo = '<option value="">— не указан —</option>';
+    Object.keys(ENGINE_FAMILIES).forEach(fam => {
+        const codes = ENGINE_FAMILIES[fam].codes.filter(k => ENGINES[k]);
+        if (!codes.length) return;
+        eo += '<optgroup label="' + escA(ENGINE_FAMILIES[fam].label) + '">'
+            + codes.map(k => '<option value="' + k + '">' + k + ' — ' + ENGINES[k].v + ' ' + ENGINES[k].hp + ' л.с.</option>').join('')
+            + '</optgroup>';
+    });
+    engSel.innerHTML = eo;
     const trnSel = $('v_trans');
-    trnSel.innerHTML = '<option value="">— не указан —</option>'
+    trnSel.innerHTML = '<option value="">— не указано —</option>'
         + Object.keys(TRANSMISSIONS).map(k => '<option value="' + k + '">' + TRANSMISSIONS[k] + '</option>').join('');
     $('v_model').value = av.model || '';
     $('v_proddate').value = av.prodDate || '';
     $('v_year').value = av.year || '';
     $('v_engine').value = av.engineCode || '';
     $('v_trans').value = av.transCode || '';
+    $('v_gearbox').value = av.gearboxCode || '';
+    // Каскад: мотор сужает семейства и коды КПП (сохранённые значения не теряются)
+    refreshTransForEngine();
+    updEngHint();
     $('v_equip').value = av.equipCode || '';
     $('v_bodycolor').value = av.bodyColor || '';
     $('v_roofcolor').value = av.roofColor || '';
     openM('vinmo');
+}
+
+/* Платформа текущей редактируемой машины (hatch/estate/classic/caddy) */
+function vinPlatform() {
+    const g = G.find(x => x.id === vinEdId) || {};
+    const vm = $('v_model') ? $('v_model').value : '';
+    return platformOf(g.body, [g.model || '', vm].join(' '));
+}
+
+/* Подсказка по двигателю: семейство, объём, мощность, справка */
+function updEngHint() {
+    const hint = $('v_eng_hint'); if (!hint) return;
+    const code = $('v_engine') ? $('v_engine').value : '';
+    if (!code) {
+        hint.innerHTML = 'ℹ️ Код двигателя — из СТС, наклейки в багажнике или сервисной книжки. Моторы сгруппированы по семействам (EA111 и др.); при выборе список КПП сузится до ставившихся с ним.';
+        return;
+    }
+    const fam = engineFamOf(code), e = ENGINES[code] || {};
+    let h = '<b>⚙️ ' + esc(code) + '</b>';
+    if (e.v) h += ' — ' + esc(e.v) + ', ' + e.hp + ' л.с.' + (e.f === 'D' ? ', дизель' : ', бензин');
+    if (fam && ENGINE_FAMILIES[fam]) {
+        h += '<br>🧬 Семейство: <b>' + esc(fam) + '</b> · ' + esc(ENGINE_FAMILIES[fam].label);
+        if (ENGINE_FAMILIES[fam].note) h += '<br>' + esc(ENGINE_FAMILIES[fam].note);
+    }
+    hint.innerHTML = h;
+}
+
+/* Каскад «мотор → семейства КПП»: перестраивает select семейств,
+   сохраняя текущий выбор (если он не подходит — остаётся с пометкой ⚠) */
+function refreshTransForEngine() {
+    const trnSel = $('v_trans'), engSel = $('v_engine');
+    if (!trnSel || !engSel) return;
+    const info = gearboxForEngine(engSel.value, vinPlatform());
+    const cur = trnSel.value;
+    const keys = info.fams.length ? info.fams.filter(k => TRANSMISSIONS[k]) : Object.keys(TRANSMISSIONS);
+    let opts = '<option value="">— не указано —</option>';
+    keys.forEach(k => { opts += '<option value="' + k + '">' + esc(TRANSMISSIONS[k]) + '</option>'; });
+    if (cur && !keys.includes(cur)) {
+        opts += '<option value="' + cur + '">⚠ ' + esc(TRANSMISSIONS[cur] || cur) + ' (с этим мотором не значится)</option>';
+    }
+    trnSel.innerHTML = opts;
+    if (cur) trnSel.value = cur;
+    refreshGbCodeOptions();
+    updGbHint();
+}
+
+/* Каскад «мотор/семейство → буквенные коды» для datalist v_gb_codes.
+   Приоритет: проверенные коды под мотор (с учётом семейства) →
+   коды выбранного семейства → коды семейств мотора → все. */
+function refreshGbCodeOptions() {
+    const engSel = $('v_engine'), trnSel = $('v_trans');
+    const famSel = trnSel ? trnSel.value : '';
+    const eng = engSel ? engSel.value : '';
+    const info = gearboxForEngine(eng, vinPlatform());
+    // 1) Проверенные коды под мотор (семейство не выбрано или совместимо)
+    if (eng && info.codes.length && (!famSel || info.fams.includes(famSel))) {
+        const codes = famSel ? info.codes.filter(c => gearboxFamsOf(c).includes(famSel)) : info.codes;
+        if (codes.length) { fillGearboxDatalist('v_gb_codes', { codes }); return; }
+        // под пару «мотор+семейство» проверенных кодов нет — ниже покажем коды семейства
+    }
+    // 2) Явно выбранное семейство с базой кодов
+    if (famSel && GEARBOX[famSel]) { fillGearboxDatalist('v_gb_codes', { fams: [famSel] }); return; }
+    // 3) Семейство без базы буквенных кодов (АКПП, 020/02K)
+    if (famSel && TRANSMISSIONS[famSel]) { fillGearboxDatalist('v_gb_codes', { codes: [] }); return; }
+    // 4) Объединение кодов семейств мотора
+    if (info.fams.length) { fillGearboxDatalist('v_gb_codes', { fams: info.fams }); return; }
+    // 5) Всё известное
+    fillGearboxDatalist('v_gb_codes', {});
+}
+
+/* Подсказка: что ставилось с мотором + справка по введённому коду */
+function updGbHint() {
+    const hint = $('v_gb_hint'); if (!hint) return;
+    const eng = $('v_engine') ? $('v_engine').value : '';
+    const info = gearboxForEngine(eng, vinPlatform());
+    let h = '';
+    if (eng && info.fams.length) {
+        h += '⚙️ С мотором <b>' + esc(eng) + '</b> ставили: ' + esc(info.fams.map(f => TRANSMISSIONS[f] || f).join(', '));
+        if (info.codes.length) {
+            h += '<br>📋 Проверенные коды: <b>' + info.codes.map(esc).join('</b>, <b>') + '</b>';
+        }
+    } else if (eng) {
+        h += '⚙️ <b>' + esc(eng) + '</b>: данных по сочетаемости нет — показан полный список КПП';
+    }
+    const code = normGb($('v_gearbox').value);
+    if (code !== 'all') {
+        const gi = gearboxInfo(code);
+        if (h) h += '<br>';
+        h += '🔤 <b>' + esc(code) + '</b> → ';
+        if (gi.fams.length) {
+            h += esc(gi.fams.map(f => TRANSMISSIONS[f] || f).join(' / '));
+            if (gi.fams.length > 1) h += ' <span style="color:var(--wn)">⚠ код встречается в двух семействах — уточни семейство выше</span>';
+        } else {
+            h += '<span style="color:var(--wn)">⚠ код не найден в базе</span>';
+        }
+        if (gi.special) h += '<br>📌 ' + esc(gi.special);
+        else if (gi.note) h += '<br>' + esc(gi.note);
+        if (eng && info.codes.length) {
+            h += info.codes.includes(code)
+                ? '<br><span style="color:var(--ok)">✔ Значится в справочнике для мотора ' + esc(eng) + '</span>'
+                : '<br><span style="color:var(--wn)">⚠ В справочнике для мотора ' + esc(eng) + ' не значится — сверьте с ETKA/наклейкой</span>';
+        }
+    } else if (!h) {
+        h = 'ℹ️ Буквенный код КПП выбит на корпусе коробки и на наклейке в багажнике (например CHL, DXB, FFU). Выбери двигатель — список КПП сузится до ставившихся с ним.';
+    }
+    hint.innerHTML = h;
+}
+
+/* Ввод буквенного кода: подсказка + авто-вывод семейства */
+function onGbCodeInput() {
+    updGbHint();
+    const inp = $('v_gearbox'), sel = $('v_trans');
+    if (!inp || !sel) return;
+    const code = normGb(inp.value);
+    if (code === 'all') return;
+    const fams = gearboxFamsOf(code);
+    // Авто-подставляем семейство, если оно пустое или код ему явно противоречит
+    if (fams.length && !fams.includes(sel.value)) {
+        sel.value = fams[0];
+        refreshGbCodeOptions();
+    }
 }
 const cVIN = () => { closeM('vinmo'); vinEdId = null; };
 function sVIN() {
@@ -3692,12 +4425,27 @@ function sVIN() {
     g.year = yv ? Number(yv) : null;
     g.engineCode = $('v_engine').value || '';
     g.transCode = $('v_trans').value || '';
+    g.gearboxCode = normGb($('v_gearbox').value) === 'all' ? '' : normGb($('v_gearbox').value);
+    // Если семейство не выбрано, но код известный — выводим семейство из кода
+    if (!g.transCode && g.gearboxCode) {
+        const fs = gearboxFamsOf(g.gearboxCode);
+        if (fs.length) g.transCode = fs[0];
+    }
     g.equipCode = $('v_equip').value.trim();
     g.bodyColor = $('v_bodycolor').value.trim().toUpperCase();
     g.roofColor = $('v_roofcolor').value.trim().toUpperCase();
+    // Мягкая проверка: код не из справочника для выбранного мотора — не ошибка, но повод сверить
+    if (g.engineCode && g.gearboxCode) {
+        const gi = gearboxForEngine(g.engineCode, platformOf(g.body, g.model));
+        if (gi.codes.length && !gi.codes.includes(g.gearboxCode)) {
+            toast('⚠ Код ' + g.gearboxCode + ' не значится в справочнике для ' + g.engineCode + ' — сверьте с ETKA', 'info');
+        }
+    }
     applyVinFilters();
     sG();
     rGar();
+    rSB();
+    rC();
     cVIN();
     toast('Данные сохранены', 'success');
 }
@@ -3831,6 +4579,23 @@ function openWhatsNewDetails() {
 
 /* ============ FAQ ============ */
 function oFaq() { openM('faqmo'); }
+
+/* ============ ОБУЧЕНИЕ ПРИ ПЕРВОМ ЗАПУСКЕ ============
+   После принятия лицензии (самый первый запуск на устройстве)
+   автоматически открываем FAQ-путеводитель: человек видит, какие
+   кнопки зачем, до того как начнёт работать с базой. Показываем
+   один раз — факт показа запоминаем в ONBKEY. */
+function maybeShowOnboarding() {
+    let seen = '';
+    try { seen = localStorage.getItem(ONBKEY) || ''; } catch (e) { }
+    if (seen) return;
+    try { localStorage.setItem(ONBKEY, APP_VERSION); } catch (e) { }
+    setTimeout(() => {
+        if (!licAppReady) return;
+        oFaq();
+        toast('👋 Это быстрый путеводитель по базе. Закройте его, когда изучите — он вернётся в меню ⚙️ → «Помощь»', 'info');
+    }, 900);
+}
 function cFaq() { closeM('faqmo'); }
 
 /* ============ INIT ============ */
@@ -3852,6 +4617,7 @@ async function init() {
     iPWA();
     fCS();
     checkWhatsNew();
+    maybeShowOnboarding();
 }
 
 function bindUI() {
@@ -3865,21 +4631,67 @@ function bindUI() {
     si.addEventListener('input', e => { SV.searchQuery = e.target.value; uSC(); sUS(); dRC(); });
     $('sf').addEventListener('change', e => { SV.statusFilter = e.target.value; sU(); rSB(); rC(); });
     $('ss').addEventListener('change', e => { SV.sortBy = e.target.value; sU(); rC(); });
-    $('fmtr').addEventListener('change', e => { SV.engineFilter = e.target.value; SV._vinApplied = false; updateFilterStyling(); sU(); rSB(); rC(); });
-    $('fbdy').addEventListener('change', e => { SV.bodyFilter = e.target.value; SV._vinApplied = false; updateFilterStyling(); sU(); rSB(); rC(); });
-    $('ftr').addEventListener('change', e => { SV.transFilter = e.target.value; SV._vinApplied = false; updateFilterStyling(); sU(); rSB(); rC(); });
 
-    const _fgen = $('fgen');
-    if (_fgen) _fgen.addEventListener('change', e => { SV.genFilter = e.target.value; SV._vinApplied = false; sU(); rSB(); rC(); });
+    /* Объединённый фильтр ДВС: семейство (fam:X) + коды моторов в одном списке */
+    buildEngineSelect();
+    $('fmtr').addEventListener('change', e => {
+        const v = e.target.value;
+        if (v === 'all') { SV.engineFilter = 'all'; SV.engFamFilter = 'all'; }
+        else if (v.indexOf('fam:') === 0) { SV.engFamFilter = v.slice(4); SV.engineFilter = 'all'; }
+        else { SV.engineFilter = v; SV.engFamFilter = engineFamOf(v) || 'all'; }
+        SV._vinApplied = false;
+        updateFilterStyling(); sU(); rSB(); rC();
+    });
+
+    /* Объединённый фильтр «кузов / поколение»: gen:X + кузова в одном списке */
+    buildBodyGenSelect();
+    $('fbdy').addEventListener('change', e => {
+        const v = e.target.value;
+        if (v === 'all') { SV.bodyFilter = 'all'; SV.genFilter = 'all'; }
+        else if (v.indexOf('gen:') === 0) { SV.genFilter = v.slice(4); SV.bodyFilter = 'all'; }
+        else { SV.bodyFilter = v; SV.genFilter = 'all'; }
+        SV._vinApplied = false;
+        updateFilterStyling(); sU(); rSB(); rC();
+    });
+
+    /* Объединённый фильтр КПП: семейство + буквенные коды (gb:X) в одном списке */
+    buildTransSelect();
+    fillGearboxDatalist('gbCodes', {}); // datalist для поля кодов в редакторе детали
+    $('ftr').addEventListener('change', e => {
+        const v = e.target.value;
+        if (v === 'all') { SV.transFilter = 'all'; SV.gearboxFilter = 'all'; }
+        else if (v.indexOf('gb:') === 0) {
+            SV.gearboxFilter = v.slice(3);
+            const fs = gearboxFamsOf(SV.gearboxFilter);
+            // Однозначный код задаёт и семейство; неоднозначный (CHL/CHX) — нет
+            SV.transFilter = fs.length === 1 ? fs[0] : 'all';
+        }
+        else { SV.transFilter = v; SV.gearboxFilter = 'all'; }
+        SV._vinApplied = false;
+        updateFilterStyling(); sU(); rSB(); rC();
+    });
+
+    /* Каскад «мотор → семейство → код» в редакторе VIN */
+    const _ve = $('v_engine');
+    if (_ve) _ve.addEventListener('change', () => { refreshTransForEngine(); updEngHint(); });
+    const _vt = $('v_trans');
+    if (_vt) _vt.addEventListener('change', () => { refreshGbCodeOptions(); updGbHint(); });
+    const _vm = $('v_model');
+    if (_vm) _vm.addEventListener('change', () => { refreshTransForEngine(); });
+    const _vg = $('v_gearbox');
+    if (_vg) {
+        _vg.addEventListener('input', onGbCodeInput);
+        _vg.addEventListener('change', () => { _vg.value = normGb(_vg.value) === 'all' ? '' : normGb(_vg.value); updGbHint(); });
+    }
+
     $('if').addEventListener('change', oIF);
     $('pf').addEventListener('change', oPF);
 
     $('sf').value = SV.statusFilter || 'all';
     $('ss').value = SV.sortBy || 'default';
-    $('fmtr').value = SV.engineFilter || 'all';
-    $('fbdy').value = SV.bodyFilter || 'all';
-    $('ftr').value = SV.transFilter || 'all';
-    if (_fgen) _fgen.value = SV.genFilter || 'all';
+    syncEngineSelect();
+    syncBodyGenSelect();
+    syncTransSelect();
     updateFilterStyling();
     setV(SV.view || 'grid', true);
 
@@ -3945,6 +4757,15 @@ function bindUI() {
         const d = e.target.closest('[data-vact="delete"]');
         if (d) { e.stopPropagation(); remV(d.dataset.gid); return; }
         if (e.target.closest('[data-vact="edit"]')) { e.stopPropagation(); oVIN(); return; }
+        const c = e.target.closest('[data-vact="collapse"]');
+        if (c) {
+            e.stopPropagation();
+            const gid = c.dataset.gid;
+            if (!SV.garCollapsed) SV.garCollapsed = {};
+            SV.garCollapsed[gid] = !SV.garCollapsed[gid];
+            sU(); rGar();
+            return;
+        }
         if (e.target.closest('.gi-info')) return;
         const i = e.target.closest('.gi');
         if (i && i.dataset.gid) setAV(i.dataset.gid);
@@ -4047,6 +4868,22 @@ function bindUI() {
 
 /* ============ СТАРТ ============ */
 async function bootApp() {
+    /* Самотест «html ↔ js»: версии файлов обязаны совпадать.
+       Если на сервере или в кэше пользователя файлы «смешаны»
+       (например, залили только index.html), интерфейс ломается
+       молча — предупреждаем сразу и понятно. */
+    try {
+        const uiMeta = document.querySelector('meta[name="app-ui-ver"]');
+        const uiVer = uiMeta ? String(uiMeta.getAttribute('content') || '') : '';
+        if (uiVer && uiVer !== APP_VERSION) {
+            console.warn('[ver] рассинхрон: index.html=' + uiVer + ', app.js=' + APP_VERSION);
+            setTimeout(() => toast(
+                '⚠️ Файлы разных версий: html ' + uiVer + ', js ' + APP_VERSION +
+                '. Обновите страницу (Ctrl+Shift+R) или залейте index.html и js/app.js вместе',
+                'danger'), 900);
+        }
+    } catch (e) { }
+
     /* ✅ Правка №2: checkLicense() — ДО fetch, чтобы пользователь не ждал сеть */
     ['ver_gate', 'ver_footer', 'ver_about', 'ver_bug'].forEach(id => {
         const el = document.getElementById(id);
@@ -4076,4 +4913,4 @@ if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', bootApp, { once: true });
 } else {
     bootApp();
-}
+}

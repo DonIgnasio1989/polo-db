@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -5,6 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#0a1830">
+    <!-- Версия разметки: должна совпадать с APP_VERSION в js/app.js.
+         Лоадер добавляет её в URL скрипта (&ui=…), чтобы новый index.html
+         никогда не грузил закэшированный старый app.js. -->
+    <meta name="app-ui-ver" content="1.6.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>VW Polo/Caddy 1995–2003 — База Мастера</title>
 
@@ -32,8 +37,12 @@
             function inject(v) {
                 if (injected) return;
                 injected = true;
+                /* Привязка к версии разметки: новый index.html → новый URL
+                   скрипта → гарантированно свежий app.js (обход кэша). */
+                var meta = document.querySelector('meta[name="app-ui-ver"]');
+                var ui = meta ? (meta.getAttribute('content') || '') : '';
                 var script = document.createElement('script');
-                script.src = 'js/app.js?v=' + v;
+                script.src = 'js/app.js?v=' + v + (ui ? '&ui=' + ui : '');
                 document.head.appendChild(script);
             }
 
@@ -260,118 +269,16 @@
                     <span>📖</span><span class="bl">Журнал</span>
                 </button>
 
-                <select class="fs flt mtr" id="fmtr" title="Фильтр по мотору">
-                    <option value="all">⚙️ Все моторы</option>
-
-                    <optgroup label="Бензин 1.0 (50 л.с.)">
-                        <option value="AER">AER 1.0 50</option>
-                        <option value="ALL">ALL 1.0 50</option>
-                        <option value="AEV">AEV 1.0 50</option>
-                        <option value="ALD">ALD 1.0 50</option>
-                        <option value="ANV">ANV 1.0 50</option>
-                        <option value="AUC">AUC 1.0 50</option>
-                    </optgroup>
-
-                    <optgroup label="Бензин 1.3 (55 л.с.)">
-                        <option value="ADX">ADX 1.3 55</option>
-                    </optgroup>
-
-                    <optgroup label="Бензин 1.4 8V">
-                        <option value="ABU">ABU 1.4 60</option>
-                        <option value="AEX">AEX 1.4 60</option>
-                        <option value="APQ">APQ 1.4 60</option>
-                        <option value="AKV">AKV 1.4 60</option>
-                        <option value="ANX">ANX 1.4 60</option>
-                        <option value="AKK">AKK 1.4 60</option>
-                        <option value="ANW">ANW 1.4 60</option>
-                        <option value="AUD">AUD 1.4 60</option>
-                        <option value="AHT">AHT 1.4 75</option>
-                    </optgroup>
-
-                    <optgroup label="Бензин 1.4 16V">
-                        <option value="AHW">AHW 1.4 16V 75</option>
-                        <option value="AKQ">AKQ 1.4 16V 75</option>
-                        <option value="AFK">AFK 1.4 16V 75</option>
-                        <option value="ANM">ANM 1.4 16V 75</option>
-                        <option value="APE">APE 1.4 16V 75</option>
-                        <option value="AUA">AUA 1.4 16V 75</option>
-                        <option value="AFH">AFH 1.4 16V 100</option>
-                    </optgroup>
-
-                    <optgroup label="Бензин 1.6 8V">
-                        <option value="AEA">AEA 1.6 75</option>
-                        <option value="AHS">AHS 1.6 75</option>
-                        <option value="AEE">AEE 1.6 75</option>
-                        <option value="ALM">ALM 1.6 75</option>
-                        <option value="AUR">AUR 1.6 75</option>
-                        <option value="1F">1F 1.6 75</option>
-                        <option value="AFT">AFT 1.6 100</option>
-                        <option value="AKL">AKL 1.6 100</option>
-                    </optgroup>
-
-                    <optgroup label="Бензин 1.6 16V">
-                        <option value="AJV">AJV 1.6 16V 120</option>
-                    </optgroup>
-
-                    <optgroup label="Бензин 1.8">
-                        <option value="ADZ">ADZ 1.8 90</option>
-                    </optgroup>
-
-                    <optgroup label="Дизель 1.7 SDI">
-                        <option value="AKU">AKU 1.7 SDI 57</option>
-                        <option value="AHG">AHG 1.7 SDI 57</option>
-                        <option value="AKW">AKW 1.7 SDI 60</option>
-                        <option value="AHB">AHB 1.7 SDI 60</option>
-                    </optgroup>
-
-                    <optgroup label="Дизель 1.9 D / SDI">
-                        <option value="AEY">AEY 1.9 SDI 64</option>
-                        <option value="AYQ">AYQ 1.9 SDI 64</option>
-                        <option value="1Y">1Y 1.9 D 64</option>
-                        <option value="AGD">AGD 1.9 SDI 64</option>
-                        <option value="AEF">AEF 1.9 SDI 64</option>
-                        <option value="AGP">AGP 1.9 D 68</option>
-                        <option value="AQM">AQM 1.9 SDI 68</option>
-                        <option value="ASV">ASV 1.9 SDI 110</option>
-                    </optgroup>
-
-                    <optgroup label="Дизель 1.9 TDI">
-                        <option value="AHU">AHU 1.9 TDI 90</option>
-                        <option value="ALE">ALE 1.9 TDI 90</option>
-                        <option value="AGR">AGR 1.9 TDI 90</option>
-                        <option value="ALH">ALH 1.9 TDI 90</option>
-                        <option value="AFN">AFN 1.9 TDI 110</option>
-                    </optgroup>
+                <select class="fs flt mtr" id="fmtr" title="Двигатель: семейство (EA111 / EA827 / EA827-D) или код мотора">
+                    <option value="all">⚙️ Мотор: все</option>
                 </select>
 
-                <select class="fs flt trn" id="ftr" title="Фильтр по КПП">
-                    <option value="all">🔄 Все КПП</option>
-                    <optgroup label="Механика">
-                        <option value="085">085 (5-ст МКПП)</option>
-                        <option value="020">020 (5-ст МКПП)</option>
-                        <option value="02K">02K (5-ст МКПП)</option>
-                    </optgroup>
-                    <optgroup label="Автомат">
-                        <option value="01M">01M (4-ст АКПП)</option>
-                        <option value="01N">01N (4-ст АКПП)</option>
-                    </optgroup>
+                <select class="fs flt trn" id="ftr" title="КПП: семейство (084 / 085 / 002…) или буквенный код (CHL, DXB…)">
+                    <option value="all">🔄 КПП: все</option>
                 </select>
 
-                <select class="fs flt gen" id="fgen" title="Фильтр по поколению">
-                    <option value="all">🚘 Все поколения</option>
-                    <option value="6N1">6N1 — дорестайл (1994–1999)</option>
-                    <option value="6N2">6N2 — рестайлинг (1999–2001)</option>
-                </select>
-
-                <select class="fs flt bdy" id="fbdy" title="Фильтр по кузову">
-                    <option value="all">🚗 Все кузова</option>
-                    <option value="3d">Hatchback 3д</option>
-                    <option value="5d">Hatchback 5д</option>
-                    <option value="classic">Polo Classic (седан)</option>
-                    <option value="estate">Polo Estate (универсал)</option>
-                    <option value="caddy-van">Caddy Van</option>
-                    <option value="caddy-kombi">Caddy Kombi</option>
-                    <option value="caddy-pickup">Caddy Pickup</option>
+                <select class="fs flt bdy" id="fbdy" title="Кузов/поколение: Polo 6N1/6N2 (3д/5д), Classic (6V2), Variant (6V5), Caddy (9K/9U)">
+                    <option value="all">🚗 Кузов/поколение: все</option>
                 </select>
 
                 <select class="fs" id="sf" title="Фильтр по статусу">
@@ -445,11 +352,16 @@
                         placeholder="AER, ALL, AEX">
                 </div>
                 <div class="fr">
-                    <div class="fg"><label>КПП (пусто = все)</label><input type="text" id="f_trn"
-                            placeholder="085, 020, 01M">
+                    <div class="fg"><label>КПП — семейство (пусто = все)</label><input type="text" id="f_trn"
+                            placeholder="084, 085, 002, 020, 01M">
                     </div>
                     <div class="fg"><label>Кузова (пусто = все)</label><input type="text" id="f_bdy"
                             placeholder="3d, 5d, caddy-van"></div>
+                </div>
+                <div class="fg"><label>КПП — буквенные коды (пусто = все)</label><input type="text" id="f_trnc"
+                        list="gbCodes" autocomplete="off" spellcheck="false"
+                        placeholder="CHL, DXB, FFU, DKE085 — коды с корпуса КПП / наклейки">
+                    <datalist id="gbCodes"></datalist>
                 </div>
                 <div class="fg"><label>Поколение (пусто = все)</label><input type="text" id="f_gen"
                         placeholder="6N1, 6N2">
@@ -618,6 +530,7 @@
             </div>
             <div class="mf">
                 <button class="bn" onclick="licReset()">🔄 Показать при след. запуске</button>
+                <button class="bn" onclick="cAbout();oFaq()">📖 Показать путеводитель</button>
                 <button class="bn" onclick="cAbout()">Закрыть</button>
             </div>
         </div>
@@ -898,15 +811,24 @@
             </div>
             <div class="mb">
                 <div class="fg"><label>Обозначение модели</label>
-                    <input type="text" id="v_model" placeholder="Polo/Derby/Vento-IND">
+                    <input type="text" id="v_model" placeholder="Polo (6N1) / Polo Classic (6V2) / Caddy (9K)">
                 </div>
                 <div class="fr">
                     <div class="fg"><label>Дата производства</label><input type="date" id="v_proddate"></div>
                     <div class="fg"><label>Модельный год</label><input type="number" id="v_year" min="1995" max="2003">
                     </div>
                 </div>
-                <div class="fg"><label>Код двигателя</label><select id="v_engine"></select></div>
-                <div class="fg"><label>Код КПП</label><select id="v_trans"></select></div>
+                <div class="fg"><label>Код двигателя (сгруппированы по семействам)</label><select id="v_engine"></select></div>
+                <div class="fh gb-hint" id="v_eng_hint"></div>
+                <div class="fr">
+                    <div class="fg"><label>КПП — семейство</label><select id="v_trans"></select></div>
+                    <div class="fg"><label>КПП — буквенный код</label>
+                        <input type="text" id="v_gearbox" list="v_gb_codes" maxlength="6" autocomplete="off"
+                            spellcheck="false" placeholder="CHL, DXB, FFU…" style="text-transform:uppercase">
+                        <datalist id="v_gb_codes"></datalist>
+                    </div>
+                </div>
+                <div class="fh gb-hint" id="v_gb_hint"></div>
                 <div class="fr">
                     <div class="fg"><label>Код оснащения</label><input type="text" id="v_equip" placeholder="41"></div>
                     <div class="fg"><label>Цвет кузова</label><input type="text" id="v_bodycolor" placeholder="J2">
@@ -916,7 +838,10 @@
                 <div class="fh"
                     style="padding:8px 10px;background:var(--hv);border-radius:4px;font-size:.75rem;line-height:1.5">
                     ℹ️ Эти данные не закодированы в VIN. Возьми их из ETKA, Elcats или из наклейки в багажнике /
-                    сервисной книжки.
+                    сервисной книжки. <b>Выбери двигатель — списки семейств и буквенных кодов КПП автоматически
+                    сузятся до ставившихся с этим мотором</b> (для Classic/Caddy учитывается платформа 6K:
+                    добавляются семейства 002 и 020). Буквенный код также выбит на корпусе коробки — при его вводе
+                    семейство (084 / 085 / 002) определится автоматически, а каталог отфильтруется под твою коробку.
                 </div>
             </div>
             <div class="mf">
@@ -951,6 +876,18 @@
             </div>
             <div class="mb">
 
+                <div class="faq-intro">
+                    <div class="faq-intro-h">👋 Знакомство с базой — 2 минуты</div>
+                    <p>Если вы открыли приложение впервые — пройдите этот список сверху вниз: здесь простыми
+                        словами рассказано, что делает каждая кнопка и как собрать каталог «под свою машину».
+                        Окно можно закрыть в любой момент: путеводитель всегда доступен в меню ⚙️ →
+                        «Помощь — что делают кнопки».</p>
+                    <p><b>Короткий путь мастера:</b> ① добавьте VIN машины в «Гараж» → ② нажмите «✎ Уточнить
+                        данные» и укажите код двигателя и буквенный код КПП (на наклейке в багажнике) →
+                        ③ каталог сам покажет только те детали, что подходят именно вашей машине, а фильтры в
+                        шапке позволят сузить список до семейства, кузова или поколения.</p>
+                </div>
+
                 <div class="faq-sec">
                     <div class="faq-sec-h">🧭 Шапка приложения</div>
 
@@ -984,7 +921,20 @@
                         <div class="faq-q"><span class="faq-ic">⚙️</span> Фильтры (мотор, кузов, КПП, статус,
                             сортировка)</div>
                         <div class="faq-a">Ограничивают список по параметрам. Пустое значение = «все». Активный фильтр
-                            подсвечивается цветом. Кнопка <b>«Сбросить фильтры»</b> в ⚙️-меню обнуляет всё сразу.</div>
+                            подсвечивается цветом. Кнопка <b>«Сбросить фильтры»</b> в ⚙️-меню обнуляет всё сразу.
+                            <br><br>⚙️ <b>Мотор</b> — объединённый список: семейства ДВС (🧬 <b>EA111</b> — бензин
+                            1.0–1.6, <b>EA827</b> — бензин 1.6/1.8, <b>EA827-D</b> — дизель 1.7–1.9 D/SDI/TDI) и коды
+                            моторов, сгруппированные по семействам. Выберите «— вся семья EA111 —» для фильтра по
+                            семейству или конкретный мотор (AEX, AKV…).
+                            <br><br>🔄 <b>КПП</b> — тоже объединённый список: семейства <b>084</b> (4-ст, ранние Polo
+                            III 1994–1999), <b>085</b> (самая массовая 5-ст), <b>002</b> (5-ст, Polo Classic и Caddy),
+                            020/02K и автоматы 01M/01N, а внутри каждого семейства — буквенные коды (CHL, DXB,
+                            FFU…). Код выбит на корпусе коробки и указан на наклейке в багажнике. Фильтр по коду
+                            пропускает и детали, где указано только семейство.
+                            <br><br>🚗 <b>Кузов/поколение</b> — объединённый список: поколения Polo <b>6N1</b>
+                            (1994–1999) и <b>6N2</b> (1999–2001), кузова хэтчбек 3д/5д, <b>Polo Classic</b> (6V2/6KV
+                            седан) и <b>Variant</b> (6V5/6KV универсал) на платформе 6K, а также <b>Caddy</b> Van и
+                            Kombi (9K) и Pickup (9U).</div>
                     </div>
 
                     <div class="faq-item">
@@ -1112,7 +1062,26 @@
                             двигателя,
                             КПП, дату производства, цвета — эти данные не закодированы в VIN, их нужно взять из ETKA или
                             из наклейки в
-                            багажнике.</div>
+                            багажнике.
+                            <br><br>🔤 Для КПП можно указать <b>буквенный код</b> (с корпуса коробки или наклейки) —
+                            приложение само определит семейство (084 / 085 / 002), покажет справку «с чем ставили» и
+                            подставит оба значения в фильтры каталога. Коды CHL и CHX встречаются в двух семействах
+                            (084 и 085) — в этом случае семейство лучше выбрать вручную.
+                            <br><br>⚙️ <b>Каскад «мотор → КПП»:</b> список двигателей сгруппирован по семействам
+                            (EA111, EA827, EA827-D), а при выборе мотора в списках остаются только те
+                            семейства и буквенные коды КПП, которые ставились с этим мотором (справочник по ETKA и
+                            ti-lo.de/polomagazin.de). Для Polo Classic (6V2/6KV), Variant (6V5) и Caddy (9K/9U)
+                            учитывается платформа 6K — к списку добавляются семейства 002, 020 (для Classic также
+                            02K). Справочник ориентировочный: код всегда можно ввести вручную, даже если его нет в
+                            списке.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">▾</span> Свернуть карточку машины</div>
+                        <div class="faq-a">Шеврон справа вверху активной карточки сворачивает подробную информацию
+                            (модель, мотор, КПП, цвета) в одну компактную строку — VIN при этом остаётся активным и
+                            фильтры продолжают работать. Повторный клик разворачивает обратно; состояние запоминается.
+                        </div>
                     </div>
 
                     <div class="faq-item">
@@ -1233,4 +1202,4 @@
     <div class="whatsnew" id="whatsnew"></div>
 </body>
 
-</html>
+</html>
