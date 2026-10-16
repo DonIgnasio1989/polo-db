@@ -58,7 +58,11 @@ const ENGINES = {
     'AKL': { v: '1.6', hp: 100, f: 'P' }, 'AHT': { v: '1.4', hp: 75, f: 'P' }, 'ABU': { v: '1.4', hp: 60, f: 'P' },
     'AKQ': { v: '1.4 16V', hp: 75, f: 'P' }, 'AFK': { v: '1.4 16V', hp: 75, f: 'P' }, 'ANM': { v: '1.4 16V', hp: 75, f: 'P' },
     'AKU': { v: '1.7 SDI', hp: 57, f: 'D' }, 'AHG': { v: '1.7 SDI', hp: 57, f: 'D' },
-    'AGD': { v: '1.9 SDI', hp: 64, f: 'D' }, 'AEF': { v: '1.9 SDI', hp: 64, f: 'D' }
+    'AGD': { v: '1.9 SDI', hp: 64, f: 'D' }, 'AEF': { v: '1.9 SDI', hp: 64, f: 'D' },
+    /* Коды семейства SEAT/R3, встречаются в каталоге доноров и 6N2:
+       AKP 1.4 8V 60, AHV 1.6 8V 75, AMF 1.4 TDI R3 75 — сверены по кросс-справочникам */
+    'AKP': { v: '1.4', hp: 60, f: 'P' }, 'AHV': { v: '1.6', hp: 75, f: 'P' },
+    'AMF': { v: '1.4 TDI', hp: 75, f: 'D' }
 };
 /* ============ СЕМЕЙСТВА ДВИГАТЕЛЕЙ ============
    Зеркальная структура к семействам КПП: у каждого мотора
@@ -75,7 +79,7 @@ const ENGINE_FAMILIES = {
         label: 'EA111 — бензин R4 1.0–1.6 (8V/16V)',
         fuel: 'P',
         note: 'Малолитражная бензиновая серия для платформы A0: Polo 6N/6N2, Lupo, Seat Arosa/Ibiza, Caddy, Golf. Сюда входят 1.0 50 (AER/ALL/AEV/ALD/ANV/AUC), 1.3 55 (ADX), 1.4 8V 60–75 (ABU/AEX/APQ/AKV/ANX/AKK/ANW/AUD/AHT), 1.4 16V 75–100 (AHW/AKQ/AFK/ANM/APE/AUA/AFH), 1.6 75–100 (AEA/AHS/AEE/ALM/AUR/AFT/AKL) и GTI 1.6 16V 120 (AJV). Основа бензиновой линейки Polo III.',
-        codes: ['AER', 'ALL', 'AEV', 'ALD', 'ANV', 'AUC', 'ADX', 'ABU', 'AEX', 'APQ', 'AKV', 'ANX', 'AKK', 'ANW', 'AUD', 'AHT', 'AHW', 'AKQ', 'AFK', 'ANM', 'APE', 'AUA', 'AFH', 'AEA', 'AHS', 'AEE', 'ALM', 'AUR', 'AFT', 'AKL', 'AJV']
+        codes: ['AER', 'ALL', 'AEV', 'ALD', 'ANV', 'AUC', 'ADX', 'ABU', 'AEX', 'APQ', 'AKV', 'ANX', 'AKK', 'ANW', 'AUD', 'AHT', 'AHW', 'AKQ', 'AFK', 'ANM', 'APE', 'AUA', 'AFH', 'AEA', 'AHS', 'AEE', 'ALM', 'AUR', 'AFT', 'AKL', 'AJV', 'AKP', 'AHV']
     },
     'EA827': {
         label: 'EA827 — бензин R4 1.6/1.8',
@@ -88,6 +92,12 @@ const ENGINE_FAMILIES = {
         fuel: 'D',
         note: 'Дизельные R4 на архитектуре EA827 («1.9 R4»): 1.7 SDI 57–60 (AKU/AHG/AKW/AHB), 1.9 D/SDI 64–68 (1Y, AEY/AYQ/AGD/AEF, AGP/AQM), 1.9 TDI 90–110 (AHU/ALE/AGR/ALH, AFN/ASV). Ставились на Polo 6N, Classic, Variant и Caddy; славятся огромным ресурсом.',
         codes: ['AKU', 'AHG', 'AKW', 'AHB', '1Y', 'AEY', 'AYQ', 'AGD', 'AEF', 'AGP', 'AQM', 'ASV', 'AHU', 'ALE', 'AGR', 'ALH', 'AFN']
+    },
+    'R3-TDI': {
+        label: 'R3-TDI — 3-цилиндровый дизель 1.4 TDI',
+        fuel: 'D',
+        note: 'Трёхцилиндровые TDI (AMF, позднее ATL/BAY): Polo 6N2 и Lupo 1999–2005. В каталоге пока представлен только AMF (1.4 TDI 75 л.с.).',
+        codes: ['AMF']
     }
 };
 /* код мотора → семейство */
@@ -235,7 +245,11 @@ const ENGINE_GEARBOX = {
     'ALE': { fams: ['085', '020'], codes: [] },
     'AGR': { fams: ['085', '020'], codes: [] },
     'ALH': { fams: ['085', '020'], codes: [] },
-    'AFN': { fams: ['020', '085'], codes: [] }
+    'AFN': { fams: ['020', '085'], codes: [] },
+    // Семейство SEAT / R3-TDI (коды из каталога доноров и 6N2)
+    'AKP': { fams: ['085'], codes: [] },
+    'AHV': { fams: ['085'], codes: [] },
+    'AMF': { fams: ['085'], codes: [] }
 };
 
 /* Classic (6V2/6KV) и Caddy (9K) — платформа Seat Ibiza/Cordoba 6K:
@@ -828,6 +842,7 @@ let pPhs = [];
 let _lbPhotos = [], _lbIdx = 0;
 let _confirmCb = null;
 let _changelogCache = [];
+let _onbPending = false, _wnPending = false; // схема первого запуска: лицензия → FAQ → что нового
 let _logByOem = new Map();
 let _visibleLimit = 40, _lastRenderSig = '';
 
@@ -1748,6 +1763,8 @@ function syncTransSelect() {
    · Caddy Van/Kombi (9K) и Pickup (9U).
    Значения: 'all' | 'gen:X' (поколение) | ключ BODIES (кузов).
    ============================================================ */
+/* Ярлыки хэтчбеков для схемы «поколение → кузов» (в BODIES исторически латиница) */
+const HATCH_LABELS = { '3d': 'хэтчбек 3-дверный', '5d': 'хэтчбек 5-дверный' };
 const BODY_FULL_LABELS = {
     '3d': 'Polo хэтчбек 3д (6N)',
     '5d': 'Polo хэтчбек 5д (6N)',
@@ -1761,13 +1778,17 @@ function buildBodyGenSelect() {
     const sel = $('fbdy'); if (!sel) return;
     const bodyOpt = b => (BODIES[b] ? '<option value="' + b + '">' + esc(BODY_FULL_LABELS[b] || BODIES[b]) + '</option>' : '');
     let h = '<option value="all">🚗 Кузов/поколение: все</option>';
-    // Polo (6N) — поколения и кузова хэтчбека
-    h += '<optgroup label="🚘 Polo (6N) — поколения и кузова">';
+    /* Polo 6N: поколение раскрывается в кузова —
+       «6N1 дорестайл: 3д, 5д» и «6N2 рестайлинг: 3д, 5д».
+       Комбо-значение «6N1|3d» ставит ОБА фильтра (поколение + кузов). */
     Object.keys(GENERATIONS).forEach(g => {
-        h += '<option value="gen:' + g + '">' + esc(GENERATIONS[g]) + '</option>';
+        h += '<optgroup label="🚘 ' + esc(GENERATIONS[g]) + '">';
+        h += '<option value="gen:' + g + '">— всё поколение (3д + 5д)</option>';
+        ['3d', '5d'].forEach(b => {
+            h += '<option value="' + g + '|' + b + '">' + esc(HATCH_LABELS[b] || BODIES[b]) + '</option>';
+        });
+        h += '</optgroup>';
     });
-    h += bodyOpt('3d') + bodyOpt('5d');
-    h += '</optgroup>';
     // Classic / Variant — платформа Seat Córdoba (6K)
     h += '<optgroup label="🚗 Classic / Variant (платформа 6K)">';
     h += bodyOpt('classic') + bodyOpt('estate');
@@ -1789,8 +1810,13 @@ function buildBodyGenSelect() {
 }
 function syncBodyGenSelect() {
     const sel = $('fbdy'); if (!sel) return;
-    if (SV.genFilter && SV.genFilter !== 'all' && GENERATIONS[SV.genFilter]) sel.value = 'gen:' + SV.genFilter;
-    else if (SV.bodyFilter && SV.bodyFilter !== 'all' && BODIES[SV.bodyFilter]) sel.value = SV.bodyFilter;
+    const g = SV.genFilter, b = SV.bodyFilter;
+    const hasG = g && g !== 'all' && GENERATIONS[g];
+    const hasB = b && b !== 'all' && BODIES[b];
+    // Поколение + кузов хэтчбека = комбо-пункт; иначе одиночные значения
+    if (hasG && hasB && (b === '3d' || b === '5d')) sel.value = g + '|' + b;
+    else if (hasG) sel.value = 'gen:' + g;
+    else if (hasB) sel.value = b;
     else sel.value = 'all';
 }
 
@@ -2896,14 +2922,21 @@ function rC() {
     } else if (SV.engFamFilter && SV.engFamFilter !== 'all') {
         chips.push('<span class="chip" data-chip="clearEngFam" style="cursor:pointer" title="Фильтр по семейству ДВС — клик, чтобы снять">🧬 ' + esc(SV.engFamFilter) + ' ✕</span>');
     }
-    if (SV.bodyFilter && SV.bodyFilter !== 'all') chips.push('<span class="chip">🚗 ' + esc(BODIES[SV.bodyFilter] || SV.bodyFilter) + '</span>');
+    const _comboBG = !!(SV.genFilter && SV.genFilter !== 'all' && GENERATIONS[SV.genFilter]
+        && SV.bodyFilter && SV.bodyFilter !== 'all' && (SV.bodyFilter === '3d' || SV.bodyFilter === '5d'));
+    if (_comboBG) {
+        // Комбо «поколение + кузов» выбрано одним пунктом — одной плашкой и снимается
+        chips.push('<span class="chip" data-chip="clearBodyGen" style="cursor:pointer" title="Поколение + кузов — клик, чтобы снять">🚘 ' + esc(SV.genFilter) + ' · ' + esc(HATCH_LABELS[SV.bodyFilter] || BODIES[SV.bodyFilter]) + ' ✕</span>');
+    } else if (SV.bodyFilter && SV.bodyFilter !== 'all') {
+        chips.push('<span class="chip">🚗 ' + esc(BODIES[SV.bodyFilter] || SV.bodyFilter) + '</span>');
+    }
     if (SV.transFilter && SV.transFilter !== 'all') chips.push('<span class="chip">🔄 ' + esc(TRANSMISSIONS[SV.transFilter] || SV.transFilter) + '</span>');
     if (SV.gearboxFilter && SV.gearboxFilter !== 'all') {
         const gbi = gearboxInfo(SV.gearboxFilter);
         const gbTitle = gbi && gbi.fams.length ? 'Семейство: ' + gbi.fams.map(f => TRANSMISSIONS[f] || f).join(' / ') : 'Буквенный код КПП';
         chips.push('<span class="chip" data-chip="clearGearbox" style="cursor:pointer;border-color:var(--wn)" title="' + escA(gbTitle + ' — клик, чтобы снять') + '">🔤 ' + esc(SV.gearboxFilter) + ' ✕</span>');
     }
-    if (SV.genFilter && SV.genFilter !== 'all') chips.push('<span class="chip">🚘 ' + esc(GENERATIONS[SV.genFilter] || SV.genFilter) + '</span>');
+    if (!_comboBG && SV.genFilter && SV.genFilter !== 'all') chips.push('<span class="chip">🚘 ' + esc(GENERATIONS[SV.genFilter] || SV.genFilter) + '</span>');
     if (SV.statusFilter && SV.statusFilter !== 'all') chips.push('<span class="chip">🏷 ' + esc(SV.statusFilter) + '</span>');
     if (SV.searchQuery) chips.push('<span class="chip">🔍 "' + esc(SV.searchQuery) + '"</span>');
     if (SV.activeSub) {
@@ -3327,6 +3360,12 @@ function oCC(e) {
             SV.engineFilter = 'all';
             SV._vinApplied = false;
             syncEngineSelect();
+            updateFilterStyling(); sU(); rSB(); rC();
+        } else if (k === 'clearBodyGen') {
+            SV.genFilter = 'all';
+            SV.bodyFilter = 'all';
+            SV._vinApplied = false;
+            syncBodyGenSelect();
             updateFilterStyling(); sU(); rSB(); rC();
         }
         return;
@@ -4528,14 +4567,29 @@ function confetti() {
 function _setChangelog(list) {
     if (Array.isArray(list)) _changelogCache = list;
 }
-function checkWhatsNew() {
+function checkWhatsNew(defer) {
     let lastSeen = '';
     try { lastSeen = localStorage.getItem(WNKEY) || ''; } catch (e) { }
-    if (!lastSeen) {
+    const first = !lastSeen;
+    if (first) {
+        /* Первый запуск: плашка «Что нового» — шаг 3 схемы,
+           выпускается после закрытия путеводителя (releasePendingWhatsNew). */
+        if (defer) { _wnPending = true; return; }
         try { localStorage.setItem(WNKEY, APP_VERSION); } catch (e) { }
         return;
     }
     if (lastSeen === APP_VERSION) return;
+    // Обновление версии: если путеводитель ещё не показан — плашка ждёт его закрытия
+    if (defer) { _wnPending = true; return; }
+    const rec = _changelogCache.find(r => r && String(r.version) === String(APP_VERSION));
+    const changes = rec && Array.isArray(rec.changes) ? rec.changes.slice(0, 5) : [];
+    showWhatsNew(APP_VERSION, changes);
+}
+/* Шаг 3 схемы «лицензия → FAQ → что нового»: выпустить отложенную плашку */
+function releasePendingWhatsNew() {
+    if (!_wnPending) return;
+    _wnPending = false;
+    try { localStorage.setItem(WNKEY, APP_VERSION); } catch (e) { }
     const rec = _changelogCache.find(r => r && String(r.version) === String(APP_VERSION));
     const changes = rec && Array.isArray(rec.changes) ? rec.changes.slice(0, 5) : [];
     showWhatsNew(APP_VERSION, changes);
@@ -4588,15 +4642,25 @@ function oFaq() { openM('faqmo'); }
 function maybeShowOnboarding() {
     let seen = '';
     try { seen = localStorage.getItem(ONBKEY) || ''; } catch (e) { }
-    if (seen) return;
+    if (seen) return false;
     try { localStorage.setItem(ONBKEY, APP_VERSION); } catch (e) { }
+    _onbPending = true;
     setTimeout(() => {
         if (!licAppReady) return;
         oFaq();
         toast('👋 Это быстрый путеводитель по базе. Закройте его, когда изучите — он вернётся в меню ⚙️ → «Помощь»', 'info');
     }, 900);
+    return true;
 }
-function cFaq() { closeM('faqmo'); }
+function cFaq() {
+    closeM('faqmo');
+    /* Схема первого запуска: закрыли путеводитель (шаг 2) →
+       выпускаем плашку «Что нового» (шаг 3), дав окну закрыться. */
+    if (_onbPending) {
+        _onbPending = false;
+        setTimeout(releasePendingWhatsNew, 450);
+    }
+}
 
 /* ============ INIT ============ */
 async function init() {
@@ -4616,8 +4680,10 @@ async function init() {
     rTOWidget();
     iPWA();
     fCS();
-    checkWhatsNew();
-    maybeShowOnboarding();
+    /* Схема первого запуска: 1) лицензия (гейт до init), 2) путеводитель FAQ,
+       3) плашка «Что нового» — выпускается после закрытия путеводителя. */
+    const onb = maybeShowOnboarding();
+    checkWhatsNew(onb);
 }
 
 function bindUI() {
@@ -4643,12 +4709,18 @@ function bindUI() {
         updateFilterStyling(); sU(); rSB(); rC();
     });
 
-    /* Объединённый фильтр «кузов / поколение»: gen:X + кузова в одном списке */
+    /* Объединённый фильтр «кузов / поколение»: gen:X, комбо «6N1|3d» и кузова в одном списке */
     buildBodyGenSelect();
     $('fbdy').addEventListener('change', e => {
         const v = e.target.value;
         if (v === 'all') { SV.bodyFilter = 'all'; SV.genFilter = 'all'; }
         else if (v.indexOf('gen:') === 0) { SV.genFilter = v.slice(4); SV.bodyFilter = 'all'; }
+        else if (v.indexOf('|') > 0) {
+            // Комбо «поколение + кузов»: ставим оба фильтра сразу
+            const p = v.split('|');
+            SV.genFilter = GENERATIONS[p[0]] ? p[0] : 'all';
+            SV.bodyFilter = BODIES[p[1]] ? p[1] : 'all';
+        }
         else { SV.bodyFilter = v; SV.genFilter = 'all'; }
         SV._vinApplied = false;
         updateFilterStyling(); sU(); rSB(); rC();
