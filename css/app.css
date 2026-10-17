@@ -581,6 +581,19 @@ body.theme-light .sb {
     flex-shrink: 1;
 }
 
+/* Карточки в скролл-списке не сжимаются: иначе при нескольких
+   машинах flex сплющивал их, и контент обрезался overflow:hidden */
+.gl>* {
+    flex-shrink: 0;
+}
+
+/* Шапка гаража и кнопка «+ Добавить VIN» тоже не сжимаются */
+.gb>.gb-header,
+.gb>.gab,
+.gb>#vinBar {
+    flex-shrink: 0;
+}
+
 .ge {
     font-size: .7rem;
     opacity: .45;

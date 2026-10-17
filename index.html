@@ -9,7 +9,7 @@
     <!-- Версия разметки: должна совпадать с APP_VERSION в js/app.js.
          Лоадер добавляет её в URL скрипта (&ui=…), чтобы новый index.html
          никогда не грузил закэшированный старый app.js. -->
-    <meta name="app-ui-ver" content="1.6.0">
+    <meta name="app-ui-ver" content="1.7.1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>VW Polo/Caddy 1995–2003 — База Мастера</title>
 
@@ -848,6 +848,18 @@
                 <button class="bn" onclick="cVIN()">Отмена</button>
                 <button class="bn p" onclick="sVIN()">💾 Сохранить</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: ОСНАЩЕНИЕ ПО БАЗЕ VIN (PR) ============ -->
+    <div class="mo" id="prmo">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:560px">
+            <div class="mh">
+                <h3 id="prmo_title">📋 Оснащение</h3>
+                <button class="mc" onclick="cPR()">✕</button>
+            </div>
+            <div class="mb" id="prmo_body"></div>
+            <div class="mf"><button class="bn" onclick="cPR()">Закрыть</button></div>
         </div>
     </div>
 
