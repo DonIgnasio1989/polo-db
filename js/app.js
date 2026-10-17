@@ -832,7 +832,7 @@ let USER = { name: '', email: '', city: '', initials: '', color: '#00b0f0' };
 let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastDate: null, interval: 15000 };
 
-let APP_VERSION = '1.6.0';
+let APP_VERSION = '1.7.1';
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -1645,6 +1645,9 @@ function rGar() {
                 + '<span class="gi-info-val">' + esc(r[1]) + '</span></div>'
             ).join('');
             h += '<button class="veh-edit-btn" type="button" data-vact="edit" data-gid="' + escA(g.id) + '">✎ Уточнить данные</button>';
+            if (vinDbRow(g.vin)) {
+                h += '<button class="veh-edit-btn" type="button" data-vact="pr" data-gid="' + escA(g.id) + '" style="margin-top:6px">📋 Оснащение по базе VIN (PR)</button>';
+            }
             h += '</div>';
         } else if (act && collapsed) {
             // Свёрнутая активная карточка — компактная сводка в одну строку
@@ -1903,9 +1906,21 @@ function sGarV() {
         addedAt: Date.now()
     };
     G.push(g); sG(); SV.activeVinId = g.id;
+    // Оснащение из внешней базы VIN (если файл подключён): мотор, КПП, краска, дата
+    const dbrow = vinDbRow(g.vin);
+    let fromDb = false;
+    if (dbrow) {
+        fromDb = true;
+        if (!g.engineCode && dbrow.engine && ENGINES[dbrow.engine]) g.engineCode = dbrow.engine;
+        if (!g.gearboxCode && dbrow.gearbox_code) g.gearboxCode = String(dbrow.gearbox_code).toUpperCase();
+        if (!g.transCode) g.transCode = vinDbFamilyOf(dbrow);
+        if (!g.bodyColor && dbrow.paint) g.bodyColor = String(dbrow.paint).toUpperCase();
+        if (!g.prodDate && dbrow.prod_date) g.prodDate = dbrow.prod_date;
+    }
     applyVinFilters();
     sU(); rGar(); rSB(); rC();
-    cGM(); toast('VIN сохранён', 'success');
+    cGM();
+    toast(fromDb ? 'VIN сохранён · 📦 оснащение распознано по базе VIN' : 'VIN сохранён', 'success');
     window.ymGoal && window.ymGoal('vin_added');
 }
 
@@ -1950,6 +1965,10 @@ async function decG() {
         if (info.plant && info.plant !== '—') L.push('Завод: ' + esc(info.plant) + (info.plantCountry && info.plantCountry !== '—' ? ' (' + esc(info.plantCountry) + ')' : ''));
         if (info.modelCode) L.push('Код модели (символы 7–9 VIN): <b>' + esc(info.modelCode) + '</b>' + (info.serial ? ' · серийный № ' + esc(info.serial) : ''));
         if (info.engines && info.engines[0] !== '—') L.push('Возможные моторы: ' + info.engines.length + ' кодов — точный укажите через ✎ после сохранения');
+        const dbrow = vinDbRow(raw);
+        if (dbrow) {
+            L.push('<span style="color:var(--ok)">📦 VIN найден в базе оснащения: ' + esc(vinDbSummary(dbrow) || 'да') + '</span>');
+        }
         L.push('<span style="opacity:.7">🔤 Буквенные коды мотора/КПП в VIN не кодируются — они на наклейке в багажнике, в СТС и сервисной книжке</span>');
         re.innerHTML = L.join('<br>'); sb.disabled = false;
     } catch (e) {
@@ -4300,6 +4319,49 @@ function iPWA() {
     } catch (e) { }
 }
 
+/* ============ ВНЕШНЯЯ БАЗА ОСНАЩЕНИЯ ПО VIN (data/vin-db.json) ============
+   Собирается инструментом tools/vin_extract.py + tools/make_vin_db_web.py
+   из офлайн-базы ETKA: VIN → мотор, КПП+код, краска, салон, дата, PR-коды.
+   Если файла нет — функция молча отключена (toast/подсказки не мешают). */
+const VINDB = { map: null, pr: null, promise: null };
+function vinDbLoad() {
+    if (VINDB.promise) return VINDB.promise;
+    const base = location.origin + location.pathname.replace(/[^/]*$/, '');
+    VINDB.promise = (async () => {
+        try {
+            const r = await fetch(base + 'data/vin-db.json', { cache: 'no-store' });
+            if (r.ok) {
+                const arr = await r.json();
+                VINDB.map = new Map();
+                for (const rec of arr) if (rec && rec.vin) VINDB.map.set(String(rec.vin).toUpperCase(), rec);
+            }
+        } catch (e) { VINDB.map = null; }
+        try {
+            const r2 = await fetch(base + 'data/pr-codes.json', { cache: 'no-store' });
+            if (r2.ok) VINDB.pr = await r2.json();
+        } catch (e) { VINDB.pr = null; }
+        return VINDB.map;
+    })();
+    return VINDB.promise;
+}
+const vinDbRow = vin => (VINDB.map && vin && VINDB.map.get(String(vin).toUpperCase())) || null;
+function vinDbFamilyOf(row) {
+    if (!row) return '';
+    const f = gearboxFamsOf(row.gearbox_code || '');
+    if (f.length) return f[0];
+    return row.gearbox || '';
+}
+function vinDbSummary(row) {
+    if (!row) return '';
+    const bits = [];
+    if (row.engine) bits.push('мотор ' + row.engine);
+    if (row.gearbox_code) bits.push('КПП ' + row.gearbox_code + (row.gearbox ? ' (' + row.gearbox + ')' : ''));
+    else if (row.gearbox) bits.push('КПП ' + row.gearbox);
+    if (row.paint) bits.push('краска ' + row.paint);
+    if (row.prod_date) bits.push('собран ' + row.prod_date);
+    return bits.join(' · ');
+}
+
 /* ============ РЕДАКТОР VIN ============ */
 function oVIN() {
     const av = gAV();
@@ -4324,6 +4386,15 @@ function oVIN() {
     $('v_engine').value = av.engineCode || '';
     $('v_trans').value = av.transCode || '';
     $('v_gearbox').value = av.gearboxCode || '';
+    // Пустые поля подсказывает внешняя база оснащения по VIN
+    const dbrow = vinDbRow(av.vin);
+    if (dbrow) {
+        if (!$('v_engine').value && dbrow.engine && ENGINES[dbrow.engine]) $('v_engine').value = dbrow.engine;
+        if (!$('v_gearbox').value && dbrow.gearbox_code) $('v_gearbox').value = String(dbrow.gearbox_code).toUpperCase();
+        if (!$('v_trans').value) { const fam = vinDbFamilyOf(dbrow); if (fam && TRANSMISSIONS[fam]) $('v_trans').value = fam; }
+        if (!$('v_bodycolor').value && dbrow.paint) $('v_bodycolor').value = String(dbrow.paint).toUpperCase();
+        if (!$('v_proddate').value && dbrow.prod_date) $('v_proddate').value = dbrow.prod_date;
+    }
     // Каскад: мотор сужает семейства и коды КПП (сохранённые значения не теряются)
     refreshTransForEngine();
     updEngHint();
@@ -4488,6 +4559,32 @@ function sVIN() {
     cVIN();
     toast('Данные сохранены', 'success');
 }
+
+/* ============ МОДАЛКА ОСНАЩЕНИЯ (PR) ИЗ БАЗЫ VIN ============ */
+function oPR(gid) {
+    const g = G.find(x => x.id === gid); if (!g) return;
+    const row = vinDbRow(g.vin);
+    if (!row) { toast('Этого VIN нет в базе оснащения', 'info'); return; }
+    let h = '<div class="gb-hint">' + esc(vinDbSummary(row) || 'Данных об оснащении нет') + '</div>';
+    const prs = Array.isArray(row.pr) ? row.pr : [];
+    if (prs.length) {
+        h += '<div class="gi-info" style="margin-top:10px">';
+        h += prs.map(c => {
+            const desc = (VINDB.pr && VINDB.pr[c]) || '';
+            return '<div class="gi-info-row"><span class="gi-info-lb">' + esc(c) + '</span>'
+                + '<span class="gi-info-val" style="text-align:left;font-family:inherit">'
+                + (desc ? esc(desc) : '<span style="opacity:.5">описание не найдено</span>')
+                + '</span></div>';
+        }).join('');
+        h += '</div>';
+    } else {
+        h += '<p style="font-size:.8rem;color:var(--mu)">PR-кодов в записи нет.</p>';
+    }
+    $('prmo_body').innerHTML = h;
+    $('prmo_title').textContent = '📋 Оснащение · …' + g.vin.slice(-6);
+    openM('prmo');
+}
+function cPR() { closeM('prmo'); }
 
 /* ============ SKELETON ============ */
 function showSkeleton() {
@@ -4684,6 +4781,8 @@ async function init() {
        3) плашка «Что нового» — выпускается после закрытия путеводителя. */
     const onb = maybeShowOnboarding();
     checkWhatsNew(onb);
+    // Внешняя база оснащения по VIN грузится асинхронно и не блокирует старт
+    vinDbLoad();
 }
 
 function bindUI() {
@@ -4829,6 +4928,8 @@ function bindUI() {
         const d = e.target.closest('[data-vact="delete"]');
         if (d) { e.stopPropagation(); remV(d.dataset.gid); return; }
         if (e.target.closest('[data-vact="edit"]')) { e.stopPropagation(); oVIN(); return; }
+        const prb = e.target.closest('[data-vact="pr"]');
+        if (prb) { e.stopPropagation(); oPR(prb.dataset.gid); return; }
         const c = e.target.closest('[data-vact="collapse"]');
         if (c) {
             e.stopPropagation();
@@ -4848,7 +4949,7 @@ function bindUI() {
         mo: cM, wmo: cWM, gmo: cGM, smo: cSM, aboutmo: cAbout, bugmo: cBug,
         donmo: cDonate, profmo: cProfile, upmo: cUp, partmo: cPC,
         logmo: cLog, tomo: cTO, shopmo: cShop, vinmo: cVIN, thememmo: cTheme,
-        faqmo: cFaq, apkmo: () => closeM('apkmo'),
+        faqmo: cFaq, prmo: cPR, apkmo: () => closeM('apkmo'),
         confirmmo: () => cConfirm(false)
     };
     Object.keys(modalClose).forEach(id => {
