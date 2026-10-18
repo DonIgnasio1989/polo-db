@@ -18,8 +18,8 @@ import os
 import sys
 
 KEEP = ('vin', 'model', 'body', 'gen', 'year', 'plant', 'brand',
-        'engine', 'gearbox', 'gearbox_code', 'paint', 'trim', 'prod_date',
-        'pr', 'xcheck', 'warn')
+        'engine', 'gearbox', 'gearbox_code', 'paint', 'roof_color', 'equip_code',
+        'trim', 'prod_date', 'pr', 'xcheck', 'warn')
 
 
 def main():
