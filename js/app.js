@@ -673,6 +673,7 @@ function issuesForGarageCar(g) {
 function oIssues(gid) {
     const g = (gid && G.find(x => x.id === gid)) || gAV();
     if (!g) { toast('VIN не выбран — добавьте машину в гараж', 'danger'); return; }
+    window._issGid = g.id;
     const issues = issuesForGarageCar(g);
     $('issmo_title').textContent = '⚠️ Типичные проблемы · …' + (g.vin ? g.vin.slice(-6) : '');
     let h = '';
@@ -708,6 +709,533 @@ function oIssues(gid) {
     openM('issmo');
 }
 function cIss() { closeM('issmo'); }
+
+/* ============ КАБИНЕТ ВЛАДЕЛЬЦА («Моя машина») ============
+   Один экран собирает всё, что приложение уже знает: ТО, журнал,
+   расходы по годам, открытые статусы покупок, критичные болячки. */
+function rDash() {
+    const ar = $('ca'); if (!ar) return;
+    window._maintActive = false;
+    const av = gAV();
+    if (!av) {
+        ar.innerHTML = '<div class="emp"><div class="empi">🚘</div><p><b>Машина не выбрана</b></p>'
+            + '<p style="font-size:.8rem;color:var(--mu)">Добавьте VIN в гараж — и кабинет соберёт всё известное о машине: ТО, журнал, расходы, статусы покупок и болячки.</p>'
+            + '<button class="bn p" onclick="oGM()">+ Добавить VIN</button></div>';
+        return;
+    }
+    const col = lafColor(av.bodyColor);
+    let h = '<div class="dash-head"><div class="dash-car">'
+        + '<span class="dash-ico">' + giBodyIcon(av) + '</span>'
+        + '<div><div class="dash-vin">' + esc(av.vin) + '</div>'
+        + '<div class="dash-desc">' + esc([av.brand, av.model, av.year].filter(Boolean).join(' ') || '—')
+        + (col ? ' · <span class="gi-dot" style="background:' + col.hex + '"></span> ' + esc(col.ru) : '')
+        + (av.engineCode ? ' · ⚙ ' + esc(av.engineCode) : '') + (av.gearboxCode ? ' · 🔄 ' + esc(av.gearboxCode) : '')
+        + '</div></div></div>'
+        + '<div class="dash-km"><label>Пробег, км</label><div class="dash-km-row">'
+        + '<input type="number" id="dashKm" min="0" step="500" value="' + (TO.km != null ? TO.km : '') + '" placeholder="напр. 187300">'
+        + '<button class="bn p" data-action="dash-km" title="Сохранить пробег — виджет ТО и напоминания обновятся">Обновить</button>'
+        + '<button class="bn" data-action="dash-notify" title="Разрешить push-напоминания о ТО">🔔</button>'
+        + '</div></div></div>';
+
+    const t = nextTO();
+    h += '<div class="dash-grid">';
+    /* ТО */
+    const urgent = t && (t.daysLeft <= 7 || t.kmLeft <= 500);
+    h += '<div class="dash-card' + (urgent ? ' warn' : '') + '"><div class="dc-h">🛠 Ближайшее ТО</div>';
+    if (t) {
+        h += '<div class="dc-big">' + Math.max(0, t.kmLeft).toLocaleString('ru-RU') + ' км · ' + Math.max(0, t.daysLeft) + ' дн</div>'
+            + '<div class="dc-sub">' + (t.kmLeft <= 0 || t.daysLeft <= 0 ? '⚠ пора на сервис!' : 'до следующего обслуживания · интервал ' + (Number(TO.interval) || 15000).toLocaleString('ru-RU') + ' км') + '</div>'
+            + '<div class="dash-btns"><button class="bn" onclick="oShopList()">🛒 Список покупок</button><button class="bn" onclick="oTO()">✏️ Параметры</button></div>';
+    } else {
+        h += '<div class="dc-sub">Укажите пробег и дату последнего ТО — виджет посчитает остаток</div>'
+            + '<div class="dash-btns"><button class="bn p" onclick="oTO()">🛠 Настроить ТО</button></div>';
+    }
+    h += '</div>';
+    /* Журнал + расходы */
+    const logs = LOG.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+    const spend = {};
+    LOG.forEach(l => {
+        if (l.cost == null) return;
+        const cur = l.currency || 'RUB';
+        const y = String(l.date || '').slice(0, 4) || 'б/д';
+        spend[y] = spend[y] || {}; spend[y][cur] = (spend[y][cur] || 0) + (Number(l.cost) || 0);
+    });
+    const years = Object.keys(spend).sort();
+    const yearTot = y => Object.values(spend[y]).reduce((s, x) => s + x, 0);
+    const maxYear = Math.max.apply(null, years.map(yearTot).concat([1]));
+    h += '<div class="dash-card"><div class="dc-h">📖 Журнал и расходы</div>';
+    if (logs.length) {
+        h += '<ul class="dash-log">' + logs.slice(0, 4).map(l =>
+            '<li><span class="dl-d">' + esc(fD(l.date) || l.date || '') + '</span>'
+            + '<span class="dl-t">' + esc(l.title || '') + '</span>'
+            + (l.km ? '<span class="dl-km">' + Number(l.km).toLocaleString('ru-RU') + ' км</span>' : '')
+            + (l.cost != null ? '<span class="dl-c">' + esc(fP(l.cost, l.currency)) + '</span>' : '') + '</li>').join('') + '</ul>';
+        if (years.length) {
+            h += '<div class="dc-bars">' + years.slice(-5).map(y => {
+                const tot = yearTot(y);
+                const w = Math.max(4, Math.round(tot / maxYear * 100));
+                const rub = spend[y].RUB;
+                return '<div class="dc-bar" title="' + y + ': ' + tot.toLocaleString('ru-RU') + '"><span class="dc-bar-y">' + esc(y) + '</span><span class="dc-bar-f" style="width:' + w + '%"></span><span class="dc-bar-v">' + (rub ? Math.round(rub).toLocaleString('ru-RU') + ' ₽' : tot.toLocaleString('ru-RU')) + '</span></div>';
+            }).join('') + '</div>';
+        }
+    } else {
+        h += '<div class="dc-sub">Журнал пуст — зафиксируйте первую работу</div>';
+    }
+    h += '<div class="dash-btns"><button class="bn" onclick="oLogNew()">➕ Запись</button><button class="bn" onclick="goCat(\'Log\')">📖 Весь журнал</button></div></div>';
+    /* Покупки */
+    const want = D.filter(p => p.status === 'want'), bought = D.filter(p => p.status === 'bought');
+    h += '<div class="dash-card"><div class="dc-h">🛒 Покупки</div>'
+        + '<div class="dc-big">' + want.length + ' хочу · ' + bought.length + ' куплено</div>';
+    const stList = want.concat(bought).slice(0, 5);
+    if (stList.length) {
+        h += '<ul class="dash-log">' + stList.map(p =>
+            '<li><button type="button" class="dl-link" data-action="dash-part" data-id="' + escA(p.id) + '">' + esc(p.oem || '—') + '</button>'
+            + '<span class="dl-t">' + esc(p.name || '') + '</span>'
+            + '<span class="dl-km">' + (p.status === 'want' ? '🛒' : '📦') + '</span></li>').join('') + '</ul>';
+    }
+    h += '</div>';
+    /* Болячки */
+    const iss = issuesForGarageCar(av).filter(i => i.severity === 'high').slice(0, 3);
+    h += '<div class="dash-card' + (iss.length ? ' warn' : '') + '"><div class="dc-h">⚠️ Проверить в первую очередь</div>';
+    h += iss.length
+        ? '<ul class="dash-log">' + iss.map(i => '<li><span class="dl-t">' + esc(i.issue) + '</span><span class="dl-km">' + esc(i.source) + '</span></li>').join('') + '</ul>'
+        : '<div class="dc-sub">Критичных записей под этот год нет</div>';
+    h += '<div class="dash-btns"><button class="bn" onclick="oIssues(\'' + escA(av.id) + '\')">⚠️ Все болячки</button></div></div>';
+    h += '</div>';
+    ar.innerHTML = h;
+    ar.scrollTop = 0;
+}
+function goCat(id) { SV.activeCat = id; SV.activeSub = null; sU(); rSB(); rC(); }
+
+/* ============ ГОЛОСА ЗА АНАЛОГИ (community-слой) ============
+   «Подошёл / не подошёл» по каждому аналогу; хранится локально,
+   экспортируется «community-паком» и сливается с чужими паками (max). */
+const VOTEKEY = 'vw_analog_votes_v1';
+function votesAll() { try { const o = JSON.parse(localStorage.getItem(VOTEKEY) || '{}'); return o && typeof o === 'object' ? o : {}; } catch (e) { return {}; } }
+const voteKeyOf = (p, a) => normOem(p.oem) + '|' + normOem(a);
+function getVote(p, a) { return votesAll()[voteKeyOf(p, a)] || { ok: 0, bad: 0, my: '' }; }
+function voteScore(p, a) { const v = getVote(p, a); return (v.ok || 0) - (v.bad || 0); }
+function setVote(p, a, dir) {
+    const all = votesAll(); const k = voteKeyOf(p, a);
+    const v = all[k] || { ok: 0, bad: 0, my: '' };
+    if (v.my === 'ok') v.ok = Math.max(0, (v.ok || 0) - 1);
+    if (v.my === 'bad') v.bad = Math.max(0, (v.bad || 0) - 1);
+    v.my = (v.my === dir) ? '' : dir;
+    if (v.my === 'ok') v.ok = (v.ok || 0) + 1;
+    if (v.my === 'bad') v.bad = (v.bad || 0) + 1;
+    all[k] = v;
+    try { localStorage.setItem(VOTEKEY, JSON.stringify(all)); } catch (e) { }
+    return v;
+}
+function exportVotes() {
+    const all = votesAll();
+    if (!Object.keys(all).length) { toast('Голосов пока нет — пакет пуст', 'info'); return; }
+    dl('analog_votes_' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({ version: 1, votes: all }, null, 2), 'application/json');
+    toast('🧑‍🤝‍🧑 Community-пак голосов выгружен', 'success');
+}
+function importVotes() {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'application/json,.json';
+    inp.onchange = () => {
+        const f = inp.files && inp.files[0]; if (!f) return;
+        const rd = new FileReader();
+        rd.onload = () => {
+            try {
+                const j = JSON.parse(String(rd.result));
+                const src = (j && j.votes && typeof j.votes === 'object') ? j.votes : j;
+                const all = votesAll(); let n = 0;
+                Object.keys(src || {}).forEach(k => {
+                    const s = src[k];
+                    if (!s || typeof s !== 'object') return;
+                    const cur = all[k] || { ok: 0, bad: 0, my: '' };
+                    cur.ok = Math.max(cur.ok || 0, s.ok || 0);
+                    cur.bad = Math.max(cur.bad || 0, s.bad || 0);
+                    all[k] = cur; n++;
+                });
+                try { localStorage.setItem(VOTEKEY, JSON.stringify(all)); } catch (e) { }
+                toast('Импортировано голосов: ' + n, 'success');
+                if (partmoId) oPC(partmoId);
+                rC();
+            } catch (e) { toast('Файл голосов не читается', 'danger'); }
+        };
+        rd.readAsText(f);
+    };
+    inp.click();
+}
+
+/* ============ НАПОМИНАНИЯ О ТО ============ */
+function toReminderMsg() {
+    const t = nextTO(); if (!t) return null;
+    const overdue = t.kmLeft <= 0 || t.daysLeft <= 0;
+    const soon = t.daysLeft <= 14 || t.kmLeft <= 500;
+    if (!overdue && !soon) return null;
+    let last = '';
+    try { last = localStorage.getItem('vw_to_remind_v1') || ''; } catch (e) { }
+    const today = new Date().toISOString().slice(0, 10);
+    if (last === today) return null;
+    try { localStorage.setItem('vw_to_remind_v1', today); } catch (e) { }
+    return overdue
+        ? '🛠 Пора на ТО: интервал превышен на ' + Math.abs(Math.min(0, t.kmLeft)).toLocaleString('ru-RU') + ' км / ' + Math.abs(Math.min(0, t.daysLeft)) + ' дн'
+        : '🛠 ТО скоро: осталось ' + t.kmLeft.toLocaleString('ru-RU') + ' км / ' + t.daysLeft + ' дн';
+}
+function fireToReminder() {
+    const msg = toReminderMsg(); if (!msg) return;
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        try { new Notification('База Мастера', { body: msg }); return; } catch (e) { }
+    }
+    setTimeout(() => toast(msg, 'info'), 1200);
+}
+function askToNotify() {
+    if (typeof Notification === 'undefined') { toast('Браузер не поддерживает уведомления', 'info'); return; }
+    if (Notification.permission === 'granted') { toast('🔔 Напоминания уже включены', 'success'); return; }
+    Notification.requestPermission().then(p => toast(p === 'granted' ? '🔔 Напоминания о ТО включены' : 'Уведомления не разрешены', p === 'granted' ? 'success' : 'info'));
+}
+
+/* ============ СИНОНИМЫ ПОИСКА ============
+   Сленг мастеров и EN-термины → термины каталога (nz-форма). */
+const SYNONYMS = {
+    'грм': ['ремень', 'ролик', 'натяжител'],
+    'дворники': ['щетк'], 'дворник': ['щетк'], 'wiper': ['щетк'],
+    'ожи': ['охлажд'], 'тосол': ['охлажд'], 'coolant': ['охлажд'],
+    'маслофильтр': ['фильтр'], 'oilfilter': ['фильтр'],
+    'воздушник': ['воздуш'], 'салонник': ['салон'],
+    'помпа': ['насос'], 'waterpump': ['насос'],
+    'ламбда': ['лямбда'], 'lambda': ['лямбда'],
+    'шаровые': ['шаров'], 'сайленты': ['сайлент'],
+    'ступа': ['ступиц'], 'hub': ['ступиц'],
+    'belt': ['ремен', 'ремн'], 'filter': ['фильтр'], 'pads': ['колодк'],
+    'plugs': ['свеч'], 'spark': ['свеч'], 'brakes': ['тормоз'],
+    'candy': ['candy'], 'tornero': ['tornado']
+};
+
+/* ============ СКАНЕР: VIN / штрих-код детали (камера) ============
+   BarcodeDetector (Chrome/Android, WebView в APK): QR, EAN-13, Code128/39.
+   Распознанный VIN → форма гаража с подставленным значением;
+   артикул/EAN → карточка детали или поиск по кросс-индексу. */
+let _scanStream = null, _scanTimer = null;
+function classifyScan(s) {
+    const t = String(s || '').trim();
+    if (!t) return { type: 'text', value: '' };
+    if (/^[A-HJ-NPR-Z0-9]{17}$/i.test(t)) return { type: 'vin', value: t.toUpperCase() };
+    const art = t.replace(/[^A-Za-z0-9]/g, '');
+    if (/^\d{8,14}$/.test(art)) return { type: 'art', value: art.toUpperCase() };   // EAN/UPC
+    if (art.length >= 5) return { type: 'art', value: art.toUpperCase() };
+    return { type: 'text', value: t };
+}
+function applyScan(res) {
+    if (!res || !res.value) { toast('Пустой код', 'danger'); return; }
+    if (res.type === 'vin') {
+        cScan();
+        if (pubGuard()) return;
+        oGM();
+        setTimeout(() => {
+            const inp = $('g_vi');
+            if (inp) { inp.value = res.value; try { inp.dispatchEvent(new Event('input')); } catch (e) { } }
+        }, 60);
+        toast('📷 VIN считан: …' + res.value.slice(-6) + ' — проверьте и сохраните', 'success');
+        return;
+    }
+    if (res.type === 'art') {
+        const p = findByOem(res.value) || D.find(x => (x.analogs || []).some(a => normOem(a) === res.value));
+        cScan();
+        if (p) { oPC(p.id); toast('📷 Найдена деталь: ' + (p.oem || p.name), 'success'); }
+        else {
+            SV.searchQuery = res.value; if ($('sr')) $('sr').value = res.value;
+            uSC(); rC();
+            toast('📷 Точного совпадения нет — показан поиск по коду', 'info');
+        }
+        return;
+    }
+    cScan();
+    SV.searchQuery = res.value; if ($('sr')) $('sr').value = res.value;
+    uSC(); rC();
+}
+function oScan() {
+    openM('scanmo');
+    const st = $('scanStatus');
+    if (st) st.textContent = 'Запускаю камеру…';
+    if (typeof window.BarcodeDetector === 'undefined') {
+        if (st) st.textContent = 'Этот браузер не поддерживает BarcodeDetector — вставьте код вручную ниже.';
+        return;
+    }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        if (st) st.textContent = 'Камера недоступна — вставьте код вручную ниже.';
+        return;
+    }
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(stream => {
+        _scanStream = stream;
+        const v = $('scanVideo');
+        if (v) { v.srcObject = stream; v.play().catch(() => { }); }
+        let det;
+        try { det = new window.BarcodeDetector({ formats: ['qr_code', 'ean_13', 'ean_8', 'code_128', 'code_39', 'data_matrix'] }); }
+        catch (e) { if (st) st.textContent = 'Детектор штрих-кодов не запустился — вставьте код вручную.'; stopScan(); return; }
+        const tick = () => {
+            if (!_scanStream) return;
+            det.detect(v).then(codes => {
+                if (!_scanStream) return;
+                if (codes && codes.length) { const raw = codes[0].rawValue; stopScan(); applyScan(classifyScan(raw)); return; }
+                _scanTimer = setTimeout(tick, 350);
+            }).catch(() => { _scanTimer = setTimeout(tick, 700); });
+        };
+        tick();
+        if (st) st.textContent = 'Наведите камеру на VIN-стикер или штрих-код детали…';
+    }).catch(() => {
+        stopScan();
+        if (st) st.textContent = 'Нет доступа к камере — вставьте код вручную ниже.';
+    });
+}
+function stopScan() {
+    if (_scanStream) { _scanStream.getTracks().forEach(t => t.stop()); _scanStream = null; }
+    if (_scanTimer) { clearTimeout(_scanTimer); _scanTimer = null; }
+    const v = $('scanVideo'); if (v) v.srcObject = null;
+}
+function cScan() { stopScan(); closeM('scanmo'); }
+
+/* ============ СХЕМЫ УЗЛОВ: фото + нумерованные маркеры ============
+   Своя замена взрыв-схемам ETKA: фотография узла (или чертёж) + точки,
+   пронумерованные по списку позиций подгруппы. Хранится локально
+   (localStorage, фото сжимаются до 1400px JPEG). */
+const SCH_KEY = 'vw_schemes_v1';
+function schAll() { try { const o = JSON.parse(localStorage.getItem(SCH_KEY) || '{}'); return o && typeof o === 'object' ? o : {}; } catch (e) { return {}; } }
+function schGet(key) { const v = schAll()[key]; return v && Array.isArray(v.photos) ? v : { photos: [], marks: [] }; }
+function schSet(key, val) {
+    const all = schAll(); all[key] = val;
+    try { localStorage.setItem(SCH_KEY, JSON.stringify(all)); return true; }
+    catch (e) { toast('Хранилище переполнено — удалите часть фото', 'danger'); return false; }
+}
+function oScheme(cat, sub) {
+    if (!sub) { toast('У позиции не указана подгруппа — схема недоступна', 'info'); return; }
+    window._sch = { key: cat + '|' + sub, cat: cat, sub: sub, photo: 0, active: 1, data: schGet(cat + '|' + sub) };
+    renderSch();
+    openM('schmo');
+}
+function cSch() { closeM('schmo'); window._sch = null; }
+function renderSch() {
+    const s = window._sch; if (!s) return;
+    const parts = D.filter(p => p.cat === s.cat && (p.sub || '').trim() === s.sub)
+        .sort((a, b) => _maintWeight(a) - _maintWeight(b) || String(a.oem || '').localeCompare(String(b.oem || '')));
+    s.parts = parts;
+    const ph = s.data.photos[s.photo];
+    let h = '<div class="sch-top"><b>📐 Схема узла: ' + esc(catL(s.cat)) + ' › ' + esc(s.sub) + '</b>'
+        + '<span class="sch-cnt">' + parts.length + ' поз. · сохраняется на этом устройстве</span></div>';
+    h += '<div class="sch-stage" id="schStage">'
+        + (ph
+            ? '<img src="' + ph + '" alt="Схема узла">'
+            + '<svg class="sch-marks" viewBox="0 0 100 100" preserveAspectRatio="none">'
+            + s.data.marks.filter(m => m.ph === s.photo).map(m =>
+                '<g class="sch-mk' + (m.n === s.active ? ' act' : '') + '" data-n="' + m.n + '">'
+                + '<circle cx="' + m.x + '" cy="' + m.y + '" r="3.6"/>'
+                + '<text x="' + m.x + '" y="' + (m.y + 1.3) + '" text-anchor="middle">' + m.n + '</text></g>').join('')
+            + '</svg>'
+            : '<div class="sch-empty">Схемы пока нет.<br>Добавьте фото узла или чертёж — и расставьте номера по списку ниже.</div>')
+        + '</div>';
+    h += '<div class="sch-tools"><button type="button" class="bn" onclick="schPick()">📷 Добавить фото</button>'
+        + (ph ? '<button type="button" class="bn" onclick="schDelPhoto()">🗑 Фото</button>'
+            + '<button type="button" class="bn" onclick="schClearMarks()">✖ Маркеры</button>' : '')
+        + '<span class="sch-hint">' + (ph ? 'Выберите номер в списке → кликните по фото, чтобы поставить точку. Клик по точке — выбрать номер.' : '') + '</span></div>';
+    if (s.data.photos.length > 1) {
+        h += '<div class="sch-strip">' + s.data.photos.map((p, i) =>
+            '<img class="' + (i === s.photo ? 'on' : '') + '" src="' + p + '" alt="" onclick="schPhoto(' + i + ')">').join('') + '</div>';
+    }
+    h += '<div class="sch-list">' + (parts.length
+        ? parts.map((p, i) => '<button type="button" class="sch-li' + ((i + 1) === s.active ? ' act' : '') + '" onclick="schActive(' + (i + 1) + ')">'
+            + '<span class="sch-n">' + (i + 1) + '</span>'
+            + '<span class="sch-oem">' + esc(p.oem || '—') + '</span>'
+            + '<span class="sch-nm">' + esc(p.name || '') + '</span></button>').join('')
+        : '<p style="color:var(--mu);font-size:.8rem">В этой подгруппе пока нет позиций.</p>') + '</div>';
+    $('schmo_body').innerHTML = h;
+    const stg = $('schStage');
+    if (stg) stg.onclick = e => {
+        const s2 = window._sch; if (!s2 || !s2.data.photos[s2.photo]) return;
+        const mk = e.target.closest ? e.target.closest('.sch-mk') : null;
+        if (mk) { s2.active = +mk.getAttribute('data-n'); renderSch(); return; }
+        const r = stg.getBoundingClientRect();
+        const x = ((e.clientX - r.left) / r.width) * 100, y = ((e.clientY - r.top) / r.height) * 100;
+        if (x < 0 || y < 0 || x > 100 || y > 100) return;
+        s2.data.marks = s2.data.marks.filter(m => !(m.ph === s2.photo && m.n === s2.active));
+        s2.data.marks.push({ n: s2.active, x: +x.toFixed(1), y: +y.toFixed(1), ph: s2.photo });
+        schSet(s2.key, s2.data);
+        renderSch();
+    };
+}
+function schActive(n) { const s = window._sch; if (!s) return; s.active = n; renderSch(); }
+function schPhoto(i) { const s = window._sch; if (!s) return; s.photo = i; renderSch(); }
+function schClearMarks() {
+    const s = window._sch; if (!s) return;
+    s.data.marks = s.data.marks.filter(m => m.ph !== s.photo);
+    schSet(s.key, s.data); renderSch();
+}
+function schDelPhoto() {
+    const s = window._sch; if (!s) return;
+    const d = s.photo;
+    s.data.photos.splice(d, 1);
+    s.data.marks = s.data.marks.filter(m => m.ph !== d).map(m => m.ph > d ? Object.assign({}, m, { ph: m.ph - 1 }) : m);
+    s.photo = Math.max(0, Math.min(d, s.data.photos.length - 1));
+    schSet(s.key, s.data); renderSch();
+}
+function schPick() {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*';
+    inp.onchange = () => {
+        const f = inp.files && inp.files[0]; if (!f) return;
+        const rd = new FileReader();
+        rd.onload = () => schAddPhoto(rd.result);
+        rd.readAsDataURL(f);
+    };
+    inp.click();
+}
+/* Community-пак схем: экспорт/импорт локальных схем (фото + маркеры).
+   Слияние осторожное: одинаковые фото схлопываются, маркеры дедуплятся
+   по (номер, фото, координаты), чужие фото получают новые индексы. */
+function mergeSchemes(base, inc) {
+    const out = {};
+    Object.keys(base || {}).forEach(k => { out[k] = { photos: (base[k].photos || []).slice(), marks: (base[k].marks || []).slice() }; });
+    Object.keys(inc || {}).forEach(k => {
+        const b = inc[k] || {};
+        const cur = out[k] || (out[k] = { photos: [], marks: [] });
+        (b.photos || []).forEach(ph => { if (!cur.photos.includes(ph)) cur.photos.push(ph); });
+        (b.marks || []).forEach(m => {
+            const src = (b.photos || [])[m.ph];
+            const newPh = src ? cur.photos.indexOf(src) : m.ph;
+            if (newPh < 0) return;
+            if (!cur.marks.some(x => x.n === m.n && x.ph === newPh && x.x === m.x && x.y === m.y)) {
+                cur.marks.push({ n: m.n, x: m.x, y: m.y, ph: newPh });
+            }
+        });
+    });
+    return out;
+}
+function schSetAll(all) {
+    try { localStorage.setItem(SCH_KEY, JSON.stringify(all)); return true; }
+    catch (e) { toast('Хранилище переполнено — пак импортирован не полностью', 'danger'); return false; }
+}
+function exportSchemes() {
+    const all = schAll();
+    if (!Object.keys(all).length) { toast('Схем пока нет — сначала добавьте фото с маркерами', 'info'); return; }
+    dl('schemes_pack_' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({ version: 1, schemes: all }, null, 2), 'application/json');
+    toast('📐 Пак схем выгружен: ' + Object.keys(all).length + ' узла(ов)', 'success');
+}
+function importSchemes() {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'application/json,.json';
+    inp.onchange = () => {
+        const f = inp.files && inp.files[0]; if (!f) return;
+        const rd = new FileReader();
+        rd.onload = () => {
+            try {
+                const j = JSON.parse(String(rd.result));
+                const inc = (j && j.schemes && typeof j.schemes === 'object') ? j.schemes : j;
+                if (!inc || typeof inc !== 'object') throw new Error('bad');
+                const before = Object.keys(schAll()).length;
+                const merged = mergeSchemes(schAll(), inc);
+                if (schSetAll(merged)) {
+                    toast('📐 Импортировано узлов: ' + Object.keys(inc).length + ' (всего стало ' + Object.keys(merged).length + ', было ' + before + ')', 'success');
+                    if (window._sch) { window._sch.data = schGet(window._sch.key); renderSch(); }
+                }
+            } catch (e) { toast('Файл пака схем не читается', 'danger'); }
+        };
+        rd.readAsText(f);
+    };
+    inp.click();
+}
+/* Сжатие фото до 1400px JPEG, чтобы не убить localStorage */
+function schAddPhoto(dataUrl) {
+    const s = window._sch; if (!s) return;
+    const img = new Image();
+    img.onload = () => {
+        const max = 1400;
+        const k = Math.min(1, max / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * k)), hgt = Math.max(1, Math.round(img.height * k));
+        const cv = document.createElement('canvas'); cv.width = w; cv.height = hgt;
+        const c2 = cv.getContext('2d'); c2.drawImage(img, 0, 0, w, hgt);
+        const url = cv.toDataURL('image/jpeg', 0.82);
+        s.data.photos.push(url); s.photo = s.data.photos.length - 1;
+        if (schSet(s.key, s.data)) toast('Схема сохранена на устройстве', 'success');
+        renderSch();
+    };
+    img.onerror = () => toast('Не удалось прочитать изображение', 'danger');
+    img.src = dataUrl;
+}
+
+/* Печатный чек-лист осмотра машины: болячки под этот VIN + базовые пункты.
+   Формат «сел в машину → прошёл с бумагой» (как tech-статьи Pelican/ECS). */
+function printIssueChecklist() {
+    const g = G.find(x => x.id === window._issGid) || gAV(); if (!g) return;
+    const issues = issuesForGarageCar(g);
+    const base = [
+        'Кузов: арки, пороги, ниша запаски, кромки дверей — коррозия',
+        'Моторный отсек: ремень/цепь ГРМ и дата замены, течи масла и антифриза',
+        'Охлаждение: уровень и цвет ОЖ, подтёки радиатора и помпы',
+        'Тормоза: остаток колодок/дисков, возраст жидкости (> 2 лет — замена)',
+        'Ходовая: сайлентблоки рычагов, шаровые, наконечники, ступичные люфты',
+        'Рулевое: люфт рейки на месте и в движении, пыльники тяг',
+        'Электрика: клеммы АКБ, заряд генератора, жгут гофры двери багажника (6N2)',
+        'Тест-драйв: синхронизаторы КПП под нагрузкой, турбина и ТНВД (TDI/SDI)'
+    ];
+    const w = window.open('', '_blank');
+    if (!w) { toast('Браузер заблокировал всплывающее окно', 'danger'); return; }
+    const css = '<style>body{font-family:Arial,Helvetica,sans-serif;color:#111;padding:24px;max-width:720px;margin:0 auto}'
+        + 'h1{font-size:17px;margin:0 0 4px}h2{font-size:14px;margin:18px 0 6px}.sub{font-size:11px;color:#666;margin-bottom:14px}'
+        + 'ul{list-style:none;padding:0;margin:0}li{margin:7px 0;font-size:13px;line-height:1.5}'
+        + '.box{display:inline-block;width:12px;height:12px;border:1.5px solid #333;margin-right:8px;vertical-align:-2px}'
+        + '.sev{font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:.03em}.hi{color:#a11}.me{color:#a60}.lo{color:#370}'
+        + '.src{font-size:11px;color:#888}.note{margin-top:14px;font-size:11px;color:#888}</style>';
+    let h = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Чек-лист осмотра — ' + esc(g.vin || '') + '</title>' + css + '</head><body>';
+    h += '<h1>📋 Чек-лист осмотра автомобиля</h1><div class="sub">VIN ' + esc(g.vin || '—') + ' · ' + esc([g.brand, g.model, g.year].filter(Boolean).join(' '))
+        + (g.engineCode ? ' · мотор ' + esc(g.engineCode) : '') + (g.transCode ? ' · КПП ' + esc(g.transCode) : '')
+        + ' · База Мастера v' + esc(APP_VERSION) + ' · ' + new Date().toLocaleDateString('ru-RU') + '</div>';
+    if (issues.length) {
+        h += '<h2>⚠ Типичные проблемы этой модели (с учётом года выпуска)</h2><ul>';
+        issues.forEach(i => {
+            const cls = i.severity === 'high' ? 'hi' : i.severity === 'medium' ? 'me' : 'lo';
+            const lb = i.severity === 'high' ? 'важно' : i.severity === 'medium' ? 'типично' : 'мелочи';
+            h += '<li><span class="box"></span><span class="sev ' + cls + '">[' + lb + ']</span> ' + esc(i.issue) + ' <span class="src">— ' + esc(i.source) + (i.year && i.year !== 'all' ? ', ' + esc(i.year) : '') + '</span></li>';
+        });
+        h += '</ul>';
+    } else {
+        h += '<h2>⚠ Типичные проблемы</h2><ul><li><span class="box"></span>Для этой машины записей нет — проверьте базовые пункты ниже</li></ul>';
+    }
+    h += '<h2>🔧 Базовый осмотр</h2><ul>' + base.map(b => '<li><span class="box"></span>' + b + '</li>').join('') + '</ul>';
+    h += '<div class="note">Заметки: ....................................................................................................</div>';
+    h += '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script></body></html>';
+    w.document.write(h);
+    w.document.close();
+}
+
+/* ============ ДИПЛИНКИ (#/cat/…, #/part/…, #/vin/…, #/maint/…) ============
+   Ссылку на карточку/раздел/машину можно скопировать и открыть позже —
+   состояние восстанавливается из hash. Кнопка «назад» браузера работает. */
+let _lastSetHash = '';
+let _hashReady = false;   // до конца init hash не трогаем, чтобы не затереть входящий диплинк
+function setHash(h) {
+    const nh = '#' + h;
+    if (nh === location.hash) return;
+    _lastSetHash = nh;
+    location.hash = nh;
+}
+function syncCatHash() {
+    if (!_hashReady) return;
+    if (partmoId) return;                                  // поверх каталога открыта карточка
+    if (window._maintActive && window._maintViewGid) { setHash('/maint/' + window._maintViewGid); return; }
+    setHash('/cat/' + encodeURIComponent(SV.activeCat) + (SV.activeSub ? '/' + encodeURIComponent(SV.activeSub) : ''));
+}
+function routeHash() {
+    const h = decodeURIComponent(location.hash || '');
+    let m;
+    if ((m = h.match(/^#\/part\/(.+)$/))) { const p = D.find(x => x.id === m[1]); if (p) oPC(p.id); return; }
+    if ((m = h.match(/^#\/maint\/(.+)$/))) { const g = G.find(x => x.id === m[1]); if (g) showMaintenanceForVin(g.id); return; }
+    if ((m = h.match(/^#\/vin\/(.+)$/))) { const g = G.find(x => x.id === m[1]); if (g && SV.activeVinId !== g.id) setAV(g.id); return; }
+    if ((m = h.match(/^#\/cat\/([^/]+)(?:\/(.+))?$/))) {
+        SV.activeCat = decodeURIComponent(m[1]);
+        SV.activeSub = m[2] ? decodeURIComponent(m[2]) : null;
+        sU(); rSB(); rC();
+        return;
+    }
+}
+window.addEventListener('hashchange', () => {
+    if (location.hash === _lastSetHash) { _lastSetHash = ''; return; }  // это мы сами поставили
+    routeHash();
+});
 
 /* ====== УТИЛИТЫ ====== */
 function getWeekNumber(dateStr) {
@@ -1107,7 +1635,7 @@ const CAT_GROUPS = [
     {
         id: 'refs',
         label: 'Справочники',
-        cats: ['Torque', 'Diagnostics', 'Workshops', 'Log'],
+        cats: ['Torque', 'Diagnostics', 'Wiring', 'WiringFuses', 'WiringRelays', 'WiringRef', 'WiringPins', 'Workshops', 'Log'],
         virtual: true
     }
 ];
@@ -1198,6 +1726,13 @@ const getPurchaseHtml = p => {
     h += hh;
     if (su) h += '<a class="sl" href="' + escA(su) + '" target="_blank" rel="noopener noreferrer">🛒 Свой магазин</a>';
     h += '</div>';
+    /* Статистика цены: мин/сред/макс по истории + изменение + мини-график */
+    const ps = priceStats(p);
+    if (ps && (p.priceHistory || []).length) {
+        const d = ps.delta;
+        const dHtml = d == null ? '' : '<span class="pd ' + (d > 0 ? 'up' : d < 0 ? 'down' : '') + '" title="Изменение к последней записи истории цен">' + (d > 0 ? '▲' : d < 0 ? '▼' : '＝') + ' ' + Math.abs(d) + '%</span>';
+        h += '<div class="prow price-stats"><span class="ps-lb">📊 мин ' + esc(fP(ps.min, p.currency)) + ' · сред ' + esc(fP(ps.avg, p.currency)) + ' · макс ' + esc(fP(ps.max, p.currency)) + '</span>' + dHtml + sparkSvg(ps.series, 110, 26) + '</div>';
+    }
     if (p.oem) h += '<div class="prow">' + shopH(p.oem, p.name) + '</div>';
     if (p.oem) {
         const c = p.oem.replace(/\s+/g, '');
@@ -1207,6 +1742,28 @@ const getPurchaseHtml = p => {
         h += '<a class="psl opE" target="_blank" rel="noopener noreferrer" href="' + ONLINE_CATALOGS.elcats() + '" title="Открыть каталог Elcats (выберите VW → Polo → введите артикул)">Elcats</a>';
         h += '</div>';
     }
+    /* Взрыв-схемы узла: бесплатные русскоязычные каталоги (Autodoc/Emex/Elcats) */
+    const av = gAV();
+    const ext = [];
+    if (av && av.vin) ext.push({ l: 'Autodoc · схемы по VIN', u: 'https://www.autodoc.ru/vin/' + encodeURIComponent(av.vin), t: 'Бесплатный заводской каталог со взрыв-схемами по вашему VIN (рус.)' });
+    if (p.oem) ext.push({ l: 'Autodoc · по артикулу', u: 'https://www.autodoc.ru/search/?q=' + encodeURIComponent(String(p.oem).replace(/\s/g, '')), t: 'Поиск в оригинальном каталоге по артикулу (рус.)' });
+    ext.push({ l: 'Emex · оригинал', u: 'https://emex.ru/catalogs/original2', t: 'Оригинальный каталог VAG по VIN (рус.); VIN вводится на сайте' });
+    ext.push({ l: 'Elcats VW', u: 'https://elcats.ru/vw/', t: 'Каталог схем VAG (рус.)' });
+    h += '<div class="prow ext-diag"><span class="ed-lb" title="Бесплатные русскоязычные внешние каталоги со схемами узлов">🔍 Схемы:</span>'
+        + ext.map(x => '<a class="psl" target="_blank" rel="noopener noreferrer" href="' + escA(x.u) + '" title="' + escA(x.t) + '">' + esc(x.l) + '</a>').join('')
+        + '</div>';
+    /* Supersession: артикул заменён VAG на новый */
+    if (p.sup) {
+        const np = findByOem(p.sup);
+        h += '<div class="sup-note">⚠ Артикул заменён производителем на <b>' + esc(p.sup) + '</b>'
+            + (np ? ' — <button type="button" class="bn sup-open" data-action="open-oem" data-oem="' + escA(p.sup) + '">открыть карточку</button>' : ' (в каталоге пока нет)')
+            + '</div>';
+    }
+    /* PR-применимость к активной машине */
+    const pf = prFit(p);
+    if (pf) h += '<div class="sup-note ' + (pf.cls === 'y' ? 'ok' : 'no') + '">' + (pf.cls === 'y' ? '✅' : '⛔') + ' ' + esc(pf.label) + '</div>';
+    /* своя схема узла: фото + нумерованные маркеры */
+    h += '<div class="prow"><button type="button" class="bn sch-open" data-action="scheme" data-id="' + escA(p.id) + '">📐 Схема узла: фото + номера</button></div>';
     return h;
 };
 
@@ -1238,7 +1795,7 @@ let SV = {
     bodyFilter: 'all', trimFilter: 'all', transFilter: 'all', gearboxFilter: 'all', genFilter: 'all',
     sidebarCollapsed: false,
     theme: 'aurora', sortBy: 'default', view: 'grid', activeVinId: null,
-    groupBySub: false, vinStrictFilter: false, expandedCats: {},
+    groupBySub: false, vinStrictFilter: false, fitOnly: false, expandedCats: {},
     garCollapsed: {},
     _vinApplied: false
 };
@@ -1246,7 +1803,7 @@ let USER = { name: '', email: '', city: '', initials: '', color: '#00b0f0' };
 let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastDate: null, interval: 15000 };
 
-let APP_VERSION = '1.8.0';
+let APP_VERSION = '1.8.1';
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -1401,6 +1958,12 @@ function cConfirm(ok) {
 
 /* ============ ЛИЦЕНЗИЯ ============ */
 function checkLicense() {
+    /* Публичный read-only режим: каталог без гейта, без гаража и правок */
+    if (pubMode()) {
+        pubApply();
+        init().then(() => rSz()).catch(e => { console.error(e); toast('Ошибка инициализации', 'danger'); });
+        return;
+    }
     let st = '';
     try { st = localStorage.getItem(LICKEY) || ''; } catch (e) { }
     if (st === 'accepted') {
@@ -1410,6 +1973,36 @@ function checkLicense() {
     } else {
         $('licgate').classList.add('show');
     }
+}
+/* ============ ПУБЛИЧНЫЙ READ-ONLY РЕЖИМ ============
+   «Витрина» каталога для новичков и поиска: без лицензионного гейта,
+   но любые изменения базы/гаража заблокированы (pubGuard в мутаторах). */
+const PUBKEY = 'vw_public_mode_v1';
+const pubMode = () => { try { return localStorage.getItem(PUBKEY) === '1'; } catch (e) { return false; } };
+function pubGuard() {
+    if (!pubMode()) return false;
+    toast('👁 Просмотр без регистрации: гараж и правки доступны в полной версии', 'info');
+    return true;
+}
+function pubApply() {
+    document.body.classList.add('pub');
+    if (!$('pubbar')) {
+        const d = document.createElement('div');
+        d.id = 'pubbar';
+        d.innerHTML = '<span>👁 Публичный режим: каталог открыт без гаража и правок</span>'
+            + '<button type="button" class="bn" onclick="pubExit()">Включить полную версию</button>';
+        document.body.appendChild(d);
+    }
+}
+function pubEnter() {
+    try { localStorage.setItem(PUBKEY, '1'); } catch (e) { }
+    $('licgate').classList.remove('show');
+    pubApply();
+    init().then(() => rSz()).catch(e => { console.error(e); toast('Ошибка инициализации', 'danger'); });
+}
+function pubExit() {
+    try { localStorage.removeItem(PUBKEY); } catch (e) { }
+    location.reload();
 }
 function licAccept() {
     try { localStorage.setItem(LICKEY, 'accepted'); } catch (e) { }
@@ -1530,6 +2123,17 @@ function nP(p) {
         : [];
     const trc = Array.from(new Set(trcMigrated.concat(trcOwn))).slice(0, 50);
     const trm = Array.isArray(p.trims) ? p.trims.filter(x => TRIMS.includes(x)) : [];
+    /* PR-применимость: prReq — коды, которые обязаны быть на машине;
+       prNo («!CODE») — коды, с которыми деталь не ставится. */
+    const prRaw = (Array.isArray(p.prReq) ? p.prReq.map(String) : String(p.prReq || '').split(','))
+        .concat(Array.isArray(p.prNo) ? p.prNo.map(x => '!' + x) : String(p.prNo || '').split(',').filter(x => x.trim()).map(x => '!' + x));
+    const prReq = [], prNo = [];
+    prRaw.forEach(s0 => {
+        const s = String(s0 || '').trim().toUpperCase();
+        if (!s) return;
+        if (s[0] === '!') prNo.push(s.slice(1)); else prReq.push(s);
+    });
+    const sup = String(p.sup || p.supersededTo || '').trim().toUpperCase();
     const ALL_GENS = Object.keys(GENERATIONS);
     const gens = Array.isArray(p.gens) ? p.gens.filter(x => ALL_GENS.includes(x)) : [];
 
@@ -1555,6 +2159,7 @@ function nP(p) {
         analogs: Array.isArray(p.a || p.analogs) ? (p.a || p.analogs).map(String).filter(Boolean) : [],
         donors: Array.isArray(p.d || p.donors) ? (p.d || p.donors).map(String).filter(Boolean) : [],
         engines: eng, bodies: bdy, transmissions: trn, transCodes: trc, trims: trm, gens,
+        prReq, prNo, sup,
         price: (p.price == null || p.price === '') ? null : (isFinite(Number(p.price)) ? Number(p.price) : null),
         currency: p.currency || 'RUB',
         status: ['want', 'bought', 'installed'].includes(p.status) ? p.status : '',
@@ -1794,7 +2399,7 @@ function lU() {
             if (!SV.expandedCats || typeof SV.expandedCats !== 'object') SV.expandedCats = {};
             if (!SV.garCollapsed || typeof SV.garCollapsed !== 'object') SV.garCollapsed = {};
             if (typeof SV._vinApplied !== 'boolean') SV._vinApplied = false;
-            if (!CATS.some(c => c.id === SV.activeCat) && !['Favorites', 'Workshops', 'Log'].includes(SV.activeCat)) SV.activeCat = 'All';
+            if (!CATS.some(c => c.id === SV.activeCat) && !['Favorites', 'Workshops', 'Log', 'Dash'].includes(SV.activeCat) && !(CUSTOM.sections && CUSTOM.sections[SV.activeCat]) && !SEC_TABLE_IDS.includes(SV.activeCat)) SV.activeCat = 'All';
         }
     } catch (e) { }
 }
@@ -1960,13 +2565,15 @@ function partMatchesGearbox(p, gb) {
     if (fams.length) return cf.length ? fams.some(f => cf.includes(f)) : true;
     return true;
 }
-/* VIN-строго: доноры + буквенный код КПП активного VIN */
+/* VIN-строго: доноры + буквенный код КПП активного VIN + PR-несовместимость */
 function vinStrictOk(p) {
     const av = gAV();
     if (av) {
         const gb = normGb(av.gearboxCode);
         const codes = p.transCodes || [];
         if (gb !== 'all' && codes.length && !codes.includes(gb)) return false;
+        const pf = prFit(p);
+        if (pf && pf.cls === 'n') return false;
     }
     if (!p.donors || !p.donors.length) return true;
     const cmp = pCompat(p);
@@ -2043,6 +2650,8 @@ function rGar() {
         if (g.year) metaHtml += '<span class="gi-chip">' + esc(g.year) + '</span>';
         if (g.engineCode) metaHtml += '<span class="gi-chip">⚙ ' + esc(g.engineCode) + '</span>';
         if (g.gearboxCode || g.transCode) metaHtml += '<span class="gi-chip">🔄 ' + esc(g.gearboxCode || g.transCode) + '</span>';
+        if (g.gen) metaHtml += '<span class="gi-chip">🚘 ' + esc(g.gen) + '</span>';
+        if (g.trim) metaHtml += '<span class="gi-chip gi-chip-b">🏷 ' + esc(g.trim) + '</span>';
         const bl = giBodyLabel(g);
         if (bl) metaHtml += '<span class="gi-chip gi-chip-b">' + esc(bl) + '</span>';
         metaHtml += '</div>';
@@ -2331,6 +2940,7 @@ function setAV(id) {
 
     if (!wasActive && SV.activeVinId) SV.vinStrictFilter = true;
     if (wasActive && !SV.activeVinId) SV.vinStrictFilter = false;
+    if (SV.activeVinId === id) setHash('/vin/' + encodeURIComponent(id)); else syncCatHash();
 
     applyVinFilters();
     sU(); rGar(); rSB(); rC();
@@ -2351,6 +2961,7 @@ function setAV(id) {
 }
 
 function sGarV() {
+    if (pubGuard()) return;
     if (!pGV || !pGV.ok) return;
     if (G.some(g => g.vin === pGV.vin)) { toast('VIN уже в гараже', 'danger'); return; }
     const g = {
@@ -2365,6 +2976,7 @@ function sGarV() {
         engines: Array.isArray(pGV.engines) ? pGV.engines : [],
         prodDate: '', engineCode: '', transCode: '', gearboxCode: '',
         equipCode: '', bodyColor: '', roofColor: '',
+        gen: '', trim: '',
         addedAt: Date.now()
     };
     G.push(g); sG(); SV.activeVinId = g.id;
@@ -2390,6 +3002,7 @@ function sGarV() {
 }
 
 function remV(id) {
+    if (pubGuard()) return;
     const g = G.find(x => x.id === id); if (!g) return;
     if (!confirm('Удалить VIN ' + g.vin + '?')) return;
     G = G.filter(x => x.id !== id);
@@ -2809,7 +3422,57 @@ function _dedupeParts(parts) {
     }
     return Array.from(map.values());
 }
+
+/* ✅ 1.8.1: слияние серверных данных вынесено в функции — их используют
+   обе ветки lAll() (полная загрузка и «лёгкая» перезагрузка поверх кэша) */
+function _mergeCats(cats) {
+    if (!Array.isArray(cats)) return;
+    for (const c of cats) {
+        if (!c || !c.id) continue;
+        if (!CATS.find(x => x.id === c.id))
+            CATS.push({ id: c.id, label: c.label || c.id, icon: c.icon || '📁' });
+    }
+}
+function _mergeSections(secs) {
+    if (!secs || typeof secs !== 'object' || Array.isArray(secs)) return;
+    for (const sid of Object.keys(secs)) {
+        const srv = secs[sid];
+        if (!srv || typeof srv !== 'object') continue;
+        const loc = CUSTOM.sections[sid];
+        if (!loc) { CUSTOM.sections[sid] = srv; continue; }
+        /* Пользовательские метка/иконка приоритетнее, НО пустые локальные
+           строки не должны затенять свежие серверные данные — иначе старая
+           мета из localStorage вечно показывает раздел пустым */
+        const merged = Object.assign({}, srv, loc);
+        const locHasRows = Array.isArray(loc.rows) && loc.rows.length > 0;
+        if (!locHasRows && Array.isArray(srv.rows)) {
+            merged.rows = srv.rows;
+            if (Array.isArray(srv.cols)) merged.cols = srv.cols;
+        }
+        CUSTOM.sections[sid] = merged;
+    }
+    sMeta();
+}
+async function _mergeWorkshops(wss) {
+    if (!Array.isArray(wss) || !wss.length) return;
+    const normalized = wss.map(nW).filter(Boolean);
+    const existingIds = new Set(W.map(w => w.id));
+    const existingNames = new Set(W.map(w => (w.name || '').toLowerCase()));
+    for (const w of normalized) {
+        const nLow = (w.name || '').toLowerCase();
+        if (!existingIds.has(w.id) && !existingNames.has(nLow)) {
+            W.push(w);
+            existingIds.add(w.id);
+            existingNames.add(nLow);
+        }
+    }
+    if (useIDB) { try { await iMany(SW, W); } catch (e) { } } else sWk();
+}
 async function lAll() {
+    // 0. ✅ 1.8.1: пользовательская мета грузится ПЕРВОЙ — серверный мердж
+    //    ниже не перетрёт её через sMeta(), а кастомные категории увидит nP()
+    lMeta();
+
     // 1. Локальные данные из IndexedDB / localStorage
     try {
         const p = await iAll(SP), w = await iAll(SW);
@@ -2853,6 +3516,31 @@ async function lAll() {
 
     if (skipFetch) {
         console.log('[lAll] data v' + remoteVersion + ' cached · ' + D.length + ' items');
+        /* ✅ 1.8.1: даже при совпавшей версии перечитываем ЛЁГКИЕ файлы
+           (sections/categories/workshops). Раньше skipFetch отменял всю
+           загрузку — и обновлённый sections.json без смены appVersion
+           не попадал на клиент: разделы в сайдбаре есть, а таблицы пустые. */
+        const typeOf = item => {
+            const f = typeof item === 'string' ? item : item.path;
+            return (typeof item === 'string' ? null : item.type) || _guessType(f);
+        };
+        const metaFiles = files.filter(item => ['sections', 'categories', 'workshops'].includes(typeOf(item)));
+        if (!metaFiles.some(item => typeOf(item) === 'sections'))
+            metaFiles.push({ path: 'data/sections.json', type: 'sections' });
+        const mres = await Promise.all(metaFiles.map(async (item) => {
+            const f = typeof item === 'string' ? item : item.path;
+            try {
+                const r = await fetch(f + '?t=' + Date.now(), { cache: 'no-store' });
+                if (!r.ok) return null;
+                return { type: typeOf(item), data: await r.json() };
+            } catch (e) { return null; }
+        }));
+        for (const res of mres) {
+            if (!res) continue;
+            if (res.type === 'sections') _mergeSections(res.data);
+            else if (res.type === 'categories') _mergeCats(res.data);
+            else if (res.type === 'workshops') await _mergeWorkshops(res.data);
+        }
     } else {
         const t0 = performance.now();
 
@@ -2878,6 +3566,19 @@ async function lAll() {
                         secs = Object.assign(secs || {}, res.data);
                     break;
                 case 'workshops': if (Array.isArray(res.data)) wss = res.data; break;
+            }
+        }
+
+        /* Фолбэк для чистого локального запуска / восстановления: боевого
+           parts.json нет. Сначала пробуем ОРИГИНАЛ каталога (parts.full.json —
+           слив data-src/parts-01..10), затем демо. Имена намеренно не совпадают
+           с боевым путём data/parts.json — затирание при деплое невозможно. */
+        if (!serverParts.length) {
+            for (const alt of ['data/parts.full.json', 'data/parts.demo.json']) {
+                try {
+                    const rd = await fetch(alt + '?t=' + Date.now(), { cache: 'no-store' });
+                    if (rd.ok) { const arr = await rd.json(); if (Array.isArray(arr) && arr.length) { serverParts = arr; break; } }
+                } catch (e) { /* пробуем следующий */ }
             }
         }
 
@@ -2914,45 +3615,22 @@ async function lAll() {
         D = _dedupeParts(D);
         if (useIDB) try { await iMany(SP, D); } catch (e) { } else sD();
 
-        if (remoteVersion) {
+        /* ✅ 1.8.1: версию базы записываем, только если детали реально
+           загрузились — ошибка сети/404 больше не «замораживает» устаревшие
+           данные в кэше (иначе skipFetch навсегда отменит докачку) */
+        if (remoteVersion && serverParts.length) {
             try { localStorage.setItem('vw_polo_data_ver', remoteVersion); } catch (e) { }
         }
 
-        if (cats) for (const c of cats) {
-            if (!c || !c.id) continue;
-            if (!CATS.find(x => x.id === c.id))
-                CATS.push({ id: c.id, label: c.label || c.id, icon: c.icon || '📁' });
-        }
-
-        /* ✅ Правка №7a: merge, а не replace, для CUSTOM.sections */
-        if (secs) {
-            for (const sid of Object.keys(secs)) {
-                // Пользовательские секции приоритетнее — их не перетираем
-                if (!CUSTOM.sections[sid]) CUSTOM.sections[sid] = secs[sid];
-                else CUSTOM.sections[sid] = Object.assign({}, secs[sid], CUSTOM.sections[sid]);
-            }
-            sMeta();
-        }
-
-        /* ✅ Правка №7b: merge, а не replace, для W (workshops) */
-        if (wss && wss.length) {
-            const normalized = wss.map(nW).filter(Boolean);
-            const existingIds = new Set(W.map(w => w.id));
-            const existingNames = new Set(W.map(w => (w.name || '').toLowerCase()));
-            for (const w of normalized) {
-                const nLow = (w.name || '').toLowerCase();
-                if (!existingIds.has(w.id) && !existingNames.has(nLow)) {
-                    W.push(w);
-                    existingIds.add(w.id);
-                    existingNames.add(nLow);
-                }
-            }
-            if (useIDB) await iMany(SW, W); else sWk();
-        }
+        /* ✅ 1.8.1: единые функции слияния (см. _mergeCats/_mergeSections/
+           _mergeWorkshops) — те же правила применяются и в ветке skipFetch */
+        _mergeCats(cats);
+        _mergeSections(secs);
+        await _mergeWorkshops(wss);
     }
 
-    // 8. Гараж, мета, профиль, ТО, логи
-    lG(); lMeta(); lU(); lProfile(); lTO(); await lLogs();
+    // 8. Гараж, профиль, ТО, логи (мета загружена в шаге 0 — ✅ 1.8.1)
+    lG(); lU(); lProfile(); lTO(); await lLogs();
     if (SV.activeVinId && !G.some(g => g.id === SV.activeVinId)) SV.activeVinId = null;
     try { vk = localStorage.getItem(VK) || ''; } catch (e) { }
 }
@@ -3022,11 +3700,22 @@ const tMM = (e) => {
 
 /* Виртуальные (не товарные) разделы — для сайдбара */
 const VIRTUAL_CATS = {
+    Dash: { label: 'Моя машина', icon: '🚘' },
     Workshops: { label: 'Мастерские/СТО', icon: '🔧' },
     Log: { label: 'Журнал обслуживания', icon: '📖' },
     Diagnostics: { label: 'Диагностика (OBD)', icon: '🩺' },
     Torque: { label: 'Моменты затяжки', icon: '🔩' },
+    Wiring: { label: 'Электросхемы', icon: '⚡' },
+    WiringFuses: { label: 'Предохранители 6N1', icon: '🔌' },
+    WiringRelays: { label: 'Реле 6N1', icon: '🎛️' },
+    WiringRef: { label: 'Провода и клеммы', icon: '🎨' },
+    WiringPins: { label: 'Разъёмы и пины', icon: '🔗' },
 };
+
+/* ✅ 1.8.1: табличные разделы-справочники из data/sections.json.
+   Рендерятся через rSec даже если файл ещё не загрузился —
+   с понятным экраном «не загружено» вместо пустого списка деталей. */
+const SEC_TABLE_IDS = ['Torque', 'Diagnostics', 'Wiring', 'WiringFuses', 'WiringRelays', 'WiringRef', 'WiringPins'];
 
 /* ============================================================
    Отфильтрованный список для счётчиков в сайдбаре.
@@ -3219,6 +3908,7 @@ function rSB() {
         });
     };
 
+    addItem('Dash', '🚘', 'Моя машина', SV.activeVinId ? 1 : 0);
     addItem('Favorites', '⭐', 'Избранное', cnt('Favorites'), 'fav');
     addItem('All', '📦', 'Все системы', cnt('All'));
 
@@ -3267,6 +3957,7 @@ function resetFilters() {
     syncTransSelect();
     SV.sortBy = 'default'; $('ss').value = 'default';
     SV._vinApplied = false;
+    SV.fitOnly = false;
     updateFilterStyling(); sU(); rSB(); rC();
     toast('Фильтры сброшены', 'success');
 }
@@ -3299,7 +3990,17 @@ function mP(p, t) {
     ...((p.inst || []).map(i => i.text)), p.notes || '',
     ...(p.engines || []), ...((p.engines || []).map(e => engineFamOf(e)).filter(Boolean)),
     ...(p.transmissions || []), ...(p.transCodes || []), ...(p.bodies || []), ...(p.gens || [])].join('  '));
-    return t.every(x => h.includes(x));
+    /* Второй проход — без пробелов/знаков: «030115561B» находит «030 115 561 B»,
+       а поиск по артикулу аналога («530009010») даёт кросс на OEM */
+    const t2 = t.map(x => x.replace(/[^a-z0-9]/g, ''));
+    const h2 = h.replace(/[^a-z0-9]/g, '');
+    return t.every((x, i) => {
+        const alts = [x].concat(SYNONYMS[x] || []);   // синонимы: «грм» → ремень/ролик/натяжитель
+        return alts.some(a => {
+            const a2 = a.replace(/[^a-z0-9]/g, '');
+            return h.includes(a) || (a2.length >= 5 && h2.includes(a2));
+        });
+    });
 }
 function sP(a) {
     const s = SV.sortBy;
@@ -3322,9 +4023,10 @@ function gF() {
     const t = nz(SV.searchQuery).split(/\s+/).filter(Boolean);
     let f = D;
     if (SV.activeVinId && SV.vinStrictFilter) f = f.filter(vinStrictOk);
+    if (SV.fitOnly && SV.activeVinId) f = f.filter(fitAllCriteria);
     if (SV.activeCat === 'Favorites') {
         f = f.filter(p => p.favorite);
-    } else if (SV.activeCat !== 'All' && SV.activeCat !== 'Workshops' && SV.activeCat !== 'Log') {
+    } else if (SV.activeCat !== 'All' && SV.activeCat !== 'Workshops' && SV.activeCat !== 'Log' && SV.activeCat !== 'Dash') {
         f = f.filter(p => p.cat === SV.activeCat);
         if (SV.activeSub) {
             f = f.filter(p => (p.sub || '').trim() === SV.activeSub);
@@ -3353,11 +4055,20 @@ function updateFilterStyling() {
         const el = $(id); if (!el) return;
         el.classList.toggle('act', el.value && el.value !== 'all');
     });
+    const fb = $('fitOnlyBtn');
+    if (fb) {
+        fb.classList.toggle('act', !!SV.fitOnly);
+        fb.title = SV.activeVinId
+            ? (SV.fitOnly ? 'Показаны только подходящие вашему VIN — клик, чтобы снять' : 'Показать только позиции, подходящие вашему VIN по всем критериям')
+            : 'Нужна активная машина в гараже';
+    }
 }
 function updSearchSuggest() {
     const dl = $('searchSuggest'); if (!dl) return;
     const items = [], seen = new Set();
     const MAX = 200;
+    /* Недавние запросы — сверху списка подсказок */
+    getRecentQ().slice(0, 5).forEach(q => { items.push('🕘 ' + q); seen.add('r:' + q.toLowerCase()); });
     for (const p of D) {
         if (items.length >= MAX) break;
         if (p.oem && !seen.has('o:' + p.oem)) { items.push(p.oem); seen.add('o:' + p.oem); }
@@ -3365,6 +4076,15 @@ function updSearchSuggest() {
         if (p.name && !seen.has('n:' + p.name)) { items.push(p.name); seen.add('n:' + p.name); }
     }
     dl.innerHTML = items.map(x => '<option value="' + escA(x) + '">').join('');
+}
+/* Недавние поисковые запросы (localStorage) */
+function getRecentQ() {
+    try { const a = JSON.parse(localStorage.getItem('vw_recent_q') || '[]'); return Array.isArray(a) ? a.filter(x => typeof x === 'string') : []; } catch (e) { return []; }
+}
+function pushRecentQ(q) {
+    const list = [q].concat(getRecentQ().filter(x => x.toLowerCase() !== q.toLowerCase())).slice(0, 8);
+    try { localStorage.setItem('vw_recent_q', JSON.stringify(list)); } catch (e) { }
+    updSearchSuggest();
 }
 
 /* ============ КОНТЕНТ ============ */
@@ -3379,9 +4099,13 @@ function _renderSignature() {
 
 function rC() {
     window._maintActive = false;   // каталог/журнал/мастерские заместили список расходников
+    syncCatHash();
     if (SV.activeCat === 'Workshops') { rW(); return; }
     if (SV.activeCat === 'Log') { rLog(); return; }
-    if (CUSTOM.sections[SV.activeCat]) { rSec(SV.activeCat); return; }
+    if (SV.activeCat === 'Dash') { rDash(); return; }
+    /* ✅ 1.8.1: справочные разделы всегда через rSec — даже без данных
+       покажем экран «не загружено» с кнопкой обновления, а не «найдено: 0» */
+    if (CUSTOM.sections[SV.activeCat] || SEC_TABLE_IDS.includes(SV.activeCat)) { rSec(SV.activeCat); return; }
 
     const sig = _renderSignature();
     if (sig !== _lastRenderSig) { _visibleLimit = PAGE_SIZE; _lastRenderSig = sig; }
@@ -3435,6 +4159,7 @@ function rC() {
     if (av) {
         chips.push('<span class="chip">VIN …' + esc(av.vin.slice(-6)) + '</span>');
         chips.push('<span class="chip" data-chip="vinStrict" style="cursor:pointer;' + (SV.vinStrictFilter ? 'border-color:var(--dg);background:rgba(220,53,69,.12);' : '') + '" title="Скрыть детали, несовместимые с VIN">🔒 VIN-строго</span>');
+        chips.push('<span class="chip" data-chip="fitOnly" style="cursor:pointer;' + (SV.fitOnly ? 'border-color:var(--ok);background:rgba(90,128,80,.14);' : '') + '" title="Только позиции, подходящие вашему VIN по всем критериям (мотор, кузов, поколение, комплектация, КПП, PR)">🎯 подходит моему VIN</span>');
     }
     h += '<div class="ri">' + chips.join('') + '</div>';
 
@@ -3514,10 +4239,192 @@ window.toggleTreeAll = function () {
     }
 };
 
+/* ============ КРОСС-СЕРВИС: артикулы, PR-применимость, цены, подсветка ============ */
+const normOem = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+function findByOem(o) {
+    const n = normOem(o);
+    if (!n) return null;
+    return D.find(p => normOem(p.oem) === n) || null;
+}
+/* PR-коды активной машины (когда база оснащения полная); null = проверять не по чему */
+let _prSetV = null, _prSet = null;
+function vinPrSet() {
+    const av = gAV();
+    const id = av ? av.id : null;
+    if (id === _prSetV) return _prSet;
+    _prSetV = id; _prSet = null;
+    if (av) {
+        const row = vinDbRow(av.vin);
+        if (row && Array.isArray(row.pr) && row.pr.length) _prSet = new Set(row.pr.map(c => String(c).toUpperCase()));
+    }
+    return _prSet;
+}
+/* Подходит ли деталь под оснащение VIN по PR: {cls:'y'|'n', label} или null */
+function prFit(p, set) {
+    set = set === undefined ? vinPrSet() : set;
+    if (!set) return null;
+    if (!(p.prReq || []).length && !(p.prNo || []).length) return null;
+    const miss = (p.prReq || []).filter(c => !set.has(c));
+    const bad = (p.prNo || []).filter(c => set.has(c));
+    if (miss.length || bad.length) {
+        const why = [miss.length ? 'нет кодов ' + miss.join(', ') : '', bad.length ? 'есть несовместимый ' + bad.join(', ') : ''].filter(Boolean).join('; ');
+        return { cls: 'n', label: 'PR: не подходит под ваш VIN (' + why + ')' };
+    }
+    return { cls: 'y', label: 'PR: проверено по оснащению вашего VIN — подходит' };
+}
+/* Статистика цены: текущая/мин/сред/макс + изменение к последней записи истории */
+function priceStats(p) {
+    const h = (p.priceHistory || []).map(x => ({ ts: x.ts, price: Number(x.price) })).filter(x => isFinite(x.price));
+    const cur = p.price != null ? Number(p.price) : (h.length ? h[h.length - 1].price : null);
+    if (cur == null) return null;
+    const prices = h.map(x => x.price).concat([cur]);
+    if (prices.length < 2) return { cur, min: cur, max: cur, avg: cur, delta: null, series: [cur] };
+    const min = Math.min.apply(null, prices), max = Math.max.apply(null, prices);
+    const avg = Math.round(prices.reduce((s, x) => s + x, 0) / prices.length);
+    const prev = h[h.length - 1].price;
+    const delta = prev > 0 ? Math.round((cur - prev) / prev * 100) : null;
+    return { cur, min, max, avg, delta, series: prices.slice(-14) };
+}
+/* Мини-график цены (inline SVG, без библиотек) */
+function sparkSvg(series, w, hgt) {
+    if (!series || series.length < 2) return '';
+    const min = Math.min.apply(null, series), max = Math.max.apply(null, series);
+    const rng = (max - min) || 1;
+    const pts = series.map((v, i) => {
+        const x = (i / (series.length - 1)) * (w - 4) + 2;
+        const y = (hgt - 4) - ((v - min) / rng) * (hgt - 8) + 2;
+        return x.toFixed(1) + ',' + y.toFixed(1);
+    });
+    const last = pts[pts.length - 1].split(',');
+    return '<svg class="spark" viewBox="0 0 ' + w + ' ' + hgt + '" width="' + w + '" height="' + hgt + '" aria-hidden="true">'
+        + '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--a)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>'
+        + '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="2.2" fill="var(--a)"/></svg>';
+}
+/* Подсветка совпадений поискового запроса (безопасная: сначала esc) */
+function prBadge(p) {
+    const pf = prFit(p);
+    if (!pf) return '';
+    return '<span class="vb ' + (pf.cls === 'y' ? 't' : 'f') + '" title="' + escA(pf.label) + '">PR ' + (pf.cls === 'y' ? '✓' : '✗') + '</span>';
+}
+function hl(text) {
+    const s = String(text == null ? '' : text);
+    const toks = nz(SV.searchQuery).split(/\s+/).filter(x => x.length >= 2);
+    if (!toks.length) return esc(s);
+    const f = nz(s);
+    const ranges = [];
+    toks.forEach(tok => { let i = f.indexOf(tok); while (i >= 0) { ranges.push([i, i + tok.length]); i = f.indexOf(tok, i + 1); } });
+    if (!ranges.length) return esc(s);
+    ranges.sort((a, b) => a[0] - b[0]);
+    let out = '', last = 0;
+    ranges.forEach(r => { if (r[0] < last) return; out += esc(s.slice(last, r[0])) + '<mark>' + esc(s.slice(r[0], r[1])) + '</mark>'; last = r[1]; });
+    return out + esc(s.slice(last));
+}
+
+/* ============ ПРИМЕНИМОСТЬ: покритериальный отчёт по активному VIN ============
+   Доноры — косвенный признак; здесь же явные критерии: моторы (с семействами),
+   кузова, поколения, комплектации, КПП (семейства + буквенные коды), PR-коды.
+   По каждому — вердикт ✓/✗/— против активной машины и пояснение. */
+function partFitReport(p) {
+    const av = gAV();
+    const d = av ? vD(av.vin) : null;
+    const rows = [];
+    const eng = p.engines || [];
+    if (eng.length) {
+        const fams = Array.from(new Set(eng.map(e => engineFamOf(e)).filter(Boolean)));
+        const val = (eng.length <= 6 ? eng.join(', ') : fams.join('/') + ' · ' + eng.length + ' кодов')
+            + (fams.length ? ' (' + fams.join(', ') + ')' : '');
+        let vd = 'u', why = 'мотор машины неизвестен';
+        if (av && av.engineCode) { vd = eng.includes(av.engineCode) ? 'y' : 'n'; why = av.engineCode + (vd === 'y' ? ' есть в списке' : ' отсутствует в списке'); }
+        rows.push({ k: 'Двигатели', val, vd, why });
+    } else rows.push({ k: 'Двигатели', val: 'все моторы каталога', vd: (av && av.engineCode) ? 'y' : 'u', why: (av && av.engineCode) ? 'ограничений нет' : '' });
+    const bd = p.bodies || [];
+    if (bd.length) {
+        let vd = 'u', why = 'кузов машины неизвестен';
+        if (av && av.body) { vd = bd.includes(av.body) ? 'y' : 'n'; why = (BODIES[av.body] || av.body) + (vd === 'y' ? ' есть в списке' : ' отсутствует в списке'); }
+        rows.push({ k: 'Кузова', val: bd.map(b => BODIES[b] || b).join(', '), vd, why });
+    } else rows.push({ k: 'Кузова', val: 'все кузова', vd: (av && av.body) ? 'y' : 'u', why: '' });
+    const gn = p.gens || [];
+    if (gn.length) {
+        /* поколение: вручную из гаража, иначе автоподстановка из декодера VIN */
+        const my = (av && av.gen) ? av.gen : (d && d.gen ? d.gen : '');
+        let vd = 'u', why = 'поколение машины неизвестно (укажите в «✎ Уточнить данные» или добавьте VIN с 6N1/6N2)';
+        if (my) { vd = gn.includes(my) ? 'y' : 'n'; why = my + (vd === 'y' ? ' есть в списке' : ' отсутствует в списке'); }
+        rows.push({ k: 'Поколение', val: gn.join(', '), vd, why });
+    }
+    const trm = p.trims || [];
+    if (trm.length) {
+        const myT = (av && av.trim) ? av.trim : '';
+        let vd = 'u', why = 'комплектация машины не указана — задайте в «✎ Уточнить данные»';
+        if (myT) { vd = trm.includes(myT) ? 'y' : 'n'; why = myT + (vd === 'y' ? ' есть в списке' : ' отсутствует в списке'); }
+        rows.push({ k: 'Комплектации', val: trm.join(', '), vd, why });
+    }
+    const tfams = p.transmissions || [], tcodes = p.transCodes || [];
+    if (tfams.length || tcodes.length) {
+        let vd = 'u', why = 'КПП машины неизвестна';
+        if (av && (av.transCode || av.gearboxCode)) {
+            const okFam = av.transCode && tfams.includes(av.transCode);
+            const okCode = av.gearboxCode && tcodes.includes(av.gearboxCode);
+            const okFamByCode = av.gearboxCode && gearboxFamsOf(av.gearboxCode).some(f => tfams.includes(f));
+            vd = (okFam || okCode || okFamByCode) ? 'y' : 'n';
+            why = [av.transCode, av.gearboxCode].filter(Boolean).join('/') + (vd === 'y' ? ' совпадает' : ' не совпадает');
+        }
+        rows.push({ k: 'КПП', val: tfams.map(f => TRANSMISSIONS[f] || f).concat(tcodes).join(', '), vd, why });
+    } else rows.push({ k: 'КПП', val: 'все КПП', vd: (av && (av.transCode || av.gearboxCode)) ? 'y' : 'u', why: '' });
+    if ((p.prReq || []).length || (p.prNo || []).length) {
+        const pf = prFit(p);
+        rows.push({ k: 'PR-коды', val: (p.prReq || []).concat((p.prNo || []).map(x => '!' + x)).join(', '), vd: pf ? pf.cls : 'u', why: pf ? pf.label : 'PR-коды машины неизвестны' });
+    }
+    if ((p.donors || []).length) {
+        const cmp = pCompat(p);
+        rows.push({
+            k: 'Доноры (косвенно)', val: p.donors.slice(0, 5).join(', ') + (p.donors.length > 5 ? '…' : ''),
+            vd: cmp ? (cmp.cls === 'y' ? 'y' : cmp.cls === 'n' ? 'n' : 'u') : 'u',
+            why: cmp && cmp.cls !== 'u' ? cmp.label : ''
+        });
+    }
+    return rows;
+}
+function fitSummaryBadge(p) {
+    const rows = partFitReport(p);
+    if (!rows.length) return '';
+    if (rows.some(r => r.vd === 'n')) return '<span class="fit-sum n" title="Есть несовпадения с активным VIN — см. критерии ниже">✗ не подходит к вашему VIN</span>';
+    if (rows.some(r => r.vd === 'y')) return '<span class="fit-sum y" title="Все проверенные критерии сходятся с активным VIN">✓ подходит к вашему VIN</span>';
+    return '<span class="fit-sum u" title="Недостаточно данных машины для проверки">? не проверено</span>';
+}
+function fitRowsHtml(p) {
+    const rows = partFitReport(p);
+    if (!rows.length) return '<div class="dc-sub">Данных о применимости нет.</div>';
+    return '<div class="fit-rows">' + rows.map(r =>
+        '<div class="fit-row">'
+        + '<span class="fit-b ' + r.vd + '" title="' + escA(r.why || (r.vd === 'y' ? 'совпадает' : r.vd === 'n' ? 'не совпадает' : 'нет данных')) + '">' + (r.vd === 'y' ? '✓' : r.vd === 'n' ? '✗' : '—') + '</span>'
+        + '<span class="fit-k">' + esc(r.k) + '</span>'
+        + '<span class="fit-v">' + esc(r.val) + '</span></div>'
+    ).join('') + '</div>';
+}
+/* «Подходит моему VIN»: нет ни одного ✗ и есть хотя бы один ✓ */
+function fitAllCriteria(p) {
+    const rows = partFitReport(p);
+    return rows.length > 0 && !rows.some(r => r.vd === 'n') && rows.some(r => r.vd === 'y');
+}
+function tgFitOnly() {
+    if (!SV.activeVinId) { toast('Сначала выберите машину в гараже — иначе сравнивать не с чем', 'info'); return; }
+    SV.fitOnly = !SV.fitOnly;
+    sU(); updateFilterStyling(); rSB(); rC();
+    toast(SV.fitOnly ? '🎯 Показаны только позиции, подходящие вашему VIN по всем критериям' : '🎯 Фильтр применимости снят', SV.fitOnly ? 'success' : '');
+}
+
 function cH(p) {
     const o = p.oem || '';
     const anInline = (p.analogs || []).length
-        ? p.analogs.map(a => '<span class="tg an">' + esc(a) + '<button class="ctb2" data-copy="' + escA(a) + '" title="Копировать">📋</button></span>').join('')
+        ? p.analogs.map((a, ai) => {
+            const v = getVote(p, a);
+            const score = (v.ok || 0) - (v.bad || 0);
+            return '<span class="tg an' + (score >= 3 ? ' voted' : '') + '"' + (score >= 3 ? ' title="Проверено сообществом: подошёл ' + score + ' раз(а)"' : '') + '>' + esc(a)
+                + '<button class="ctb2" data-copy="' + escA(a) + '" title="Копировать">📋</button>'
+                + '<button type="button" class="vtb' + (v.my === 'ok' ? ' on' : '') + '" data-action="vote-analog" data-id="' + escA(p.id) + '" data-ai="' + ai + '" data-dir="ok" title="Подошёл (' + (v.ok || 0) + ')">👍' + (v.ok ? v.ok : '') + '</button>'
+                + '<button type="button" class="vtb' + (v.my === 'bad' ? ' on bad' : '') + '" data-action="vote-analog" data-id="' + escA(p.id) + '" data-ai="' + ai + '" data-dir="bad" title="Не подошёл (' + (v.bad || 0) + ')">👎' + (v.bad ? v.bad : '') + '</button>'
+                + '</span>';
+        }).join('')
         : '<span style="color:var(--mu);font-size:.66rem">—</span>';
     const dn = (p.donors || []).map(d => '<span class="tg dn">' + esc(d) + '</span>').join('')
         || '<span style="color:var(--mu);font-size:.72rem">— нет данных —</span>';
@@ -3607,16 +4514,16 @@ function cH(p) {
 
     return '<div class="cd' + (f ? ' fav' : '') + '" data-id="' + escA(p.id) + '">'
         + '<div class="cd-top">'
-        + '<h3 class="cd-nm">' + esc(p.name || '(без названия)') + '</h3>'
+        + '<h3 class="cd-nm">' + hl(p.name || '(без названия)') + '</h3>'
         + '<div class="cd-btns">'
         + '<button class="ctb sr' + (f ? ' on' : '') + '" data-action="favorite" title="Избранное">' + (f ? '★' : '☆') + '</button>'
         + '<button class="ctb" data-action="edit" title="Ред.">✎</button>'
         + '<button class="ctb dg" data-action="delete" title="Удалить">✕</button>'
         + '</div></div>'
         + '<div class="cd-meta">'
-        + '<span class="cd-oem-v">' + (o ? esc(o) : '— без артикула —')
+        + '<span class="cd-oem-v">' + (o ? hl(o) : '— без артикула —')
         + (o ? '<button class="cob" data-action="copy" data-oem="' + escA(o) + '" title="Копировать">📋</button>' : '')
-        + '</span>' + vb + ch
+        + '</span>' + vb + ch + prBadge(p)
         + '</div>'
         + '<div class="cd-meta cd-ans"><span class="cd-ans-lb">🔧 Аналоги:</span>' + anInline + '</div>'
         + (partsHtml
@@ -3627,13 +4534,8 @@ function cH(p) {
         + '<div class="cd-st">' + stBar + '</div>'
         + '<details class="cd-body"><summary>Подробности</summary><div class="cd-content">'
         + phh
-        + '<div class="cd-sec"><div class="cd-s-t">🚗 Применимость</div>'
-        + '<div class="rw"><span class="lb">Двигатели</span><div class="tgs">' + eng + '</div></div>'
-        + '<div class="rw"><span class="lb">Кузова</span><div class="tgs">' + bdy + '</div></div>'
-        + (gn ? '<div class="rw"><span class="lb">Поколение</span><div class="tgs">' + gn + '</div></div>' : '')
-        + (trnAll ? '<div class="rw"><span class="lb">КПП</span><div class="tgs">' + trnAll + '</div></div>' : '')
-        + (trm ? '<div class="rw"><span class="lb">Комплектации</span><div class="tgs">' + trm + '</div></div>' : '')
-        + '<div class="rw"><span class="lb">Доноры</span><div class="tgs">' + dn + '</div></div>'
+        + '<div class="cd-sec"><div class="cd-s-t">🚗 Применимость' + fitSummaryBadge(p) + '</div>'
+        + fitRowsHtml(p)
         + '</div>'
         + (ih ? '<div class="cd-sec"><div class="cd-s-t">📖 Инструкции (' + p.inst.length + ')</div>' + ih + '</div>' : '')
         + '<div class="cd-sec"><div class="cd-s-t">📝 Заметки</div>' + ntH + '</div>'
@@ -3645,6 +4547,7 @@ function oPC(id) {
     const p = D.find(x => x.id === id);
     if (!p) return;
     partmoId = id;
+    setHash('/part/' + encodeURIComponent(id));
     $('partmo_title').textContent = p.name || p.oem || 'Деталь';
     let html = cH(p);
     html = html.replace(/<button class="ctb" data-action="edit"[^>]*>✎<\/button>/, '');
@@ -3655,16 +4558,26 @@ function oPC(id) {
     if (det) det.setAttribute('open', '');
     openM('partmo');
 }
-const cPC = () => { closeM('partmo'); partmoId = null; };
+const cPC = () => { closeM('partmo'); partmoId = null; syncCatHash(); };
 
 function rSec(sid) {
     const ar = $('ca');
     const s = CUSTOM.sections[sid] || {};
+    const vc = (typeof VIRTUAL_CATS !== 'undefined' && VIRTUAL_CATS[sid]) || {};
     const rows = Array.isArray(s.rows) ? s.rows : [];
-    let h = '<h2 class="sh">' + (s.icon || '📋') + ' ' + esc(s.label || sid) + '</h2>';
+    let h = '<h2 class="sh">' + (s.icon || vc.icon || '📋') + ' ' + esc(s.label || vc.label || sid) + '</h2>';
     h += '<div class="ri"><span class="chip">всего: <b>' + rows.length + '</b></span></div>';
     if (!rows.length) {
-        h += '<div class="emp"><div class="empi">📋</div><p>Раздел пуст — заполни через импорт JSON.</p></div>';
+        if (CUSTOM.sections[sid]) {
+            h += '<div class="emp"><div class="empi">📋</div><p>Раздел пуст — заполни через импорт JSON.</p></div>';
+        } else {
+            /* ✅ 1.8.1: раздел известен сайдбару, но файл данных не доехал */
+            h += '<div class="emp"><div class="empi">📭</div>'
+                + '<p><b>Данные раздела не загружены</b></p>'
+                + '<p style="color:var(--mu);font-size:.85rem;max-width:420px;margin:6px auto 0">Обычно это кэш: приложение решило, что версия базы не менялась, и не стало скачивать <code>data/sections.json</code>. Кнопка ниже сбросит отметку версии и перечитает данные с сервера.</p>'
+                + '<button type="button" class="bn" style="margin-top:12px" onclick="forceDataReload()">🔄 Обновить данные</button>'
+                + '</div>';
+        }
         ar.innerHTML = h; return;
     }
     const cols = s.cols || [];
@@ -3675,12 +4588,27 @@ function rSec(sid) {
     h += '<tbody>';
     for (const r of rows) {
         const cells = Array.isArray(r) ? r : cols.map(c => (r && r[c] != null) ? r[c] : '');
-        h += '<tr>' + cells.map(c =>
-            '<td style="padding:7px 10px;border-bottom:1px solid var(--bd);vertical-align:top">' + esc(String(c == null ? '' : c)) + '</td>'
-        ).join('') + '</tr>';
+        h += '<tr>' + cells.map(c => {
+            const cs = String(c == null ? '' : c);
+            /* ячейка-ссылка: «метка|url» или голый url */
+            const m = cs.match(/^(.+?)\|(https?:\/\/\S+)$/);
+            const inner = m
+                ? '<a href="' + escA(m[2]) + '" target="_blank" rel="noopener noreferrer" style="color:var(--a)">' + esc(m[1]) + ' ↗</a>'
+                : (/^https?:\/\//.test(cs)
+                    ? '<a href="' + escA(cs) + '" target="_blank" rel="noopener noreferrer" style="color:var(--a);word-break:break-all">' + esc(cs) + '</a>'
+                    : esc(cs));
+            return '<td style="padding:7px 10px;border-bottom:1px solid var(--bd);vertical-align:top">' + inner + '</td>';
+        }).join('') + '</tr>';
     }
     h += '</tbody></table></div>';
     ar.innerHTML = h;
+}
+
+/* ✅ 1.8.1: «Обновить данные» — сбрасывает записанную версию базы
+   и перезагружает страницу: lAll() гарантированно сходит в сеть */
+function forceDataReload() {
+    try { localStorage.removeItem('vw_polo_data_ver'); } catch (e) { }
+    try { if (typeof location !== 'undefined' && location.reload) location.reload(); } catch (e) { }
 }
 
 function rET(parts) {
@@ -3745,7 +4673,7 @@ function rET(parts) {
                 else if (p.status === 'bought') pm = ' 📦';
                 else if (p.status === 'installed') pm = ' ✅';
                 let nm = p.notes ? ' 📝' : '';
-                h += '<div class="ep" data-id="' + escA(p.id) + '"><span class="om">' + esc(p.oem || '—') + '</span><span class="nm">' + esc(p.name || '') + pm + nm + w + sm + '</span></div>';
+                h += '<div class="ep" data-id="' + escA(p.id) + '"><span class="om">' + hl(p.oem || '—') + '</span>' + prBadge(p) + '<span class="nm">' + hl(p.name || '') + pm + nm + w + sm + '</span></div>';
             }
             h += '</div></details>';
         }
@@ -3829,6 +4757,8 @@ function oCC(e) {
         if (k === 'groupBySub') {
             SV.groupBySub = !SV.groupBySub;
             sU(); rC();
+        } else if (k === 'fitOnly') {
+            tgFitOnly();
         } else if (k === 'vinStrict') {
             SV.vinStrictFilter = !SV.vinStrictFilter;
             sU(); rGar(); rSB(); rC();
@@ -3879,6 +4809,48 @@ function oCC(e) {
         if ($('ca')) $('ca').scrollTop = sc;
         return;
     }
+    const sch = e.target.closest('[data-action="scheme"]');
+    if (sch) {
+        e.stopPropagation();
+        const sp = D.find(x => x.id === sch.dataset.id);
+        if (sp) oScheme(sp.cat, (sp.sub || '').trim());
+        return;
+    }
+    const va = e.target.closest('[data-action="vote-analog"]');
+    if (va) {
+        e.stopPropagation();
+        const p = D.find(x => x.id === va.dataset.id);
+        if (p && p.analogs && p.analogs[+va.dataset.ai] !== undefined) {
+            setVote(p, p.analogs[+va.dataset.ai], va.dataset.dir === 'bad' ? 'bad' : 'ok');
+            if (partmoId === p.id) oPC(p.id);
+            rC();
+        }
+        return;
+    }
+    const dk = e.target.closest('[data-action="dash-km"]');
+    if (dk) {
+        e.stopPropagation();
+        const inp = $('dashKm');
+        const v = inp && inp.value !== '' ? Math.max(0, parseInt(inp.value, 10)) : NaN;
+        if (isNaN(v)) { toast('Введите пробег числом', 'danger'); return; }
+        TO.km = v;
+        sTOStorage(); rTOWidget(); rDash();
+        toast(' Пробег обновлён: ' + v.toLocaleString('ru-RU') + ' км', 'success');
+        return;
+    }
+    const dn = e.target.closest('[data-action="dash-notify"]');
+    if (dn) { e.stopPropagation(); askToNotify(); return; }
+    const dp = e.target.closest('[data-action="dash-part"]');
+    if (dp) { e.stopPropagation(); oPC(dp.dataset.id); return; }
+    const oo = e.target.closest('[data-action="open-oem"]');
+    if (oo) {
+        e.stopPropagation();
+        const np = findByOem(oo.dataset.oem);
+        if (np) oPC(np.id); else toast('Артикул ' + oo.dataset.oem + ' в каталоге не найден', 'info');
+        return;
+    }
+    const mk = e.target.closest('[data-action="maint-kit"]');
+    if (mk) { e.stopPropagation(); maintAddAllToShop(); return; }
     const mop = e.target.closest('[data-action="maint-open"]');
     if (mop) { e.stopPropagation(); oPC(mop.dataset.id); return; }
     const mfv = e.target.closest('[data-action="maint-fav"]');
@@ -3929,6 +4901,7 @@ function oCC(e) {
     if (tp && tp.dataset.id) oPC(tp.dataset.id);
 }
 function tF(id) {
+    if (pubGuard()) return;
     const p = D.find(x => x.id === id); if (!p) return;
     p.favorite = !p.favorite;
     useIDB ? iPut(SP, p).catch(() => { }) : sD();
@@ -3939,6 +4912,7 @@ function tF(id) {
     if (p.favorite) window.ymGoal && window.ymGoal('favorite_added');
 }
 function sPS(id, st) {
+    if (pubGuard()) return;
     const p = D.find(x => x.id === id);
     if (!p || !['want', 'bought', 'installed'].includes(st)) return;
     const same = p.status === st;
@@ -4008,7 +4982,7 @@ function oAM() {
     $('f_id').value = '';
     $('f_cat').value = (SV.activeCat !== 'All' && SV.activeCat !== 'Favorites' && SV.activeCat !== 'Workshops' && SV.activeCat !== 'Log')
         ? SV.activeCat : 'Engine';
-    ['f_name', 'f_oem', 'f_an', 'f_dn', 'f_pr', 'f_su', 'f_notes', 'f_eng', 'f_trn', 'f_trnc', 'f_bdy', 'f_trm', 'f_gen'].forEach(id => { if ($(id)) $(id).value = ''; });
+    ['f_name', 'f_oem', 'f_an', 'f_dn', 'f_pr', 'f_su', 'f_notes', 'f_eng', 'f_trn', 'f_trnc', 'f_bdy', 'f_trm', 'f_gen', 'f_prreq', 'f_sup_oem'].forEach(id => { if ($(id)) $(id).value = ''; });
     $('f_ver').checked = false; $('f_cu').value = 'RUB'; $('f_sts').value = ''; $('f_fav').value = '0';
     $('ie').innerHTML = ''; aIR('proc', '');
     uPP(); rPH([]);
@@ -4025,6 +4999,8 @@ function oEM(id) {
     $('f_oem').value = p.oem || '';
     $('f_ver').checked = !!p.verified;
     $('f_an').value = (p.analogs || []).join(', ');
+    if ($('f_prreq')) $('f_prreq').value = [].concat(p.prReq || [], (p.prNo || []).map(x => '!' + x)).join(', ');
+    if ($('f_sup_oem')) $('f_sup_oem').value = p.sup || '';
     $('f_dn').value = (p.donors || []).join(', ');
     $('f_eng').value = (p.engines || []).join(', ');
     $('f_trn').value = (p.transmissions || []).join(', ');
@@ -4049,10 +5025,16 @@ function oEM(id) {
 const cM = () => { $('mo').classList.remove('show'); edId = null; pPhs = []; };
 
 function sPt() {
+    if (pubGuard()) return;
     const name = $('f_name').value.trim(), cat = $('f_cat').value;
     if (!name) { toast('Введите название', 'danger'); $('f_name').focus(); return; }
     const oem = $('f_oem').value.trim(), verified = $('f_ver').checked;
     const analogs = sl($('f_an').value), donors = sl($('f_dn').value);
+    /* PR-применимость и supersession */
+    const prTokens = sl($('f_prreq') ? $('f_prreq').value : '').map(s => s.toUpperCase());
+    const prReq = prTokens.filter(x => x[0] !== '!');
+    const prNo = prTokens.filter(x => x[0] === '!').map(x => x.slice(1));
+    const sup = $('f_sup_oem') ? $('f_sup_oem').value.trim().toUpperCase() : '';
     const engsRaw = sl($('f_eng').value).map(s => s.toUpperCase());
     const engs = engsRaw.filter(x => ENGINES[x]);
     const engsIgnored = engsRaw.filter(x => !ENGINES[x]);
@@ -4096,6 +5078,7 @@ function sPt() {
         D[i] = Object.assign({}, o, {
             cat, sub: o.sub || '', name, oem, verified, analogs, donors,
             engines: engs, bodies: bdys, transmissions: trns, transCodes: trcs, trims: trms, gens,
+            prReq, prNo, sup,
             price, currency, status, favorite, notes, shopUrl, inst, photos: photosArr,
             priceHistory: h
         });
@@ -4106,6 +5089,7 @@ function sPt() {
         const np = {
             id: uid(), cat, sub: '', name, oem, verified, analogs, donors,
             engines: engs, bodies: bdys, transmissions: trns, transCodes: trcs, trims: trms, gens,
+            prReq, prNo, sup,
             price, currency, status, favorite, notes, shopUrl, inst, photos: photosArr, priceHistory: []
         };
         D.push(np);
@@ -4117,6 +5101,7 @@ function sPt() {
     rSB(); rC(); cM();
 }
 function dPt(id) {
+    if (pubGuard()) return;
     const p = D.find(x => x.id === id); if (!p) return;
     if (!confirm('Удалить «' + (p.name || p.oem || 'без названия').replace(/["'«»]/g, '') + '»?')) return;
     const idx = D.findIndex(x => x.id === id);
@@ -4665,8 +5650,8 @@ function sTO() {
 }
 
 /* ============ СПИСОК ПОКУПОК ============ */
-function oShopList() {
-    shopPick = new Set();
+function oShopList(keep) {
+    if (!keep) shopPick = new Set();
     const t = nextTO();
     const candidates = D.filter(p => {
         if (p.cat === 'Maintenance') return false;
@@ -4818,6 +5803,14 @@ function iPWA() {
         fav.rel = 'icon'; fav.href = ic;
         document.head.appendChild(fav);
     } catch (e) { }
+    /* Оффлайн: Service Worker кэширует оболочку и данные (см. sw.js) */
+    try {
+        if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+            navigator.serviceWorker.register('sw.js').catch(() => { });
+        }
+    } catch (e) { }
+    window.addEventListener('online', () => toast('📶 Сеть восстановлена', 'success'));
+    window.addEventListener('offline', () => toast('📴 Оффлайн: работаю на закэшированных данных', 'info'));
 }
 
 /* ============ ВНЕШНЯЯ БАЗА ОСНАЩЕНИЯ ПО VIN (data/vin-db.json) ============
@@ -4830,7 +5823,14 @@ function vinDbLoad() {
     const base = location.origin + location.pathname.replace(/[^/]*$/, '');
     VINDB.promise = (async () => {
         try {
-            const r = await fetch(base + 'data/vin-db.json', { cache: 'no-store' });
+            let r = await fetch(base + 'data/vin-db.json', { cache: 'no-store' });
+            if (!r.ok) {
+                /* Боевой базы нет (локальный запуск, чистая установка): грузим
+                   пример формата, чтобы «Оснащение (PR)» можно было пощупать
+                   без дампа. На проде с реальным vin-db.json ветка не трогается. */
+                r = await fetch(base + 'data/vin-db.example.json', { cache: 'no-store' });
+                if (r.ok) VINDB.example = true;
+            }
             if (r.ok) {
                 const arr = await r.json();
                 VINDB.map = new Map();
@@ -4841,6 +5841,11 @@ function vinDbLoad() {
             const r2 = await fetch(base + 'data/pr-codes.json', { cache: 'no-store' });
             if (r2.ok) VINDB.pr = await r2.json();
         } catch (e) { VINDB.pr = null; }
+        /* Русские описания PR-кодов (переопределяют английские из pr-codes.json) */
+        try {
+            const r3 = await fetch(base + 'data/pr-codes-ru.json', { cache: 'no-store' });
+            if (r3.ok) VINDB.prRu = await r3.json();
+        } catch (e) { VINDB.prRu = null; }
         return VINDB.map;
     })();
     return VINDB.promise;
@@ -4927,6 +5932,21 @@ function oVIN() {
     $('v_equip').value = av.equipCode || '';
     $('v_bodycolor').value = av.bodyColor || '';
     $('v_roofcolor').value = av.roofColor || '';
+    /* Поколение и комплектация: вручную + автоподстановка поколения по VIN */
+    const genSel = $('v_gen');
+    if (genSel) {
+        genSel.innerHTML = '<option value="">— неизвестно —</option>'
+            + Object.keys(GENERATIONS).map(k => '<option value="' + escA(k) + '">' + esc(GENERATIONS[k]) + '</option>').join('')
+            + '<option value="6V">6V — Classic/Variant (платформа 6K)</option>'
+            + '<option value="9K">9K — Caddy</option><option value="9U">9U — Caddy Pickup</option>';
+        genSel.value = av.gen || '';
+        if (!genSel.value) { const dd = vD(av.vin); if (dd && dd.ok && dd.gen) genSel.value = dd.gen; }
+    }
+    const trimSel = $('v_trim');
+    if (trimSel) {
+        trimSel.innerHTML = '<option value="">— неизвестно —</option>' + TRIMS.map(x => '<option value="' + escA(x) + '">' + esc(x) + '</option>').join('');
+        trimSel.value = av.trim || '';
+    }
     lafBindPickers();
     openM('vinmo');
 }
@@ -5128,6 +6148,7 @@ function onGbCodeInput() {
 }
 const cVIN = () => { closeM('vinmo'); vinEdId = null; };
 function sVIN() {
+    if (pubGuard()) return;
     if (!vinEdId) return;
     const g = G.find(x => x.id === vinEdId);
     if (!g) return;
@@ -5144,6 +6165,8 @@ function sVIN() {
         if (fs.length) g.transCode = fs[0];
     }
     g.equipCode = $('v_equip').value.trim();
+    g.gen = $('v_gen') ? $('v_gen').value : '';
+    g.trim = $('v_trim') ? $('v_trim').value : '';
     g.bodyColor = $('v_bodycolor').value.trim().toUpperCase();
     g.roofColor = $('v_roofcolor').value.trim().toUpperCase();
     // Мягкая проверка: код не из справочника для выбранного мотора — не ошибка, но повод сверить
@@ -5192,10 +6215,36 @@ function oPR(gid) {
     if (!row) { toast('Этого VIN нет в базе оснащения', 'info'); return; }
     const hasEquip = !!(row.engine || row.gearbox || row.gearbox_code || row.paint || row.prod_date || (Array.isArray(row.pr) && row.pr.length));
     if (!hasEquip) {
-        /* VIN есть в фильтрованном списке дампа ETKA, но запись «пустая»:
-           полные данные оснащения ещё не извлечены из исходных файлов. */
-        $('prmo_body').innerHTML = '<div class="gb-hint">VIN <b>' + esc(g.vin) + '</b> найден в базе (дамп ETKA), но данных об оснащении в записи пока нет.</div>'
-            + '<p style="font-size:.82rem;color:var(--mu);line-height:1.6;margin-top:10px">Список VIN собран из дампа (см. <b>vin-db.meta.json</b>), а содержимое карточек — мотор, КПП, краска, PR-коды — извлекается из исходных файлов отдельно. После генерации полного <b>data/vin-db.json</b> здесь появится оснащение, а поля в «✎ Уточнить данные» будут заполняться автоматически.</p>';
+        /* VIN есть в фильтрованном списке дампа ETKA, но запись «пустая».
+           Вместо тупика показываем всё, что известно: декодирование самого
+           VIN (модель/год/завод/серия) + то, что пользователь указал в гараже,
+           и быстрые действия. */
+        const d = vD(g.vin);
+        let h = '<div class="gb-hint">VIN <b>' + esc(g.vin) + '</b> найден в базе (дамп ETKA), но оснащение в записи пока не извлечено.</div>';
+        const rows = [];
+        if (d && d.ok) {
+            rows.push(['Модель по VIN', [d.model, d.gen ? '(' + d.gen + ')' : ''].filter(Boolean).join(' ')]);
+            if (d.year) rows.push(['Год выпуска', String(d.year) + ' (буква года «' + String(g.vin).charAt(9) + '»)']);
+            if (d.plant) rows.push(['Завод', d.plant + (d.plantCountry ? ' (' + d.plantCountry + ')' : '')]);
+            if (d.serial) rows.push(['Серийный №', d.serial + '-й с конвейера']);
+            if (d.note) rows.push(['Примечание', d.note]);
+        }
+        if (g.engineCode) rows.push(['Мотор (из гаража)', g.engineCode + (ENGINES[g.engineCode] ? ' — ' + ENGINES[g.engineCode].v + ' ' + ENGINES[g.engineCode].hp + ' л.с.' : '')]);
+        if (g.transCode || g.gearboxCode) rows.push(['КПП (из гаража)', [g.transCode, g.gearboxCode].filter(Boolean).join(' / ')]);
+        const colB = lafColor(g.bodyColor);
+        if (g.bodyColor) rows.push(['Цвет (из гаража)', colB ? colB.ru + ' (' + g.bodyColor + ')' : g.bodyColor]);
+        if (g.prodDate) rows.push(['Дата производства (из гаража)', g.prodDate]);
+        h += '<div class="pr-empty-box"><div class="pr-empty-h">🔎 Что известно об этой машине</div>';
+        if (rows.length) rows.forEach(r => { h += '<div class="pr-empty-row"><span class="pr-empty-k">' + esc(r[0]) + '</span><span class="pr-empty-v">' + esc(r[1]) + '</span></div>'; });
+        else h += '<div class="pr-empty-row"><span class="pr-empty-v">Пока ничего — уточните данные вручную.</span></div>';
+        h += '</div>';
+        h += '<div class="pr-empty-actions">'
+            + '<button class="bn p" type="button" onclick="cPR();oVIN()">✎ Уточнить данные</button>'
+            + '<button class="bn" type="button" onclick="cPR();showPlateLocation(\'' + escA(g.id) + '\')">📍 Где коды</button>'
+            + '<button class="bn" type="button" onclick="cPR();showVinQR(\'' + escA(g.id) + '\')">📱 QR-код</button>'
+            + '</div>';
+        h += '<p class="pr-note">Полное оснащение (мотор, КПП, краска, PR-коды) появится здесь после генерации <b>data/vin-db.json</b> из исходных файлов дампа — инструкция в <b>vin-dump/README.md</b>. Мотор и КПП можно указать вручную («✎ Уточнить данные») — каталог и списки ТО сразу сузятся под эту машину.</p>';
+        $('prmo_body').innerHTML = h;
         $('prmo_title').textContent = '📋 Оснащение · …' + g.vin.slice(-6);
         openM('prmo');
         return;
@@ -5220,7 +6269,7 @@ function oPR(gid) {
                 + '<span class="pr-cat-ico">' + cat.icon + '</span><span>' + esc(cat.label) + '</span>'
                 + '<span class="pr-count">' + codes.length + '</span></summary><div class="pr-group-body">';
             codes.forEach(c => {
-                const desc = (VINDB.pr && VINDB.pr[c]) || '';
+                const desc = (VINDB.prRu && VINDB.prRu[c]) || (VINDB.pr && VINDB.pr[c]) || '';
                 const search = nz(c + ' ' + desc);
                 h += '<div class="pr-row' + (desc ? '' : ' unknown') + '" data-prs="' + escA(search) + '">'
                     + '<span class="pr-code">' + esc(c) + '</span>'
@@ -5230,6 +6279,7 @@ function oPR(gid) {
         });
         h += '</div>';
         h += '<p class="pr-note">💡 Классификация по первой цифре PR-кода ориентировочная: у VAG один блок может содержать коды разного назначения.</p>';
+        if (VINDB.example) h += '<p class="pr-note">ℹ️ Загружен пример данных (data/vin-db.example.json), а не боевая база оснащения.</p>';
     } else {
         h += '<p style="font-size:.8rem;color:var(--mu)">PR-кодов в записи нет.</p>';
     }
@@ -5448,6 +6498,7 @@ async function init() {
     bindUI();
     updSearchSuggest();
     rTOWidget();
+    fireToReminder();
     iPWA();
     fCS();
     /* Схема первого запуска: 1) лицензия (гейт до init), 2) путеводитель FAQ,
@@ -5456,6 +6507,9 @@ async function init() {
     checkWhatsNew(onb);
     // Внешняя база оснащения по VIN грузится асинхронно и не блокирует старт
     vinDbLoad();
+    // Диплинк из URL (#/part/…, #/cat/…, #/vin/…, #/maint/…)
+    routeHash();
+    _hashReady = true;
 }
 /* ====== НОВЫЕ КНОПКИ КАРТОЧКИ VIN ======
    Расходники под VIN: мотор + КПП (семейство и буквенный код) + кузов.
@@ -5500,6 +6554,7 @@ function showMaintenanceForVin(gid) {
     const g = G.find(x => x.id === gid); if (!g) return;
     window._maintViewGid = gid;
     window._maintActive = true;
+    setHash('/maint/' + encodeURIComponent(gid));
     const collapsedMap = window._maintCollapsed || (window._maintCollapsed = {});
     const allMode = !!window._maintAll;
     const gb = normGb(g.gearboxCode);
@@ -5512,6 +6567,7 @@ function showMaintenanceForVin(gid) {
     };
 
     let maintParts, grouped, order;
+    window._maintIds = [];
     if (allMode) {
         /* Предохранитель: «вся база под VIN» — широкие категории, как раньше */
         const maintCats = ['Maintenance', 'Fluids', 'Engine', 'Fuel', 'Ignition', 'Cooling', 'Brakes', 'Suspension', 'Transmission', 'Tires'];
@@ -5528,6 +6584,7 @@ function showMaintenanceForVin(gid) {
         Object.keys(grouped).forEach(id => { if (!order.includes(id)) order.push(id); });
     }
     order.forEach(id => grouped[id].sort((a, b) => _maintWeight(a) - _maintWeight(b) || String(a.name || '').localeCompare(String(b.name || ''), 'ru')));
+    window._maintIds = maintParts.map(p => p.id);
 
     const nWant = maintParts.filter(p => p.status === 'want').length;
     const nBought = maintParts.filter(p => p.status === 'bought').length;
@@ -5537,6 +6594,7 @@ function showMaintenanceForVin(gid) {
         + '<button class="bn" data-action="maint-back" title="Вернуться в каталог">← Каталог</button>'
         + '<h2 class="sh" style="margin:0">🛒 ' + (allMode ? 'Вся база под VIN' : 'Расходники для ТО') + '</h2>'
         + (maintParts.length ? '<button class="bn" data-action="maint-tgl-all" title="Свернуть или развернуть все разделы">⇕ Разделы</button>' : '')
+        + (maintParts.length ? '<button class="bn" data-action="maint-kit" title="Добавить все позиции списка в список покупок на ТО">🛒 В список</button>' : '')
         + '<button class="bn maint-mode" data-action="maint-all" title="' + (allMode ? 'Вернуться к списку расходников' : 'Показать вообще все подходящие позиции каталога') + '">' + (allMode ? '🛒 Только расходники' : '🗂 Вся база под VIN') + '</button>'
         + '</div>';
     h += '<div class="ri">'
@@ -5592,6 +6650,7 @@ function showMaintenanceForVin(gid) {
 /* Статус из списка расходников: пишет в карточку детали, как sPS,
    но перерисовывает список расходников, а не весь каталог. */
 function maintSetStatus(gid, id, st) {
+    if (pubGuard()) return;
     const p = D.find(x => x.id === id);
     if (!p || !['want', 'bought', 'installed'].includes(st)) return;
     const same = p.status === st;
@@ -5612,6 +6671,7 @@ function maintRerender() {
 }
 /* Избранное из списка расходников (как tF, но без перерисовки каталога) */
 function maintToggleFav(id) {
+    if (pubGuard()) return;
     const p = D.find(x => x.id === id); if (!p) return;
     p.favorite = !p.favorite;
     useIDB ? iPut(SP, p).catch(() => { }) : sD();
@@ -5628,6 +6688,14 @@ function maintToggleAllGroups() {
     const anyOpen = keys.some(k => !window._maintCollapsed[k]);
     keys.forEach(k => { window._maintCollapsed[k] = anyOpen; });
     maintRerender();
+}
+/* Весь текущий список расходников — в список покупок на ТО */
+function maintAddAllToShop() {
+    const ids = window._maintIds || [];
+    if (!ids.length) { toast('Список пуст — добавлять нечего', 'danger'); return; }
+    shopPick = new Set(ids);
+    toast('🛒 В список покупок добавлено: ' + ids.length, 'success');
+    oShopList(true);   // не сбрасывать только что наполненный набор
 }
 
 function showVinQR(gid) {
@@ -5955,7 +7023,14 @@ function bindUI() {
     si.value = SV.searchQuery || '';
     uSC();
 
-    si.addEventListener('input', e => { SV.searchQuery = e.target.value; uSC(); sUS(); dRC(); });
+    si.addEventListener('input', e => {
+        let v = e.target.value;
+        if (v.indexOf('🕘 ') === 0) { v = v.slice(2); si.value = v; }   // выбор из «недавних»
+        SV.searchQuery = v; uSC(); sUS(); dRC();
+    });
+    si.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { const q = (si.value || '').trim(); if (q.length >= 3) pushRecentQ(q); }
+    });
     $('sf').addEventListener('change', e => { SV.statusFilter = e.target.value; sU(); rSB(); rC(); });
     $('ss').addEventListener('change', e => { SV.sortBy = e.target.value; sU(); rC(); });
 
@@ -6120,7 +7195,7 @@ function bindUI() {
         logmo: cLog, tomo: cTO, shopmo: cShop, vinmo: cVIN, thememmo: cTheme,
         faqmo: cFaq, prmo: cPR, apkmo: () => closeM('apkmo'),
         confirmmo: () => cConfirm(false), expmo: cExp, qrmo: () => closeM('qrmo'),
-        platemmo: () => closeM('platemmo'), issmo: cIss
+        platemmo: () => closeM('platemmo'), issmo: cIss, schmo: cSch, scanmo: cScan
     };
     Object.keys(modalClose).forEach(id => {
         const el = $(id); if (!el) return;
@@ -6128,6 +7203,14 @@ function bindUI() {
     });
 
     document.addEventListener('keydown', e => {
+        /* Ctrl+K (или «/» вне полей ввода) — фокус в поиск, как в больших каталогах */
+        const tag = String((e.target && e.target.tagName) || '');
+        if (((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K' || e.key === 'л' || e.key === 'Л'))
+            || (e.key === '/' && !/^(input|textarea|select)$/i.test(tag))) {
+            e.preventDefault();
+            const s = $('sr'); if (s) { s.focus(); s.select(); }
+            return;
+        }
         if ($('lbt').classList.contains('show')) {
             if (e.key === 'ArrowLeft') { e.preventDefault(); lbNav(-1); return; }
             if (e.key === 'ArrowRight') { e.preventDefault(); lbNav(1); return; }
