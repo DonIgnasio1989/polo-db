@@ -431,8 +431,13 @@ def build_record(rec, extra_map, pr_dict, stats):
             out[key] = val
     paint = pick(rec, 'paint', extra_map) or rec.get('paint', '')
     if paint:
-        if len(paint) > 2:
-            out['paint'], out['trim'] = paint[:2], paint[2:]
+        if len(paint) >= 6:
+            # колонка дампа ETKA = кузов + крыша + код оснащения (J2J241 = J2 / J2 / 41)
+            out['paint'], out['roof_color'], out['equip_code'] = paint[:2], paint[2:4], paint[4:6]
+            out['trim'] = paint[2:6]   # совместимость со старыми версиями сайта
+        elif len(paint) == 4:
+            out['paint'], out['roof_color'] = paint[:2], paint[2:]
+            out['trim'] = paint[2:]
         else:
             out['paint'] = paint
     tcode = rec.get('type', '')
@@ -491,6 +496,9 @@ def main():
     ap.add_argument('--columns', default='',
                     help='роли полей беззаголовочных строк: vin,type,paint,engine,id,gkb,skip,date,skip,year,pr')
     ap.add_argument('--pr-dict', default='', help='путь к словарю PR-кодов (по умолчанию ../data/pr-codes.json)')
+    ap.add_argument('--update-pr-dict', nargs='?', const='', default=None,
+                    help='дописать в словарь pr-codes.json все PR-коды из собранных записей '
+                         '(новые коды — с пустым описанием); значение — путь к словарю, по умолчанию где лежит')
     ap.add_argument('--limit', type=int, default=0, help='остановиться после N найденных VIN (проба)')
     ap.add_argument('-v', '--verbose', action='store_true')
     args = ap.parse_args()
@@ -618,6 +626,28 @@ def main():
             if sql_con:
                 sql_con.commit()
                 sql_con.close()
+
+    # Дописываем все встреченные PR-коды в словарь (описания можно заполнить позже)
+    if args.update_pr_dict is not None and not args.scan_only:
+        dict_path = args.update_pr_dict or pr_path
+        union = []
+        for r in store.values():
+            for c in (r['pr'] if isinstance(r.get('pr'), list) else []):
+                if c not in union:
+                    union.append(c)
+        added = [c for c in union if c not in pr_dict]
+        for c in added:
+            pr_dict[c] = ''
+        try:
+            with io.open(dict_path, 'w', encoding='utf-8') as f:
+                json.dump(pr_dict, f, ensure_ascii=False, indent=1)
+            print('  PR-словарь: кодов %d, добавлено новых %d -> %s' % (len(pr_dict), len(added), dict_path))
+            if added:
+                print('    новые: %s' % ', '.join(sorted(added)[:24]) + (' …' if len(added) > 24 else ''))
+        except OSError as e:
+            print('  ! не удалось записать словарь: %s' % e, file=sys.stderr)
+        stats['pr_union'] = len(union)
+        stats['pr_added'] = len(added)
 
     meta = {'generated': time.strftime('%Y-%m-%dT%H:%M:%S'),
             'input': args.input, 'include_donors': bool(args.include_donors),

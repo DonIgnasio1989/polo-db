@@ -1,4 +1,3 @@
-
 /* ============================================================
    VW Polo / Caddy 6N — База Мастера · Redesign v22 (clean)
    ============================================================ */
@@ -6513,4 +6512,1098 @@ body.theme-light .em-title {
 
 .rSec td {
     white-space: pre-line;
-}
+}
+
+/* ====== НОВЫЕ ЭЛЕМЕНТЫ КАРТОЧКИ VIN ====== */
+.gi-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.gi-btn {
+    padding: 8px 10px;
+    background: var(--hv);
+    border: 1px solid var(--bd);
+    border-radius: 6px;
+    font-size: .76rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--tr);
+    text-align: center;
+    color: var(--tx);
+}
+
+.gi-btn:hover {
+    background: var(--a);
+    color: #fff;
+    border-color: var(--a);
+    transform: translateY(-1px);
+}
+
+.gi-btn-primary {
+    background: var(--a);
+    color: #fff;
+    border-color: var(--a);
+}
+
+.gi-btn-primary:hover {
+    background: var(--a-h);
+}
+
+.vin-color-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: .82rem;
+}
+
+.vin-color-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    border: 1px solid var(--bd);
+}
+
+.vin-color-name {
+    color: var(--tx);
+    font-weight: 500;
+}
+
+.vin-week-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    font-size: .82rem;
+    color: var(--mu);
+    flex-wrap: wrap;
+}
+
+.vin-week-label {
+    font-weight: 600;
+    color: var(--tx);
+}
+
+.vin-serial {
+    font-family: var(--ff-mono);
+    font-size: .75rem;
+    background: var(--hv);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--tx);
+}
+
+.vin-engine-details {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--bd);
+}
+
+.vin-engine-code {
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--a);
+    font-family: var(--ff-mono);
+}
+
+.vin-engine-spec {
+    font-size: .82rem;
+    color: var(--tx);
+}
+
+.vin-engine-tech {
+    font-size: .75rem;
+    color: var(--mu);
+    font-style: italic;
+}
+
+.vin-trans-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: .82rem;
+    flex-wrap: wrap;
+}
+
+.vin-trans-label {
+    font-weight: 600;
+    color: var(--tx);
+}
+
+.vin-trans-code {
+    font-family: var(--ff-mono);
+    font-weight: 700;
+    color: var(--a);
+}
+
+.vin-trans-name {
+    color: var(--mu);
+    font-size: .75rem;
+}
+
+.vin-issues {
+    margin-top: 12px;
+    padding: 10px;
+    background: var(--hv);
+    border-radius: 6px;
+    border-left: 3px solid var(--wn);
+}
+
+.vin-issues-title {
+    font-weight: 700;
+    font-size: .82rem;
+    margin-bottom: 8px;
+    color: var(--wn);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vin-issue {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: .78rem;
+    border-bottom: 1px solid var(--bd);
+    flex-wrap: wrap;
+}
+
+.vin-issue:last-child {
+    border-bottom: none;
+}
+
+.vin-issue.high {
+    border-left: 3px solid var(--dg);
+    padding-left: 8px;
+}
+
+.vin-issue.medium {
+    border-left: 3px solid var(--wn);
+    padding-left: 8px;
+}
+
+.vin-issue.low {
+    border-left: 3px solid var(--ok);
+    padding-left: 8px;
+}
+
+.vin-issue-source {
+    font-weight: 600;
+    color: var(--a);
+    min-width: 50px;
+    font-family: var(--ff-mono);
+    font-size: .72rem;
+}
+
+.vin-issue-text {
+    flex: 1;
+    color: var(--tx);
+    min-width: 200px;
+}
+
+.vin-issue-year {
+    font-size: .7rem;
+    color: var(--mu);
+    font-style: italic;
+}
+
+.pr-group {
+    margin-bottom: 12px;
+    border: 1px solid var(--bd);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.pr-group-header {
+    padding: 10px 12px;
+    background: var(--hv);
+    font-weight: 700;
+    font-size: .88rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--tx);
+}
+
+.pr-count {
+    margin-left: auto;
+    background: var(--a);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: .75rem;
+}
+
+.pr-group-body {
+    padding: 8px 12px;
+}
+
+.pr-row {
+    display: flex;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--bd);
+    font-size: .82rem;
+    align-items: baseline;
+}
+
+.pr-row:last-child {
+    border-bottom: none;
+}
+
+.pr-row.unknown {
+    opacity: .6;
+    font-style: italic;
+}
+
+.pr-code {
+    font-family: var(--ff-mono);
+    font-weight: 700;
+    color: var(--a);
+    min-width: 60px;
+    flex-shrink: 0;
+}
+
+.pr-desc {
+    flex: 1;
+    color: var(--tx);
+}
+/* ════════════════════════════════════════════════════════════
+   v1.8.0 — карточка VIN: палитра LAF, PR-группы, расходники ТО,
+   превью гаража, QR, экспорт
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Выбор цвета кузова (LAF-пикер) ─────────────────────── */
+.laf-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.laf-wrap input {
+    flex: 1;
+    min-width: 0;
+    text-transform: uppercase;
+}
+
+.laf-swatch {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    border: 1px solid var(--bd);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .25);
+    flex-shrink: 0;
+}
+
+.laf-swatch.on {
+    border-color: var(--a);
+}
+
+.laf-swatch.unk {
+    background: repeating-linear-gradient(45deg, var(--hv), var(--hv) 3px, transparent 3px, transparent 6px) !important;
+    border-style: dashed;
+}
+
+.laf-btn {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    border: 1px solid var(--bd);
+    background: var(--cd-2);
+    color: var(--tx);
+    cursor: pointer;
+    font-size: .9rem;
+    line-height: 1;
+    transition: border-color var(--tr-fast), transform var(--tr-fast);
+}
+
+.laf-btn:hover {
+    border-color: var(--a);
+    transform: scale(1.06);
+}
+
+.laf-hint {
+    min-height: 1.2em;
+    margin-top: 4px;
+}
+
+.laf-pop {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 60;
+    width: min(320px, calc(100vw - 48px));
+    background: var(--cd);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-md);
+    box-shadow: var(--sh-lg);
+    padding: 8px;
+}
+
+.laf-pop.show {
+    display: block;
+}
+
+.laf-search {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 6px;
+}
+
+.laf-list {
+    max-height: 240px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.laf-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 5px 6px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--tx);
+    font-size: .8rem;
+    cursor: pointer;
+    text-align: left;
+}
+
+.laf-item:hover {
+    background: var(--hv);
+}
+
+.laf-sw {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1px solid var(--bd);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .2);
+    flex-shrink: 0;
+}
+
+.laf-code {
+    font-family: var(--ff-mono);
+    font-weight: 700;
+    color: var(--a);
+    min-width: 38px;
+}
+
+.laf-name {
+    flex: 1;
+    color: var(--tx);
+}
+
+/* ── Оснащение (PR): тулбар и группы ────────────────────── */
+.pr-toolbar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+
+.pr-filter {
+    flex: 1;
+    min-width: 160px;
+}
+
+.pr-toolbar-btns {
+    display: flex;
+    gap: 6px;
+}
+
+.pr-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pr-group summary.pr-group-header {
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+.pr-group summary.pr-group-header::-webkit-details-marker {
+    display: none;
+}
+
+.pr-group summary.pr-group-header::before {
+    content: '▸';
+    color: var(--mu);
+    font-size: .8rem;
+    transition: transform var(--tr-fast);
+    margin-right: 2px;
+}
+
+.pr-group[open] summary.pr-group-header::before {
+    transform: rotate(90deg);
+}
+
+.pr-group summary.pr-group-header:hover {
+    background: var(--cd-2);
+}
+
+.pr-cat-ico {
+    font-size: 1rem;
+}
+
+.pr-note {
+    margin-top: 10px;
+    font-size: .74rem;
+    color: var(--mu);
+    line-height: 1.5;
+}
+
+/* ── Расходники ТО под VIN ──────────────────────────────── */
+.maint-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.maint-sts-sum {
+    font-family: var(--ff-mono);
+    font-size: .74rem;
+}
+
+.maint-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--bd);
+    transition: background var(--tr-fast);
+}
+
+.maint-row:last-child {
+    border-bottom: none;
+}
+
+.maint-row.has-want {
+    background: rgba(200, 152, 56, .07);
+}
+
+.maint-row.has-bought {
+    background: rgba(74, 109, 150, .09);
+}
+
+.maint-row.has-installed {
+    background: rgba(90, 128, 80, .1);
+}
+
+.maint-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.maint-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: baseline;
+}
+
+.maint-oem {
+    font-family: var(--ff-mono);
+    font-weight: 700;
+    color: var(--a);
+    font-size: .82rem;
+}
+
+.maint-price {
+    font-weight: 700;
+    color: var(--tx);
+    font-size: .82rem;
+    white-space: nowrap;
+}
+
+.maint-name {
+    font-size: .82rem;
+    color: var(--tx);
+}
+
+.maint-analogs {
+    font-size: .72rem;
+    color: var(--mu);
+}
+
+.maint-sts {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.mst {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--bd);
+    background: var(--cd-2);
+    color: var(--tx);
+    cursor: pointer;
+    font-size: .95rem;
+    line-height: 1;
+    opacity: .55;
+    transition: all var(--tr-fast);
+}
+
+.mst:hover {
+    opacity: 1;
+    border-color: var(--a);
+    transform: translateY(-1px);
+}
+
+.mst.on {
+    opacity: 1;
+    font-weight: 700;
+}
+
+.mst.want.on {
+    background: rgba(200, 152, 56, .2);
+    border-color: var(--sr);
+    box-shadow: 0 0 0 1px var(--sr);
+}
+
+.mst.bought.on {
+    background: rgba(74, 109, 150, .22);
+    border-color: var(--a);
+    box-shadow: 0 0 0 1px var(--a);
+}
+
+.mst.installed.on {
+    background: rgba(90, 128, 80, .22);
+    border-color: var(--ok);
+    box-shadow: 0 0 0 1px var(--ok);
+}
+
+/* ── Гараж: превью-строка свёрнутой карточки ────────────── */
+.gi-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.gi-ico {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.gi-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid var(--bd);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .3);
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.gi-dot.unk {
+    background: repeating-linear-gradient(45deg, var(--hv), var(--hv) 2px, transparent 2px, transparent 4px);
+    border-style: dashed;
+}
+
+.gi-chip {
+    font-size: .66rem;
+    font-weight: 600;
+    color: var(--mu);
+    background: var(--hv);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-pill);
+    padding: 1px 8px;
+    white-space: nowrap;
+    font-family: var(--ff-mono);
+}
+
+.gi-chip-b {
+    font-family: var(--ff);
+}
+
+/* ── Карточка VIN: цвет, мотор, проблемы ────────────────── */
+.vin-color-swatch.unk {
+    background: repeating-linear-gradient(45deg, var(--hv), var(--hv) 3px, transparent 3px, transparent 6px);
+    border-style: dashed;
+    color: var(--mu);
+    font-size: .7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vin-color-code {
+    font-family: var(--ff-mono);
+    font-size: .74rem;
+    color: var(--mu);
+    margin-left: 4px;
+}
+
+.vin-color-row.roof .vin-color-name {
+    font-size: .78rem;
+    color: var(--mu);
+}
+
+.vin-engine-fam {
+    display: inline-block;
+    font-size: .66rem;
+    font-weight: 700;
+    color: var(--a);
+    border: 1px solid var(--a);
+    border-radius: var(--r-pill);
+    padding: 0 8px;
+    margin-left: 8px;
+    vertical-align: 2px;
+    cursor: help;
+}
+
+.vin-issues summary.vin-issues-title {
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+.vin-issues summary.vin-issues-title::-webkit-details-marker {
+    display: none;
+}
+
+.vin-issues summary.vin-issues-title::before {
+    content: '▸';
+    margin-right: 2px;
+    transition: transform var(--tr-fast);
+}
+
+.vin-issues[open] summary.vin-issues-title::before {
+    transform: rotate(90deg);
+}
+
+.vin-issues-count {
+    margin-left: auto;
+    background: var(--wn);
+    color: #1a1206;
+    border-radius: var(--r-pill);
+    padding: 1px 8px;
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.vin-issues-legend {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: .68rem;
+    color: var(--mu);
+    padding: 2px 0 6px;
+}
+
+.vin-issues-legend .lg.high {
+    color: var(--dg);
+}
+
+.vin-issues-legend .lg.medium {
+    color: var(--wn);
+}
+
+.vin-issues-legend .lg.low {
+    color: var(--ok);
+}
+
+/* ── QR-код ─────────────────────────────────────────────── */
+.qr-card {
+    display: inline-block;
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: var(--sh-md);
+}
+
+.qr-card svg {
+    width: 264px;
+    height: 264px;
+    display: block;
+}
+
+/* ── Экспорт карточки ───────────────────────────────────── */
+.exp-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.exp-big {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    justify-content: flex-start;
+    padding: 12px 14px;
+    font-size: 1rem;
+}
+
+.exp-big span {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.exp-sm {
+    font-size: .72rem;
+    font-weight: 400;
+    color: var(--mu);
+}
+
+.exp-prev {
+    border: 1px solid var(--bd);
+    border-radius: var(--r-md);
+    overflow: hidden;
+}
+
+.exp-prev-h {
+    padding: 8px 12px;
+    background: var(--hv);
+    font-size: .76rem;
+    font-weight: 700;
+    color: var(--mu);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.exp-row {
+    display: flex;
+    gap: 10px;
+    padding: 6px 12px;
+    border-top: 1px solid var(--bd);
+    font-size: .8rem;
+    align-items: baseline;
+}
+
+.exp-k {
+    min-width: 130px;
+    flex-shrink: 0;
+    color: var(--mu);
+    font-weight: 600;
+}
+
+.exp-v {
+    flex: 1;
+    color: var(--tx);
+    word-break: break-word;
+}
+
+/* ── Мобильная адаптация ────────────────────────────────── */
+@media (max-width: 640px) {
+    .maint-row {
+        flex-wrap: wrap;
+    }
+
+    .maint-sts {
+        margin-left: auto;
+    }
+
+    .qr-card svg {
+        width: min(264px, calc(100vw - 120px));
+        height: min(264px, calc(100vw - 120px));
+    }
+
+    .exp-k {
+        min-width: 100px;
+    }
+
+    .pr-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pr-toolbar-btns {
+        justify-content: flex-end;
+    }
+}
+
+/* Данные под QR-кодом */
+.qr-data {
+    margin-top: 14px;
+    text-align: left;
+}
+
+.qr-data summary {
+    cursor: pointer;
+    font-size: .78rem;
+    color: var(--mu);
+    user-select: none;
+}
+
+.qr-data pre {
+    margin: 8px 0 0;
+    padding: 10px;
+    background: var(--hv);
+    border: 1px solid var(--bd);
+    border-radius: 6px;
+    font-size: .75rem;
+    white-space: pre-wrap;
+    color: var(--tx);
+    font-family: var(--ff-mono);
+}
+
+
+/* ── v1.8.0: «Болячки» — миникнопка в карточке + модалка ── */
+.gi-iss {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    margin-top: 10px;
+    padding: 6px 10px;
+    background: var(--hv);
+    border: 1px solid var(--bd);
+    border-left: 3px solid var(--sr);
+    border-radius: 6px;
+    color: var(--tx);
+    font-size: .76rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--tr-fast);
+    text-align: left;
+}
+
+.gi-iss:hover {
+    border-color: var(--sr);
+    background: rgba(200, 152, 56, .1);
+    transform: translateY(-1px);
+}
+
+.gi-iss.has-high {
+    border-left-color: var(--dg);
+}
+
+.gi-iss.has-high:hover {
+    border-color: var(--dg);
+    background: rgba(169, 74, 74, .1);
+}
+
+.gi-iss-ic {
+    font-size: .9rem;
+    line-height: 1;
+}
+
+.gi-iss-lb {
+    font-weight: 700;
+}
+
+.gi-iss-sev {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--mu);
+    font-weight: 600;
+    font-size: .72rem;
+    white-space: nowrap;
+}
+
+.gi-iss-n {
+    background: var(--sr);
+    color: #1a1206;
+    border-radius: var(--r-pill);
+    padding: 0 7px;
+    font-weight: 700;
+    font-size: .72rem;
+    line-height: 1.5;
+}
+
+.gi-iss.has-high .gi-iss-n {
+    background: var(--dg);
+    color: #fff;
+}
+
+/* Модалка проблем */
+.iss-head {
+    margin-bottom: 10px;
+}
+
+.iss-year {
+    font-size: .74rem;
+    color: var(--mu);
+    margin-top: 6px;
+}
+
+.iss-src {
+    border: 1px solid var(--bd);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    overflow: hidden;
+}
+
+.iss-src summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    background: var(--hv);
+    cursor: pointer;
+    font-weight: 700;
+    font-size: .84rem;
+    list-style: none;
+    user-select: none;
+}
+
+.iss-src summary::-webkit-details-marker {
+    display: none;
+}
+
+.iss-src summary::before {
+    content: '▸';
+    color: var(--mu);
+    font-size: .8rem;
+    transition: transform var(--tr-fast);
+}
+
+.iss-src[open] summary::before {
+    transform: rotate(90deg);
+}
+
+.iss-src summary:hover {
+    background: var(--cd-2);
+}
+
+.iss-src-ic {
+    font-size: 1rem;
+}
+
+.iss-src-t {
+    flex: 1;
+}
+
+.iss-src-body {
+    padding: 4px 12px 8px;
+}
+
+.pr-count.hi {
+    background: var(--dg);
+}
+
+.iss-note {
+    margin-top: 10px;
+    font-size: .74rem;
+    color: var(--mu);
+    line-height: 1.5;
+}
+
+/* Переключатель «Только расходники / Вся база под VIN» */
+.maint-mode {
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+    .maint-mode {
+        margin-left: 0;
+    }
+}
+
+/* ── Расходники ТО: сворачиваемые разделы + действия в строках ── */
+details.maint-gr > summary.maint-sum {
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    position: relative;
+    padding-right: 34px;
+}
+
+details.maint-gr > summary.maint-sum::-webkit-details-marker {
+    display: none;
+}
+
+details.maint-gr > summary.maint-sum::after {
+    content: '▾';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--mu);
+    font-size: .85rem;
+    transition: transform var(--tr-fast);
+}
+
+details.maint-gr:not([open]) > summary.maint-sum::after {
+    transform: translateY(-50%) rotate(-90deg);
+}
+
+details.maint-gr > summary.maint-sum:hover {
+    background: var(--hv);
+}
+
+.maint-info[data-action] {
+    cursor: pointer;
+}
+
+.maint-info[data-action]:hover .maint-oem {
+    text-decoration: underline;
+}
+
+.maint-info[data-action]:hover .maint-name {
+    color: var(--a);
+}
+
+.maint-acts {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+    align-items: center;
+}
+
+.mact {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--bd);
+    background: var(--cd-2);
+    color: var(--tx);
+    cursor: pointer;
+    font-size: .9rem;
+    line-height: 1;
+    opacity: .6;
+    transition: all var(--tr-fast);
+}
+
+.mact:hover {
+    opacity: 1;
+    border-color: var(--a);
+    transform: translateY(-1px);
+}
+
+.mact.fav.on {
+    opacity: 1;
+    color: #f5c542;
+    border-color: #f5c542;
+    background: rgba(245, 197, 66, .12);
+}
+
+@media (max-width: 640px) {
+    .maint-acts .mact,
+    .maint-sts .mst {
+        width: 32px;
+        height: 32px;
+    }
+}

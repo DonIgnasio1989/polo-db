@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -9,7 +8,7 @@
     <!-- Версия разметки: должна совпадать с APP_VERSION в js/app.js.
          Лоадер добавляет её в URL скрипта (&ui=…), чтобы новый index.html
          никогда не грузил закэшированный старый app.js. -->
-    <meta name="app-ui-ver" content="1.7.1">
+    <meta name="app-ui-ver" content="1.8.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>VW Polo/Caddy 1995–2003 — База Мастера</title>
 
@@ -84,9 +83,9 @@
     </style>
 
     <!-- ymGoal — заглушка. Раньше здесь была Яндекс.Метрика, убрана по просьбе пользователей. -->
-<script>
-  window.ymGoal = function () { /* no-op */ };
-</script>
+    <script>
+        window.ymGoal = function () { /* no-op */ };
+    </script>
 </head>
 
 <body class="theme-aurora">
@@ -269,15 +268,18 @@
                     <span>📖</span><span class="bl">Журнал</span>
                 </button>
 
-                <select class="fs flt mtr" id="fmtr" title="Двигатель: семейство (EA111 / EA827 / EA827-D) или код мотора">
+                <select class="fs flt mtr" id="fmtr"
+                    title="Двигатель: семейство (EA111 / EA827 / EA827-D) или код мотора">
                     <option value="all">⚙️ Мотор: все</option>
                 </select>
 
-                <select class="fs flt trn" id="ftr" title="КПП: семейство (084 / 085 / 002…) или буквенный код (CHL, DXB…)">
+                <select class="fs flt trn" id="ftr"
+                    title="КПП: семейство (084 / 085 / 002…) или буквенный код (CHL, DXB…)">
                     <option value="all">🔄 КПП: все</option>
                 </select>
 
-                <select class="fs flt bdy" id="fbdy" title="Кузов/поколение: Polo 6N1/6N2 (3д/5д), Classic (6V2), Variant (6V5), Caddy (9K/9U)">
+                <select class="fs flt bdy" id="fbdy"
+                    title="Кузов/поколение: Polo 6N1/6N2 (3д/5д), Classic (6V2), Variant (6V5), Caddy (9K/9U)">
                     <option value="all">🚗 Кузов/поколение: все</option>
                 </select>
 
@@ -818,7 +820,8 @@
                     <div class="fg"><label>Модельный год</label><input type="number" id="v_year" min="1995" max="2003">
                     </div>
                 </div>
-                <div class="fg"><label>Код двигателя (сгруппированы по семействам)</label><select id="v_engine"></select></div>
+                <div class="fg"><label>Код двигателя (сгруппированы по семействам)</label><select
+                        id="v_engine"></select></div>
                 <div class="fh gb-hint" id="v_eng_hint"></div>
                 <div class="fr">
                     <div class="fg"><label>КПП — семейство</label><select id="v_trans"></select></div>
@@ -831,15 +834,34 @@
                 <div class="fh gb-hint" id="v_gb_hint"></div>
                 <div class="fr">
                     <div class="fg"><label>Код оснащения</label><input type="text" id="v_equip" placeholder="41"></div>
-                    <div class="fg"><label>Цвет кузова</label><input type="text" id="v_bodycolor" placeholder="J2">
+                    <div class="fg"><label>Цвет кузова (Lacknr)</label>
+                        <div class="laf-wrap">
+                            <input type="text" id="v_bodycolor" placeholder="J2" maxlength="8" autocomplete="off"
+                                spellcheck="false">
+                            <span class="laf-swatch" id="v_bodycolor_sw" title="Код цвета"></span>
+                            <button type="button" class="laf-btn" id="v_bodycolor_btn"
+                                title="Выбрать цвет из справочника">🎨</button>
+                            <div class="laf-pop" id="v_bodycolor_pop"></div>
+                        </div>
+                        <div class="fh laf-hint" id="v_bodycolor_hint"></div>
                     </div>
                 </div>
-                <div class="fg"><label>Цвет крыши</label><input type="text" id="v_roofcolor" placeholder="J2"></div>
+                <div class="fg"><label>Цвет крыши</label>
+                    <div class="laf-wrap">
+                        <input type="text" id="v_roofcolor" placeholder="J2" maxlength="8" autocomplete="off"
+                            spellcheck="false">
+                        <span class="laf-swatch" id="v_roofcolor_sw" title="Код цвета"></span>
+                        <button type="button" class="laf-btn" id="v_roofcolor_btn"
+                            title="Выбрать цвет из справочника">🎨</button>
+                        <div class="laf-pop" id="v_roofcolor_pop"></div>
+                    </div>
+                    <div class="fh laf-hint" id="v_roofcolor_hint"></div>
+                </div>
                 <div class="fh"
                     style="padding:8px 10px;background:var(--hv);border-radius:4px;font-size:.75rem;line-height:1.5">
                     ℹ️ Эти данные не закодированы в VIN. Возьми их из ETKA, Elcats или из наклейки в багажнике /
                     сервисной книжки. <b>Выбери двигатель — списки семейств и буквенных кодов КПП автоматически
-                    сузятся до ставившихся с этим мотором</b> (для Classic/Caddy учитывается платформа 6K:
+                        сузятся до ставившихся с этим мотором</b> (для Classic/Caddy учитывается платформа 6K:
                     добавляются семейства 002 и 020). Буквенный код также выбит на корпусе коробки — при его вводе
                     семейство (084 / 085 / 002) определится автоматически, а каталог отфильтруется под твою коробку.
                 </div>
@@ -947,7 +969,8 @@
                             (1994–1999) и <b>6N2</b> (1999–2001) раскрываются каждый в свои кузова — хэтчбек 3д и
                             5д: можно выбрать всё поколение целиком или конкретный кузов (тогда работают оба
                             фильтра сразу). Ниже — <b>Polo Classic</b> (6V2/6KV седан) и <b>Variant</b> (6V5/6KV
-                            универсал) на платформе 6K, а также <b>Caddy</b> Van и Kombi (9K) и Pickup (9U).</div>
+                            универсал) на платформе 6K, а также <b>Caddy</b> Van и Kombi (9K) и Pickup (9U).
+                        </div>
                     </div>
 
                     <div class="faq-item">
@@ -1023,7 +1046,8 @@
                         <div class="faq-q"><span class="faq-ic">🛒 Exist · Autodoc · Avito</span> Магазины</div>
                         <div class="faq-a">Открывают поиск по артикулу в Exist, Autodoc и Avito — три вкладки. Кнопка
                             <b>🔍 Найти
-                                дешевле</b> делает то же самое одним кликом.</div>
+                                дешевле</b> делает то же самое одним кликом.
+                        </div>
                     </div>
 
                     <div class="faq-item">
@@ -1032,7 +1056,8 @@
                             <b>Поставил</b> —
                             установлено (при этом срабатывает небольшой праздник 🎉). Повторный клик по активной кнопке
                             снимает
-                            статус.</div>
+                            статус.
+                        </div>
                     </div>
 
                     <div class="faq-item">
@@ -1086,7 +1111,72 @@
                             ti-lo.de/polomagazin.de). Для Polo Classic (6V2/6KV), Variant (6V5) и Caddy (9K/9U)
                             учитывается платформа 6K — к списку добавляются семейства 002, 020 (для Classic также
                             02K). Справочник ориентировочный: код всегда можно ввести вручную, даже если его нет в
-                            списке.</div>
+                            списке.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">🎨</span> Цвет кузова — справочник</div>
+                        <div class="faq-a">В окне «✎ Уточнить данные» рядом с полем цвета появился образец и кнопка
+                            🎨 — справочник из 90+ кодов краски VAG эпохи 6N/6K/9K (Candy White B4, Tornado Red
+                            G2, Chagallblau J2…). Введите код с наклейки — увидите название и цвет; или выберите из
+                            списка с поиском. Работает и для цвета крыши.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">📋</span> Оснащение (PR)</div>
+                        <div class="faq-a">Список PR-кодов машины из базы оснащения, сгруппированный по категориям:
+                            🛞 шасси, 🛑 тормоза, 🪑 салон, 💡 оптика, ❄️ климат и т.д. Сверху — живой фильтр по
+                            коду или описанию, кнопки «Развернуть/свернуть все».
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">🛒</span> Расходники ТО</div>
+                        <div class="faq-a">Готовый список покупок на ТО под конкретный VIN: каталог фильтруется по
+                            мотору, семейству и буквенному коду КПП и кузову. В списке — <b>только настоящие
+                            расходники</b>: фильтры, жидкости и масла, ремни/ролики/ГРМ, колодки и диски, свечи,
+                            щётки — сгруппированные по разделам. Крепёж и ремонтные запчасти (суппорты,
+                            цилиндры, радиаторы, сальники…) исключены. Если нужная позиция не попала в список —
+                            переключатель <b>«🗂 Вся база под VIN»</b> покажет всё подряд. У каждой позиции —
+                            кнопки статусов 🛒/📦/✅ (пишутся прямо в карточку детали). Кнопка «← Каталог»
+                            возвращает к общему списку.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">📱</span> QR-код</div>
+                        <div class="faq-a">QR с комплектацией машины (VIN, мотор, КПП, кузов, цвет, неделя выпуска) —
+                            генерируется <b>оффлайн</b>, без интернета. Покажите его мастеру на СТО: он отсканирует
+                            код камерой и увидит все данные. Рядом — «Скопировать» и «Поделиться».
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">📍</span> Где коды</div>
+                        <div class="faq-a">Схема расположения VIN-таблички для вашего кузова (Polo 6N — чашка
+                            амортизатора, Classic/Variant — стойка двери, Caddy — моторный щит) плюс <b>персональный
+                                пример наклейки</b> с вашими MKB/GKB/Lacknr/PR — удобно сверять с оригиналом в
+                            багажнике.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">📤</span> Экспорт карточки</div>
+                        <div class="faq-a">Карточка VIN в трёх форматах: <b>PNG</b> (рисуется оффлайн, удобно
+                            отправить в WhatsApp), <b>печать/PDF</b> (через диалог печати) и <b>текст</b> (в буфер
+                            обмена или .txt). На телефоне доступно системное меню «Поделиться».
+                        </div>
+                    </div>
+
+                                      <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">⚠️</span> Болячки (типичные проблемы)</div>
+                        <div class="faq-a">Компактная кнопка «⚠️ Болячки» в активной карточке VIN: на ней —
+                            счётчик и раскладка по серьёзности (🔴 важно / 🟡 типично / 🟢 мелочи). Клик открывает
+                            отдельное окно со списком по мотору, КПП и кузову — сгруппированным и отфильтрованным
+                            по году выпуска (например, трещина ГБЦ AEX показана только для 1994–1997).
+                        </div>
                     </div>
 
                     <div class="faq-item">
@@ -1213,6 +1303,46 @@
 
     <!-- ============ ПЛАШКА «ЧТО НОВОГО» ============ -->
     <div class="whatsnew" id="whatsnew"></div>
+    <!-- Модалка: типичные проблемы (болячки) -->
+    <div id="issmo" class="mo" onclick="if(event.target===this)cIss()">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:560px">
+            <div class="mh">
+                <h3 id="issmo_title">⚠️ Типичные проблемы</h3><button class="mc" onclick="cIss()">✕</button>
+            </div>
+            <div class="mb" id="issmo_body"></div>
+            <div class="mf"><button class="bn" onclick="cIss()">Закрыть</button></div>
+        </div>
+    </div>
+
+    <!-- Модалка экспорта карточки VIN -->
+    <div id="expmo" class="mo" onclick="if(event.target===this)cExp()">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:560px">
+            <div class="mh">
+                <h3>📤 Экспорт карточки VIN</h3><button class="mc" onclick="cExp()">✕</button>
+            </div>
+            <div class="mb" id="expmo_body"></div>
+        </div>
+    </div>
+
+    <!-- Модалка QR -->
+    <div id="qrmo" class="mo" onclick="if(event.target===this)closeM('qrmo')">
+        <div class="mdl">
+            <div class="mh">
+                <h3> QR-код</h3><button class="mcl" onclick="closeM('qrmo')"></button>
+            </div>
+            <div class="mb" id="qrmo_body"></div>
+        </div>
+    </div>
+
+    <!-- Модалка схемы VIN-таблички -->
+    <div id="platemmo" class="mo" onclick="if(event.target===this)closeM('platemmo')">
+        <div class="mdl">
+            <div class="mh">
+                <h3>📍 Где искать коды</h3><button class="mcl" onclick="closeM('platemmo')">✕</button>
+            </div>
+            <div class="mb" id="platemmo_body"></div>
+        </div>
+    </div>
 </body>
 
-</html>
+</html>
