@@ -1,0 +1,31 @@
+{
+ "generated": "2026-10-17T22:53:50",
+ "input": ".",
+ "include_donors": false,
+ "scan_only": false,
+ "files_total": 1172391,
+ "files_scanned": 1172391,
+ "totals": {
+  "fgst_keys": 1158888,
+  "matched": 13500,
+  "no_vin": 3
+ },
+ "unique_vins": 13414,
+ "per_model": {
+  "Caddy (9K)": 4626,
+  "Polo (6N2)": 3800,
+  "Polo (6N1)": 4933,
+  "Polo Classic/Variant (6V)": 109,
+  "Caddy Pickup (9U)": 8,
+  "Polo (6N)": 24
+ },
+ "pr_dict_codes": 0,
+ "filtered_list": "./out\\filtered-vins.txt",
+ "catalog_prefixes": [
+  "6N",
+  "6V",
+  "9K",
+  "9U"
+ ],
+ "donor_prefixes": []
+}

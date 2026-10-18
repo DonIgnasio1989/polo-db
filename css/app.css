@@ -7607,3 +7607,707 @@ details.maint-gr > summary.maint-sum:hover {
         height: 32px;
     }
 }
+
+/* PR: экран «пустой» записи дампа — известные данные из VIN и гаража */
+.pr-empty-box {
+    margin-top: 12px;
+    border: 1px solid var(--bd);
+    border-radius: var(--r-md);
+    overflow: hidden;
+}
+
+.pr-empty-h {
+    padding: 9px 12px;
+    background: var(--hv);
+    font-weight: 700;
+    font-size: .84rem;
+}
+
+.pr-empty-row {
+    display: flex;
+    gap: 10px;
+    padding: 7px 12px;
+    border-top: 1px solid var(--bd);
+    font-size: .82rem;
+    align-items: baseline;
+}
+
+.pr-empty-k {
+    min-width: 150px;
+    flex-shrink: 0;
+    color: var(--mu);
+    font-weight: 600;
+}
+
+.pr-empty-v {
+    flex: 1;
+    color: var(--tx);
+}
+
+.pr-empty-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+/* ═══ Спринты 1–2: поиск, кросс-сервис, цены, диплинки ═══ */
+mark {
+    background: rgba(200, 152, 56, .35);
+    color: inherit;
+    border-radius: 3px;
+    padding: 0 1px;
+}
+
+.price-stats {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: .74rem;
+    color: var(--mu);
+}
+
+.price-stats .ps-lb {
+    font-family: var(--ff-mono);
+}
+
+.pd {
+    font-weight: 700;
+    font-size: .72rem;
+    padding: 1px 6px;
+    border-radius: var(--r-pill);
+    background: var(--hv);
+}
+
+.pd.up {
+    color: var(--dg);
+    background: rgba(169, 74, 74, .12);
+}
+
+.pd.down {
+    color: var(--ok);
+    background: rgba(90, 128, 80, .14);
+}
+
+.spark {
+    flex-shrink: 0;
+    opacity: .9;
+}
+
+.ext-diag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: .74rem;
+}
+
+.ext-diag .ed-lb {
+    color: var(--mu);
+    font-weight: 600;
+}
+
+.ext-diag .ed-note {
+    color: var(--mu);
+    font-size: .68rem;
+    opacity: .8;
+}
+
+.sup-note {
+    margin-top: 6px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--bd);
+    border-left: 3px solid var(--wn);
+    background: var(--hv);
+    font-size: .78rem;
+    line-height: 1.5;
+    color: var(--tx);
+}
+
+.sup-note.ok {
+    border-left-color: var(--ok);
+}
+
+.sup-note.no {
+    border-left-color: var(--dg);
+}
+
+.sup-open {
+    padding: 2px 8px;
+    font-size: .7rem;
+}
+
+.vb.prb {
+    cursor: help;
+}
+
+/* ═══ Спринт 3: сканер, схемы узлов, публичный режим ═══ */
+.scan-wrap {
+    position: relative;
+    background: #000;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+}
+
+.scan-wrap video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.scan-frame {
+    position: absolute;
+    inset: 18%;
+    border: 2px solid rgba(45, 212, 191, .85);
+    border-radius: 10px;
+    box-shadow: 0 0 0 2000px rgba(0, 0, 0, .35);
+    pointer-events: none;
+}
+
+.scan-status {
+    margin: 8px 0 12px;
+    font-size: .8rem;
+    color: var(--mu);
+    min-height: 1.2em;
+}
+
+/* Схемы узлов */
+.sch-top {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.sch-cnt {
+    font-size: .72rem;
+    color: var(--mu);
+}
+
+.sch-stage {
+    position: relative;
+    background: var(--hv);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    min-height: 180px;
+    cursor: crosshair;
+}
+
+.sch-stage img {
+    display: block;
+    width: 100%;
+    max-height: 52vh;
+    object-fit: contain;
+    background: #101418;
+}
+
+.sch-marks {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.sch-mk circle {
+    fill: rgba(45, 212, 191, .9);
+    stroke: #fff;
+    stroke-width: .6;
+    cursor: pointer;
+}
+
+.sch-mk text {
+    fill: #04252b;
+    font-size: 4px;
+    font-weight: 700;
+    font-family: var(--ff-mono);
+    pointer-events: none;
+}
+
+.sch-mk.act circle {
+    fill: rgba(251, 191, 36, .95);
+}
+
+.sch-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    color: var(--mu);
+    font-size: .82rem;
+    text-align: center;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.sch-tools {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 8px 0;
+}
+
+.sch-hint {
+    font-size: .72rem;
+    color: var(--mu);
+    flex: 1;
+    min-width: 180px;
+}
+
+.sch-strip {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+    overflow-x: auto;
+}
+
+.sch-strip img {
+    width: 56px;
+    height: 42px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    opacity: .7;
+}
+
+.sch-strip img.on {
+    border-color: var(--a);
+    opacity: 1;
+}
+
+.sch-list {
+    max-height: 240px;
+    overflow-y: auto;
+    border: 1px solid var(--bd);
+    border-radius: var(--r-md);
+}
+
+.sch-li {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    width: 100%;
+    padding: 6px 10px;
+    border: none;
+    border-bottom: 1px solid var(--bd);
+    background: transparent;
+    color: var(--tx);
+    font-size: .8rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sch-li:last-child {
+    border-bottom: none;
+}
+
+.sch-li.act {
+    background: rgba(251, 191, 36, .12);
+}
+
+.sch-li:hover {
+    background: var(--hv);
+}
+
+.sch-n {
+    font-family: var(--ff-mono);
+    font-weight: 700;
+    color: #04252b;
+    background: var(--a);
+    border-radius: 50%;
+    min-width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .7rem;
+    flex-shrink: 0;
+}
+
+.sch-oem {
+    font-family: var(--ff-mono);
+    color: var(--a);
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.sch-nm {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sch-open {
+    padding: 6px 10px;
+    font-size: .76rem;
+}
+
+/* Публичный read-only режим */
+#pubbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 95;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 7px 14px;
+    background: linear-gradient(90deg, rgba(200, 152, 56, .95), rgba(201, 112, 42, .95));
+    color: #1a1206;
+    font-size: .8rem;
+    font-weight: 700;
+    flex-wrap: wrap;
+}
+
+body.pub {
+    padding-top: 34px;
+}
+
+body.pub #gab,
+body.pub .gix,
+body.pub .sc-wrap [onclick="oAM()"],
+body.pub [data-action="edit"],
+body.pub [data-action="delete"],
+body.pub [data-vact="edit"],
+body.pub [data-vact="delete"],
+body.pub .tp,
+body.pub .mst,
+body.pub .ctb.sr {
+    display: none !important;
+}
+
+body.pub .sft-btn.don {
+    display: inline-flex;
+}
+
+/* ═══ Спринт 4: кабинет владельца, голоса за аналоги ═══ */
+.dash-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.dash-car {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.dash-ico {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.dash-vin {
+    font-family: var(--ff-mono);
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: var(--tx);
+}
+
+.dash-desc {
+    font-size: .8rem;
+    color: var(--mu);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.dash-km label {
+    display: block;
+    font-size: .7rem;
+    color: var(--mu);
+    margin-bottom: 4px;
+}
+
+.dash-km-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.dash-km-row input {
+    width: 130px;
+}
+
+.dash-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+}
+
+.dash-card {
+    border: 1px solid var(--bd);
+    border-radius: var(--r-md);
+    background: var(--cd);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dash-card.warn {
+    border-color: var(--sr);
+    box-shadow: 0 0 0 1px var(--sr);
+}
+
+.dc-h {
+    font-weight: 700;
+    font-size: .84rem;
+    color: var(--tx);
+}
+
+.dc-big {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--a);
+    font-family: var(--ff-mono);
+}
+
+.dc-sub {
+    font-size: .76rem;
+    color: var(--mu);
+    line-height: 1.5;
+}
+
+.dash-btns {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: auto;
+}
+
+.dash-log {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.dash-log li {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    font-size: .78rem;
+    flex-wrap: wrap;
+}
+
+.dl-d {
+    font-family: var(--ff-mono);
+    color: var(--mu);
+    font-size: .72rem;
+    flex-shrink: 0;
+}
+
+.dl-t {
+    flex: 1;
+    min-width: 120px;
+    color: var(--tx);
+}
+
+.dl-km,
+.dl-c {
+    font-family: var(--ff-mono);
+    font-size: .72rem;
+    color: var(--mu);
+    white-space: nowrap;
+}
+
+.dl-link {
+    border: none;
+    background: none;
+    padding: 0;
+    font-family: var(--ff-mono);
+    font-size: .74rem;
+    font-weight: 700;
+    color: var(--a);
+    cursor: pointer;
+    text-decoration: underline dotted;
+}
+
+.dc-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.dc-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .72rem;
+}
+
+.dc-bar-y {
+    font-family: var(--ff-mono);
+    color: var(--mu);
+    width: 34px;
+    flex-shrink: 0;
+}
+
+.dc-bar-f {
+    height: 10px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--a), var(--a-h));
+    flex-shrink: 0;
+}
+
+.dc-bar-v {
+    color: var(--tx);
+    font-family: var(--ff-mono);
+}
+
+/* Голоса за аналоги */
+.vtb {
+    border: none;
+    background: transparent;
+    color: var(--mu);
+    cursor: pointer;
+    font-size: .68rem;
+    padding: 0 3px;
+    opacity: .75;
+    transition: transform var(--tr-fast), opacity var(--tr-fast);
+}
+
+.vtb:hover {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+.vtb.on {
+    opacity: 1;
+    color: var(--ok);
+    font-weight: 700;
+}
+
+.vtb.on.bad {
+    color: var(--dg);
+}
+
+.tg.an.voted {
+    border-color: var(--ok);
+    box-shadow: 0 0 0 1px var(--ok);
+}
+
+/* ═══ Применимость v2: покритериальный отчёт по VIN ═══ */
+.fit-sum {
+    margin-left: 8px;
+    padding: 2px 9px;
+    border-radius: var(--r-pill);
+    font-size: .7rem;
+    font-weight: 700;
+    vertical-align: 1px;
+    cursor: help;
+}
+
+.fit-sum.y {
+    background: rgba(90, 128, 80, .18);
+    color: var(--ok);
+    border: 1px solid var(--ok);
+}
+
+.fit-sum.n {
+    background: rgba(169, 74, 74, .15);
+    color: var(--dg);
+    border: 1px solid var(--dg);
+}
+
+.fit-sum.u {
+    background: var(--hv);
+    color: var(--mu);
+    border: 1px solid var(--bd);
+}
+
+.fit-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.fit-row {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    font-size: .78rem;
+    padding: 3px 0;
+    border-bottom: 1px dashed var(--bd);
+}
+
+.fit-row:last-child {
+    border-bottom: none;
+}
+
+.fit-b {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .7rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    cursor: help;
+    align-self: center;
+}
+
+.fit-b.y {
+    background: rgba(90, 128, 80, .2);
+    color: var(--ok);
+    border: 1px solid var(--ok);
+}
+
+.fit-b.n {
+    background: rgba(169, 74, 74, .18);
+    color: var(--dg);
+    border: 1px solid var(--dg);
+}
+
+.fit-b.u {
+    background: var(--hv);
+    color: var(--mu);
+    border: 1px solid var(--bd);
+}
+
+.fit-k {
+    min-width: 118px;
+    flex-shrink: 0;
+    color: var(--mu);
+    font-weight: 600;
+    font-size: .74rem;
+}
+
+.fit-v {
+    flex: 1;
+    min-width: 0;
+    color: var(--tx);
+    word-break: break-word;
+}
+
+/* Тумблер «подходит моему VIN» */
+.fit-only.act {
+    border-color: var(--ok);
+    background: rgba(90, 128, 80, .16);
+    color: var(--ok);
+    font-weight: 700;
+    box-shadow: 0 0 0 1px var(--ok);
+}

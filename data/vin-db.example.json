@@ -1,0 +1,27 @@
+[
+  {
+    "vin": "WVWZZZ6NZYX123456",
+    "engine": "AEX",
+    "gearbox": "085",
+    "gearbox_code": "CHL",
+    "paint": "J2",
+    "roof_color": "J2",
+    "equip_code": "41",
+    "prod_date": "1999-04-14",
+    "pr": [
+      "0A2",
+      "0AA",
+      "0BA",
+      "0DH",
+      "0F2",
+      "0KZ",
+      "0L0",
+      "0NB",
+      "0RA",
+      "0SB",
+      "0TA",
+      "0UA",
+      "G0C"
+    ]
+  }
+]

@@ -8,7 +8,7 @@
     <!-- Версия разметки: должна совпадать с APP_VERSION в js/app.js.
          Лоадер добавляет её в URL скрипта (&ui=…), чтобы новый index.html
          никогда не грузил закэшированный старый app.js. -->
-    <meta name="app-ui-ver" content="1.8.0">
+    <meta name="app-ui-ver" content="1.8.1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>VW Polo/Caddy 1995–2003 — База Мастера</title>
 
@@ -131,6 +131,7 @@
             </div>
             <div class="gate-foot">
                 <button class="bn dg-btn" onclick="licDecline()">✖ Отказаться</button>
+                <button class="bn" onclick="pubEnter()" title="Открыть каталог без гаража и правок">👁 Смотреть каталог (без регистрации)</button>
                 <button class="bn ok-btn" onclick="licAccept()">✓ Принять и продолжить</button>
             </div>
         </div>
@@ -188,6 +189,10 @@
                             <button onclick="eCSV(true);cEM()">⭐ <span>CSV — избранное</span></button>
                             <button onclick="eET();cEM()">🗂 <span>CSV — ETKA</span></button>
                             <button onclick="eWCSV();cEM()">🔧 <span>CSV — мастерские</span></button>
+                        <button onclick="exportVotes();cEM()">🧑🤝‍ <span>Пак голосов за аналоги — экспорт</span></button>
+                        <button onclick="importVotes();cEM()">📥 <span>Пак голосов за аналоги — импорт</span></button>
+                        <button onclick="exportSchemes();cEM()">📐 <span>Схемы узлов — экспорт пака</span></button>
+                        <button onclick="importSchemes();cEM()">📐 <span>Схемы узлов — импорт пака</span></button>
                             <button onclick="rD();cEM()">♻️ <span>Пересобрать БД (сброс)</span></button>
                         </details>
 
@@ -256,6 +261,9 @@
                 <button class="bn p sc-oem-btn" onclick="oAM()" title="Добавить деталь по OEM">
                     <span>➕</span><span class="bl">OEM</span>
                 </button>
+                <button class="bn p sc-oem-btn" onclick="oScan()" title="Сканировать VIN или штрих-код детали камерой">
+                    <span>📷</span><span class="bl">Скан</span>
+                </button>
             </div>
 
             <div class="tb-filters">
@@ -306,6 +314,11 @@
                     <span class="vt-lbl" id="vtLbl">▦ Плитка</span>
                 </label>
 
+                <button class="bn fit-only" id="fitOnlyBtn" type="button" onclick="tgFitOnly()"
+                    title="Показать только позиции, подходящие вашему VIN по всем критериям (мотор, кузов, поколение, комплектация, КПП, PR)">
+                    🎯<span class="bl"> Подходит моему VIN</span>
+                </button>
+
                 <div class="ac">
                     <button class="bn" onclick="toggleAllDetails()" title="Развернуть/свернуть все карточки"
                         id="tb3">⇕</button>
@@ -348,6 +361,13 @@
                             ETKA</span></label></div>
                 <div class="fg"><label>Аналоги (через запятую)</label><input type="text" id="f_an"
                         placeholder="INA 530 0090 10, Gates KP235"></div>
+                <div class="fr">
+                    <div class="fg"><label>PR-коды применимости</label><input type="text" id="f_prreq"
+                            placeholder="1AE, !1ZG — «!» = не ставится с этим кодом" autocomplete="off" spellcheck="false"
+                            style="text-transform:uppercase"></div>
+                    <div class="fg"><label>Заменён на (supersession)</label><input type="text" id="f_sup_oem"
+                            placeholder="Новый артикул VAG, если старый отменён"></div>
+                </div>
                 <div class="fg"><label>Доноры (через запятую)</label><input type="text" id="f_dn"
                         placeholder="VW Lupo, Seat Arosa"></div>
                 <div class="fg"><label>Двигатели (пусто = все)</label><input type="text" id="f_eng"
@@ -857,6 +877,14 @@
                     </div>
                     <div class="fh laf-hint" id="v_roofcolor_hint"></div>
                 </div>
+                <div class="fr">
+                    <div class="fg"><label>Поколение машины</label><select id="v_gen"></select>
+                        <div class="fh laf-hint">Подставляется по VIN, если есть 6N1/6N2; уточните вручную для 6V/9K/9U</div>
+                    </div>
+                    <div class="fg"><label>Комплектация машины</label><select id="v_trim"></select>
+                        <div class="fh laf-hint">Влияет на проверку деталей с ограничением по комплектации</div>
+                    </div>
+                </div>
                 <div class="fh"
                     style="padding:8px 10px;background:var(--hv);border-radius:4px;font-size:.75rem;line-height:1.5">
                     ℹ️ Эти данные не закодированы в VIN. Возьми их из ETKA, Elcats или из наклейки в багажнике /
@@ -1140,8 +1168,11 @@
                             щётки — сгруппированные по разделам. Крепёж и ремонтные запчасти (суппорты,
                             цилиндры, радиаторы, сальники…) исключены. Если нужная позиция не попала в список —
                             переключатель <b>«🗂 Вся база под VIN»</b> покажет всё подряд. У каждой позиции —
-                            кнопки статусов 🛒/📦/✅ (пишутся прямо в карточку детали). Кнопка «← Каталог»
-                            возвращает к общему списку.
+                            кнопки статусов 🛒/📦/✅ (пишутся прямо в карточку детали). Заголовки разделов
+                            сворачиваются кликом («⇕ Разделы» сворачивает всё сразу), состояние запоминается.
+                            Клик по позиции открывает её карточку, а кнопки <b>🔍</b> (Exist · Autodoc · Avito)
+                            и <b>☆</b> (избранное) работают прямо из списка. Кнопка «← Каталог» возвращает к
+                            общему списку.
                         </div>
                     </div>
 
@@ -1310,7 +1341,49 @@
                 <h3 id="issmo_title">⚠️ Типичные проблемы</h3><button class="mc" onclick="cIss()">✕</button>
             </div>
             <div class="mb" id="issmo_body"></div>
-            <div class="mf"><button class="bn" onclick="cIss()">Закрыть</button></div>
+            <div class="mf">
+                <button class="bn" onclick="printIssueChecklist()">🖨 Чек-лист осмотра</button>
+                <button class="bn" onclick="cIss()">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка: сканер VIN / штрих-кода -->
+    <div id="scanmo" class="mo" onclick="if(event.target===this)cScan()">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:520px">
+            <div class="mh">
+                <h3>📷 Сканер: VIN или код детали</h3><button class="mc" onclick="cScan()">✕</button>
+            </div>
+            <div class="mb">
+                <div class="scan-wrap"><video id="scanVideo" muted playsinline></video>
+                    <div class="scan-frame"></div>
+                </div>
+                <div class="scan-status" id="scanStatus">Запускаю камеру…</div>
+                <div class="fg"><label>Или вставьте код вручную</label>
+                    <div style="display:flex;gap:6px">
+                        <input type="text" id="scanManual" placeholder="VIN 17 знаков или артикул / EAN" autocomplete="off"
+                            spellcheck="false">
+                        <button class="bn p" type="button"
+                            onclick="applyScan(classifyScan($('scanManual').value))">Найти</button>
+                    </div>
+                </div>
+                <div class="fh" style="padding:8px 10px;background:var(--hv);border-radius:4px;font-size:.75rem;line-height:1.5">
+                    ℹ️ Поддерживаются QR, EAN-13/8, Code-128/39 (BarcodeDetector, Chrome/Android и APK WebView).
+                    VIN со стикера считывается как текст только в ручном режиме — камерой берём QR/штрих-код.
+                </div>
+            </div>
+            <div class="mf"><button class="bn" onclick="cScan()">Закрыть</button></div>
+        </div>
+    </div>
+
+    <!-- Модалка: схема узла (фото + маркеры) -->
+    <div id="schmo" class="mo" onclick="if(event.target===this)cSch()">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:760px">
+            <div class="mh">
+                <h3 id="schmo_title">📐 Схема узла</h3><button class="mc" onclick="cSch()">✕</button>
+            </div>
+            <div class="mb" id="schmo_body"></div>
+            <div class="mf"><button class="bn" onclick="cSch()">Закрыть</button></div>
         </div>
     </div>
 
