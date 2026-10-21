@@ -8,7 +8,7 @@
     <!-- Версия разметки: должна совпадать с APP_VERSION в js/app.js.
          Лоадер добавляет её в URL скрипта (&ui=…), чтобы новый index.html
          никогда не грузил закэшированный старый app.js. -->
-    <meta name="app-ui-ver" content="1.8.1">
+    <meta name="app-ui-ver" content="1.8.3">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>VW Polo/Caddy 1995–2003 — База Мастера</title>
 
@@ -806,6 +806,7 @@
             </div>
             <div class="mb" id="shopBody"></div>
             <div class="mf">
+                <span id="shopCount" class="shop-count zero">🛒 Выбрано: <b>0</b> позиций</span>
                 <button class="bn" onclick="cShop()">Закрыть</button>
                 <button class="bn" onclick="eShopCSV()">📊 CSV</button>
                 <button class="bn p" onclick="pShop()">🖨 Печать</button>
