@@ -3505,14 +3505,16 @@ body.theme-paper .mh h3 {
 }
 
 @media (max-width: 480px) {
+    /* v1.8.4: кнопка-иконка «🔍». Раньше использовался font-size:0 + ::before '🔍' —
+       на Android-браузерах font-size:0 ненадёжно скрывает эмодзи (font boosting),
+       из-за чего лупа задваивалась. Теперь текст в <span class="g-db-lbl">
+       и скрывается через display:none, а лупа живёт прямо в HTML. */
     #g_db {
         padding: 12px 14px;
-        font-size: 0;
     }
 
-    #g_db::before {
-        content: '🔍';
-        font-size: 1.15rem;
+    #g_db .g-db-lbl {
+        display: none;
     }
 }
 
@@ -8373,4 +8375,19 @@ body.pub .sft-btn.don {
     color: var(--ok);
     font-weight: 700;
     box-shadow: 0 0 0 1px var(--ok);
+}
+
+/* ============ v1.8.4: ОТКЛИК НАЖАТИЙ НА ТЕЛЕФОНЕ ============
+   touch-action: manipulation убирает задержку ~300 мс
+   (double-tap-to-zoom) на всех интерактивных элементах —
+   кнопки перестают «лагать» при тапе. */
+button,
+a,
+input,
+select,
+textarea,
+summary,
+label,
+[onclick] {
+    touch-action: manipulation;
 }
