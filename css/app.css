@@ -8391,3 +8391,29 @@ label,
 [onclick] {
     touch-action: manipulation;
 }
+
+/* ============ v1.9.0: АНАЛОГИ — ИСТОЧНИКИ ============ */
+/* 🔗 цепочка кроссов (аналог аналога), ❓ база знаний (требует проверки) */
+.an-src {
+    font-size: .62rem;
+    margin-left: 3px;
+    opacity: .85;
+    cursor: help;
+}
+
+.an-src.ch {
+    filter: saturate(.6);
+}
+
+.an-src.kb {
+    color: var(--warn, #e8b33c);
+}
+
+.an-legend {
+    display: block;
+    width: 100%;
+    margin-top: 3px;
+    font-size: .6rem;
+    color: var(--mu);
+    opacity: .8;
+}
