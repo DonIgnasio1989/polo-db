@@ -863,6 +863,153 @@ function importVotes() {
     inp.click();
 }
 
+/* ============ 1.9.0: АНАЛОГИ — ЦЕПОЧКИ + БАЗА ЗНАНИЙ ============
+   Три источника аналогов в карточке:
+   · db    — analogs из данных (заполнено владельцем базы);
+   · chain — транзитивное замыкание: «аналог аналога» через общий
+             кросс-код (union-find по сегментам OEM и кодам аналогов);
+   · kb    — data/analogs.json: внешняя база знаний кросс-номеров
+             (drive2.ru топ-кроссы + цепочки замен VAG). Требует
+             проверки — потому с бейджем ❓ и голосами 👍/👎.
+   Мусорные строки без цифр («USEDPART», «Kolbenschmidt») в граф
+   НЕ попадают — только отображаются как есть. Компоненты больше
+   _AN_MAX не сливаются (защита от ложных цепей). */
+let AKB = {};        // normOem → [«Бренд Код»] (из data/analogs.json)
+let _anIdx = null;   // normCode → [part id] — индекс для сканера/поиска
+const _AN_MAX = 32;
+
+/* Сегменты мульти-артикула «030 121 008 D · DX» → ['030121008D']
+   (хвосты-суффиксы без цифр вроде «DX» отбрасываются). */
+const anCodeOk = s => { const n = normOem(s); return n.length >= 5 && /[0-9]/.test(n); };
+const oemSegs = o => String(o || '').split('·').map(s => normOem(s)).filter(anCodeOk);
+
+function normalizeAKB(raw) {
+    const out = {};
+    const src = raw && typeof raw === 'object' ? (raw.kb && typeof raw.kb === 'object' ? raw.kb : raw) : null;
+    if (!src) return out;
+    Object.keys(src).forEach(k => {
+        const nk = normOem(String(k).replace(/^\s*VAG\s+/i, ''));
+        if (!nk) return;
+        const arr = Array.isArray(src[k]) ? src[k] : [src[k]];
+        const vals = Array.from(new Set(arr.map(x => String(x || '').trim()).filter(x => x && anCodeOk(x))));
+        if (vals.length) out[nk] = vals;
+    });
+    return out;
+}
+
+function applyAnalogKb() {
+    if (!Array.isArray(D) || !D.length) { _anIdx = {}; return { chain: 0, kb: 0 }; }
+    const t0 = Date.now();
+    /* 1. Существующие аналоги помечаем как db (данные владельца) */
+    D.forEach(p => {
+        if (!Array.isArray(p.analogs)) p.analogs = [];
+        if (!p.analogSrc || typeof p.analogSrc !== 'object') p.analogSrc = {};
+        p.analogs.forEach(a => { const n = normOem(a); if (n && !p.analogSrc[n]) p.analogSrc[n] = 'db'; });
+    });
+    /* 2. Граф кроссов: сегменты OEM ↔ коды аналогов ↔ база знаний */
+    const parent = {};
+    const addNode = x => { if (!(x in parent)) parent[x] = x; };
+    const find = x => { while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; };
+    const uni = (a, b) => { a = find(a); b = find(b); if (a !== b) parent[a] = b; };
+    const disp = {}, dispDb = {}, segDisp = {}, kbNodes = {};
+    D.forEach(p => {
+        String(p.oem || '').split('·').forEach(seg => { const n = normOem(seg); if (n && !segDisp[n]) segDisp[n] = seg.trim(); });
+        const segs = oemSegs(p.oem);
+        segs.forEach(addNode);
+        p.analogs.forEach(a => {
+            if (!anCodeOk(a)) return;
+            const n = normOem(a);
+            addNode(n);
+            if (!dispDb[n]) { disp[n] = String(a).trim(); dispDb[n] = 1; }
+            segs.forEach(s => uni(s, n));
+        });
+    });
+    Object.keys(AKB).forEach(k => {
+        (AKB[k] || []).forEach(code => {
+            const nc = normOem(String(code).replace(/^\s*VAG\s+/i, ''));
+            if (!anCodeOk(nc)) return;
+            addNode(k); addNode(nc);
+            if (!disp[nc]) disp[nc] = String(code).trim();
+            kbNodes[nc] = 1; kbNodes[k] = 1;
+            uni(k, nc);
+        });
+    });
+    /* 3. Компоненты связности */
+    const comps = {};
+    Object.keys(parent).forEach(n => { const r = find(n); (comps[r] = comps[r] || []).push(n); });
+    /* 4. Слияние в детали */
+    let addedChain = 0, addedKb = 0, skippedBig = 0;
+    D.forEach(p => {
+        const own = new Set(oemSegs(p.oem));
+        const have = new Set(p.analogs.map(a => normOem(a)).filter(Boolean));
+        const roots = new Set();
+        own.forEach(s => { if (s in parent) roots.add(find(s)); });
+        p.analogs.forEach(a => { const n = normOem(a); if (anCodeOk(n) && (n in parent)) roots.add(find(n)); });
+        roots.forEach(r => {
+            const comp = comps[r] || [];
+            if (comp.length > _AN_MAX) { skippedBig++; return; }
+            comp.forEach(n => {
+                if (own.has(n) || have.has(n)) return;
+                const d = disp[n] || segDisp[n] || n;
+                p.analogs.push(d); have.add(n);
+                const isKb = kbNodes[n] && !dispDb[n] && !segDisp[n];
+                p.analogSrc[n] = isKb ? 'kb' : 'chain';
+                if (isKb) addedKb++; else addedChain++;
+            });
+        });
+    });
+    /* 5. Индекс «код → детали» для сканера и кросс-поиска.
+       Двойные ключи: полная норма («BOSCH1987432300») и без бренда
+       («1987432300») — коробка на фото может нести только цифры. */
+    const idx = {};
+    const put = (n, id) => {
+        if (!n || n.length < 5) return;
+        const arr = idx[n] = idx[n] || [];
+        if (arr.length < 50 && !arr.includes(id)) arr.push(id);
+    };
+    const stripBrand = s => {
+        const m = String(s).match(/^\s*[A-Za-zА-Яа-яЁё.\-]{2,}\s+(.+)$/);
+        return m ? m[1] : '';
+    };
+    D.forEach(p => {
+        oemSegs(p.oem).forEach(n => put(n, p.id));
+        (p.analogs || []).forEach(a => {
+            const n = normOem(a);
+            if (anCodeOk(n)) put(n, p.id);
+            const s = normOem(stripBrand(a));
+            if (anCodeOk(s)) put(s, p.id);
+        });
+    });
+    _anIdx = idx;
+    console.log('[analogKb] +' + addedChain + ' цепочка · +' + addedKb + ' KB · индекс ' + Object.keys(idx).length + ' кодов · ' + Math.round(Date.now() - t0) + 'ms' + (skippedBig ? ' · пропущено больших компонент: ' + skippedBig : ''));
+    return { chain: addedChain, kb: addedKb };
+}
+
+/* Единая точка поиска детали по любому коду: артикул (включая
+   сегменты «·»), аналог из базы, цепочка или база знаний. */
+function findPartByCode(code) {
+    const n = normOem(code);
+    if (!n) return null;
+    let p = D.find(x => normOem(x.oem) === n);
+    if (p) return { p, via: 'oem', matched: p.oem || n };
+    p = D.find(x => oemSegs(x.oem).includes(n));
+    if (p) return { p, via: 'oem', matched: p.oem || n };
+    if (_anIdx && _anIdx[n]) {
+        for (const id of _anIdx[n]) {
+            const q = D.find(x => x.id === id);
+            if (!q) continue;
+            const hit = (q.analogs || []).find(a => normOem(a) === n || normOem(stripBrandLocal(a)) === n);
+            const src = (q.analogSrc && q.analogSrc[n]) || 'db';
+            return { p: q, via: src === 'kb' ? 'kb' : 'analog', matched: hit || n };
+        }
+    }
+    return null;
+}
+const stripBrandLocal = s => {
+    const m = String(s).match(/^\s*[A-Za-zА-Яа-яЁё.\-]{2,}\s+(.+)$/);
+    return m ? m[1] : s;
+};
+
 /* ============ НАПОМИНАНИЯ О ТО ============ */
 function toReminderMsg() {
     const t = nextTO(); if (!t) return null;
@@ -913,14 +1060,39 @@ const SYNONYMS = {
    Распознанный VIN → форма гаража с подставленным значением;
    артикул/EAN → карточка детали или поиск по кросс-индексу. */
 let _scanStream = null, _scanTimer = null;
+/* ✅ 1.9.0: извлечение ВСЕХ кандидатов-кодов из подписи/текста.
+   Порядок важен: сначала строка целиком (бренд+код как в базе),
+   затем шаблоны: VW-OEM «030 115 561 AB», компактный OEM,
+   брендовые коды «W 719/45», «PP831», «CT979», цифровые группы
+   Bosch «1 987 432 300», EAN-13/8. */
+function extractCodes(s) {
+    const t = String(s || '');
+    const out = [];
+    const push = x => { const n = normOem(x); if (anCodeOk(n) && !out.includes(n)) out.push(n); };
+    push(t);
+    const pats = [
+        /\b\d{3}\s?\d{3}\s?\d{3}(?:\s?[A-Z]{1,2})?\b/gi,
+        /\b\d{9,12}[A-Z]{1,2}\b/g,
+        /\b[A-Z]{1,6}\s?\d{2,7}(?:\s?\/\s?\d{1,3})?\b/gi,
+        /\b\d{1,3}(?:\s\d{3}){1,3}\s?\d{0,3}\b/g,
+        /\b\d{13}\b/g,
+        /\b\d{8}\b/g
+    ];
+    pats.forEach(re => {
+        re.lastIndex = 0;
+        let m;
+        while ((m = re.exec(t)) !== null) { push(m[0]); if (out.length >= 14) break; }
+    });
+    return out.slice(0, 14);
+}
 function classifyScan(s) {
     const t = String(s || '').trim();
     if (!t) return { type: 'text', value: '' };
-    if (/^[A-HJ-NPR-Z0-9]{17}$/i.test(t)) return { type: 'vin', value: t.toUpperCase() };
+    if (/^[A-HJ-NPR-Z0-9]{17}$/i.test(t)) return { type: 'vin', value: t.toUpperCase(), cands: [t.toUpperCase()] };
     const art = t.replace(/[^A-Za-z0-9]/g, '');
-    if (/^\d{8,14}$/.test(art)) return { type: 'art', value: art.toUpperCase() };   // EAN/UPC
-    if (art.length >= 5) return { type: 'art', value: art.toUpperCase() };
-    return { type: 'text', value: t };
+    if (/^\d{8,14}$/.test(art)) return { type: 'art', value: art.toUpperCase(), cands: extractCodes(t) };   // EAN/UPC
+    if (art.length >= 5) return { type: 'art', value: art.toUpperCase(), cands: extractCodes(t) };
+    return { type: 'text', value: t, cands: extractCodes(t) };
 }
 function applyScan(res) {
     if (!res || !res.value) { toast('Пустой код', 'danger'); return; }
@@ -935,20 +1107,22 @@ function applyScan(res) {
         toast('📷 VIN считан: …' + res.value.slice(-6) + ' — проверьте и сохраните', 'success');
         return;
     }
-    if (res.type === 'art') {
-        const p = findByOem(res.value) || D.find(x => (x.analogs || []).some(a => normOem(a) === res.value));
-        cScan();
-        if (p) { oPC(p.id); toast('📷 Найдена деталь: ' + (p.oem || p.name), 'success'); }
-        else {
-            SV.searchQuery = res.value; if ($('sr')) $('sr').value = res.value;
-            uSC(); rC();
-            toast('📷 Точного совпадения нет — показан поиск по коду', 'info');
-        }
+    /* ✅ 1.9.0: перебор всех извлечённых кодов — артикул (включая
+       сегменты «·»), аналог из базы, цепочка кроссов или база знаний. */
+    const cands = (Array.isArray(res.cands) && res.cands.length) ? res.cands : [normOem(res.value)].filter(Boolean);
+    let hit = null;
+    for (const c of cands) { hit = findPartByCode(c); if (hit) break; }
+    cScan();
+    if (hit) {
+        oPC(hit.p.id);
+        toast(hit.via === 'oem'
+            ? '📷 Найдена деталь: ' + (hit.p.oem || hit.p.name)
+            : '📷 Найдено по ' + (hit.via === 'kb' ? 'базе знаний' : 'аналогу') + ' «' + hit.matched + '» → ' + (hit.p.oem || hit.p.name), 'success');
         return;
     }
-    cScan();
     SV.searchQuery = res.value; if ($('sr')) $('sr').value = res.value;
     uSC(); rC();
+    toast('📷 Точного совпадения нет — показан поиск по коду', 'info');
 }
 function oScan() {
     openM('scanmo');
@@ -1804,7 +1978,7 @@ let USER = { name: '', email: '', city: '', initials: '', color: '#00b0f0' };
 let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastDate: null, interval: 15000 };
 
-let APP_VERSION = '1.8.4';
+let APP_VERSION = '1.9.0';
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -3377,6 +3551,7 @@ function _guessType(path) {
     if (/parts-\d|parts\.json|\/parts\//.test(p)) return 'parts';
     if (/categories\.json/.test(p)) return 'categories';
     if (/sections\.json|composition\.json/.test(p)) return 'sections';
+    if (/analogs\.json/.test(p)) return 'analogs';
     if (/workshops\.json/.test(p)) return 'workshops';
     return 'unknown';
 }
@@ -3520,6 +3695,7 @@ async function lAll() {
             { path: 'data/parts-05-rear-axle-controls.json', type: 'parts' },
             { path: 'data/categories.json', type: 'categories' },
             { path: 'data/sections.json', type: 'sections' },
+            { path: 'data/analogs.json', type: 'analogs' },
             { path: 'data/workshops.json', type: 'workshops' }
         ];
     }
@@ -3539,9 +3715,11 @@ async function lAll() {
             const f = typeof item === 'string' ? item : item.path;
             return (typeof item === 'string' ? null : item.type) || _guessType(f);
         };
-        const metaFiles = files.filter(item => ['sections', 'categories', 'workshops'].includes(typeOf(item)));
+        const metaFiles = files.filter(item => ['sections', 'categories', 'workshops', 'analogs'].includes(typeOf(item)));
         if (!metaFiles.some(item => typeOf(item) === 'sections'))
             metaFiles.push({ path: 'data/sections.json', type: 'sections' });
+        if (!metaFiles.some(item => typeOf(item) === 'analogs'))
+            metaFiles.push({ path: 'data/analogs.json', type: 'analogs' });
         const mres = await Promise.all(metaFiles.map(async (item) => {
             const f = typeof item === 'string' ? item : item.path;
             try {
@@ -3554,8 +3732,11 @@ async function lAll() {
             if (!res) continue;
             if (res.type === 'sections') _mergeSections(res.data);
             else if (res.type === 'categories') _mergeCats(res.data);
+            else if (res.type === 'analogs') { if (res.data && typeof res.data === 'object') AKB = normalizeAKB(res.data); }
             else if (res.type === 'workshops') await _mergeWorkshops(res.data);
         }
+        /* ✅ 1.9.0: цепи кроссов + база знаний — даже из кэша */
+        applyAnalogKb();
     } else {
         const t0 = performance.now();
 
@@ -3570,7 +3751,7 @@ async function lAll() {
             } catch (e) { console.warn('fetch fail:', f, e); return null; }
         }));
 
-        let serverParts = [], cats = null, secs = null, wss = null;
+        let serverParts = [], cats = null, secs = null, wss = null, akbData = null;
         for (const res of results) {
             if (!res) continue;
             switch (res.type) {
@@ -3579,6 +3760,9 @@ async function lAll() {
                 case 'sections':
                     if (res.data && typeof res.data === 'object' && !Array.isArray(res.data))
                         secs = Object.assign(secs || {}, res.data);
+                    break;
+                case 'analogs':
+                    if (res.data && typeof res.data === 'object' && !Array.isArray(res.data)) akbData = res.data;
                     break;
                 case 'workshops': if (Array.isArray(res.data)) wss = res.data; break;
             }
@@ -3628,6 +3812,10 @@ async function lAll() {
 
         // 7. Финальный проход по объединённому массиву + сохранение
         D = _dedupeParts(D);
+        /* ✅ 1.9.0: аналоги — цепочки кроссов + база знаний. Мерджим ДО
+           сохранения, чтобы обогащённые analogs физически оседали в базе. */
+        if (akbData) AKB = normalizeAKB(akbData);
+        applyAnalogKb();
         if (useIDB) try { await iMany(SP, D); } catch (e) { } else sD();
 
         /* ✅ 1.8.1: версию базы записываем, только если детали реально
@@ -4259,7 +4447,8 @@ const normOem = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
 function findByOem(o) {
     const n = normOem(o);
     if (!n) return null;
-    return D.find(p => normOem(p.oem) === n) || null;
+    /* ✅ 1.9.0: точное совпадение → сегмент мульти-артикула «A · B» */
+    return D.find(p => normOem(p.oem) === n) || D.find(p => oemSegs(p.oem).includes(n)) || null;
 }
 /* PR-коды активной машины (когда база оснащения полная); null = проверять не по чему */
 let _prSetV = null, _prSet = null;
@@ -4434,13 +4623,22 @@ function cH(p) {
         ? p.analogs.map((a, ai) => {
             const v = getVote(p, a);
             const score = (v.ok || 0) - (v.bad || 0);
-            return '<span class="tg an' + (score >= 3 ? ' voted' : '') + '"' + (score >= 3 ? ' title="Проверено сообществом: подошёл ' + score + ' раз(а)"' : '') + '>' + esc(a)
+            /* ✅ 1.9.0: бейдж источника — 🔗 цепочка кроссов, ❓ база знаний */
+            const src = (p.analogSrc || {})[normOem(a)] || 'db';
+            const srcB = src === 'chain'
+                ? '<span class="an-src ch" title="Цепочка кроссов: аналог аналога (транзитивная связь)">🔗</span>'
+                : src === 'kb'
+                    ? '<span class="an-src kb" title="Из базы знаний кросс-номеров — проверьте применимость и проголосуйте 👍/👎">❓</span>'
+                    : '';
+            return '<span class="tg an' + (score >= 3 ? ' voted' : '') + '"' + (score >= 3 ? ' title="Проверено сообществом: подошёл ' + score + ' раз(а)"' : '') + '>' + esc(a) + srcB
                 + '<button class="ctb2" data-copy="' + escA(a) + '" title="Копировать">📋</button>'
                 + '<button type="button" class="vtb' + (v.my === 'ok' ? ' on' : '') + '" data-action="vote-analog" data-id="' + escA(p.id) + '" data-ai="' + ai + '" data-dir="ok" title="Подошёл (' + (v.ok || 0) + ')">👍' + (v.ok ? v.ok : '') + '</button>'
                 + '<button type="button" class="vtb' + (v.my === 'bad' ? ' on bad' : '') + '" data-action="vote-analog" data-id="' + escA(p.id) + '" data-ai="' + ai + '" data-dir="bad" title="Не подошёл (' + (v.bad || 0) + ')">👎' + (v.bad ? v.bad : '') + '</button>'
                 + '</span>';
         }).join('')
         : '<span style="color:var(--mu);font-size:.66rem">—</span>';
+    const hasSrc = (p.analogs || []).some(a => { const s = (p.analogSrc || {})[normOem(a)]; return s === 'chain' || s === 'kb'; });
+    const anLegend = hasSrc ? '<span class="an-legend">🔗 цепочка кроссов · ❓ база знаний — проверьте и голосуйте 👍/👎</span>' : '';
     const dn = (p.donors || []).map(d => '<span class="tg dn">' + esc(d) + '</span>').join('')
         || '<span style="color:var(--mu);font-size:.72rem">— нет данных —</span>';
     const eng = (p.engines || []).length
@@ -4540,7 +4738,7 @@ function cH(p) {
         + (o ? '<button class="cob" data-action="copy" data-oem="' + escA(o) + '" title="Копировать">📋</button>' : '')
         + '</span>' + vb + ch + prBadge(p)
         + '</div>'
-        + '<div class="cd-meta cd-ans"><span class="cd-ans-lb">🔧 Аналоги:</span>' + anInline + '</div>'
+        + '<div class="cd-meta cd-ans"><span class="cd-ans-lb">🔧 Аналоги:</span>' + anInline + anLegend + '</div>'
         + (partsHtml
             ? partsHtml
             : '<div class="cd-purchase">' + getPurchaseHtml(p) + '</div>'
@@ -5113,6 +5311,7 @@ function sPt() {
         window.ymGoal && window.ymGoal('part_added');
     }
     if (!useIDB) sD();
+    applyAnalogKb();   /* ✅ 1.9.0: новая/изменённая деталь входит в граф кроссов */
     rSB(); rC(); cM();
 }
 function dPt(id) {
