@@ -1804,7 +1804,7 @@ let USER = { name: '', email: '', city: '', initials: '', color: '#00b0f0' };
 let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastDate: null, interval: 15000 };
 
-let APP_VERSION = '1.8.3';
+let APP_VERSION = '1.8.4';
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -2964,11 +2964,25 @@ function setAV(id) {
 
 function sGarV() {
     if (pubGuard()) return;
-    if (!pGV || !pGV.ok) return;
-    if (G.some(g => g.vin === pGV.vin)) { toast('VIN уже в гараже', 'danger'); return; }
+    /* v1.8.4: сохранение больше не зависит от кнопки «🔍 Декодировать».
+       Раньше #g_sb оставалась disabled до успешного декодирования, а при
+       !pGV.ok функция молча выходила — на телефоне «Сохранить» «не работало».
+       Теперь VIN берётся прямо из поля и при необходимости декодируется
+       офлайн (vD), а невалидный ввод показывается пользователю. */
+    const raw = ($('g_vi').value || '').trim().toUpperCase();
+    const re = $('g_re'), sb = $('g_sb');
+    if (!vV(raw)) {
+        if (re) { re.style.display = 'block'; re.innerHTML = '<span class="er">Введите VIN: 17 символов, без I, O, Q</span>'; }
+        if (sb) sb.disabled = true;
+        try { $('g_vi').focus(); } catch (e) { }
+        return;
+    }
+    if (!pGV || !pGV.ok || pGV.vin !== raw) pGV = vD(raw);
+    if (!pGV || !pGV.ok) { toast('Не удалось разобрать VIN', 'danger'); return; }
+    if (G.some(g => g.vin === raw)) { toast('VIN уже в гараже', 'danger'); return; }
     const g = {
         id: 'g_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6),
-        vin: pGV.vin,
+        vin: raw,
         brand: pGV.brand || '',
         model: pGV.model || '',
         year: pGV.year || null,
@@ -2978,7 +2992,6 @@ function sGarV() {
         engines: Array.isArray(pGV.engines) ? pGV.engines : [],
         prodDate: '', engineCode: '', transCode: '', gearboxCode: '',
         equipCode: '', bodyColor: '', roofColor: '',
-        gen: '', trim: '',
         addedAt: Date.now()
     };
     G.push(g); sG(); SV.activeVinId = g.id;
@@ -7395,10 +7408,28 @@ function bindUI() {
         gv.addEventListener('keydown', e => {
             if (e.key === 'Enter') { e.preventDefault(); decG(); }
         });
+        /* v1.8.4: «Сохранить» активируется сразу, как только введён валидный VIN.
+           Раньше кнопка включалась лишь после «🔍 Декодировать» — при ручном
+           вводе или после сканера QR она оставалась disabled («не нажимается»). */
+        const syncVinState = () => {
+            const v = gv.value.trim().toUpperCase();
+            const ok = vV(v);
+            const sb = $('g_sb'); if (sb) sb.disabled = !ok;
+            if (ok && pGV && pGV.vin !== v) pGV = null; // VIN правили после декодирования — сброс
+            const re = $('g_re');
+            if (!re) return;
+            if (!v) { re.style.display = 'none'; re.innerHTML = ''; return; }
+            if (ok && !(pGV && pGV.ok)) {
+                re.style.display = 'block';
+                re.innerHTML = '<span style="opacity:.75">✓ VIN корректен — можно сразу сохранить, а «🔍» покажет подробности</span>';
+            }
+        };
+        gv.addEventListener('input', syncVinState);
         ['paste', 'blur'].forEach(ev => gv.addEventListener(ev, () => {
             const f = () => {
                 const r = gv.value, c = r.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '').slice(0, vmLimit);
                 if (c !== r) gv.value = c;
+                syncVinState();
             };
             if (ev === 'paste') setTimeout(f, 0); else f();
         }));

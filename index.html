@@ -3,12 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
     <meta name="theme-color" content="#0a1830">
     <!-- Версия разметки: должна совпадать с APP_VERSION в js/app.js.
          Лоадер добавляет её в URL скрипта (&ui=…), чтобы новый index.html
          никогда не грузил закэшированный старый app.js. -->
-    <meta name="app-ui-ver" content="1.8.3">
+    <meta name="app-ui-ver" content="1.8.4">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>VW Polo/Caddy 1995–2003 — База Мастера</title>
 
@@ -19,9 +19,11 @@
 
        Про cache-busting: ?v= не обязателен, если сервер правильно
        отдаёт Cache-Control (no-cache / ETag). Если хочется — можно
-       вручную поднимать: href="css/app.css?v=1.3.0" при релизе.
+       вручную поднимать: href="css/app.css?v=<версия>" при релизе.
+       С 1.8.4 так и делаем — SW отдаёт CSS cache-first, без ?v= телефоны
+       жили бы со старым стилем до следующего фонового обновления.
        ═══════════════════════════════════════════════════════════════ -->
-    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/app.css?v=1.8.4">
 
     <script>
         /* ────── АВТО-КЕШБАСТИНГ ТОЛЬКО ДЛЯ JS ─────────────────────
@@ -487,7 +489,7 @@
                 <div class="fg"><label>VIN (17 символов)</label>
                     <div style="display:flex;gap:6px;align-items:stretch">
                         <input type="text" class="vi" id="g_vi" autocomplete="off" spellcheck="false">
-                        <button class="bn p" id="g_db" onclick="decG()" style="flex-shrink:0">🔍 Декодировать</button>
+                        <button class="bn p" id="g_db" onclick="decG()" style="flex-shrink:0" aria-label="Декодировать VIN">🔍<span class="g-db-lbl">Декодировать</span></button>
                     </div>
                 </div>
                 <div class="gdr" id="g_re" style="display:none"></div>
