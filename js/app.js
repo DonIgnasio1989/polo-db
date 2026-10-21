@@ -745,7 +745,7 @@ function rDash() {
     if (t) {
         h += '<div class="dc-big">' + Math.max(0, t.kmLeft).toLocaleString('ru-RU') + ' км · ' + Math.max(0, t.daysLeft) + ' дн</div>'
             + '<div class="dc-sub">' + (t.kmLeft <= 0 || t.daysLeft <= 0 ? '⚠ пора на сервис!' : 'до следующего обслуживания · интервал ' + (Number(TO.interval) || 15000).toLocaleString('ru-RU') + ' км') + '</div>'
-            + '<div class="dash-btns"><button class="bn" onclick="oShopList()">🛒 Список покупок</button><button class="bn" onclick="oTO()">✏️ Параметры</button></div>';
+            + '<div class="dash-btns"><button class="bn" onclick="oShopList()" title="Только расходники ТО: фильтры, жидкости и смазки, ремни, колодки, герметики, пробка поддона">🛒 Список покупок</button><button class="bn" onclick="oTO()">✏️ Параметры</button></div>';
     } else {
         h += '<div class="dc-sub">Укажите пробег и дату последнего ТО — виджет посчитает остаток</div>'
             + '<div class="dash-btns"><button class="bn p" onclick="oTO()">🛠 Настроить ТО</button></div>';
@@ -1797,13 +1797,14 @@ let SV = {
     theme: 'aurora', sortBy: 'default', view: 'grid', activeVinId: null,
     groupBySub: false, vinStrictFilter: false, fitOnly: false, expandedCats: {},
     garCollapsed: {},
+    shopCollapsed: {},
     _vinApplied: false
 };
 let USER = { name: '', email: '', city: '', initials: '', color: '#00b0f0' };
 let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastDate: null, interval: 15000 };
 
-let APP_VERSION = '1.8.1';
+let APP_VERSION = '1.8.3';
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -2398,6 +2399,7 @@ function lU() {
             if (!SV.expandedTree || typeof SV.expandedTree !== 'object') SV.expandedTree = {};
             if (!SV.expandedCats || typeof SV.expandedCats !== 'object') SV.expandedCats = {};
             if (!SV.garCollapsed || typeof SV.garCollapsed !== 'object') SV.garCollapsed = {};
+            if (!SV.shopCollapsed || typeof SV.shopCollapsed !== 'object') SV.shopCollapsed = {};
             if (typeof SV._vinApplied !== 'boolean') SV._vinApplied = false;
             if (!CATS.some(c => c.id === SV.activeCat) && !['Favorites', 'Workshops', 'Log', 'Dash'].includes(SV.activeCat) && !(CUSTOM.sections && CUSTOM.sections[SV.activeCat]) && !SEC_TABLE_IDS.includes(SV.activeCat)) SV.activeCat = 'All';
         }
@@ -5649,72 +5651,166 @@ function sTO() {
     toast('Настройки ТО сохранены', 'success');
 }
 
-/* ============ СПИСОК ПОКУПОК ============ */
+/* ============ СПИСОК ПОКУПОК ============
+   «Список покупок на ТО» (кнопка «🛒 Список покупок» в «Моя машина» и
+   «🛒 В список» из расходников VIN): только расходники ТО — ровно те, что
+   отбирает классификатор maintClassOf для списка «Расходники для ТО»:
+   фильтры, жидкости/масла/смазки, пробка и болт поддона (с шайбой),
+   герметики и фиксаторы, ремни и ролики, колодки/диски/барабаны, свечи,
+   щётки, регламент. Ремонтные запчасти (подвеска, электрика, радиаторы,
+   суппорты, лампы и т.п.) сюда не попадают — они в каталоге.
+   Если в гараже выбрана машина, список сужается до позиций её мотора/
+   кузова/КПП; уже отмеченные позиции (shopPick) не теряются и открываются
+   с готовыми галочками. */
 function oShopList(keep) {
     if (!keep) shopPick = new Set();
     const t = nextTO();
-    const candidates = D.filter(p => {
-        if (p.cat === 'Maintenance') return false;
-        return ['Engine', 'Fuel', 'Ignition', 'Cooling', 'Brakes', 'Suspension', 'Transmission', 'Fluids', 'Bulbs', 'Electrical', 'Heating'].includes(p.cat);
-    });
-    const byCat = {};
+    const av = gAV();
+    /* «ТО 15 000 км» / «🔧 ТО-2: воздушный фильтр + свечи» — напоминания
+       регламента, а не товар: в список покупок не идут (в любой группе). */
+    const isBuyable = p => {
+        if (!maintClassOf(p)) return false;
+        if (/^\s*(?:🔧\s*)?ТО[\s\-–—]*\d/i.test(String(p.name || ''))) return false;
+        return true;
+    };
+    const candidates = D.filter(p => shopPick.has(p.id) || (isBuyable(p) && maintFitsCar(av, p)));
+    const byGr = {};
     for (const p of candidates) {
-        if (!byCat[p.cat]) byCat[p.cat] = [];
-        byCat[p.cat].push(p);
+        const gid = maintClassOf(p) || 'reglament';
+        (byGr[gid] = byGr[gid] || []).push(p);
     }
     const ar = $('shopBody');
     let h = '';
     if (t) h += '<div style="padding:10px 12px;background:rgba(40,167,69,.08);border:1px solid var(--ok);border-radius:4px;font-size:.82rem;margin-bottom:12px">📅 Последнее ТО: <b>' + esc(t.lastDate) + '</b> · Следующее через <b>' + t.kmLeft.toLocaleString('ru-RU') + ' км</b> (~' + t.daysLeft + ' дн.)</div>';
     else h += '<div style="padding:10px 12px;background:rgba(245,166,35,.08);border:1px solid var(--sr);border-radius:4px;font-size:.82rem;margin-bottom:12px">⚠️ Настрой ТО в шапке (🛠) — расчёт будет точнее. Пока показываю всё по регламенту.</div>';
-    h += '<p style="font-size:.82rem;color:var(--mu);margin-top:0">Отметь, что нужно купить. Итог суммируется внизу.</p>';
-    const catLbl = {
-        Engine: '⚙️ Двигатель / ГРМ', Fuel: '⛽ Топливная', Ignition: '🔥 Зажигание',
-        Cooling: '❄️ Охлаждение', Brakes: '🛑 Тормоза', Suspension: '🛞 Подвеска',
-        Transmission: '🔄 Трансмиссия', Fluids: '🛢️ Жидкости', Bulbs: '🔆 Лампы',
-        Electrical: '💡 Электрика', Heating: '🌡️ Печка'
-    };
-    const catOrder = ['Fluids', 'Engine', 'Ignition', 'Fuel', 'Cooling', 'Brakes', 'Suspension', 'Transmission', 'Electrical', 'Heating', 'Bulbs'];
-    for (const cat of catOrder) {
-        if (!byCat[cat]) continue;
-        h += '<div style="margin-top:14px"><div style="font-size:.85rem;font-weight:700;color:var(--tx);padding:6px 0;border-bottom:1px solid var(--bd);margin-bottom:6px">' + (catLbl[cat] || cat) + '</div>';
-        for (const p of byCat[cat]) {
-            h += '<label style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-bottom:1px solid var(--bd);cursor:pointer;transition:all .15s"><input type="checkbox" data-shop-id="' + escA(p.id) + '" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;cursor:pointer"><div style="flex:1;min-width:0">';
-            h += '<div style="font-weight:700;font-size:.85rem;color:var(--tx)">' + esc(p.name || '') + '</div>';
-            if (p.oem) h += '<div style="font-family:Consolas,monospace;font-size:.7rem;color:var(--mu)">' + esc(p.oem) + '</div>';
-            if (p.analogs && p.analogs.length) h += '<div style="font-size:.7rem;color:var(--mu);margin-top:2px">Аналоги: ' + esc(p.analogs.slice(0, 3).join(', ')) + '</div>';
-            h += '</div></label>';
+    h += '<p style="font-size:.82rem;color:var(--mu);margin-top:0">Отметь, что нужно купить. Итог суммируется внизу. Здесь только расходники ТО — ремонтные запчасти ищите в каталоге.</p>';
+    if (!candidates.length) {
+        h += '<div style="padding:26px 12px;text-align:center;color:var(--mu);font-size:.85rem">🛒 Расходников ТО не найдено.<br>Проверьте, что база загружена, а в карточке VIN указаны мотор и кузов.</div>';
+    } else {
+        const order = MAINT_GROUPS.map(x => x.id).filter(id => byGr[id] && byGr[id].length);
+        Object.keys(byGr).forEach(id => { if (!order.includes(id)) order.push(id); });
+        for (const id of order) {
+            const meta = MAINT_GROUPS.find(x => x.id === id);
+            const parts = byGr[id].slice().sort((a, b) => _maintWeight(a) - _maintWeight(b) || String(a.name || '').localeCompare(String(b.name || ''), 'ru'));
+            /* Сворачиваемая группа: состояние помнится в SV.shopCollapsed. */
+            const collapsed = !!(SV.shopCollapsed && SV.shopCollapsed[id]);
+            const sel = parts.filter(p => shopPick.has(p.id)).length;
+            h += '<div class="shop-gr" data-shop-gr="' + escA(id) + '">';
+            h += '<button type="button" class="shop-gr-h" data-shop-tgl="' + escA(id) + '" aria-expanded="' + (collapsed ? 'false' : 'true') + '">'
+                + '<span class="shop-chev' + (collapsed ? ' collapsed' : '') + '">▼</span>'
+                + '<span>' + esc(meta ? meta.icon + ' ' + meta.label : id) + ' <span style="color:var(--mu);font-weight:400">(' + parts.length + ')</span></span>'
+                + (sel ? '<span class="shop-gr-sel">✓ ' + sel + '</span>' : '')
+                + '</button>';
+            h += '<div class="shop-gr-b"' + (collapsed ? ' style="display:none"' : '') + '>';
+            for (const p of parts) {
+                h += '<label style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-bottom:1px solid var(--bd);cursor:pointer;transition:all .15s"><input type="checkbox" data-shop-id="' + escA(p.id) + '"' + (shopPick.has(p.id) ? ' checked' : '') + ' style="margin-top:3px;flex-shrink:0;width:16px;height:16px;cursor:pointer"><div style="flex:1;min-width:0">';
+                h += '<div style="font-weight:700;font-size:.85rem;color:var(--tx)">' + esc(p.name || '') + '</div>';
+                if (p.oem) h += '<div style="font-family:Consolas,monospace;font-size:.7rem;color:var(--mu)">' + esc(p.oem) + '</div>';
+                if (p.analogs && p.analogs.length) h += '<div style="font-size:.7rem;color:var(--mu);margin-top:2px">Аналоги: ' + esc(p.analogs.slice(0, 3).join(', ')) + '</div>';
+                if (p.price != null) h += '<div style="font-size:.72rem;color:var(--mu);margin-top:2px">' + esc(fP(p.price, p.currency)) + '</div>';
+                h += '</div></label>';
+            }
+            h += '</div></div>';
         }
-        h += '</div>';
     }
-    h += '<div id="shopTotal" style="padding:12px;background:var(--hv);border:1px solid var(--bd);border-radius:6px;font-weight:700;font-size:.92rem;text-align:right;margin-top:10px;color:var(--tx)">Выбрано: <b>0</b> позиций</div>';
     ar.innerHTML = h;
     ar.querySelectorAll('[data-shop-id]').forEach(cb => {
         cb.addEventListener('change', () => {
             if (cb.checked) shopPick.add(cb.dataset.shopId);
             else shopPick.delete(cb.dataset.shopId);
-            $('shopTotal').innerHTML = 'Выбрано: <b>' + shopPick.size + '</b> позиций';
+            updShopCount();
+            updShopGrSel(cb);
         });
     });
+    /* Клик по шапке группы — свернуть/развернуть (с запоминанием). */
+    ar.querySelectorAll('[data-shop-tgl]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const gid = btn.dataset.shopTgl;
+            const wrap = btn.closest ? btn.closest('.shop-gr') : null;
+            if (!wrap) return;
+            if (!SV.shopCollapsed || typeof SV.shopCollapsed !== 'object') SV.shopCollapsed = {};
+            const now = !SV.shopCollapsed[gid];
+            SV.shopCollapsed[gid] = now;
+            const body = wrap.querySelector('.shop-gr-b');
+            if (body) body.style.display = now ? 'none' : '';
+            const chev = wrap.querySelector('.shop-chev');
+            if (chev) chev.classList.toggle('collapsed', now);
+            btn.setAttribute('aria-expanded', now ? 'false' : 'true');
+            sU();
+        });
+    });
+    updShopCount();
     openM('shopmo');
     window.ymGoal && window.ymGoal('shop_list_opened');
+}
+/* Счётчик выбранных позиций — в подвале модалки (слева от кнопок). */
+function pluralPos(n) {
+    const m = n % 100, k = n % 10;
+    if (m >= 11 && m <= 14) return 'позиций';
+    if (k === 1) return 'позиция';
+    if (k >= 2 && k <= 4) return 'позиции';
+    return 'позиций';
+}
+function updShopCount() {
+    const el = $('shopCount');
+    if (!el) return;
+    el.innerHTML = '🛒 Выбрано: <b>' + shopPick.size + '</b> ' + pluralPos(shopPick.size);
+    if (shopPick.size) el.classList.remove('zero'); else el.classList.add('zero');
+}
+/* Бейдж «✓ k» в шапке группы — сколько отмечено внутри. */
+function updShopGrSel(cb) {
+    const wrap = cb && cb.closest ? cb.closest('.shop-gr') : null;
+    if (!wrap) return;
+    let sel = 0;
+    wrap.querySelectorAll('[data-shop-id]').forEach(c => { if (c.checked) sel++; });
+    const head = wrap.querySelector('.shop-gr-h');
+    let badge = wrap.querySelector('.shop-gr-sel');
+    if (sel) {
+        if (!badge && head) {
+            badge = document.createElement('span');
+            badge.className = 'shop-gr-sel';
+            head.appendChild(badge);
+        }
+        if (badge) badge.textContent = '✓ ' + sel;
+    } else if (badge && badge.remove) badge.remove();
 }
 const cShop = () => closeM('shopmo');
 function pShop() {
     if (!shopPick.size) { toast('Ничего не выбрано', 'danger'); return; }
     const items = D.filter(p => shopPick.has(p.id));
-    const css = '<style>body{font-family:Arial,sans-serif;padding:20px;color:#000}h1{font-size:18px;margin:0 0 12px}h2{font-size:14px;margin:18px 0 8px;color:#004b8f;border-bottom:1px solid #ccc;padding-bottom:3px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left}th{background:#f0f0f0}@media print{@page{margin:15mm}}</style>';
+    const av = gAV();
+    const css = '<style>body{font-family:Arial,sans-serif;padding:20px;color:#000}h1{font-size:18px;margin:0 0 12px}h2{font-size:14px;margin:18px 0 8px;color:#004b8f;border-bottom:1px solid #ccc;padding-bottom:3px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left}th{background:#f0f0f0}.vinbox{border:2px solid #000;padding:10px 14px;margin:10px 0 14px}.vinlab{font-size:11px;font-weight:700;letter-spacing:2px;color:#555}.vincode{font-family:Consolas,"Courier New",monospace;font-size:22px;font-weight:700;letter-spacing:2px}.vincar{font-size:12px;margin-top:4px}@media print{@page{margin:15mm}}</style>';
     const w = window.open('', '_blank');
     let h = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Список покупок на ТО</title>' + css + '</head><body>';
     h += '<h1>Список покупок на ТО — VW Polo/Caddy 6N</h1>';
-    h += '<p style="font-size:12px;color:#666">Дата: ' + new Date().toLocaleDateString('ru-RU') + (TO.km ? ' · Пробег: ' + TO.km.toLocaleString('ru-RU') + ' км' : '') + '</p>';
-    const byCat = {};
-    for (const p of items) {
-        if (!byCat[p.cat]) byCat[p.cat] = [];
-        byCat[p.cat].push(p);
+    /* VIN крупно — продавцу в магазине проще ориентироваться по машине. */
+    if (av && av.vin) {
+        const carBits = [];
+        if (av.brand || av.model) carBits.push([av.brand, av.model].filter(Boolean).join(' '));
+        if (av.year) carBits.push(av.year + ' г.');
+        if (av.engineCode) carBits.push('мотор ' + av.engineCode);
+        if (av.transCode || av.gearboxCode) carBits.push('КПП ' + (av.transCode || av.gearboxCode));
+        if (av.prodDate) carBits.push('выпуск ' + av.prodDate);
+        h += '<div class="vinbox"><div class="vinlab">VIN</div>'
+            + '<div class="vincode">' + esc(String(av.vin).toUpperCase()) + '</div>'
+            + (carBits.length ? '<div class="vincar">' + esc(carBits.join(' · ')) + '</div>' : '')
+            + '</div>';
+    } else {
+        h += '<div style="border:1px dashed #999;padding:8px 12px;margin:10px 0 14px;font-size:12px;color:#666">VIN не указан — выберите машину в гараже, чтобы продавец мог проверить применяемость.</div>';
     }
-    for (const cat of Object.keys(byCat)) {
-        h += '<h2>' + cat + '</h2><table><tr><th style="width:30px">OK</th><th style="width:150px">OEM</th><th>Наименование</th><th style="width:200px">Аналоги</th></tr>';
-        for (const p of byCat[cat]) {
+    h += '<p style="font-size:12px;color:#666">Дата: ' + new Date().toLocaleDateString('ru-RU') + (TO.km ? ' · Пробег: ' + TO.km.toLocaleString('ru-RU') + ' км' : '') + '</p>';
+    const byGr = {};
+    for (const p of items) {
+        const key = maintClassOf(p) || ('cat:' + (p.cat || ''));
+        (byGr[key] = byGr[key] || []).push(p);
+    }
+    const grOrder = MAINT_GROUPS.map(x => x.id).filter(k => byGr[k])
+        .concat(Object.keys(byGr).filter(k => k.indexOf('cat:') === 0));
+    for (const key of grOrder) {
+        const meta = MAINT_GROUPS.find(x => x.id === key);
+        const title = meta ? meta.label : catL(key.slice(4));
+        h += '<h2>' + esc(title) + '</h2><table><tr><th style="width:30px">OK</th><th style="width:150px">OEM</th><th>Наименование</th><th style="width:200px">Аналоги</th></tr>';
+        for (const p of byGr[key]) {
             h += '<tr><td></td><td>' + esc(p.oem || '—') + '</td><td>' + esc(p.name || '') + '</td><td style="font-size:11px">' + esc((p.analogs || []).slice(0, 3).join(', ')) + '</td></tr>';
         }
         h += '</table>';
@@ -6513,41 +6609,75 @@ async function init() {
 }
 /* ====== НОВЫЕ КНОПКИ КАРТОЧКИ VIN ======
    Расходники под VIN: мотор + КПП (семейство и буквенный код) + кузов.
-   В список попадают ТОЛЬКО настоящие расходники: фильтры, жидкости/масла,
-   ремни и ролики (ГРМ), колодки/диски/барабаны, свечи, щётки.
+   В список попадают ТОЛЬКО настоящие расходники ТО — то, что меняется при
+   регламентном обслуживании: фильтры, жидкости/масла/смазки, пробка и болт
+   поддона (с шайбой), герметики и фиксаторы резьбы, ремни и ролики (ГРМ),
+   колодки/диски/барабаны, свечи, щётки.
    Крепёж (болт/гайка/шайба…), ремонтные запчасти (суппорт/цилиндр/
    радиатор/сальник…) и прочая база НЕ вываливаются — только по кнопке
    «🗂 Вся база под VIN». */
 const MAINT_GROUPS = [
     { id: 'filters', icon: '🌀', label: 'Фильтры', re: /фильтр/i },
-    { id: 'fluids', icon: '🛢️', label: 'Жидкости и масла', re: /масл|антифриз|тосол|охлажд|жидкост|смазк|омывател|дистилл|трансмиссион|гидравлич|\batf\b|\bdot\s?\d|\bg\s?0\d/i },
+    { id: 'fluids', icon: '🛢️', label: 'Жидкости, масла и смазки', re: /масл|антифриз|тосол|охлажд|жидкост|смазк|омывател|дистилл|трансмиссион|гидравлич|\batf\b|\bdot\s?\d|\bg\s?0\d/i },
+    { id: 'drainplug', icon: '🔩', label: 'Пробка и шайба поддона', re: null },
+    { id: 'sealants', icon: '🧴', label: 'Герметики и фиксаторы', re: null },
     { id: 'belts', icon: '➰', label: 'Ремни, ролики, ГРМ', re: /ремн|ремень|грм|ролик|натяжител|демпфер|помп(?!.*топлив)|водян.{0,8}насос|насос\s+(водян|охлажд)/i },
     { id: 'brakes', icon: '🛑', label: 'Тормоза', re: /колодк|тормозн|барабан/i },
-    { id: 'plugs', icon: '🔥', label: 'Свечи', re: /свеч/i },
+    { id: 'plugs', icon: '🔥', label: 'Свечи и провода зажигания', re: /свеч|высоковольтн|провод[а-яё]*\s+зажиган/i },
     { id: 'wipers', icon: '🌧️', label: 'Щётки стеклоочистителя', re: /щётк|щетк|дворник|стеклоочист/i },
     { id: 'reglament', icon: '📋', label: 'Регламент ТО — прочее', re: null }
 ];
 /* Первое слово — метиз или ремонтная запчасть: точно не расходник */
-const MAINT_JUNK_LEAD_RE = /^(болт|гайк|шайб|шпильк|винт|саморез|заклёпк|заклепк|шплинт|скоб|хомут|подшипник|сальник|прокладк|уплотнит|колпачк|вкладыш|цилиндр|суппорт|шланг|трубк|радиатор|бачок|форсунк|датчик|амортизатор|пружин|рычаг|стойк|тяг|наконечник|шрус|пыльник|сайлентблок|клапан|поршн|кольц|генератор|стартер|компрессор|аккумулятор|лампа|лампочк|предохранит|трос|кронштейн|опор|подушк|втулк|обойм|шток|золотник|маслосъёмн|маслосъемн|маслоотраж|патрубок|термостат|ступиц)/i;
-/* Ремонтные слова в любом месте названия (подшипник — с исключением для роликов/ГРМ) */
-const MAINT_JUNK_ANY_RE = /шланг|суппорт|цилиндр|колпачк|маслосъёмн|маслосъемн|маслоотраж|вкладыш|сальник|прокладк|уплотнител|радиатор|бачок|патрубок|термостат|датчик|лямбда|ступиц|шрус|пыльник|сайлентблок|амортизатор|тормозн.{0,6}трубк|подшипник/i;
+const MAINT_JUNK_LEAD_RE = /^(болт|гайк|шайб|шпильк|винт|саморез|заклёпк|заклепк|шплинт|скоб|хомут|подшипник|сальник|прокладк|уплотнит|уплотнени|колпач[ко]|вкладыш|цилиндр|суппорт|шланг|труб[ко]|трубопровод|радиатор|бач[ко]|форсунк|датчик|амортизатор|пружин|рычаг|стойк|тяг|наконечник|шрус|пыльник|сайлент|клапан|поршн|кольц|генератор|стартер|компрессор|аккумулятор|лампа|лампочк|предохранит|трос|кронштейн|опор|подушк|втулк|обойм|шток|золотник|маслосъёмн|маслосъемн|маслоотраж|патрубок|термостат|ступиц|жгут|фланец|поводок|штуцер|щуп|шкив|кожух|адсорбер|корпус|заглушк|защёлк|защелк|проставк|пал[еь]ц|реле|успокоител|маслоуловител|маслоприёмн|маслоприемн|маслоотделит|корректор|распорн|ползун|манжет|несущ|инерцион|разъём|разъем|мотор-насос|роликоподшипник|глушител|электродвигател)/i;
+/* Ремонтные слова в любом месте названия. Исключения для подшипника —
+   только настоящие ролики/натяжители ГРМ («роликовый подшипник» и
+   «роликоподшипник» — ремонт). «Поддон», «трубка», «крышка», «безопасность»
+   и т.п. — ремонт, хотя и содержат «масл»/«ремн»; сливная пробка, болт
+   поддона и герметики спасаются явным ТО-пре-чеком в maintClassOf. */
+const MAINT_JUNK_ANY_RE = /шланг|суппорт|цилиндр|колпач[ко]|маслосъёмн|маслосъемн|маслоотраж|вкладыш|сальник|прокладк|уплотнител|уплотнени|манжет|радиатор|бач[ко]|патрубок|термостат|датчик|лямбда|ступиц|шрус|пыльник|сайлент[-\s]?блок|амортизатор|тормозн.{0,8}труб[ко]|труб[ко]|трубопровод|подшипник|поддон|маслян[а-яё]{0,6}\s+насос|насос\s+маслян|мотор-насос|насос[а-яё]*\s+омывател|омывател[а-яё]*\s+(мотор|насос)|жгут|фланец|поводок|штуцер|щуп|шкив|кожух|адсорбер|корпус|заглушк|защёлк|защелк|проставк|пал[еь]ц|реле|успокоител|маслоуловител|маслоприёмн|маслоприемн|маслоотделит|корректор|распорн|ползун|несущ|инерцион|пульсаци|глушител|разъём|разъем|соединител|блок\s+управлен|безопасн|крепёж|крепеж|рычаг|клапан|крышк|щётк[а-яё]*\s+генератор|генератор[а-яё]*\s+щётк|регулятор[а-яё]*\s+тормозн|тормозн[а-яё]*\s+(сил|лент)|главн[а-яё]*\s+тормозн|\bгтц\b|цапф|воздуховод|(?:^|[^а-яё])щит|наклейк|ремкомплект|редуктор\s+стеклоочист|электродвигател|мотор[а-яё\-]*\s+стеклоочист|стеклоочист[а-яё]*\s+(мотор|редуктор|электродвигател)|рам[а-яё]{0,3}\s+фильтр|фильтр[а-яё]*\s+омывател|элемент[а-яё]*\s+крепления/i;
+/* Явные расходники ТО — проверяются ДО фильтра «крепёж/ремонт»:
+   сливная пробка поддона (с её медной шайбой/прокладкой) и болт поддона
+   меняются при каждой замене масла, а герметики и фиксаторы резьбы —
+   рабочая химия ТО, хотя формально это метизы и клей. */
+const MAINT_DRAIN_RE = /пробк[а-яё]{0,6}\s+(сливн|поддон|маслян)|сливн[а-яё]{0,6}\s+(пробк|шайб)|болт[а-яё]*\s+поддон|поддон[а-яё]*\s+болт|шайб[а-яё]{0,6}\s+сливн|медн[а-яё]{0,6}\s+шайб/i;
+const MAINT_SEAL_RE = /герметик|фиксатор[а-яё]{0,6}\s+резьб|резьбов[а-яё]{0,10}\s+фиксатор|анаэробн/i;
 
 /* Классификатор: id группы расходников или null (= не расходник).
    Матчинг — только по НАЗВАНИЮ позиции; подкатегория используется лишь
    чтобы отсечь подкатегории «Крепёж/Метизы». Так «Пробка сливная» из
-   подкатегории «Масло и фильтры» не превращается в фильтр. */
+   подкатегории «Масло и фильтры» не превращается в фильтр — она попадает
+   в свою группу «Пробка и шайба поддона» по явному совпадению. */
 function maintClassOf(p) {
     const name = String(p.name || '').trim();
     const sub = String(p.sub || '');
+    if (MAINT_DRAIN_RE.test(name)) return 'drainplug';
+    if (MAINT_SEAL_RE.test(name)) return 'sealants';
     if (/крепёж|крепеж|метиз/i.test(sub)) return null;
     if (MAINT_JUNK_LEAD_RE.test(name)) return null;
     if (MAINT_JUNK_ANY_RE.test(name)) {
-        /* «Ролик натяжителя с подшипником» — легитимный комплект ГРМ, оставляем */
-        if (!(/подшипник/i.test(name) && /ролик|натяжител|грм/i.test(name))) return null;
+        /* «Ролик натяжителя с подшипником» — легитимный комплект ГРМ
+           (но «роликовый подшипник»/«роликоподшипник» — ремонт);
+           «Смазка ШРУС-4» — расходная смазка, а не ремонт привода. */
+        const rollerKit = /подшипник/i.test(name)
+            && /(?:^|[^а-яё])(ролик|ролики|роликов|роликом|натяжител[а-яё]*|грм)(?:[^а-яё]|$)/i.test(name);
+        const grease = /^смазк/i.test(name);
+        if (!rollerKit && !grease) return null;
     }
     for (const g of MAINT_GROUPS) { if (g.re && g.re.test(name)) return g.id; }
     if (p.cat === 'Maintenance') return 'reglament';   // остальное из категории «Регламент ТО»
     return null;
+}
+
+/* Подходит ли позиция конкретной машине из гаража (мотор + кузов + КПП).
+   Общий фильтр для «Расходников для ТО» и «Списка покупок на ТО». */
+function maintFitsCar(g, p) {
+    if (!g) return true;
+    const gb = normGb(g.gearboxCode);
+    if (g.engineCode && (p.engines || []).length && !p.engines.includes(g.engineCode)) return false;
+    if (g.body && (p.bodies || []).length && !p.bodies.includes(g.body)) return false;
+    if (g.transCode && !partMatchesTrans(p, g.transCode)) return false;
+    if (gb !== 'all' && !partMatchesGearbox(p, gb)) return false;
+    return true;
 }
 
 function showMaintenanceForVin(gid) {
@@ -6558,13 +6688,7 @@ function showMaintenanceForVin(gid) {
     const collapsedMap = window._maintCollapsed || (window._maintCollapsed = {});
     const allMode = !!window._maintAll;
     const gb = normGb(g.gearboxCode);
-    const fitsVin = p => {
-        if (g.engineCode && (p.engines || []).length && !p.engines.includes(g.engineCode)) return false;
-        if (g.body && (p.bodies || []).length && !p.bodies.includes(g.body)) return false;
-        if (g.transCode && !partMatchesTrans(p, g.transCode)) return false;
-        if (gb !== 'all' && !partMatchesGearbox(p, gb)) return false;
-        return true;
-    };
+    const fitsVin = p => maintFitsCar(g, p);
 
     let maintParts, grouped, order;
     window._maintIds = [];

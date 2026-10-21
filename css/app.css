@@ -3320,6 +3320,69 @@ body.theme-paper .mh h3 {
     flex-shrink: 0;
 }
 
+/* Список покупок: счётчик выбранных позиций в подвале (слева от кнопок) */
+.shop-count {
+    margin-right: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 700;
+    font-size: .88rem;
+    color: var(--tx);
+}
+
+.shop-count.zero {
+    color: var(--mu);
+    font-weight: 600;
+}
+
+/* Список покупок: сворачиваемые группы */
+.shop-gr {
+    margin-top: 14px;
+}
+
+.shop-gr-h {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--bd);
+    padding: 6px 0;
+    margin-bottom: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--tx);
+    text-align: left;
+    transition: color var(--tr-fast);
+}
+
+.shop-gr-h:hover {
+    color: var(--a);
+}
+
+.shop-chev {
+    font-size: .62rem;
+    color: var(--mu);
+    flex-shrink: 0;
+    transition: transform var(--tr-fast);
+}
+
+.shop-chev.collapsed {
+    transform: rotate(-90deg);
+}
+
+.shop-gr-sel {
+    margin-left: auto;
+    color: var(--ok);
+    font-size: .78rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
 /* Формы */
 .fg {
     margin-bottom: 14px;
