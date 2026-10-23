@@ -743,18 +743,25 @@ function rDash() {
     const urgent = t && (t.daysLeft <= 7 || t.kmLeft <= 500);
     h += '<div class="dash-card' + (urgent ? ' warn' : '') + '"><div class="dc-h">🛠 Ближайшее ТО</div>';
     if (t) {
+        /* ✅ 1.10.1: при расчёте по одометру показываем, сколько уже проехали
+           с последнего ТО; без lastKm — честно пишем, что это оценка по дате. */
+        let sub;
+        if (t.kmLeft <= 0 || t.daysLeft <= 0) sub = '⚠ пора на сервис!';
+        else if (t.byKm) sub = 'с последнего ТО (' + t.lastKm.toLocaleString('ru-RU') + ' км) проехали ' + t.kmSince.toLocaleString('ru-RU') + ' км · интервал ' + t.interval.toLocaleString('ru-RU') + ' км';
+        else sub = 'до следующего обслуживания · интервал ' + t.interval.toLocaleString('ru-RU') + ' км · ⚠ оценка по дате — укажите пробег на момент ТО';
         h += '<div class="dc-big">' + Math.max(0, t.kmLeft).toLocaleString('ru-RU') + ' км · ' + Math.max(0, t.daysLeft) + ' дн</div>'
-            + '<div class="dc-sub">' + (t.kmLeft <= 0 || t.daysLeft <= 0 ? '⚠ пора на сервис!' : 'до следующего обслуживания · интервал ' + (Number(TO.interval) || 15000).toLocaleString('ru-RU') + ' км') + '</div>'
+            + '<div class="dc-sub">' + sub + '</div>'
             + '<div class="dash-btns"><button class="bn" onclick="oShopList()" title="Только расходники ТО: фильтры, жидкости и смазки, ремни, колодки, герметики, пробка поддона">🛒 Список покупок</button><button class="bn" onclick="oTO()">✏️ Параметры</button></div>';
     } else {
-        h += '<div class="dc-sub">Укажите пробег и дату последнего ТО — виджет посчитает остаток</div>'
+        h += '<div class="dc-sub">Укажите пробег и пробег/дату последнего ТО — виджет посчитает остаток</div>'
             + '<div class="dash-btns"><button class="bn p" onclick="oTO()">🛠 Настроить ТО</button></div>';
     }
     h += '</div>';
-    /* Журнал + расходы */
-    const logs = LOG.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+    /* Журнал + расходы — ✅ 1.10.0: только этой машины (переключатель
+       «все машины» в журнале на кабинет не влияет) */
+    const logs = vinLogs().slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
     const spend = {};
-    LOG.forEach(l => {
+    logs.forEach(l => {
         if (l.cost == null) return;
         const cur = l.currency || 'RUB';
         const y = String(l.date || '').slice(0, 4) || 'б/д';
@@ -1356,7 +1363,7 @@ function printIssueChecklist() {
         + '.src{font-size:11px;color:#888}.note{margin-top:14px;font-size:11px;color:#888}</style>';
     let h = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Чек-лист осмотра — ' + esc(g.vin || '') + '</title>' + css + '</head><body>';
     h += '<h1>📋 Чек-лист осмотра автомобиля</h1><div class="sub">VIN ' + esc(g.vin || '—') + ' · ' + esc([g.brand, g.model, g.year].filter(Boolean).join(' '))
-        + (g.engineCode ? ' · мотор ' + esc(g.engineCode) : '') + (g.transCode ? ' · КПП ' + esc(g.transCode) : '')
+        + (g.engineCode ? ' · мотор ' + esc(g.engineCode) : '') + ((g.gearboxCode || g.transCode) ? ' · КПП ' + esc(g.gearboxCode || g.transCode) : '')
         + ' · База Мастера v' + esc(APP_VERSION) + ' · ' + new Date().toLocaleDateString('ru-RU') + '</div>';
     if (issues.length) {
         h += '<h2>⚠ Типичные проблемы этой модели (с учётом года выпуска)</h2><ul>';
@@ -1947,8 +1954,10 @@ const UK = 'vw_polo_ui_v186', PK = 'vw_polo_db_v181', WK = 'vw_polo_workshops_v1
     SP = 'parts', SW = 'workshops', METAKEY = 'vw_polo_meta_v1', TOKEY = 'vw_polo_to_v1',
     LICKEY = 'vw_polo_license_v1', UPKEY = 'vw_polo_update_url_v1', PROFKEY = 'vw_polo_profile_v1',
     LOGKEY = 'vw_polo_logs_v1',
+    LOGVMKEY = 'vw_polo_logs_vinmig_v1',
     WNKEY = 'vw_polo_last_seen_version_v1',
-    ONBKEY = 'vw_polo_faq_onboarded_v1';
+    ONBKEY = 'vw_polo_faq_onboarded_v1',
+    SHPKEY = 'vw_polo_shop_v1';
 
 const THEMES = [
     { id: 'light', label: 'Светлая', icon: '☀️', cls: 'theme-light', preview: '#f3f5f9' },
@@ -1969,6 +1978,7 @@ let SV = {
     bodyFilter: 'all', trimFilter: 'all', transFilter: 'all', gearboxFilter: 'all', genFilter: 'all',
     sidebarCollapsed: false,
     theme: 'aurora', sortBy: 'default', view: 'grid', activeVinId: null,
+    logScope: 'car',
     groupBySub: false, vinStrictFilter: false, fitOnly: false, expandedCats: {},
     garCollapsed: {},
     shopCollapsed: {},
@@ -1976,9 +1986,18 @@ let SV = {
 };
 let USER = { name: '', email: '', city: '', initials: '', color: '#00b0f0' };
 let CUSTOM = { categories: [], sections: {} };
-let TO = { km: null, lastDate: null, interval: 15000 };
+/* ✅ 1.10.0: пробег/ТО и журнал — РАЗДЕЛЬНО по машинам гаража.
+   TO — «вид» настроек активной машины (км, дата посл. ТО, интервал);
+   TO_ALL — карта VIN → { km, lastDate, interval } (ключ '__common__' —
+   значения до выбора машины). Старый одиночный формат TOKEY мигрирует
+   на активный VIN (или единственную машину гаража) один раз.
+   ✅ 1.10.1: добавлен lastKm — пробег НА МОМЕНТ последнего ТО. С ним
+   остаток до ТО считается по фактическому одометру (интервал − пробег
+   с последнего ТО), а не по оценке «~1000 км/мес» от даты. */
+let TO = { km: null, lastKm: null, lastDate: null, interval: 15000 };
+let TO_ALL = {};
 
-let APP_VERSION = '1.9.0';
+let APP_VERSION = '1.10.3';
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -1994,10 +2013,12 @@ let _visibleLimit = 40, _lastRenderSig = '';
 
 const PAGE_SIZE = 40;
 
-/* ============ ИНДЕКС ЛОГОВ ============ */
+/* ============ ИНДЕКС ЛОГОВ ============
+   ✅ 1.10.0: индекс «меняли» строится по записям АКТИВНОЙ машины —
+   бейдж 🔧 в карточке детали больше не путает историю разных VIN. */
 function _rebuildLogIndex() {
     _logByOem.clear();
-    for (const e of LOG) {
+    for (const e of vinLogs()) {
         const items = Array.isArray(e.items) ? e.items : [];
         for (const it of items) {
             const key = nz(it);
@@ -2609,13 +2630,80 @@ function lLS() {
     } catch (e) { }
 }
 
+/* ── ТО/пробег: раздельно по VIN (1.10.0) ──
+   Ключ карты — VIN активной машины (upper) либо '__common__', если машина
+   не выбрана. TO всегда синхронизирован с TO_ALL[toKey()] через toSync(). */
+const TO_COMMON = '__common__';
+const toDef = () => ({ km: null, lastKm: null, lastDate: null, interval: 15000 });
+function toKey() {
+    const av = gAV();
+    return av && av.vin ? String(av.vin).trim().toUpperCase() : TO_COMMON;
+}
+function toForVin(vin) {
+    const k = String(vin || '').trim().toUpperCase();
+    return (k && TO_ALL[k]) || null;
+}
+function toNorm(t) {
+    if (!t || typeof t !== 'object') return null;
+    const km = t.km != null && !isNaN(Number(t.km)) ? Number(t.km) : null;
+    const lastKm = t.lastKm != null && !isNaN(Number(t.lastKm)) ? Number(t.lastKm) : null;
+    const lastDate = t.lastDate || null;
+    const interval = Number(t.interval) || 15000;
+    if (km == null && lastKm == null && !lastDate && interval === 15000) return null;
+    return { km, lastKm, lastDate, interval };
+}
+function toSync() {
+    const k = toKey();
+    TO = TO_ALL[k] ? Object.assign(toDef(), TO_ALL[k]) : toDef();
+}
+/* Одноразовая миграция старого одиночного формата { km, lastDate, interval }:
+   значения принадлежали «текущей» машине — относим их на активный VIN,
+   единственную машину гаража либо в '__common__' (машина не выбрана).
+   Важно: персистим карту напрямую (_toPersist), а не через sTOStorage —
+   вид TO в этот момент ещё не синхронизирован и commit затёр бы перенос. */
+function toMigrateLegacy() {
+    const leg = TO_ALL['__legacy__'];
+    if (!leg) return;
+    delete TO_ALL['__legacy__'];
+    let k = TO_COMMON;
+    const av = gAV();
+    if (av && av.vin) k = String(av.vin).trim().toUpperCase();
+    else if (G.length === 1 && G[0].vin) k = String(G[0].vin).trim().toUpperCase();
+    if (!TO_ALL[k]) TO_ALL[k] = leg;
+    _toPersist();
+}
 function lTO() {
+    TO_ALL = {};
     try {
         const r = localStorage.getItem(TOKEY);
-        if (r) { const t = JSON.parse(r); TO = Object.assign(TO, t); }
+        if (r) {
+            const t = JSON.parse(r);
+            if (t && typeof t === 'object' && t.byVin && typeof t.byVin === 'object') {
+                for (const k of Object.keys(t.byVin)) {
+                    const v = toNorm(t.byVin[k]);
+                    if (v) TO_ALL[String(k).trim().toUpperCase()] = v;
+                }
+            } else {
+                const v = toNorm(t);
+                if (v) TO_ALL['__legacy__'] = v;
+            }
+        }
     } catch (e) { }
+    toMigrateLegacy();
+    toSync();
 }
-function sTOStorage() { try { localStorage.setItem(TOKEY, JSON.stringify(TO)); } catch (e) { } }
+/* Запись карты TO_ALL в localStorage «как есть» (без commit текущего TO). */
+function _toPersist() {
+    try { localStorage.setItem(TOKEY, JSON.stringify({ byVin: TO_ALL })); } catch (e) { }
+}
+/* Сохраняет ТЕКУЩИЙ TO в карту под активным ключом и пишет всю карту.
+   Пустые значения (сброс) удаляют запись ключа — карта не зарастает. */
+function sTOStorage() {
+    const k = toKey();
+    const v = toNorm(TO);
+    if (v) TO_ALL[k] = v; else delete TO_ALL[k];
+    _toPersist();
+}
 
 async function lLogs() {
     try {
@@ -2631,7 +2719,44 @@ async function lLogs() {
             }
         }
     } catch (e) { console.warn('logs load error', e); }
+    logMigrateVins();
     _rebuildLogIndex();
+}
+
+/* ── Журнал: раздельно по VIN (1.10.0) ──
+   Записи хранят vin (штамповался и раньше, но не использовался).
+   vinLogs() — записи активной машины (без машины — все);
+   carLogs() — с учётом переключателя «эта машина / все машины» в журнале;
+   logMigrateVins() — одноразово относит старые записи без vin на активную
+   машину (журнал до 1.10.0 вёлся по факту для текущего VIN). */
+const logVinOf = e => String((e && e.vin) || '').trim().toUpperCase();
+function vinLogs() {
+    const av = gAV();
+    if (!av || !av.vin) return LOG;
+    const k = String(av.vin).trim().toUpperCase();
+    return LOG.filter(e => logVinOf(e) === k);
+}
+function carLogs() {
+    const av = gAV();
+    if (av && SV.logScope === 'all') return LOG;
+    return vinLogs();
+}
+function logMigrateVins() {
+    let done = false;
+    try { done = localStorage.getItem(LOGVMKEY) === '1'; } catch (e) { }
+    if (done) return;
+    const untagged = LOG.filter(e => !logVinOf(e));
+    if (!untagged.length) {
+        try { localStorage.setItem(LOGVMKEY, '1'); } catch (e) { }
+        return;
+    }
+    const av = gAV();
+    if (!av || !av.vin) return; // подождём, пока пользователь выберет машину (setAV повторит)
+    const k = String(av.vin).trim().toUpperCase();
+    for (const e of untagged) e.vin = k;
+    sLogs();
+    try { localStorage.setItem(LOGVMKEY, '1'); } catch (e) { }
+    console.info('[bm] журнал: ' + untagged.length + ' записей без VIN отнесены к …' + k.slice(-6));
 }
 
 /* ============ ТОСТ ============ */
@@ -2824,6 +2949,9 @@ function rGar() {
         if (col) metaHtml += '<span class="gi-dot" style="background:' + col.hex + '" title="' + escA(col.ru) + '"></span>';
         else if (g.bodyColor) metaHtml += '<span class="gi-dot unk" title="Цвет ' + escA(g.bodyColor) + ' (не в справочнике)"></span>';
         if (g.year) metaHtml += '<span class="gi-chip">' + esc(g.year) + '</span>';
+        /* ✅ 1.10.0: пробег своей машины прямо в превью гаража */
+        const gto = toForVin(g.vin);
+        if (gto && gto.km != null) metaHtml += '<span class="gi-chip" title="Пробег этой машины (кабинет «Моя машина»)">🛠 ' + Number(gto.km).toLocaleString('ru-RU') + ' км</span>';
         if (g.engineCode) metaHtml += '<span class="gi-chip">⚙ ' + esc(g.engineCode) + '</span>';
         if (g.gearboxCode || g.transCode) metaHtml += '<span class="gi-chip">🔄 ' + esc(g.gearboxCode || g.transCode) + '</span>';
         if (g.gen) metaHtml += '<span class="gi-chip">🚘 ' + esc(g.gen) + '</span>';
@@ -2903,6 +3031,24 @@ function rGar() {
             + '</div></div>' + metaHtml;
         if (act && !collapsed) {
             h += '<div class="gi-details">';
+            /* ✅ 1.10.1: честная подсказка, почему карточка «пустая»: оснащения
+               этого VIN нет в базе (дамп ETKA даёт только список VIN либо
+               запись без полей). Полный набор — как у машин с полной записью —
+               появляется из базы/патча (garSyncFromDb) или из ручного ввода. */
+            if (!g.engineCode && !g.gearboxCode && !g.transCode && !g.bodyColor && !g.prodDate) {
+                const _dbrow = vinDbRow(g.vin);
+                const _dbCore = !!(_dbrow && (_dbrow.engine || _dbrow.gearbox_code || _dbrow.paint || _dbrow.prod_date));
+                const _dbPrN = (_dbrow && Array.isArray(_dbrow.pr)) ? _dbrow.pr.length : 0;
+                let why = '';
+                if (_dbCore) why = '';   // есть что подтянуть — garSyncFromDb дополнит карточку
+                else if (_dbPrN) why = 'В базе нашлись только PR-коды оснащения (📋 «Оснащение (PR)» — ' + _dbPrN + ' шт.), а мотор/КПП/краска/дата в записи дампа отсутствуют.';
+                else if (_dbrow) why = 'VIN есть в дампе ETKA, но запись без оснащения.';
+                else why = 'Оснащение этого VIN в базе не найдено (ни в дампе ETKA, ни в ручных записях).';
+                if (why) {
+                    h += '<div class="gi-dbhint">📋 ' + why
+                        + ' Поэтому карточка короче, чем у машин с полной записью. Заполните мотор/КПП/цвет/дату вручную («✎ Уточнить данные») или добавьте карточку ETKA этого VIN в <b>data/vin-db.patch.json</b> — и здесь появится всё: дата и неделя выпуска, цвета, коды, PR-оснащение.</div>';
+                }
+            }
             if (engineHtml) h += engineHtml; if (transHtml) h += transHtml; if (colorHtml) h += colorHtml; if (weekHtml) h += weekHtml; if (issuesHtml) h += issuesHtml;
             h += '<div class="gi-actions"><button class="gi-btn gi-btn-primary" data-vact="edit" data-gid="' + escA(g.id) + '">✎ Уточнить данные</button><button class="gi-btn" data-vact="pr" data-gid="' + escA(g.id) + '">📋 Оснащение (PR)</button><button class="gi-btn gi-btn-primary" data-vact="maintenance" data-gid="' + escA(g.id) + '">🛒 Расходники ТО</button><button class="gi-btn" data-vact="qr" data-gid="' + escA(g.id) + '">📱 QR-код</button><button class="gi-btn" data-vact="plate" data-gid="' + escA(g.id) + '">📍 Где коды</button><button class="gi-btn" data-vact="export" data-gid="' + escA(g.id) + '">📤 Экспорт</button></div></div>';
         }
@@ -3118,8 +3264,17 @@ function setAV(id) {
     if (wasActive && !SV.activeVinId) SV.vinStrictFilter = false;
     if (SV.activeVinId === id) setHash('/vin/' + encodeURIComponent(id)); else syncCatHash();
 
+    /* ✅ 1.10.0: у каждой машины свой пробег/ТО и свой журнал —
+       при переключении VIN подтягиваем её данные и пересобираем индекс
+       «меняли» (бейджи 🔧 в карточках деталей).
+       ✅ 1.10.1: и свой список покупок — отметки переключаются вместе с VIN. */
+    toSync();
+    shopSync();
+    logMigrateVins();
+    _rebuildLogIndex();
+
     applyVinFilters();
-    sU(); rGar(); rSB(); rC();
+    sU(); rGar(); rSB(); rTOWidget(); rC();
 
     const info = gAV();
     const av = gAV();
@@ -3131,6 +3286,7 @@ function setAV(id) {
         if (SV.bodyFilter !== 'all') bits.push('🚗 ' + (BODIES[SV.bodyFilter] || SV.bodyFilter));
         if (SV.transFilter !== 'all') bits.push('🔄 ' + SV.transFilter);
         if (SV.gearboxFilter !== 'all') bits.push('🔤 ' + SV.gearboxFilter);
+        if (TO.km != null) bits.push('🛠 ' + Number(TO.km).toLocaleString('ru-RU') + ' км');
         if (bits.length) extra = ' · ' + bits.join(' · ');
     }
     toast(info ? 'Активный VIN: …' + info.vin.slice(-6) + extra : 'VIN-фильтр снят');
@@ -3184,7 +3340,10 @@ function sGarV() {
         if (!g.prodDate && dbrow.prod_date) g.prodDate = dbrow.prod_date;
     }
     applyVinFilters();
-    sU(); rGar(); rSB(); rC();
+    /* ✅ 1.10.0: новая машина активирована — её пробег/ТО пусты, журнал
+       этой машины пуст; виджет ТО и индекс «меняли» синхронизируем. */
+    toSync(); _rebuildLogIndex();
+    sU(); rGar(); rSB(); rTOWidget(); rC();
     cGM();
     toast(fromDb ? 'VIN сохранён · 📦 оснащение распознано по базе VIN' : 'VIN сохранён', 'success');
     window.ymGoal && window.ymGoal('vin_added');
@@ -3196,8 +3355,11 @@ function remV(id) {
     if (!confirm('Удалить VIN ' + g.vin + '?')) return;
     G = G.filter(x => x.id !== id);
     if (SV.activeVinId === id) SV.activeVinId = null;
+    /* ✅ 1.10.0: пробег/ТО и журнал удалённой машины НЕ стираем — при
+       повторном добавлении того же VIN история вернётся. */
+    toSync(); _rebuildLogIndex();
     applyVinFilters();
-    sG(); sU(); rGar(); rSB(); rC();
+    sG(); sU(); rGar(); rSB(); rTOWidget(); rC();
     toast('VIN удалён', 'danger');
 }
 
@@ -3833,8 +3995,13 @@ async function lAll() {
     }
 
     // 8. Гараж, профиль, ТО, логи (мета загружена в шаге 0 — ✅ 1.8.1)
-    lG(); lU(); lProfile(); lTO(); await lLogs();
+    // ✅ 1.10.0: активный VIN валидируем ДО загрузки ТО/логов — от него
+    // зависит, какой машине принадлежат пробег и записи журнала.
+    lG(); lU(); lProfile();
     if (SV.activeVinId && !G.some(g => g.id === SV.activeVinId)) SV.activeVinId = null;
+    /* ✅ 1.10.1: lShopAll() — после мерджа каталога (D готов): отметки
+       списка покупок восстанавливаются устойчивыми ключами «oem|название». */
+    lTO(); lShopAll(); await lLogs();
     try { vk = localStorage.getItem(VK) || ''; } catch (e) { }
 }
 
@@ -3982,7 +4149,7 @@ function rSB() {
         if (sec && Array.isArray(sec.rows)) return sec.rows.length;
 
         if (id === 'Workshops') return W.length;
-        if (id === 'Log') return LOG.length;
+        if (id === 'Log') return carLogs().length;   // ✅ 1.10.0: счётчик журнала — по активной машине
         if (id === 'Diagnostics')
             return (CUSTOM.sections.Diagnostics && CUSTOM.sections.Diagnostics.rows || []).length;
         if (id === 'Torque')
@@ -5040,6 +5207,13 @@ function oCC(e) {
         }
         return;
     }
+    const ls = e.target.closest('[data-action="log-scope"]');
+    if (ls) {
+        e.stopPropagation();
+        SV.logScope = SV.logScope === 'all' ? 'car' : 'all';
+        sUS(); rLog();
+        return;
+    }
     const dk = e.target.closest('[data-action="dash-km"]');
     if (dk) {
         e.stopPropagation();
@@ -5048,7 +5222,15 @@ function oCC(e) {
         if (isNaN(v)) { toast('Введите пробег числом', 'danger'); return; }
         TO.km = v;
         sTOStorage(); rTOWidget(); rDash();
-        toast(' Пробег обновлён: ' + v.toLocaleString('ru-RU') + ' км', 'success');
+        const _av = gAV();
+        /* ✅ 1.10.1: остаток до ТО пересчитывается по фактическому пробегу —
+           показываем его сразу в тосте; если пробег на момент ТО ещё не
+           указан, подсказываем, где его заполнить. */
+        let m = (_av ? '🚘 …' + _av.vin.slice(-6) + ': ' : '') + 'пробег обновлён: ' + v.toLocaleString('ru-RU') + ' км';
+        const _t = nextTO();
+        if (_t && _t.byKm) m += ' · до ТО осталось ' + _t.kmLeft.toLocaleString('ru-RU') + ' км';
+        else if (TO.lastKm == null) m += '. 💡 Укажите пробег на момент последнего ТО (✏️ Параметры) — счётчик до ТО будет считать остаток по одометру';
+        toast(m, 'success');
         return;
     }
     const dn = e.target.closest('[data-action="dash-notify"]');
@@ -5698,26 +5880,55 @@ function aI(parts, ws, gs, meta) {
     rGar(); rSB(); rC();
 }
 
-/* ============ ЖУРНАЛ ============ */
+/* ============ ЖУРНАЛ ============
+   ✅ 1.10.0: журнал ведётся РАЗДЕЛЬНО по машинам — каждая запись хранит
+   VIN. С активной машиной показываются только её записи; переключатель
+   «🚘 Эта машина / 🚙 Все машины» открывает общий список с бейджами VIN. */
 function rLog() {
     const ar = $('ca');
     let h = '<h2 class="sh">📖 Журнал обслуживания</h2>';
     const av = gAV();
+    const scopeAll = !!(av && SV.logScope === 'all');
+    const list = carLogs();
     h += '<div class="ri">';
-    h += '<span class="chip">записей: <b>' + LOG.length + '</b></span>';
-    if (av) h += '<span class="chip">VIN …' + esc(av.vin.slice(-6)) + '</span>';
+    h += '<span class="chip">записей: <b>' + list.length + '</b></span>';
+    if (av) {
+        h += '<span class="chip">VIN …' + esc(av.vin.slice(-6)) + '</span>';
+        h += '<button class="bn' + (scopeAll ? '' : ' p') + '" data-action="log-scope" style="padding:4px 10px;font-size:.78rem" title="'
+            + (scopeAll ? 'Показаны записи всех машин гаража — кликните, чтобы вернуться к активной' : 'Журнал ведётся раздельно по машинам — кликните, чтобы увидеть записи всех машин гаража') + '">'
+            + (scopeAll ? '🚙 Все машины' : '🚘 Эта машина') + '</button>';
+    } else {
+        h += '<span class="chip" title="Выберите машину в гараже — журнал покажет её записи">машина не выбрана · показаны все записи</span>';
+    }
     h += '<button class="bn p" onclick="oLogNew()" style="padding:4px 10px;font-size:.78rem">➕ Добавить запись</button>';
     h += '</div>';
-    if (!LOG.length) {
-        h += '<div class="emp"><div class="empi">📖</div><p><b>Журнал пуст</b></p><p>Фиксируй каждую работу — потом не вспомнишь, когда менял ГРМ.</p></div>';
+    if (!list.length) {
+        if (av && !scopeAll && LOG.length) {
+            h += '<div class="emp"><div class="empi">📖</div><p><b>У этой машины записей пока нет</b></p>'
+                + '<p style="font-size:.8rem;color:var(--mu)">Журнал ведётся раздельно по VIN. В других машинах гаража записей: ' + (LOG.length - vinLogs().length) + '.</p>'
+                + '<button class="bn" data-action="log-scope">🚙 Показать все машины</button> <button class="bn p" onclick="oLogNew()">➕ Добавить запись</button></div>';
+        } else {
+            h += '<div class="emp"><div class="empi">📖</div><p><b>Журнал пуст</b></p><p>Фиксируй каждую работу — потом не вспомнишь, когда менял ГРМ.</p></div>';
+        }
         ar.innerHTML = h; return;
     }
-    const srt = LOG.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.km || 0) - (a.km || 0));
+    const garVin = v => { const k = String(v || '').trim().toUpperCase(); return G.find(x => String(x.vin).toUpperCase() === k); };
+    const srt = list.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.km || 0) - (a.km || 0));
     for (const e of srt) {
         h += '<div class="log-entry" data-lid="' + escA(e.id) + '" style="background:var(--cd);border:1px solid var(--bd);border-left:4px solid var(--a);border-radius:6px;padding:10px 12px;margin-bottom:8px">';
         h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px"><span style="font-family:Consolas,monospace;font-size:.72rem;color:var(--mu);font-weight:700">' + esc(e.date || '—') + '</span>';
+        h += '<span style="display:flex;gap:4px;align-items:center">';
+        /* Бейдж машины — в режиме «все машины» и когда машина не выбрана */
+        if (scopeAll || !av) {
+            const v = logVinOf(e);
+            const mine = av && v === String(av.vin).trim().toUpperCase();
+            const inGar = v && garVin(v);
+            h += '<span title="' + (v ? escA(inGar ? (inGar.brand + ' ' + inGar.model).trim() : 'машина уже не в гараже') : 'запись без привязки к VIN') + '" style="font-family:Consolas,monospace;font-size:.66rem;padding:1px 6px;border-radius:10px;border:1px solid var(--bd);'
+                + (mine ? 'color:var(--a);border-color:var(--a)' : 'color:var(--mu)') + '">'
+                + (v ? (mine ? '🚘 ' : '') + '…' + esc(v.slice(-6)) + (inGar ? '' : ' ✝') : 'без VIN') + '</span>';
+        }
         if (e.km) h += '<span style="font-size:.72rem;background:var(--hv);padding:1px 6px;border-radius:10px;color:var(--mu)">' + e.km.toLocaleString('ru-RU') + ' км</span>';
-        h += '</div>';
+        h += '</span></div>';
         h += '<div style="font-weight:700;font-size:.92rem;color:var(--tx);margin:2px 0 6px">' + esc(e.title || '(без названия)') + '</div>';
         if (e.items && e.items.length) h += '<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px">'
             + e.items.map(it => '<span style="font-size:.68rem;background:rgba(0,176,240,.12);color:var(--a);padding:2px 6px;border-radius:3px;font-family:Consolas,monospace">' + esc(it) + '</span>').join('') + '</div>';
@@ -5731,7 +5942,9 @@ function rLog() {
     ar.innerHTML = h;
 }
 function oLogNew() {
-    $('logmt').textContent = 'Новая запись';
+    /* ✅ 1.10.0: запись прикрепляется к активной машине — показываем, к какой */
+    const av = gAV();
+    $('logmt').textContent = av ? 'Новая запись · 🚘 …' + av.vin.slice(-6) : 'Новая запись';
     $('l_id').value = '';
     $('l_date').value = new Date().toISOString().slice(0, 10);
     $('l_km').value = TO.km || '';
@@ -5746,7 +5959,8 @@ function oLogNew() {
 }
 function oLogEdit(id) {
     const e = LOG.find(x => x.id === id); if (!e) return;
-    $('logmt').textContent = 'Редактирование';
+    const ev = logVinOf(e);
+    $('logmt').textContent = ev ? 'Редактирование · 🚘 …' + ev.slice(-6) : 'Редактирование';
     $('l_id').value = e.id;
     $('l_date').value = e.date || '';
     $('l_km').value = e.km || '';
@@ -5763,6 +5977,9 @@ function sLog() {
     const title = $('l_title').value.trim();
     if (!title) { toast('Введите название', 'danger'); return; }
     const id = $('l_id').value;
+    /* ✅ 1.10.0: при редактировании VIN записи не переписываем — запись
+       остаётся в журнале той машины, к которой была прикреплена. */
+    const prev = id ? LOG.find(x => x.id === id) : null;
     const rec = {
         id: id || ('l_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6)),
         date: $('l_date').value || new Date().toISOString().slice(0, 10),
@@ -5773,8 +5990,8 @@ function sLog() {
         currency: $('l_cur').value || 'RUB',
         shop: $('l_shop').value.trim(),
         notes: $('l_notes').value.trim(),
-        vin: gAV() ? gAV().vin : '',
-        createdAt: Date.now()
+        vin: (prev && logVinOf(prev)) ? logVinOf(prev) : (gAV() ? String(gAV().vin).toUpperCase() : ''),
+        createdAt: (prev && prev.createdAt) || Date.now()
     };
     if (id) {
         const i = LOG.findIndex(x => x.id === id);
@@ -5808,17 +6025,46 @@ function lastLogBadge(oem) {
 }
 
 /* ============ ТО ============ */
+/* ✅ 1.10.1: остаток до ТО считается ПО ФАКТИЧЕСКОМУ ПРОБЕГУ, если указан
+   lastKm (пробег на момент последнего ТО): kmLeft = интервал − (текущий км −
+   км на момент ТО). Обновил пробег в кабинете — остаток сразу пересчитался.
+   Дни до ТО: по реальному темпу езды (км с последнего ТО / дней с даты),
+   иначе оценка ~1000 км/мес. Без lastKm — прежняя оценка по дате
+   (совместимость со старыми записями), в расчёте помечается byKm=false. */
 function nextTO() {
-    if (TO.km == null || !TO.lastDate) return null;
-    const last = new Date(TO.lastDate);
-    if (isNaN(last.getTime())) return null;
+    if (TO.km == null) return null;
     const interval = Number(TO.interval) || 15000;
-    const monthlyKm = 1000;
-    const monthsSince = Math.max(0, (Date.now() - last.getTime()) / (1000 * 60 * 60 * 24 * 30.44));
-    const kmSinceLast = monthsSince * monthlyKm;
-    const kmToNext = Math.max(0, interval - kmSinceLast);
-    const daysToNext = Math.round(kmToNext / monthlyKm * 30.44);
-    return { interval, kmLeft: Math.round(kmToNext), daysLeft: daysToNext, lastDate: TO.lastDate };
+    const DEF_RATE = 1000 / 30.44;          // ~1000 км/мес, км в сутки
+    let last = null;
+    if (TO.lastDate) {
+        last = new Date(TO.lastDate);
+        if (isNaN(last.getTime())) last = null;
+    }
+    const hasLastKm = TO.lastKm != null && !isNaN(Number(TO.lastKm));
+    if (hasLastKm) {
+        const kmSince = Math.max(0, Number(TO.km) - Number(TO.lastKm));
+        const kmLeft = Math.max(0, interval - kmSince);
+        let rate = DEF_RATE;
+        if (last) {
+            const daysSince = (Date.now() - last.getTime()) / 86400000;
+            if (daysSince > 1 && kmSince > 0) rate = kmSince / daysSince;
+        }
+        return {
+            interval, kmLeft: Math.round(kmLeft), daysLeft: Math.round(kmLeft / rate),
+            lastDate: TO.lastDate || null, lastKm: Number(TO.lastKm),
+            km: Number(TO.km), kmSince: Math.round(kmSince), byKm: true
+        };
+    }
+    if (!last) return null;
+    /* старая оценка по дате: ~1000 км в месяц */
+    const monthsSince = Math.max(0, (Date.now() - last.getTime()) / (86400000 * 30.44));
+    const kmSince = monthsSince * 1000;
+    const kmLeft = Math.max(0, interval - kmSince);
+    return {
+        interval, kmLeft: Math.round(kmLeft), daysLeft: Math.round(kmLeft / DEF_RATE),
+        lastDate: TO.lastDate, lastKm: null, km: Number(TO.km),
+        kmSince: Math.round(kmSince), byKm: false
+    };
 }
 function rTOWidget() {
     const chip = $('toChip'), lbl = $('toLbl');
@@ -5838,29 +6084,52 @@ function rTOWidget() {
     else if (warn) { chip.style.borderColor = 'var(--sr)'; chip.style.color = 'var(--sr)'; chip.style.background = 'rgba(245,166,35,.08)'; }
     else { chip.style.borderColor = 'var(--ok)'; chip.style.color = 'var(--ok)'; chip.style.background = 'rgba(40,167,69,.08)'; }
     lbl.textContent = '⏱ ' + t.kmLeft.toLocaleString('ru-RU') + ' км / ' + t.daysLeft + ' дн.';
-    chip.title = 'До ТО: ' + t.kmLeft.toLocaleString('ru-RU') + ' км / ' + t.daysLeft + ' дн. · Интервал ' + t.interval.toLocaleString('ru-RU') + ' км. Клик для настроек.';
+    chip.title = 'До ТО: ' + t.kmLeft.toLocaleString('ru-RU') + ' км / ' + t.daysLeft + ' дн. · Интервал ' + t.interval.toLocaleString('ru-RU') + ' км · '
+        + (t.byKm
+            ? 'расчёт по фактическому пробегу (с последнего ТО: ' + t.kmSince.toLocaleString('ru-RU') + ' км)'
+            : 'оценка по дате (~1000 км/мес) — укажите пробег на момент ТО в настройках для точного расчёта')
+        + '. Клик для настроек.';
 }
 function oTO() {
-    $('t_km').value = TO.km || '';
+    /* ✅ 1.10.0: настройки ТО принадлежат активной машине — подписываем, какой */
+    const av = gAV();
+    const tc = $('tom_car');
+    if (tc) tc.textContent = av ? '· 🚘 …' + av.vin.slice(-6) : '· машина не выбрана';
+    $('t_km').value = TO.km != null ? TO.km : '';
+    $('t_lastkm').value = TO.lastKm != null ? TO.lastKm : '';
     $('t_date').value = TO.lastDate || '';
     $('t_interval').value = String(TO.interval || 15000);
     openM('tomo');
 }
 const cTO = () => closeM('tomo');
 function resetTO() {
-    if (!confirm('Сбросить настройки ТО? Виджет вернётся в состояние «Настроить».')) return;
-    TO = { km: null, lastDate: null, interval: 15000 };
-    try { localStorage.removeItem(TOKEY); } catch (e) { }
+    const av = gAV();
+    if (!confirm('Сбросить настройки ТО' + (av ? ' машины …' + av.vin.slice(-6) : '') + '? Виджет вернётся в состояние «Настроить».')) return;
+    TO = toDef();
+    sTOStorage();   // ✅ 1.10.0: удаляет запись только этой машины, чужие не трогает
     cTO(); rTOWidget();
+    if (SV.activeCat === 'Dash') rDash();
     toast('Настройки ТО сброшены', 'danger');
 }
 function sTO() {
     TO.km = $('t_km').value !== '' ? Number($('t_km').value) : null;
+    TO.lastKm = $('t_lastkm').value !== '' ? Number($('t_lastkm').value) : null;
     TO.lastDate = $('t_date').value || null;
     TO.interval = Number($('t_interval').value) || 15000;
+    /* ✅ 1.10.1: ТО сделано сегодня, а «пробег на момент ТО» не заполнен —
+       считаем его равным текущему (самый частый сценарий: обслужился →
+       записал). Не молча: сообщаем в тосте. */
+    let note = '';
+    const today = new Date().toISOString().slice(0, 10);
+    if (TO.lastKm == null && TO.km != null && TO.lastDate === today) {
+        TO.lastKm = TO.km;
+        note = ' · пробег на момент ТО = текущий (' + TO.km.toLocaleString('ru-RU') + ' км)';
+    }
     sTOStorage();
-    cTO(); rTOWidget();
-    toast('Настройки ТО сохранены', 'success');
+    cTO(); rTOWidget(); rGar();
+    if (SV.activeCat === 'Dash') rDash();
+    const av = gAV();
+    toast((av ? '🚘 …' + av.vin.slice(-6) + ': ' : '') + 'настройки ТО сохранены' + note, 'success');
 }
 
 /* ============ СПИСОК ПОКУПОК ============
@@ -5872,10 +6141,63 @@ function sTO() {
    щётки, регламент. Ремонтные запчасти (подвеска, электрика, радиаторы,
    суппорты, лампы и т.п.) сюда не попадают — они в каталоге.
    Если в гараже выбрана машина, список сужается до позиций её мотора/
-   кузова/КПП; уже отмеченные позиции (shopPick) не теряются и открываются
-   с готовыми галочками. */
+   кузова/КПП.
+
+   ✅ 1.10.1: отметки СОХРАНЯЮТСЯ — у каждой машины свой список (как пробег
+   и журнал). Хранилище vw_polo_shop_v1 = { byVin: { VIN: [ключи] } }, ключ
+   '__common__' — когда машина не выбрана. Позиции пишутся устойчивым ключом
+   «oem|название» (lowercase), а не внутренним id: id пересоздаются при
+   обновлении каталога, а артикул с названием — нет. */
+const pickKeyOf = p => (String(p.oem || '').toLowerCase() + '|' + String(p.name || '').toLowerCase());
+let SHOP_ALL = {};
+function lShopAll() {
+    SHOP_ALL = {};
+    try {
+        const r = localStorage.getItem(SHPKEY);
+        if (r) {
+            const t = JSON.parse(r);
+            if (t && typeof t === 'object' && t.byVin && typeof t.byVin === 'object') {
+                for (const k of Object.keys(t.byVin)) {
+                    const arr = t.byVin[k];
+                    if (Array.isArray(arr)) SHOP_ALL[String(k).trim().toUpperCase()] = arr.map(String).filter(Boolean);
+                }
+            }
+        }
+    } catch (e) { }
+    shopSync();
+}
+/* shopPick = отметки активной машины: устойчивые ключи из хранилища →
+   текущие id каталога (несуществующие позиции отбрасываются). */
+function shopSync() {
+    const keys = SHOP_ALL[toKey()] || [];
+    const idx = new Map();
+    for (const p of D) { const k = pickKeyOf(p); if (!idx.has(k)) idx.set(k, p.id); }
+    const ids = [];
+    for (const k of keys) { const id = idx.get(k); if (id) ids.push(id); }
+    shopPick = new Set(ids);
+}
+function sShopPick() {
+    const idx = new Map();
+    for (const p of D) idx.set(p.id, pickKeyOf(p));
+    const keys = [];
+    for (const id of shopPick) { const k = idx.get(id); if (k) keys.push(k); }
+    const key = toKey();
+    if (keys.length) SHOP_ALL[key] = keys; else delete SHOP_ALL[key];
+    try { localStorage.setItem(SHPKEY, JSON.stringify({ byVin: SHOP_ALL })); } catch (e) { }
+}
+function shopClearAll() {
+    if (!shopPick.size) { toast('Отметок нет', 'info'); return; }
+    if (!confirm('Снять все отметки в списке покупок' + (gAV() ? ' машины …' + gAV().vin.slice(-6) : '') + '?')) return;
+    shopPick = new Set();
+    sShopPick();
+    oShopList(true);
+    toast('Отметки сняты', 'info');
+}
 function oShopList(keep) {
-    if (!keep) shopPick = new Set();
+    /* ✅ 1.10.1: при открытии отметки больше НЕ сбрасываются — галочки
+       живут в хранилище (список готовится к печати/поездке в магазин).
+       Очистка — явная, кнопкой «✖ Снять отметки» в подвале. */
+    if (!keep) shopSync();
     const t = nextTO();
     const av = gAV();
     /* «ТО 15 000 км» / «🔧 ТО-2: воздушный фильтр + свечи» — напоминания
@@ -5893,7 +6215,14 @@ function oShopList(keep) {
     }
     const ar = $('shopBody');
     let h = '';
-    if (t) h += '<div style="padding:10px 12px;background:rgba(40,167,69,.08);border:1px solid var(--ok);border-radius:4px;font-size:.82rem;margin-bottom:12px">📅 Последнее ТО: <b>' + esc(t.lastDate) + '</b> · Следующее через <b>' + t.kmLeft.toLocaleString('ru-RU') + ' км</b> (~' + t.daysLeft + ' дн.)</div>';
+    /* ✅ 1.10.3: дата последнего ТО может быть не указана (с 1.10.1 расчёт
+       идёт по пробегу lastKm) — вместо пустого «Последнее ТО: » показываем
+       пробег, на котором было ТО. */
+    if (t) {
+        const lastLbl = t.lastDate ? esc(t.lastDate)
+            : (t.lastKm != null ? 'на ' + Number(t.lastKm).toLocaleString('ru-RU') + ' км' : '—');
+        h += '<div style="padding:10px 12px;background:rgba(40,167,69,.08);border:1px solid var(--ok);border-radius:4px;font-size:.82rem;margin-bottom:12px">📅 Последнее ТО: <b>' + lastLbl + '</b> · Следующее через <b>' + t.kmLeft.toLocaleString('ru-RU') + ' км</b> (~' + t.daysLeft + ' дн.)</div>';
+    }
     else h += '<div style="padding:10px 12px;background:rgba(245,166,35,.08);border:1px solid var(--sr);border-radius:4px;font-size:.82rem;margin-bottom:12px">⚠️ Настрой ТО в шапке (🛠) — расчёт будет точнее. Пока показываю всё по регламенту.</div>';
     h += '<p style="font-size:.82rem;color:var(--mu);margin-top:0">Отметь, что нужно купить. Итог суммируется внизу. Здесь только расходники ТО — ремонтные запчасти ищите в каталоге.</p>';
     if (!candidates.length) {
@@ -5930,6 +6259,7 @@ function oShopList(keep) {
         cb.addEventListener('change', () => {
             if (cb.checked) shopPick.add(cb.dataset.shopId);
             else shopPick.delete(cb.dataset.shopId);
+            sShopPick();   // ✅ 1.10.1: отметка сразу уходит в хранилище
             updShopCount();
             updShopGrSel(cb);
         });
@@ -5993,6 +6323,10 @@ function pShop() {
     const av = gAV();
     const css = '<style>body{font-family:Arial,sans-serif;padding:20px;color:#000}h1{font-size:18px;margin:0 0 12px}h2{font-size:14px;margin:18px 0 8px;color:#004b8f;border-bottom:1px solid #ccc;padding-bottom:3px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left}th{background:#f0f0f0}.vinbox{border:2px solid #000;padding:10px 14px;margin:10px 0 14px}.vinlab{font-size:11px;font-weight:700;letter-spacing:2px;color:#555}.vincode{font-family:Consolas,"Courier New",monospace;font-size:22px;font-weight:700;letter-spacing:2px}.vincar{font-size:12px;margin-top:4px}@media print{@page{margin:15mm}}</style>';
     const w = window.open('', '_blank');
+    /* ✅ 1.10.3: защита от блокировщика всплывающих окон — без неё
+       w === null и печать падала молча (TypeError), особенно на телефонах.
+       Такой же guard есть в printIssueChecklist и printVinCard. */
+    if (!w) { toast('Браузер заблокировал всплывающее окно — разрешите его для этого сайта', 'danger'); return; }
     let h = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Список покупок на ТО</title>' + css + '</head><body>';
     h += '<h1>Список покупок на ТО — VW Polo/Caddy 6N</h1>';
     /* VIN крупно — продавцу в магазине проще ориентироваться по машине. */
@@ -6001,7 +6335,10 @@ function pShop() {
         if (av.brand || av.model) carBits.push([av.brand, av.model].filter(Boolean).join(' '));
         if (av.year) carBits.push(av.year + ' г.');
         if (av.engineCode) carBits.push('мотор ' + av.engineCode);
-        if (av.transCode || av.gearboxCode) carBits.push('КПП ' + (av.transCode || av.gearboxCode));
+        /* КПП: сначала буквенный код (выбит на корпусе, напр. CHL/DXP) — он
+           однозначно определяет агрегат; семейство (085/02K) — только запасной
+           вариант, если код в карточке не указан. */
+        if (av.gearboxCode || av.transCode) carBits.push('КПП ' + (av.gearboxCode || av.transCode));
         if (av.prodDate) carBits.push('выпуск ' + av.prodDate);
         h += '<div class="vinbox"><div class="vinlab">VIN</div>'
             + '<div class="vincode">' + esc(String(av.vin).toUpperCase()) + '</div>'
@@ -6145,6 +6482,14 @@ function vinDbLoad() {
                 for (const rec of arr) if (rec && rec.vin) VINDB.map.set(String(rec.vin).toUpperCase(), rec);
             }
         } catch (e) { VINDB.map = null; }
+        /* Патч базы VIN (data/vin-db.patch.json): ручные записи — машины, которых
+           нет в дампе ETKA, и точечные исправления. Грузится ВСЕГДА (даже когда
+           боевой vin-db.json отсутствует) и имеет приоритет над основной базой —
+           серверный vin-db.json при деплое трогать не нужно. */
+        try {
+            const rp = await fetch(base + 'data/vin-db.patch.json', { cache: 'no-store' });
+            if (rp.ok) vinDbPatchApply(await rp.json());
+        } catch (e) { /* нет патча — не страшно */ }
         try {
             const r2 = await fetch(base + 'data/pr-codes.json', { cache: 'no-store' });
             if (r2.ok) VINDB.pr = await r2.json();
@@ -6157,6 +6502,21 @@ function vinDbLoad() {
         return VINDB.map;
     })();
     return VINDB.promise;
+}
+/* Применить записи патча поверх основной базы: новые VIN добавляются,
+   существующие — перезаписываются (patch приоритетнее дампа). */
+function vinDbPatchApply(arr) {
+    if (!Array.isArray(arr) || !arr.length) return 0;
+    if (!VINDB.map) VINDB.map = new Map();
+    let n = 0;
+    for (const rec of arr) {
+        if (!rec || !rec.vin) continue;
+        rec.patch = true;
+        VINDB.map.set(String(rec.vin).toUpperCase(), rec);
+        n++;
+    }
+    VINDB.patchCount = (VINDB.patchCount || 0) + n;
+    return n;
 }
 const vinDbRow = vin => (VINDB.map && vin && VINDB.map.get(String(vin).toUpperCase())) || null;
 function vinDbFamilyOf(row) {
@@ -6196,6 +6556,44 @@ function vinDbFamily(row, platform) {
     if (row.gearbox && TRANSMISSIONS[row.gearbox]) return row.gearbox;
     if (Array.isArray(row.pr) && row.pr.includes('G0C') && (platform === 'hatch' || platform === 'estate')) return '085';
     return '';
+}
+/* ✅ 1.10.1: автодополнение карточек гаража из базы оснащения.
+   База VIN грузится асинхронно (и патч поверх неё): если машину сохранили
+   до окончания загрузки — её карточка оставалась «голой» навсегда, ведь
+   sGarV подтягивает оснащение только в момент сохранения. Теперь после
+   загрузки vin-db.json + vin-db.patch.json проходим по гаражу и заполняем
+   ПУСТЫЕ поля из записи базы (мотор/КПП/семейство/цвета/оснащение/дата).
+   Пользовательские значения не перетираются. Возвращает число дополненных
+   машин. */
+function garSyncFromDb() {
+    if (!VINDB.map || !G.length) return 0;
+    let touched = 0, activeFilled = null;
+    for (const g of G) {
+        const dbrow = vinDbRow(g.vin);
+        if (!dbrow) continue;
+        let n = 0;
+        const col = vinDbColors(dbrow);
+        if (!g.engineCode && dbrow.engine && ENGINES[dbrow.engine]) { g.engineCode = dbrow.engine; n++; }
+        if (!g.gearboxCode && dbrow.gearbox_code) { g.gearboxCode = String(dbrow.gearbox_code).toUpperCase(); n++; }
+        if (!g.transCode) { const fam = vinDbFamily(dbrow, platformOf(g.body, g.model)); if (fam) { g.transCode = fam; n++; } }
+        if (!g.bodyColor && col.paint) { g.bodyColor = String(col.paint).toUpperCase(); n++; }
+        if (!g.roofColor && col.roof) { g.roofColor = String(col.roof).toUpperCase(); n++; }
+        if (!g.equipCode && col.equip) { g.equipCode = String(col.equip).toUpperCase(); n++; }
+        if (!g.prodDate && dbrow.prod_date) { g.prodDate = dbrow.prod_date; n++; }
+        if (n) {
+            touched++;
+            if (SV.activeVinId === g.id) activeFilled = g;
+        }
+    }
+    if (touched) {
+        sG(); rGar();
+        if (activeFilled) {
+            applyVinFilters();
+            sU(); rSB(); rTOWidget(); rC();
+            toast('📦 Карточка …' + activeFilled.vin.slice(-6) + ' дополнена из базы оснащения: ' + (vinDbSummary(vinDbRow(activeFilled.vin)) || 'данные подтянуты'), 'success');
+        }
+    }
+    return touched;
 }
 
 /* ============ РЕДАКТОР VIN ============ */
@@ -6588,6 +6986,7 @@ function oPR(gid) {
         h += '</div>';
         h += '<p class="pr-note">💡 Классификация по первой цифре PR-кода ориентировочная: у VAG один блок может содержать коды разного назначения.</p>';
         if (VINDB.example) h += '<p class="pr-note">ℹ️ Загружен пример данных (data/vin-db.example.json), а не боевая база оснащения.</p>';
+        if (row.patch) h += '<p class="pr-note">🩹 Запись добавлена вручную (data/vin-db.patch.json) — этого VIN не было в дампе ETKA.</p>';
     } else {
         h += '<p style="font-size:.8rem;color:var(--mu)">PR-кодов в записи нет.</p>';
     }
@@ -6813,8 +7212,11 @@ async function init() {
        3) плашка «Что нового» — выпускается после закрытия путеводителя. */
     const onb = maybeShowOnboarding();
     checkWhatsNew(onb);
-    // Внешняя база оснащения по VIN грузится асинхронно и не блокирует старт
-    vinDbLoad();
+    // Внешняя база оснащения по VIN грузится асинхронно и не блокирует старт.
+    // ✅ 1.10.1: когда база (+патч) загрузилась — дополняем пустые карточки
+    // гаража (мотор/КПП/цвета/дата), чтобы карточка второй машины была не
+    // хуже первой, даже если VIN сохранили до окончания загрузки.
+    vinDbLoad().then(() => { try { garSyncFromDb(); } catch (e) { console.warn('garSyncFromDb', e); } }).catch(() => { });
     // Диплинк из URL (#/part/…, #/cat/…, #/vin/…, #/maint/…)
     routeHash();
     _hashReady = true;
@@ -7029,7 +7431,8 @@ function maintToggleAllGroups() {
 function maintAddAllToShop() {
     const ids = window._maintIds || [];
     if (!ids.length) { toast('Список пуст — добавлять нечего', 'danger'); return; }
-    shopPick = new Set(ids);
+    ids.forEach(id => shopPick.add(id));   // ✅ 1.10.1: дополняем, а не перетираем прежние отметки
+    sShopPick();
     toast('🛒 В список покупок добавлено: ' + ids.length, 'success');
     oShopList(true);   // не сбрасывать только что наполненный набор
 }

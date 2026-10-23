@@ -8,7 +8,7 @@
     <!-- Версия разметки: должна совпадать с APP_VERSION в js/app.js.
          Лоадер добавляет её в URL скрипта (&ui=…), чтобы новый index.html
          никогда не грузил закэшированный старый app.js. -->
-    <meta name="app-ui-ver" content="1.9.0">
+    <meta name="app-ui-ver" content="1.10.3">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>VW Polo/Caddy 1995–2003 — База Мастера</title>
 
@@ -23,7 +23,7 @@
        С 1.8.4 так и делаем — SW отдаёт CSS cache-first, без ?v= телефоны
        жили бы со старым стилем до следующего фонового обновления.
        ═══════════════════════════════════════════════════════════════ -->
-    <link rel="stylesheet" href="css/app.css?v=1.9.0">
+    <link rel="stylesheet" href="css/app.css?v=1.10.3">
 
     <script>
         /* ────── АВТО-КЕШБАСТИНГ ТОЛЬКО ДЛЯ JS ─────────────────────
@@ -772,24 +772,32 @@
     <div class="mo" id="tomo">
         <div class="mdl" onclick="event.stopPropagation()" style="max-width:520px">
             <div class="mh">
-                <h3>🛠 Настройки ТО</h3><button class="mc" onclick="cTO()">✕</button>
+                <h3>🛠 Настройки ТО <span id="tom_car" style="font-size:.72rem;color:var(--mu);font-weight:600"></span></h3><button class="mc" onclick="cTO()">✕</button>
             </div>
             <div class="mb">
-                <p style="font-size:.82rem;color:var(--mu);margin-top:0">Заполни один раз — виджет в шапке будет
-                    подсказывать,
-                    когда ехать на ТО.</p>
+                <p style="font-size:.82rem;color:var(--mu);margin-top:0">Пробег, дата и интервал ТО хранятся
+                    <b>отдельно для каждой машины</b> гаража — заполните один раз, и виджет в шапке будет
+                    подсказывать, когда ехать на ТО именно этому автомобилю.</p>
                 <div class="fr">
                     <div class="fg"><label>Текущий пробег, км</label><input type="number" id="t_km" min="0"
                             placeholder="189000">
                     </div>
-                    <div class="fg"><label>Дата последнего ТО</label><input type="date" id="t_date"></div>
+                    <div class="fg"><label>Пробег на момент посл. ТО, км</label><input type="number" id="t_lastkm"
+                            min="0" placeholder="180000">
+                    </div>
                 </div>
-                <div class="fg"><label>Интервал ТО</label>
-                    <select id="t_interval">
-                        <option value="15000">Каждые 15 000 км / 12 мес.</option>
-                        <option value="10000">Каждые 10 000 км</option>
-                        <option value="7500">Каждые 7 500 км</option>
-                    </select>
+                <p style="font-size:.75rem;color:var(--mu);margin:-4px 0 8px">💡 Остаток до ТО = интервал −
+                    (текущий пробег − пробег на момент ТО) — обновляете пробег, счётчик пересчитывается.
+                    Без «пробега на момент ТО» остаток оценивается приблизительно по дате (~1000 км/мес).</p>
+                <div class="fr">
+                    <div class="fg"><label>Дата последнего ТО</label><input type="date" id="t_date"></div>
+                    <div class="fg"><label>Интервал ТО</label>
+                        <select id="t_interval">
+                            <option value="15000">Каждые 15 000 км / 12 мес.</option>
+                            <option value="10000">Каждые 10 000 км</option>
+                            <option value="7500">Каждые 7 500 км</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="mf">
@@ -809,6 +817,7 @@
             <div class="mb" id="shopBody"></div>
             <div class="mf">
                 <span id="shopCount" class="shop-count zero">🛒 Выбрано: <b>0</b> позиций</span>
+                <button class="bn" onclick="shopClearAll()" title="Снять все галочки в списке (отметки хранятся отдельно для каждой машины)">✖ Снять отметки</button>
                 <button class="bn" onclick="cShop()">Закрыть</button>
                 <button class="bn" onclick="eShopCSV()">📊 CSV</button>
                 <button class="bn p" onclick="pShop()">🖨 Печать</button>
