@@ -241,6 +241,10 @@ body {
     color: var(--tx);
     display: flex;
     height: 100vh;
+    /* ✅ 1.10.3: dvh — на iOS Safari 100vh включает скрытую панель
+       браузера, из-за чего низ приложения уезжал за экран. Старые
+       браузеры dvh не знают и останутся на строке выше. */
+    height: 100dvh;
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -1301,6 +1305,7 @@ body.theme-light .ni.active {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    height: 100dvh; /* 1.10.3: см. body — динамическая высота на мобильных */
     overflow: hidden;
     transition: margin-left var(--tr-slow);
     position: relative;
@@ -3239,6 +3244,7 @@ body.theme-paper .wn {
     display: flex;
     flex-direction: column;
     max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - 48px); /* 1.10.3: iOS — низ модалки не под панелью */
     margin: auto;
     animation: mdlIn .25s cubic-bezier(.4, 0, .2, 1);
     overflow: hidden;
@@ -3989,6 +3995,7 @@ body.theme-paper .lic-box h4 {
     display: flex;
     flex-direction: column;
     max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - 48px); /* 1.10.3: iOS — гейт влезает в видимый экран */
     overflow: hidden;
     border: 1px solid rgba(56, 189, 248, .3);
     animation: mdlIn .4s cubic-bezier(.4, 0, .2, 1);
@@ -6450,6 +6457,7 @@ body.theme-light .faq-item {
 #upmo .mdl {
     max-width: 640px;
     max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - 48px); /* 1.10.3: iOS */
     height: auto;
     display: flex;
     flex-direction: column;
@@ -6580,6 +6588,24 @@ body.theme-light .em-title {
 }
 
 /* ====== НОВЫЕ ЭЛЕМЕНТЫ КАРТОЧКИ VIN ====== */
+/* ✅ 1.10.1: подсказка «почему карточка короче» — оснащения VIN нет в базе */
+.gi-dbhint {
+    margin: 4px 0 10px;
+    padding: 10px 12px;
+    background: rgba(245, 166, 35, .07);
+    border: 1px solid rgba(245, 166, 35, .35);
+    border-left: 3px solid var(--sr);
+    border-radius: 6px;
+    font-size: .78rem;
+    line-height: 1.55;
+    color: var(--tx);
+}
+
+.gi-dbhint b {
+    font-family: Consolas, monospace;
+    font-size: .74rem;
+}
+
 .gi-actions {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -6588,7 +6614,8 @@ body.theme-light .em-title {
 }
 
 .gi-btn {
-    padding: 8px 10px;
+    padding: 10px 11px;
+    min-height: 40px; /* 1.10.3: тач-цель ≥ 38px — по кнопкам карточки VIN удобно попадать пальцем */
     background: var(--hv);
     border: 1px solid var(--bd);
     border-radius: 6px;
@@ -8416,4 +8443,25 @@ label,
     font-size: .6rem;
     color: var(--mu);
     opacity: .8;
+}
+
+/* ============ v1.10.3: iOS — без авто-зума при фокусе полей ============
+   iOS Safari принудительно приближает страницу, если у поля ввода
+   font-size < 16px. Компактный мобильный поиск (.sr — .78rem на ≤480px)
+   и поля модалок под этот порог попадают: тап по поиску зумил весь
+   интерфейс и обратно выщипывался только pinch-жестом.
+   -webkit-touch-callout поддерживает ТОЛЬКО iOS — Android и десктоп
+   оформление не меняют (там авто-зума нет). */
+@supports (-webkit-touch-callout: none) {
+
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="date"]):not([type="time"]):not([type="datetime-local"]):not([type="file"]):not([type="submit"]),
+    textarea {
+        font-size: 16px !important;
+    }
+
+    /* Компактная строка поиска: 16px шрифт в 32px-высоту помещается,
+       но чуть плотнее рамки — компенсируем, чтобы текст не обрезался. */
+    .sr {
+        line-height: 1.2 !important;
+    }
 }
