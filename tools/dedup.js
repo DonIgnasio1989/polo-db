@@ -2,7 +2,7 @@
 /* ============================================================
    tools/dedup.js — дедупликатор каталога «База Мастера»
    ------------------------------------------------------------
-   Зачем: 20 файлов-источников (data-src/) и будущие импорты могут
+   Зачем: файлы-источники (data-src/) и будущие импорты могут
    приносить одну и ту же позицию в разных написаниях. Инструмент:
      1) АВТОСЛИЯНИЕ: группы с одинаковым нормализованным OEM
         (объединение аналогов, доноров, применимости, инструкций…);
@@ -26,7 +26,15 @@ const normOem = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
 const nz = s => String(s || '').toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/ё/g, 'е').replace(/\s+/g, ' ').trim();
-const tokens = s => new Set(nz(s).split(' ').filter(t => t.length > 2));
+/* 1.10.6: раньше отбрасывались ВСЕ токены короче 3 символов, а вместе с ними
+   размеры — «Пружинная шайба 8» и «Пружинная шайба 12» получали сходство 1.00
+   (120 таких ложных групп из 618). Числовые токены теперь сохраняем любой
+   длины; короткие единицы измерения («мм», «шт») по-прежнему не учитываются. */
+/* Одиночные буквы-обозначения («гнездо E» / «гнездо S») тоже значимы —
+   иначе два разных разъёма 357 919 968 A и 357 955 968 A получали сходство
+   1.00. Отбрасываем только чистую пунктуацию. */
+const tokens = s => new Set(nz(s).split(' ').filter(t => /[0-9a-zа-я]/.test(t)));
+const IM = { spec: 's', tool: 't', proc: 'p', warn: 'w', note: 'n', recommendation: 'r' };
 function jaccard(a, b) {
     const A = tokens(a), B = tokens(b);
     if (!A.size || !B.size) return 0;
@@ -114,6 +122,31 @@ function mergeParts(group) {
     if (notes.length) out.notes = notes.join(' | ');
     if (group.some(p => p.favorite)) out.favorite = true;
     if (group.some(p => p.status)) out.status = group.map(p => p.status).find(Boolean);
+    /* 1.10.6: поля, которых нет в явном списке (parts[], shopUrl, analogSrc
+       и любые будущие), раньше молча терялись при слиянии. Переносим их из
+       записей группы: массивы объединяем, скаляры берём первые непустые. */
+    const su = group.map(p => p.shopUrl).find(Boolean);
+    if (su) out.shopUrl = su;
+    const KNOWN = new Set(['id', 'cat', 'sub', 'n', 'name', 'o', 'oem', 'v', 'verified',
+        'a', 'analogs', 'd', 'donors', 'engines', 'bodies', 'transmissions', 'transCodes',
+        'trims', 'gens', 'prReq', 'prNo', 'sup', 'supersededTo', 'price', 'currency',
+        'status', 'favorite', 'notes', 'shopUrl', 'photos', 'photo', 'i', 'inst',
+        'priceHistory', '_src', '_idx', '_mergedFrom']);
+    group.forEach(p => Object.keys(p).forEach(k => {
+        if (KNOWN.has(k) || k in out) return;
+        if (Array.isArray(p[k])) out[k] = uniqPush([], group.flatMap(x => Array.isArray(x[k]) ? x[k] : (x[k] == null ? [] : [x[k]])));
+        else if (out[k] == null && p[k] != null) out[k] = p[k];
+    }));
+    /* схема источника: data-src хранит короткую (n/o/i/v:1), старые записи —
+       name/oem/inst/v:true. Выдаём в той же схеме, что первая запись группы,
+       чтобы сборка не смешивала форматы. */
+    if ('n' in base || 'o' in base) {
+        out.n = out.name; delete out.name;
+        out.o = out.oem; delete out.oem;
+        out.i = (out.inst || []).map(x => [IM[x.type] || 'n', x.text]);
+        delete out.inst;
+        if (out.v === true) out.v = 1;
+    }
     /* чистим пустое */
     Object.keys(out).forEach(k => {
         if (Array.isArray(out[k]) && !out[k].length && !['a', 'd'].includes(k)) delete out[k];
@@ -164,6 +197,29 @@ function findGroups(items) {
             }
         }
     });
+    /* 4) 1.10.6: сегменты композитного OEM против одиночных записей.
+       «N 101 559 01 · N 102 612 01» (parts-07) и «N 101 559 01» (parts-14) —
+       это две карточки одного болта, но ни правило 1 (ключ = вся строка OEM),
+       ни _dedupeParts в приложении такого не видят. */
+    const byNorm = new Map();
+    items.forEach(p => { const k = normOem(p.o || p.oem); if (k) { if (!byNorm.has(k)) byNorm.set(k, []); byNorm.get(k).push(p); } });
+    const segSeen = new Set();
+    items.forEach(p => {
+        const raw = String(p.o || p.oem || '');
+        if (!raw.includes('·')) return;
+        raw.split('·').map(normOem).filter(Boolean).forEach(seg => {
+            if (segSeen.has(seg)) return;
+            const hit = (byNorm.get(seg) || []).filter(q => q !== p && !String(q.o || q.oem || '').includes('·'));
+            if (!hit.length) return;
+            segSeen.add(seg);
+            suspicious.push({
+                key: 'seg:' + seg,
+                reason: 'сегмент композитного OEM совпадает с отдельной позицией — в каталоге две карточки одного номера',
+                pri: 'medium',
+                items: [p].concat(hit)
+            });
+        });
+    });
     suspicious.sort((a, b) => ({ high: 0, medium: 1, low: 2 }[a.pri] - { high: 0, medium: 1, low: 2 }[b.pri]));
     return { auto, suspicious };
 }
@@ -196,9 +252,11 @@ function buildReport(res, merged, files, opts) {
         L.push('');
         L.push('### ' + (i + 1) + '. ' + tag + ' [' + g.reason + ']');
         g.items.forEach(p => L.push('- ' + fmtP(p)));
-        L.push('- **рекомендация:** ' + (g.pri === 'low'
-            ? 'обычно это разные применения одного названия — оставьте как есть, если применимость (моторы/кузова) различается.'
-            : 'если это супрессия — оставьте обе позиции и проставьте `sup` у старой; если дубль — объедините вручную и удалите лишнюю.'));
+        L.push('- **рекомендация:** ' + (g.key.startsWith('seg:')
+            ? 'композитная позиция (набор крепежа) и одиночная деталь с тем же номером. Обе легитимны: `_dedupeParts` их не схлопнет (ключ — вся строка OEM). Проверьте, что в составной позиции есть ссылка на одиночную (правило M7 миграции 1.10.6), и не заказывайте номер дважды.'
+            : g.pri === 'low'
+                ? 'обычно это разные применения одного названия — оставьте как есть, если применимость (моторы/кузова) различается.'
+                : 'если это супрессия — оставьте обе позиции и проставьте `sup` у старой; если дубль — объедините вручную и удалите лишнюю.'));
     });
     L.push('');
     L.push('---');
@@ -236,7 +294,7 @@ function run(argv) {
         fs.writeFileSync(path.join(out, 'parts.dedup.json'), JSON.stringify(clean));
         fs.writeFileSync(path.join(out, 'duplicates.json'), JSON.stringify({
             auto: res.auto.map(g => ({ key: g.key, reason: g.reason, ids: g.items.map(p => p.id || p._src + '#' + p._idx), mergedId: g.merged.id })),
-            suspicious: res.suspicious.map(g => ({ key: g.key, reason: g.reason, ids: g.items.map(p => p.id || p._src + '#' + p._idx) }))
+            suspicious: res.suspicious.map(g => ({ key: g.key, reason: g.reason, pri: g.pri, ids: g.items.map(p => p.id || p._src + '#' + p._idx) }))
         }, null, 2));
         fs.writeFileSync(path.join(out, 'DEDUP-REPORT.md'), buildReport(res, merged, files, output));
         console.log('записано:', path.join(out, 'parts.dedup.json'), '· duplicates.json · DEDUP-REPORT.md');

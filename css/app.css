@@ -5131,6 +5131,71 @@ body.theme-light .th-card {
 /* ============================================================
    ПЕЧАТЬ
    ============================================================ */
+/* ============================================================
+   1.12.0 · СПРАВОЧНИКИ (data/sections.json → rSec)
+   Панель фильтра, «липкая» шапка, зебра, внутренние ссылки.
+   Заимствовано из Ross-Tech Wiki / OBD-Codes (мгновенный поиск
+   по коду) и ALLDATA/Haynes (длинная таблица с фиксированным
+   заголовком).
+   ============================================================ */
+.sec-bar {
+    display: flex; align-items: center; gap: 8px;
+    margin: 10px 0 8px; flex-wrap: wrap;
+}
+.sec-in {
+    flex: 1 1 240px; min-width: 180px;
+    padding: 8px 12px; border-radius: 8px;
+    border: 1px solid var(--bd); background: var(--cd); color: var(--tx);
+    font-size: .88rem; outline: none;
+}
+.sec-in:focus { border-color: var(--a); box-shadow: 0 0 0 2px rgba(79, 140, 255, .18); }
+.sec-clr { padding: 7px 11px; }
+.sec-cnt { font-size: .78rem; color: var(--mu); white-space: nowrap; }
+
+/* Собственная прокрутка таблицы: без неё position:sticky у thead не работает
+   (обёртка с overflow-x:auto делает её контейнером прокрутки по обеим осям) */
+.sec-wrap {
+    max-height: min(72vh, 900px); overflow: auto;
+    border: 1px solid var(--bd); border-radius: 8px; background: var(--cd);
+    -webkit-overflow-scrolling: touch;
+}
+.sec-tbl { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.sec-tbl thead th {
+    position: sticky; top: 0; z-index: 2;
+    padding: 8px 10px; text-align: left; cursor: pointer; user-select: none;
+    background: var(--hv); color: var(--mu);
+    border-bottom: 2px solid var(--a);
+    font-size: .7rem; text-transform: uppercase; letter-spacing: .4px;
+    white-space: nowrap;
+}
+.sec-tbl thead th:hover { color: var(--tx); }
+.sec-th-on { color: var(--a) !important; }
+.sec-ar { font-size: .68rem; }
+.sec-td { padding: 7px 10px; border-bottom: 1px solid var(--bd); vertical-align: top; }
+.sec-tbl tbody tr:hover { background: rgba(127, 127, 127, .08); }
+.sec-alt { background: rgba(127, 127, 127, .045); }
+.sec-none { text-align: center; color: var(--mu); padding: 18px 10px; }
+.sec-hint { font-size: .74rem; color: var(--mu); margin: 8px 0 0; }
+
+.sec-l { color: var(--a); }
+.sec-lb { word-break: break-all; }
+/* внутренние ссылки-кнопки: «детали каталога» и «другой справочник» */
+.sec-q, .sec-s {
+    display: inline-block; margin: 1px 3px 1px 0; padding: 2px 7px;
+    font-size: .76rem; line-height: 1.5; cursor: pointer;
+    border: 1px solid var(--bd); border-radius: 999px;
+    background: var(--cd); color: var(--a);
+}
+.sec-q:hover, .sec-s:hover { border-color: var(--a); background: var(--hv); }
+
+/* узкие экраны: таблицу можно листать horizontally, панель не ломается */
+@media (max-width: 700px) {
+    .sec-wrap { max-height: 66vh; }
+    .sec-tbl { font-size: .78rem; }
+    .sec-td { padding: 6px 7px; }
+    .sec-cnt { width: 100%; }
+}
+
 @media print {
 
     .sb,

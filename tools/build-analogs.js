@@ -75,7 +75,20 @@ const KB = {
 
 /* ============ УТИЛИТЫ ============ */
 const normOem = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-const codeOk = s => { const n = normOem(s); return n.length >= 5 && /[0-9]/.test(n); };
+/* 1.10.6: правило приведено в точности к anCodeOk из js/app.js — иначе
+   экспорт (restore/parts.with-analogs.json) и рантайм (applyAnalogKb)
+   начинают расходиться. Строки вроде «Universeel 10.9» или «Universeel М12»
+   раньше считались кодами и склеивали в одну компоненту несвязанные детали
+   (43 ложных аналога в 15 записях). Правило «≥3 цифр» НЕ вводили: оно
+   отсекло бы настоящие артикулы MAHLE LAK 63, GMB GWVW-13A, NGK BKR6E. */
+const AN_JUNK_RE = /\b(universeel|universal|used\s*part|repro|refurbished)\b/i;
+const codeOk = s => {
+    const raw = String(s || '');
+    if (/[а-яА-ЯёЁ]/.test(raw)) return false;
+    if (AN_JUNK_RE.test(raw)) return false;
+    const n = normOem(raw);
+    return n.length >= 5 && /[0-9]/.test(n);
+};
 const oemSegs = o => String(o || '').split('·').map(s => normOem(s)).filter(codeOk);
 
 function main() {
