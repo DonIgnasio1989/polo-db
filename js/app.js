@@ -93,7 +93,12 @@ const ENGINES = {
        AKP 1.4 8V 60, AHV 1.6 8V 75, AMF 1.4 TDI R3 75 — сверены по кросс-справочникам */
     'AKP': { v: '1.4', hp: 60, f: 'P', inj: 'MPI', ecu: 'Siemens Simos 2P', euro: '2' },
     'AHV': { v: '1.6', hp: 75, f: 'P', inj: 'MPI', euro: '2' },
-    'AMF': { v: '1.4 TDI', hp: 75, f: 'D', inj: 'TDI (насос-форсунки)', ecu: 'Bosch EDC15', euro: '3' }
+    'AMF': { v: '1.4 TDI', hp: 75, f: 'D', inj: 'TDI (насос-форсунки)', ecu: 'Bosch EDC15', euro: '3' },
+    /* 1.10.6: донорский код Golf IV/Bora. Встречается в применимости пружин
+       1J0 411 105 …, которыми VAG официально заменил 6N0 411 105 F, — без него
+       совместимость этих позиций терялась при загрузке (nP() отбрасывает
+       неизвестные коды). AEH/AKL/APF = 1.6 8V, 1595 см³, 74 кВт (101 л.с.), MPI. */
+    'AEH': { v: '1.6', hp: 100, f: 'P', inj: 'MPI', euro: '2' }
 };
 /* ============ СЕМЕЙСТВА ДВИГАТЕЛЕЙ ============
    Зеркальная структура к семействам КПП: у каждого мотора
@@ -109,8 +114,8 @@ const ENGINE_FAMILIES = {
     'EA111': {
         label: 'EA111 — бензин R4 1.0–1.6 (8V/16V)',
         fuel: 'P',
-        note: 'Малолитражная бензиновая серия для платформы A0: Polo 6N/6N2, Lupo, Seat Arosa/Ibiza, Caddy, Golf. Сюда входят 1.0 50 (AER/ALL/AEV/ALD/ANV/AUC), 1.3 55 (ADX), 1.4 8V 60–75 (ABU/AEX/APQ/AKV/ANX/AKK/ANW/AUD/AHT), 1.4 16V 75–100 (AHW/AKQ/AFK/ANM/APE/AUA/AFH), 1.6 75–100 (AEA/AHS/AEE/ALM/AUR/AFT/AKL) и GTI 1.6 16V 120 (AJV). Основа бензиновой линейки Polo III.',
-        codes: ['AER', 'ALL', 'AEV', 'ALD', 'ANV', 'AUC', 'ADX', 'ABU', 'AEX', 'APQ', 'AKV', 'ANX', 'AKK', 'ANW', 'AUD', 'AHT', 'AHW', 'AKQ', 'AFK', 'ANM', 'APE', 'AUA', 'AFH', 'AEA', 'AHS', 'AEE', 'ALM', 'AUR', 'AFT', 'AKL', 'AJV', 'AKP', 'AHV']
+        note: 'Малолитражная бензиновая серия для платформы A0: Polo 6N/6N2, Lupo, Seat Arosa/Ibiza, Caddy, Golf. Сюда входят 1.0 50 (AER/ALL/AEV/ALD/ANV/AUC), 1.3 55 (ADX), 1.4 8V 60–75 (ABU/AEX/APQ/AKV/ANX/AKK/ANW/AUD/AHT), 1.4 16V 75–100 (AHW/AKQ/AFK/ANM/APE/AUA/AFH), 1.6 75–100 (AEA/AHS/AEE/ALM/AUR/AFT/AKL, плюс донорский AEH от Golf IV/Bora) и GTI 1.6 16V 120 (AJV). Основа бензиновой линейки Polo III.',
+        codes: ['AER', 'ALL', 'AEV', 'ALD', 'ANV', 'AUC', 'ADX', 'ABU', 'AEX', 'APQ', 'AKV', 'ANX', 'AKK', 'ANW', 'AUD', 'AHT', 'AHW', 'AKQ', 'AFK', 'ANM', 'APE', 'AUA', 'AFH', 'AEA', 'AHS', 'AEE', 'ALM', 'AUR', 'AFT', 'AKL', 'AEH', 'AJV', 'AKP', 'AHV']
     },
     'EA827': {
         label: 'EA827 — бензин R4 1.6/1.8',
@@ -233,7 +238,7 @@ const ENGINE_GEARBOX = {
     'ABU': { fams: ['084', '085'], codes: [] },
     'AEX': { fams: ['084', '085'], codes: ['DDH', 'DHB', 'DKF', 'DQW', 'DXP'] },
     'APQ': { fams: ['085'], codes: [] },
-    'AKV': { fams: ['085'], codes: [] },
+    'AKV': { fams: ['085'], codes: ['DXP'] },   // 1.10.6: DXP подтверждён записью WVWZZZ6NZXY406408 (vin-db.patch.json)
     'ANX': { fams: ['085'], codes: ['ERD'] },
     'AKK': { fams: ['085'], codes: [] },
     'ANW': { fams: ['085'], codes: [] },
@@ -280,7 +285,11 @@ const ENGINE_GEARBOX = {
     // Семейство SEAT / R3-TDI (коды из каталога доноров и 6N2)
     'AKP': { fams: ['085'], codes: [] },
     'AHV': { fams: ['085'], codes: [] },
-    'AMF': { fams: ['085'], codes: [] }
+    'AMF': { fams: ['085'], codes: [] },
+    /* 1.10.6: донорский код Golf IV/Bora — каскад не ограничиваем (fams: []),
+       потому что на Polo этот мотор не ставился; запись нужна, чтобы
+       справочник «мотор → КПП» по-прежнему покрывал все коды ENGINES. */
+    'AEH': { fams: [], codes: [] }
 };
 
 /* Classic (6V2/6KV) и Caddy (9K) — платформа Seat Ibiza/Cordoba 6K:
@@ -906,8 +915,29 @@ let _anIdx = null;   // normCode → [part id] — индекс для скан�
 const _AN_MAX = 32;
 
 /* Сегменты мульти-артикула «030 121 008 D · DX» → ['030121008D']
-   (хвосты-суффиксы без цифр вроде «DX» отбрасываются). */
-const anCodeOk = s => { const n = normOem(s); return n.length >= 5 && /[0-9]/.test(n); };
+   (хвосты-суффиксы без цифр вроде «DX» отбрасываются).
+
+   1.10.6: фильтр ужесточён. Раньше достаточно было «≥5 символов + цифра»,
+   и в граф кроссов попадали описания вместо артикулов: «Universeel 10.9»
+   (класс прочности), «Universeel М12», «Universeel 10 см», «Universal 200А».
+   Такие узлы оказывались общими для разных деталей и склеивали их в одну
+   компоненту — у «Гайки крепления тормозного шланга» в аналогах появлялся
+   динамик «Pioneer TS-G1033i» (связка через «Universeel М10» ↔ «Universeel
+   10 см»), у «Болта стартера М10» — болты крепления амортизатора. Итог:
+   43 ложных кода в 15 записях. Теперь в граф не пускаем строки с кириллицей
+   и со словами-описаниями; сами строки в данных перенесены в инструкции
+   (tools/migrate-1.10.6.js, правило M3) — информация не потеряна.
+   Правило «≥3 цифр» НЕ вводили намеренно: оно отсекло бы настоящие
+   артикулы aftermarket — MAHLE LAK 63, GMB GWVW-13A, NGK BKR6E, ATE SL.6.
+   Зеркальное правило — codeOk в tools/build-analogs.js (держать синхронно). */
+const AN_JUNK_RE = /\b(universeel|universal|used\s*part|repro|refurbished)\b/i;
+const anCodeOk = s => {
+    const raw = String(s || '');
+    if (/[а-яА-ЯёЁ]/.test(raw)) return false;
+    if (AN_JUNK_RE.test(raw)) return false;
+    const n = normOem(raw);
+    return n.length >= 5 && /[0-9]/.test(n);
+};
 const oemSegs = o => String(o || '').split('·').map(s => normOem(s)).filter(anCodeOk);
 
 function normalizeAKB(raw) {
@@ -1836,7 +1866,7 @@ const CAT_GROUPS = [
     {
         id: 'refs',
         label: 'Справочники',
-        cats: ['Torque', 'Diagnostics', 'Wiring', 'WiringFuses', 'WiringRelays', 'WiringRef', 'WiringPins', 'Workshops', 'Log'],
+        cats: ['Torque', 'Diagnostics', 'Lamps', 'FluidSpecs', 'Wheels', 'Wiring', 'WiringFuses', 'WiringRelays', 'WiringRef', 'WiringPins', 'Workshops', 'Log'],
         virtual: true
     }
 ];
@@ -2017,7 +2047,7 @@ let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastKm: null, lastDate: null, interval: 15000 };
 let TO_ALL = {};
 
-let APP_VERSION = '1.10.5';
+let APP_VERSION = '1.12.0'; // fallback, если update.json не загрузится
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -2302,6 +2332,40 @@ const iClr = async s => {
 };
 
 /* ============ НОРМАЛИЗАТОРЫ ============ */
+/* 1.10.6: единый разбор инструкций. Исторически данные приходили в трёх
+   форматах: [["s","текст"], …] (основной), [{type:"spec",text:"…"}] (старый
+   `inst`) и — в 8 записях data-src — плоским ["s","текст"] или объектами
+   внутри поля `i`. Раньше такие элементы давали text:'' и отбрасывались
+   фильтром: карточка оставалась БЕЗ инструкций, причём молча (потерялось
+   35 строк, включая давления шин и «3.4 бар для гружёного Caddy»).
+   Теперь понимаем все три варианта; сами данные приведены к основному
+   формату миграцией tools/migrate-1.10.6.js (правила M1/M2). */
+function instEntry(x) {
+    if (!x) return null;
+    if (Array.isArray(x)) {
+        const t = MI[String(x[0] == null ? '' : x[0]).trim()] || 'note';
+        const s = String(x[1] == null ? '' : x[1]).trim();
+        return s ? { type: t, text: s } : null;
+    }
+    if (typeof x === 'object') {
+        const raw = String(x.type == null ? (x.t == null ? '' : x.t) : x.type).trim();
+        const t = MI[IM[raw]] || MI[raw] || 'note';
+        const s = String(x.text == null ? '' : x.text).trim();
+        return s ? { type: t, text: s } : null;
+    }
+    return null;
+}
+function parseInst(p) {
+    const src = Array.isArray(p.i) ? p.i : (Array.isArray(p.inst) ? p.inst : null);
+    if (!src || !src.length) return [];
+    /* плоский вариант: ["s","текст"] вместо [["s","текст"]] */
+    if (src.length === 2 && typeof src[0] === 'string' && typeof src[1] === 'string' && MI[src[0]]) {
+        const one = instEntry(src);
+        return one ? [one] : [];
+    }
+    return src.map(instEntry).filter(Boolean);
+}
+
 function nP(p) {
     if (!p || typeof p !== 'object') return null;
     const cat = (typeof p.cat === 'string' && CATS.some(x => x.id === p.cat)) ? p.cat : 'Engine';
@@ -2319,12 +2383,7 @@ function nP(p) {
             .trim();
     }
 
-    let inst;
-    if (Array.isArray(p.inst)) {
-        inst = p.inst.filter(i => i && i.text).map(i => ({ type: MI[IM[i.type]] || i.type, text: String(i.text) }));
-    } else if (Array.isArray(p.i)) {
-        inst = p.i.map(x => ({ type: MI[x[0]] || 'note', text: String(x[1] || '') })).filter(x => x.text);
-    } else inst = [];
+    const inst = parseInst(p);
 
     const eng = Array.isArray(p.engines) ? p.engines.filter(x => ALL_ENGINES.includes(x)) : [];
     const bdy = Array.isArray(p.bodies) ? p.bodies.filter(x => ALL_BODIES.includes(x)) : [];
@@ -2835,8 +2894,18 @@ function pCompat(p) {
     let best = 0;
     for (const d of donors) {
         if (d === model || d.includes(model) || model.includes(d)) { best = 100; break; }
+        /* 1.10.6: доноры в базе пишутся без цифры поколения («VW Polo 6N»),
+           а модель — с ней («Polo (6N1)»), поэтому полное совпадение не
+           срабатывало и карточка показывала 50 % / «возможно подходит»
+           вместо «подходит». Добавлено префиксное сравнение числовых
+           токенов: 6n1 ↔ 6n. Ложных срабатываний это не даёт —
+           «VW Lupo 1.0» против «Polo (6N1)» по-прежнему 0 %. */
+        const dt = d.split(/[\s()/\-]+/).filter(x => x.length >= 2);
         let hit = 0;
-        for (const t of tokens) { if (d.includes(t)) hit++; }
+        for (const t of tokens) {
+            if (d.includes(t)) { hit++; continue; }
+            if (/[0-9]/.test(t) && dt.some(x => /[0-9]/.test(x) && (t.startsWith(x) || x.startsWith(t)))) hit++;
+        }
         const pct = Math.round(hit / tokens.length * 100);
         if (pct > best) best = pct;
     }
@@ -3812,14 +3881,25 @@ function _mergeSections(secs) {
         if (!srv || typeof srv !== 'object') continue;
         const loc = CUSTOM.sections[sid];
         if (!loc) { CUSTOM.sections[sid] = srv; continue; }
-        /* Пользовательские метка/иконка приоритетнее, НО пустые локальные
-           строки не должны затенять свежие серверные данные — иначе старая
-           мета из localStorage вечно показывает раздел пустым */
-        const merged = Object.assign({}, srv, loc);
-        const locHasRows = Array.isArray(loc.rows) && loc.rows.length > 0;
-        if (!locHasRows && Array.isArray(srv.rows)) {
-            merged.rows = srv.rows;
-            if (Array.isArray(srv.cols)) merged.cols = srv.cols;
+        /* 1.11.0: справочники — серверные данные, локальная копия в localStorage
+           только кеширует их между запусками. Раньше делалось
+           Object.assign({}, srv, loc), т.е. ЛОКАЛЬНЫЕ rows имели приоритет,
+           и дополненный data/sections.json не доезжал до тех, кто уже открывал
+           приложение: раздел навсегда оставался со старым набором строк
+           (исключение было сделано только для пустых локальных rows).
+           Теперь rows/cols всегда берутся с сервера, а пользовательские
+           label/icon (их можно править в интерфейсе) сохраняются. */
+        const merged = Object.assign({}, srv);
+        const lbl = String(loc.label || '').trim(), ico = String(loc.icon || '').trim();
+        if (lbl) merged.label = lbl;
+        if (ico) merged.icon = ico;
+        if (!Array.isArray(merged.rows) || !merged.rows.length) {
+            /* сервер прислал пустой раздел — не затираем локальные строки,
+               иначе справочник мигнёт пустым при ошибке сети */
+            if (Array.isArray(loc.rows) && loc.rows.length) {
+                merged.rows = loc.rows;
+                if (Array.isArray(loc.cols) && (!Array.isArray(merged.cols) || !merged.cols.length)) merged.cols = loc.cols;
+            }
         }
         CUSTOM.sections[sid] = merged;
     }
@@ -4095,6 +4175,9 @@ const VIRTUAL_CATS = {
     Log: { label: 'Журнал обслуживания', icon: '📖' },
     Diagnostics: { label: 'Диагностика (OBD)', icon: '🩺' },
     Torque: { label: 'Моменты затяжки', icon: '🔩' },
+    Lamps: { label: 'Лампы и цоколи', icon: '💡' },
+    FluidSpecs: { label: 'Жидкости и объёмы', icon: '🛢️' },
+    Wheels: { label: 'Колёса и шины', icon: '🛞' },
     Wiring: { label: 'Электросхемы', icon: '⚡' },
     WiringFuses: { label: 'Предохранители 6N1', icon: '🔌' },
     WiringRelays: { label: 'Реле 6N1', icon: '🎛️' },
@@ -4105,7 +4188,13 @@ const VIRTUAL_CATS = {
 /* ✅ 1.8.1: табличные разделы-справочники из data/sections.json.
    Рендерятся через rSec даже если файл ещё не загрузился —
    с понятным экраном «не загружено» вместо пустого списка деталей. */
-const SEC_TABLE_IDS = ['Torque', 'Diagnostics', 'Wiring', 'WiringFuses', 'WiringRelays', 'WiringRef', 'WiringPins'];
+/* 1.11.0: добавлены «Лампы и цоколи» (Lamps) и «Жидкости и объёмы» (FluidSpecs).
+   Оба справочника собираются из карточек каталога (Bulbs / Fluids) скриптом
+   tools/build-sections.py — расхождений между справочником и артикулами не бывает. */
+/* 1.12.0: добавлен «Wheels» — колёсные параметры (PCD/CB/ET/резьба/момент)
+   и размеры шин с давлениями; строки размеров собираются генератором прямо из
+   карточек каталога, поэтому справочник не может разъехаться с данными. */
+const SEC_TABLE_IDS = ['Torque', 'Diagnostics', 'Lamps', 'FluidSpecs', 'Wheels', 'Wiring', 'WiringFuses', 'WiringRelays', 'WiringRef', 'WiringPins'];
 
 /* ============================================================
    Отфильтрованный список для счётчиков в сайдбаре.
@@ -4960,6 +5049,87 @@ function oPC(id) {
 }
 const cPC = () => { closeM('partmo'); partmoId = null; syncCatHash(); };
 
+/* ============================================================
+   СПРАВОЧНИКИ (data/sections.json) — рендер таблицы
+   ------------------------------------------------------------
+   1.12.0: заимствовано из зарубежных аналогов:
+   · Ross-Tech Wiki / OBD-Codes.com — мгновенный поиск по коду
+     (справочник на 100 строк без поиска бесполезен);
+   · ALLDATA / Haynes — «липкая» шапка и зебра при длинных таблицах;
+   · RockAuto — переход от справочной статьи к конкретной детали.
+   Добавлены: фильтр по всем ячейкам, сортировка по любому столбцу,
+   счётчик «показано N из M», sticky-заголовок, а также два вида
+   внутренних ссылок: «#q:запрос» (поиск по каталогу деталей) и
+   «#sec:Id» (переход в другой справочник).
+   ============================================================ */
+/* Состояние просмотра справочника: { [sid]: { q, col, dir } } — переживает
+   переключение разделов, но не сохраняется между запусками (это не настройка) */
+function secViewOf(sid) {
+    if (!SV.secView || typeof SV.secView !== 'object') SV.secView = {};
+    if (!SV.secView[sid]) SV.secView[sid] = { q: '', col: -1, dir: 1 };
+    return SV.secView[sid];
+}
+/* Нормализация для поиска внутри справочника: ё→е, без диакритики, lowercase */
+const secNz = s => nz(s).replace(/ё/g, 'е');
+
+/* Одна ячейка справочника. Поддерживаются ссылки трёх видов:
+     «метка|https://…» — внешняя ссылка (открывается в новой вкладке);
+     «метка|#q:запрос»  — поиск по каталогу деталей;
+     «метка|#sec:Id»    — переход в другой справочник.
+   Несколько элементов в одной ячейке разделяются «;;».
+   Голый URL тоже становится ссылкой; переводы строк → <br>. */
+function secCellHtml(c) {
+    const cs = String(c == null ? '' : c);
+    if (!cs) return '';
+    /* несколько элементов в одной ячейке разделяются «;;» — иначе парсер
+       принял бы всю ячейку за одну ссылку «метка|цель» */
+    if (cs.indexOf(';;') >= 0) return cs.split(';;').map(secCellHtml).filter(Boolean).join(' ');
+    const m = cs.match(/^([\s\S]+?)\|([\s\S]+)$/);
+    if (m) {
+        const target = m[2].trim();
+        if (/^https?:\/\/\S+$/.test(target))
+            return '<a href="' + escA(target) + '" target="_blank" rel="noopener noreferrer" class="sec-l">' + esc(m[1]) + ' ↗</a>';
+        if (target.indexOf('#q:') === 0)
+            return '<button type="button" class="sec-q" data-q="' + escA(target.slice(3)) + '" title="Найти в каталоге деталей">' + esc(m[1]) + ' 🔎</button>';
+        if (target.indexOf('#sec:') === 0)
+            return '<button type="button" class="sec-s" data-sec="' + escA(target.slice(5)) + '" title="Открыть справочник">' + esc(m[1]) + ' →</button>';
+    }
+    if (/^https?:\/\//.test(cs))
+        return '<a href="' + escA(cs) + '" target="_blank" rel="noopener noreferrer" class="sec-l sec-lb">' + esc(cs) + '</a>';
+    return esc(cs).replace(/\n/g, '<br>');
+}
+/* Подходит ли строка под запрос: ищем по всем ячейкам, все слова запроса
+   обязаны найтись (И). Часть ссылки после «|» тоже участвует в поиске —
+   по названию источника находится и сама строка. */
+function secRowMatch(row, q) {
+    const nq = secNz(q || '').trim();
+    if (!nq) return true;
+    const hay = secNz((row || []).map(c => String(c == null ? '' : c)).join(' \u0001 '));
+    return nq.split(/\s+/).filter(Boolean).every(t => hay.indexOf(t) >= 0);
+}
+/* Сортировка: числа — если обе ячейки начинаются с числа (удобно для
+   столбцов «№» и «Момент»), иначе по тексту с русской локалью */
+function secSortRows(rows, col, dir) {
+    if (!(col >= 0) || !Array.isArray(rows)) return (rows || []).slice();
+    const firstNum = v => {
+        const m = String(v == null ? '' : v).replace(/\u00a0/g, ' ').replace(',', '.').match(/-?\d+(?:\.\d+)?/);
+        return m ? parseFloat(m[0]) : null;
+    };
+    return rows.slice().sort((a, b) => {
+        const x = a[col], y = b[col];
+        const nx = firstNum(x), ny = firstNum(y);
+        let r;
+        if (nx !== null && ny !== null && nx !== ny) r = nx - ny;
+        else r = String(x == null ? '' : x).localeCompare(String(y == null ? '' : y), 'ru');
+        return dir < 0 ? -r : r;
+    });
+}
+/* HTML строк таблицы (без обёртки) — используется и при перерисовке фильтра */
+function secRowsHtml(rows) {
+    return rows.map((r, i) => '<tr' + (i % 2 ? ' class="sec-alt"' : '') + '>' + r.map(c =>
+        '<td class="sec-td">' + secCellHtml(c) + '</td>').join('') + '</tr>').join('');
+}
+
 function rSec(sid) {
     const ar = $('ca');
     const s = CUSTOM.sections[sid] || {};
@@ -4980,28 +5150,74 @@ function rSec(sid) {
         }
         ar.innerHTML = h; return;
     }
-    const cols = s.cols || [];
-    h += '<div style="overflow-x:auto;border-radius:6px"><table style="width:100%;border-collapse:collapse;font-size:.82rem;background:var(--cd);border:1px solid var(--bd)">';
-    if (cols.length) h += '<thead><tr>' + cols.map(c =>
-        '<th style="padding:8px 10px;text-align:left;border-bottom:2px solid var(--a);background:var(--hv);font-size:.7rem;text-transform:uppercase;letter-spacing:.4px;color:var(--mu)">' + esc(c) + '</th>'
-    ).join('') + '</tr></thead>';
-    h += '<tbody>';
-    for (const r of rows) {
-        const cells = Array.isArray(r) ? r : cols.map(c => (r && r[c] != null) ? r[c] : '');
-        h += '<tr>' + cells.map(c => {
-            const cs = String(c == null ? '' : c);
-            /* ячейка-ссылка: «метка|url» или голый url */
-            const m = cs.match(/^(.+?)\|(https?:\/\/\S+)$/);
-            const inner = m
-                ? '<a href="' + escA(m[2]) + '" target="_blank" rel="noopener noreferrer" style="color:var(--a)">' + esc(m[1]) + ' ↗</a>'
-                : (/^https?:\/\//.test(cs)
-                    ? '<a href="' + escA(cs) + '" target="_blank" rel="noopener noreferrer" style="color:var(--a);word-break:break-all">' + esc(cs) + '</a>'
-                    : esc(cs));
-            return '<td style="padding:7px 10px;border-bottom:1px solid var(--bd);vertical-align:top">' + inner + '</td>';
-        }).join('') + '</tr>';
+    const cols = Array.isArray(s.cols) ? s.cols : [];
+    const v = secViewOf(sid);
+
+    /* панель: поиск + сброс + счётчик */
+    h += '<div class="sec-bar">'
+        + '<input type="text" class="sec-in" id="secIn" placeholder="🔍 Фильтр по разделу («P0301», «ступица», «110 Нм»…)" value="' + escA(v.q) + '" autocomplete="off" spellcheck="false">'
+        + '<button type="button" class="bn sec-clr" id="secClr" title="Очистить фильтр">✕</button>'
+        + '<span class="sec-cnt" id="secCnt"></span>'
+        + '</div>';
+
+    h += '<div class="sec-wrap"><table class="sec-tbl">';
+    if (cols.length) {
+        h += '<thead><tr>' + cols.map((c, i) =>
+            '<th class="sec-th' + (v.col === i ? ' sec-th-on' : '') + '" data-col="' + i + '" title="Сортировать по этому столбцу">'
+            + esc(c) + '<span class="sec-ar">' + (v.col === i ? (v.dir > 0 ? ' ▲' : ' ▼') : '') + '</span></th>').join('') + '</tr></thead>';
     }
-    h += '</tbody></table></div>';
+    h += '<tbody id="secBody"></tbody></table></div>';
+    h += '<p class="sec-hint">Клик по заголовку столбца — сортировка. Ссылки 🔎 ищут по каталогу деталей, → открывают другой справочник.</p>';
     ar.innerHTML = h;
+    secPaint(sid);
+
+    /* события: фильтр, сортировка, внутренние ссылки (делегирование) */
+    const inp = $('secIn');
+    if (inp) {
+        inp.addEventListener('input', e => { v.q = e.target.value; secPaint(sid); });
+        inp.addEventListener('keydown', e => { if (e.key === 'Escape') { v.q = ''; inp.value = ''; secPaint(sid); } });
+    }
+    const clr = $('secClr');
+    if (clr) clr.addEventListener('click', () => { v.q = ''; const i2 = $('secIn'); if (i2) { i2.value = ''; i2.focus(); } secPaint(sid); });
+    ar.querySelectorAll('.sec-th').forEach(th => th.addEventListener('click', () => {
+        const i = Number(th.getAttribute('data-col'));
+        if (v.col === i) v.dir = -v.dir; else { v.col = i; v.dir = 1; }
+        ar.querySelectorAll('.sec-th').forEach(x => { x.classList.remove('sec-th-on'); const a = x.querySelector('.sec-ar'); if (a) a.textContent = ''; });
+        th.classList.add('sec-th-on');
+        const a = th.querySelector('.sec-ar'); if (a) a.textContent = v.dir > 0 ? ' ▲' : ' ▼';
+        secPaint(sid);
+    }));
+    ar.addEventListener('click', e => {
+        const q = e.target.closest ? e.target.closest('.sec-q') : null;
+        if (q) { secSearchCat(q.getAttribute('data-q')); return; }
+        const sc = e.target.closest ? e.target.closest('.sec-s') : null;
+        if (sc) {
+            const id = sc.getAttribute('data-sec');
+            if (CUSTOM.sections[id] || SEC_TABLE_IDS.includes(id)) { SV.activeCat = id; SV.activeSub = null; sU(); rSB(); rC(); }
+            else toast('Раздел «' + id + '» не загружен', 'danger');
+        }
+    });
+}
+/* Перерисовка только строк и счётчика — чтобы не терять фокус в поле фильтра */
+function secPaint(sid) {
+    const s = CUSTOM.sections[sid] || {};
+    const rows = Array.isArray(s.rows) ? s.rows : [];
+    const v = secViewOf(sid);
+    const shown = secSortRows(rows.filter(r => secRowMatch(r, v.q)), v.col, v.dir);
+    const body = $('secBody');
+    if (body) body.innerHTML = secRowsHtml(shown);
+    const cnt = $('secCnt');
+    if (cnt) cnt.textContent = v.q ? 'показано ' + shown.length + ' из ' + rows.length : rows.length + ' строк';
+    if (body && !shown.length) body.innerHTML = '<tr><td class="sec-td sec-none" colspan="' + ((s.cols || []).length || 1) + '">Ничего не найдено по запросу «' + esc(v.q) + '»</td></tr>';
+}
+/* Поиск по каталогу деталей из справочника (как клик по «🔎» в строке кода) */
+function secSearchCat(q) {
+    SV.searchQuery = String(q || '').trim();
+    SV.activeCat = 'All'; SV.activeSub = null;
+    const si = $('sr'); if (si) si.value = SV.searchQuery;
+    if (typeof uSC === 'function') uSC();
+    sU(); rSB(); rC();
+    toast(SV.searchQuery ? 'Каталог: поиск «' + SV.searchQuery + '»' : 'Фильтр поиска снят', 'info');
 }
 
 /* ✅ 1.8.1: «Обновить данные» — сбрасывает записанную версию базы
@@ -6482,7 +6698,28 @@ function iPWA() {
    Собирается инструментом tools/vin_extract.py + tools/make_vin_db_web.py
    из офлайн-базы ETKA: VIN → мотор, КПП+код, краска, салон, дата, PR-коды.
    Если файла нет — функция молча отключена (toast/подсказки не мешают). */
-const VINDB = { map: null, pr: null, promise: null };
+const VINDB = { map: null, alt: null, pr: null, promise: null };
+/* 1.10.6: 9-й символ VIN у VAG — контрольный разряд; в европейских VIN на его
+   месте часто стоит filler «Z», а в дампе ETKA / на табличке машины может быть
+   реальный символ. В прогоне vin-db.meta.json таких расхождений два
+   (WV1ZZZ9KZ3R530555 ↔ WV1ZZZ9KJ3R530555 и WVWZZZ6NZ1Y050165 ↔ WVWZZZ6N21Y050165):
+   точный поиск по Map их не находил, и карточка оставалась «пустой».
+   Держим запасной индекс без 9-го символа; точное совпадение всегда
+   приоритетнее, а запасное используем, только если оно единственное. */
+const vinAltKey = v => (v.length === 17 ? v.slice(0, 8) + v.slice(9) : '');
+function vinDbIndex(rec) {
+    if (!rec || !rec.vin) return;
+    const v = String(rec.vin).trim().toUpperCase();
+    if (!v) return;
+    if (!VINDB.map) VINDB.map = new Map();
+    if (!VINDB.alt) VINDB.alt = new Map();
+    VINDB.map.set(v, rec);
+    const k = vinAltKey(v);
+    if (!k) return;
+    const list = VINDB.alt.get(k);
+    if (!list) VINDB.alt.set(k, [rec]);
+    else if (!list.includes(rec)) list.push(rec);
+}
 function vinDbLoad() {
     if (VINDB.promise) return VINDB.promise;
     const base = location.origin + location.pathname.replace(/[^/]*$/, '');
@@ -6499,9 +6736,10 @@ function vinDbLoad() {
             if (r.ok) {
                 const arr = await r.json();
                 VINDB.map = new Map();
-                for (const rec of arr) if (rec && rec.vin) VINDB.map.set(String(rec.vin).toUpperCase(), rec);
+                VINDB.alt = new Map();
+                for (const rec of arr) vinDbIndex(rec);
             }
-        } catch (e) { VINDB.map = null; }
+        } catch (e) { VINDB.map = null; VINDB.alt = null; }
         /* Патч базы VIN (data/vin-db.patch.json): ручные записи — машины, которых
            нет в дампе ETKA, и точечные исправления. Грузится ВСЕГДА (даже когда
            боевой vin-db.json отсутствует) и имеет приоритет над основной базой —
@@ -6528,17 +6766,33 @@ function vinDbLoad() {
 function vinDbPatchApply(arr) {
     if (!Array.isArray(arr) || !arr.length) return 0;
     if (!VINDB.map) VINDB.map = new Map();
+    if (!VINDB.alt) VINDB.alt = new Map();
     let n = 0;
     for (const rec of arr) {
         if (!rec || !rec.vin) continue;
         rec.patch = true;
-        VINDB.map.set(String(rec.vin).toUpperCase(), rec);
+        vinDbIndex(rec);
         n++;
     }
     VINDB.patchCount = (VINDB.patchCount || 0) + n;
     return n;
 }
-const vinDbRow = vin => (VINDB.map && vin && VINDB.map.get(String(vin).toUpperCase())) || null;
+/* Точное совпадение → запасное (без 9-го символа), если оно единственное.
+   Второй аргумент (необязательный) получает { fuzzy, vin } — по нему UI
+   показывает честную пометку «найдено без учёта контрольного разряда». */
+const vinDbRow = (vin, out) => {
+    const v = String(vin || '').trim().toUpperCase();
+    if (!v || !VINDB.map) return null;
+    const hit = VINDB.map.get(v);
+    if (hit) return hit;
+    const k = vinAltKey(v);
+    const cand = (k && VINDB.alt) ? VINDB.alt.get(k) : null;
+    if (cand && cand.length === 1) {
+        if (out && typeof out === 'object') { out.fuzzy = true; out.vin = String(cand[0].vin || ''); }
+        return cand[0];
+    }
+    return null;
+};
 function vinDbFamilyOf(row) {
     if (!row) return '';
     const f = gearboxFamsOf(row.gearbox_code || '');
@@ -6937,7 +7191,8 @@ function prCategoryOf(code) {
 function oPR(gid) {
     const g = (gid && G.find(x => x.id === gid)) || gAV();
     if (!g) { toast('VIN не выбран — добавьте машину в гараж', 'danger'); return; }
-    const row = vinDbRow(g.vin);
+    const _vmeta = {};                    // { fuzzy, vin } — см. vinDbRow (1.10.6)
+    const row = vinDbRow(g.vin, _vmeta);
     if (!row) { toast('Этого VIN нет в базе оснащения', 'info'); return; }
     const hasEquip = !!(row.engine || row.gearbox || row.gearbox_code || row.paint || row.prod_date || (Array.isArray(row.pr) && row.pr.length));
     if (!hasEquip) {
@@ -6969,6 +7224,7 @@ function oPR(gid) {
             + '<button class="bn" type="button" onclick="cPR();showPlateLocation(\'' + escA(g.id) + '\')">📍 Где коды</button>'
             + '<button class="bn" type="button" onclick="cPR();showVinQR(\'' + escA(g.id) + '\')">📱 QR-код</button>'
             + '</div>';
+        if (_vmeta.fuzzy) h += '<p class="pr-note">🔎 Запись найдена без учёта 9-го символа VIN (контрольный разряд): в базе этот автомобиль хранится как <b>' + esc(_vmeta.vin) + '</b>.</p>';
         h += '<p class="pr-note">Полное оснащение (мотор, КПП, краска, PR-коды) появится здесь после генерации <b>data/vin-db.json</b> из исходных файлов дампа — инструкция в <b>vin-dump/README.md</b>. Мотор и КПП можно указать вручную («✎ Уточнить данные») — каталог и списки ТО сразу сузятся под эту машину.</p>';
         $('prmo_body').innerHTML = h;
         $('prmo_title').textContent = '📋 Оснащение · …' + g.vin.slice(-6);
@@ -6976,6 +7232,7 @@ function oPR(gid) {
         return;
     }
     let h = '<div class="gb-hint">' + esc(vinDbSummary(row) || 'Данных об оснащении нет') + '</div>';
+    if (_vmeta.fuzzy) h += '<p class="pr-note">🔎 Совпадение без учёта 9-го символа VIN (контрольный разряд): в базе — <b>' + esc(_vmeta.vin) + '</b>.</p>';
     const prs = (Array.isArray(row.pr) ? row.pr : []).map(c => String(c || '').trim().toUpperCase()).filter(Boolean);
     if (prs.length) {
         /* Группировка по категориям */
