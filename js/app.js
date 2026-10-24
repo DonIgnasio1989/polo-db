@@ -2047,7 +2047,7 @@ let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastKm: null, lastDate: null, interval: 15000 };
 let TO_ALL = {};
 
-let APP_VERSION = '1.12.0'; // fallback, если update.json не загрузится
+let APP_VERSION = '1.13.0'; // fallback, если update.json не загрузится
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -4173,7 +4173,7 @@ const VIRTUAL_CATS = {
     Dash: { label: 'Моя машина', icon: '🚘' },
     Workshops: { label: 'Мастерские/СТО', icon: '🔧' },
     Log: { label: 'Журнал обслуживания', icon: '📖' },
-    Diagnostics: { label: 'Диагностика (OBD)', icon: '🩺' },
+    Diagnostics: { label: 'Диагностика (OBD/VAG)', icon: '🩺' },
     Torque: { label: 'Моменты затяжки', icon: '🔩' },
     Lamps: { label: 'Лампы и цоколи', icon: '💡' },
     FluidSpecs: { label: 'Жидкости и объёмы', icon: '🛢️' },

@@ -1,0 +1,167 @@
+{
+ "generated": "2026-10-24T15:43:53.418Z",
+ "perRule": {
+  "N2": 4,
+  "N3": 4,
+  "N4": 8,
+  "N1": 6
+ },
+ "touchedFiles": 8,
+ "touchedRecs": 22,
+ "log": [
+  {
+   "file": "parts-01-engine-fuel-ignition.json",
+   "idx": 0,
+   "oem": "030 109 119",
+   "rule": "N2",
+   "text": "добавлено уточнение интервала ГРМ (данные производителя: интервал только для дизелей)"
+  },
+  {
+   "file": "parts-01-engine-fuel-ignition.json",
+   "idx": 4,
+   "oem": "030 121 011",
+   "rule": "N3",
+   "text": "добавлено напоминание: помпа приводится ремнём ГРМ"
+  },
+  {
+   "file": "parts-01-engine-fuel-ignition.json",
+   "idx": 53,
+   "oem": "030 109 119 F",
+   "rule": "N2",
+   "text": "добавлено уточнение интервала ГРМ (данные производителя: интервал только для дизелей)"
+  },
+  {
+   "file": "parts-01-engine-fuel-ignition.json",
+   "idx": 63,
+   "oem": "030 121 008 C",
+   "rule": "N3",
+   "text": "добавлено напоминание: помпа приводится ремнём ГРМ"
+  },
+  {
+   "file": "parts-02-cooling-heating-brakes-suspension.json",
+   "idx": 9,
+   "oem": "6N0 615 301",
+   "rule": "N4",
+   "text": "добавлено про MIN-толщину, обезжиривание и обкатку"
+  },
+  {
+   "file": "parts-02-cooling-heating-brakes-suspension.json",
+   "idx": 45,
+   "oem": "6N0 615 301 B",
+   "rule": "N4",
+   "text": "добавлено про MIN-толщину, обезжиривание и обкатку"
+  },
+  {
+   "file": "parts-02-cooling-heating-brakes-suspension.json",
+   "idx": 103,
+   "oem": "030 121 008 D",
+   "rule": "N3",
+   "text": "добавлено напоминание: помпа приводится ремнём ГРМ"
+  },
+  {
+   "file": "parts-02-cooling-heating-brakes-suspension.json",
+   "idx": 106,
+   "oem": "036 121 005 S",
+   "rule": "N3",
+   "text": "добавлено напоминание: помпа приводится ремнём ГРМ"
+  },
+  {
+   "file": "parts-04-body-interior-maint-fluids-roadkit.json",
+   "idx": 171,
+   "oem": "030 198 119",
+   "rule": "N2",
+   "text": "добавлено уточнение интервала ГРМ (данные производителя: интервал только для дизелей)"
+  },
+  {
+   "file": "parts-06.json",
+   "idx": 1,
+   "oem": "030 198 119 A",
+   "rule": "N2",
+   "text": "добавлено уточнение интервала ГРМ (данные производителя: интервал только для дизелей)"
+  },
+  {
+   "file": "parts-07-engine-composition.json",
+   "idx": 116,
+   "oem": "028 121 132 B · 028 121 132 C",
+   "rule": "N1",
+   "text": "engines += AEF, AGD, AHG, AKU (в названии «Фланец (AEF / AGD,AHG,AKU)» — дизели 1.9 SDI и 1.7 SDI)"
+  },
+  {
+   "file": "parts-07-engine-composition.json",
+   "idx": 392,
+   "oem": "6N0 199 111 H · 6N0 199 111 G · 6N0 199 111 F · 6N0 199 565 C",
+   "rule": "N1",
+   "text": "engines += AMF (в названии заявлен AMF (1.4 TDI), в engines его не было)"
+  },
+  {
+   "file": "parts-13-brakes-wheels-detailed.json",
+   "idx": 193,
+   "oem": "6N0 615 301 C",
+   "rule": "N4",
+   "text": "добавлено про MIN-толщину, обезжиривание и обкатку"
+  },
+  {
+   "file": "parts-13-brakes-wheels-detailed.json",
+   "idx": 194,
+   "oem": "JZW 615 301 L",
+   "rule": "N4",
+   "text": "добавлено про MIN-толщину, обезжиривание и обкатку"
+  },
+  {
+   "file": "parts-13-brakes-wheels-detailed.json",
+   "idx": 219,
+   "oem": "6N0 615 301 D",
+   "rule": "N4",
+   "text": "добавлено про MIN-толщину, обезжиривание и обкатку"
+  },
+  {
+   "file": "parts-13-brakes-wheels-detailed.json",
+   "idx": 220,
+   "oem": "6N0 615 301 E",
+   "rule": "N4",
+   "text": "добавлено про MIN-толщину, обезжиривание и обкатку"
+  },
+  {
+   "file": "parts-13-brakes-wheels-detailed.json",
+   "idx": 230,
+   "oem": "6N0 615 601",
+   "rule": "N4",
+   "text": "добавлено про MIN-толщину, обезжиривание и обкатку"
+  },
+  {
+   "file": "parts-13-brakes-wheels-detailed.json",
+   "idx": 231,
+   "oem": "6N0 615 601 A",
+   "rule": "N4",
+   "text": "добавлено про MIN-толщину, обезжиривание и обкатку"
+  },
+  {
+   "file": "parts-18-washers-fans-wiring.json",
+   "idx": 136,
+   "oem": "6X0 973 815",
+   "rule": "N1",
+   "text": "engines += AEE, AEX, AER, AHS, AKV, ALL, ANX, APQ (список моторов из названия (жгут моторного отсека, МКПП))"
+  },
+  {
+   "file": "parts-18-washers-fans-wiring.json",
+   "idx": 137,
+   "oem": "6X0 973 817",
+   "rule": "N1",
+   "text": "engines += AEE, AEX, AER, AHS, AKV, ANX, APQ, AFH (список из названия; «AF/HALL» в имени — искажённое «AFH» (подтверждено соседней позицией 1J0 973 715, где AFH указан явно))"
+  },
+  {
+   "file": "parts-18-washers-fans-wiring.json",
+   "idx": 138,
+   "oem": "1J0 973 824",
+   "rule": "N1",
+   "text": "engines += AEE, AEX, AER, AHS, AKV, ANX, APQ, AFH (список из названия; «AF/HALL» — искажённое «AFH» (см. 1J0 973 715))"
+  },
+  {
+   "file": "parts-19-wiring-harnesses.json",
+   "idx": 167,
+   "oem": "1J0 973 715",
+   "rule": "N1",
+   "text": "engines += AEE, AEX, AER, AHS, AFH, ALL, ANX, APQ, AKV (список моторов из названия (соединительная муфта жгута))"
+  }
+ ]
+}
