@@ -224,6 +224,22 @@ if (!SKIP_PROD && exists(path.join(ROOT, 'data', 'parts.full.json'))) {
    ============================================================ */
 if (exists(path.join(ROOT, 'data', 'sections.json'))) {
     const secs = readJson(path.join(ROOT, 'data', 'sections.json'));
+    /* 1.11.0: проверка в обе стороны — раздел без записи в SEC_TABLE_IDS
+       не отрисуется, а id в SEC_TABLE_IDS без данных даст пустой экран */
+    SEC_TABLE_IDS.forEach(id => {
+        if (!secs[id]) E('sections', 'SEC_TABLE_IDS содержит «' + id + '», но в data/sections.json такого раздела нет');
+        else if (!Array.isArray(secs[id].rows) || !secs[id].rows.length) W('sections', 'раздел «' + id + '» объявлен в SEC_TABLE_IDS, но не имеет строк');
+    });
+    /* регистрация в сайдбаре: VIRTUAL_CATS + группа «Справочники» */
+    const vcBlock = appSrc.slice(appSrc.indexOf('const VIRTUAL_CATS = {'), appSrc.indexOf('\n};', appSrc.indexOf('const VIRTUAL_CATS = {')));
+    const refsGroup = /id:\s*'refs'[\s\S]*?cats:\s*\[([^\]]*)\]/.exec(appSrc);
+    const refsCats = refsGroup ? [...refsGroup[1].matchAll(/'([^']+)'/g)].map(m => m[1]) : [];
+    Object.keys(secs).forEach(id => {
+        if (!new RegExp(id + '\\s*:\\s*\\{').test(vcBlock)) E('sections', '«' + id + '» нет в VIRTUAL_CATS — в сайдбаре не будет иконки/подписи');
+        if (!refsCats.includes(id)) E('sections', '«' + id + '» не добавлен в группу «Справочники» (CAT_GROUPS.refs) — раздел не появится в меню');
+    });
+    N('sections', 'разделов: ' + Object.keys(secs).length + ' · строк: ' + Object.keys(secs).reduce((a, k) => a + (secs[k].rows || []).length, 0) +
+        ' · в сайдбаре зарегистрированы все');
     Object.keys(secs).forEach(id => {
         const s = secs[id] || {};
         if (!SEC_TABLE_IDS.includes(id)) E('sections', '«' + id + '» нет в SEC_TABLE_IDS — раздел не отрисуется');
@@ -259,7 +275,10 @@ if (exists(path.join(ROOT, 'data', 'pr-codes.json'))) {
     prK.forEach(k => { if (k.length !== 3) W('pr', 'ключ «' + k + '» не 3-символьный'); });
     ruK.forEach(k => { if (!(k in pr)) E('pr', 'RU-ключ «' + k + '» отсутствует в pr-codes.json'); });
     const cyr = prK.filter(k => /[а-яА-ЯёЁ]/.test(String(pr[k])));
-    prStat = { total: prK.length, ru: ruK.length, cyr: cyr.length };
+    const emptyDesc = prK.filter(k => !String(pr[k] || '').trim());
+    prStat = { total: prK.length, ru: ruK.length, cyr: cyr.length, empty: emptyDesc.length };
+    if (emptyDesc.length) W('pr', 'pr-codes.json: ' + emptyDesc.length + ' кодов из ' + prK.length +
+        ' (' + Math.round(100 * emptyDesc.length / prK.length) + '%) с ПУСТЫМ описанием — модалка «Оснащение (PR)» покажет «описание не найдено»');
     N('pr', 'pr-codes.json: ' + prK.length + ' кодов, RU-переводов ' + ruK.length + ' (' + (100 * ruK.length / prK.length).toFixed(1) + '%), значений с кириллицей в основном словаре: ' + cyr.length);
     if (ruK.length / prK.length < 0.5) W('pr', 'RU-переводом покрыто меньше половины кодов — модалка «Оснащение (PR)» будет частично английской');
     ['vin-db.example.json', 'vin-db.patch.json'].forEach(f => {
@@ -278,6 +297,17 @@ if (exists(path.join(ROOT, 'data', 'pr-codes.json'))) {
    7. VIN-база
    ============================================================ */
 const VIN_RE = /^[A-HJ-NPR-Z0-9]{17}$/;
+/* дополнение 1.12.1 (после диагноза vin-db): контроль достоверности VIN. Присланный vin-db.json содержал
+   «вин-коды», склеенные из последних пяти PR-кодов (1ARLAT6VU2BV0AWV1 =
+   «1A» + RLA+T6V+U2B+V0A+WV1) — 9 из 9 записей. Формально они проходят
+   VIN_RE (17 допустимых символов), поэтому добавлены проверки смысла:
+   WMI, filler ZZZ, числовой серийный номер, год из VIN против prod_date
+   и прямая детекция склейки из PR-кодов. */
+const WMI_OK = /^(WVW|WV1|WV2|WV3|WVG|1VW|1V1|3VW|8AW|9BW|9BV|AAV|VSS|VSK|WAU|TRU|93V|TM)/;
+const YEAR_CODES = { A: 1980, B: 1981, C: 1982, D: 1983, E: 1984, F: 1985, G: 1986, H: 1987, J: 1988, K: 1989, L: 1990, M: 1991, N: 1992, P: 1993, R: 1994, S: 1995, T: 1996, V: 1997, W: 1998, X: 1999, Y: 2000, 1: 2001, 2: 2002, 3: 2003, 4: 2004, 5: 2005, 6: 2006, 7: 2007, 8: 2008, 9: 2009 };
+const vinIsFabricated = rec => Array.isArray(rec.pr) && rec.pr.length >= 5 &&
+    String(rec.vin || '').length === 17 &&
+    String(rec.vin).slice(2).toUpperCase() === rec.pr.slice(-5).map(x => String(x).toUpperCase()).join('');
 const vinFiles = ['data/vin-db.example.json', 'data/vin-db.patch.json', 'data/vin-db.filtered-only.json', 'data/vin-db.json'];
 const vinSets = {};
 vinFiles.forEach(f => {
@@ -285,13 +315,37 @@ vinFiles.forEach(f => {
     if (!exists(p)) return;
     const arr = readJson(p);
     const set = new Set();
+    const stat = { fab: 0, wmi: 0, filler: 0, serial: 0, year: 0 };
     arr.forEach((rec, i) => {
         const v = String(rec.vin || '').trim().toUpperCase();
         if (!v) return E('vin', f + ' #' + i + ' — нет vin');
         if (!VIN_RE.test(v)) E('vin', f + ' #' + i + ' — VIN «' + v + '» не соответствует формату (17 символов, без I/O/Q)');
         if (set.has(v)) E('vin', f + ' — дубль VIN ' + v);
         set.add(v);
+        if (v.length !== 17) return;
+        /* склейка из PR-кодов — самый опасный случай: файл выглядит валидным,
+           но не находится ни по одному реальному VIN */
+        if (vinIsFabricated(rec)) {
+            stat.fab++;
+            if (stat.fab <= 3) E('vin', f + ' #' + i + ' — VIN «' + v + '» склеен из последних 5 PR-кодов (' + rec.pr.slice(-5).join('+') + '); это не VIN, поиск по базе работать не будет');
+        }
+        if (!WMI_OK.test(v)) { stat.wmi++; if (stat.wmi <= 3) E('vin', f + ' #' + i + ' — WMI «' + v.slice(0, 3) + '» не принадлежит VW/SEAT (ожидаются WVW/WV1/WV2/VSS/…)'); }
+        if (v.slice(3, 6) !== 'ZZZ') { stat.filler++; if (stat.filler <= 3) W('vin', f + ' #' + i + ' — на месте filler (4–6 символы) «' + v.slice(3, 6) + '» вместо ZZZ'); }
+        if (!/^\d{6}$/.test(v.slice(11))) { stat.serial++; if (stat.serial <= 3) E('vin', f + ' #' + i + ' — серийная часть «' + v.slice(11) + '» не цифровая (у VW это 6 цифр)'); }
+        const yCode = YEAR_CODES[v[9]];
+        const pYear = /^(\d{4})/.exec(String(rec.prod_date || ''));
+        if (yCode && pYear && Math.abs(yCode - Number(pYear[1])) > 1) {
+            stat.year++;
+            if (stat.year <= 3) E('vin', f + ' #' + i + ' — год из VIN (' + yCode + ') не совпадает с prod_date (' + rec.prod_date + ')');
+        }
     });
+    if (stat.fab || stat.wmi || stat.serial || stat.year) {
+        E('vin', f + ': итог по достоверности — склеенных из PR: ' + stat.fab + ', чужих WMI: ' + stat.wmi +
+            ', нецифровых серийников: ' + stat.serial + ', расхождений года: ' + stat.year + ' (всего записей ' + arr.length + ')');
+    } else {
+        N('vin', f + ': проверка достоверности пройдена (WMI, filler, серийник, год против prod_date)');
+    }
+    if (stat.filler) W('vin', f + ': filler ≠ ZZZ у ' + stat.filler + ' записей');
     vinSets[f] = set;
     N('vin', f + ': ' + arr.length + ' записей, ' + set.size + ' уникальных VIN');
 });
@@ -320,6 +374,79 @@ if (exists(dumpList) && vinSets['data/vin-db.filtered-only.json']) {
         if (mism.length) W('vin', 'filtered-vins.txt ↔ filtered-files.txt: расхождения в 9-й позиции на строках ' + mism.slice(0, 5).join(', ') + ' (всего ' + mism.length + ') — покрыто запасным индексом vinDbRow()');
         else N('vin', 'filtered-vins.txt и filtered-files.txt согласованы построчно');
     }
+}
+
+/* ============================================================
+   7b. Внутренние ссылки справочников (1.12.0)
+   ------------------------------------------------------------
+   rSec() умеет два вида внутренних ссылок: «метка|#q:запрос» (поиск по
+   каталогу) и «метка|#sec:Id» (переход в другой справочник). Проверяем, что
+   каждая из них рабочая: запрос должен находить хотя бы одну деталь по тем же
+   правилам, что и mP() в приложении (все слова запроса — в одном из полей),
+   а раздел — существовать. «Мёртвая» ссылка в справочнике хуже её отсутствия.
+   ============================================================ */
+const SYNONYMS_SRC = (appSrc.match(/const SYNONYMS = \{([\s\S]*?)\n\};/) || [, ''])[1];
+const SYNONYMS = {};
+[...SYNONYMS_SRC.matchAll(/'([^']+)'\s*:\s*\[([^\]]*)\]/g)].forEach(m => {
+    SYNONYMS[m[1]] = [...m[2].matchAll(/'([^']*)'/g)].map(x => x[1]);
+});
+const secNz = x => String(x == null ? '' : x).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+function partHaystack(p) {
+    const inst = Array.isArray(p.i) ? p.i.map(x => (Array.isArray(x) ? x[1] : (x && x.text) || ''))
+        : (Array.isArray(p.inst) ? p.inst.map(x => (x && x.text) || '') : []);
+    return secNz([p.o || p.oem || '', p.n || p.name || '', ...(p.a || p.analogs || []),
+        ...(p.d || p.donors || []), ...inst, ...(p.engines || []), ...(p.transmissions || []),
+        ...(p.transCodes || []), ...(p.bodies || []), ...(p.gens || [])].join('  '));
+}
+let hayCache = null;
+/* Откуда брать детали для проверки ссылок: боевой data/parts.json, а во время
+   сборки (--skip-prod, файл ещё не пересобран) — data-src. Раньше в режиме
+   --skip-prod список оказывался пустым, и валидатор рапортовал о 117
+   «мёртвых» ссылках, которых на самом деле нет. */
+function partsForLinks() {
+    if (!SKIP_PROD && exists(path.join(ROOT, 'data', 'parts.json')))
+        return readJson(path.join(ROOT, 'data', 'parts.json'));
+    if (srcAll.length) return srcAll;
+    return exists(path.join(ROOT, 'data', 'parts.json')) ? readJson(path.join(ROOT, 'data', 'parts.json')) : [];
+}
+function queryHits(q) {
+    if (!hayCache) hayCache = partsForLinks().map(partHaystack);
+    const toks = secNz(q).split(/\s+/).filter(Boolean);
+    if (!toks.length) return 0;
+    let hits = 0;
+    for (const h of hayCache) {
+        const h2 = h.replace(/[^a-z0-9а-я]/g, '');
+        if (toks.every(t => {
+            const alts = [t].concat(SYNONYMS[t] || []);
+            return alts.some(a => h.includes(a) || (a.replace(/[^a-z0-9]/g, '').length >= 5 && h2.includes(a.replace(/[^a-z0-9]/g, ''))));
+        })) hits++;
+    }
+    return hits;
+}
+if (exists(path.join(ROOT, 'data', 'sections.json'))) {
+    const secs = readJson(path.join(ROOT, 'data', 'sections.json'));
+    let links = 0, secLinks = 0;
+    Object.keys(secs).forEach(sid => (secs[sid].rows || []).forEach((row, i) => row.forEach(cell => {
+      /* ячейка может содержать несколько элементов через «;;» — как в secCellHtml */
+      String(cell == null ? '' : cell).split(';;').forEach(part => {
+        const cs = part.trim();
+        if (!cs) return;
+        const m = cs.match(/^([\s\S]+?)\|([\s\S]+)$/);
+        if (!m) return;
+        const target = m[2].trim();
+        if (target.indexOf('#q:') === 0) {
+            links++;
+            const q = target.slice(3);
+            const n = queryHits(q);
+            if (!n) E('sections', sid + ' rows[' + i + ']: ссылка «' + m[1] + '» → поиск «' + q + '» не находит ни одной детали');
+        } else if (target.indexOf('#sec:') === 0) {
+            secLinks++;
+            const id = target.slice(5);
+            if (!secs[id]) E('sections', sid + ' rows[' + i + ']: ссылка на раздел «' + id + '», которого нет в sections.json');
+        }
+      });
+    })));
+    N('sections', 'внутренних ссылок: поиск по каталогу — ' + links + ', переходы между разделами — ' + secLinks + ' (все рабочие)');
 }
 
 /* ============================================================
