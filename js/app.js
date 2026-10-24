@@ -730,18 +730,23 @@ function rDash() {
         + '<div class="dash-desc">' + esc([av.brand, av.model, av.year].filter(Boolean).join(' ') || '—')
         + (col ? ' · <span class="gi-dot" style="background:' + col.hex + '"></span> ' + esc(col.ru) : '')
         + (av.engineCode ? ' · ⚙ ' + esc(av.engineCode) : '') + (av.gearboxCode ? ' · 🔄 ' + esc(av.gearboxCode) : '')
-        + '</div></div></div>'
-        + '<div class="dash-km"><label>Пробег, км</label><div class="dash-km-row">'
-        + '<input type="number" id="dashKm" min="0" step="500" value="' + (TO.km != null ? TO.km : '') + '" placeholder="напр. 187300">'
-        + '<button class="bn p" data-action="dash-km" title="Сохранить пробег — виджет ТО и напоминания обновятся">Обновить</button>'
-        + '<button class="bn" data-action="dash-notify" title="Разрешить push-напоминания о ТО">🔔</button>'
-        + '</div></div></div>';
+        + '</div></div></div></div>';
 
     const t = nextTO();
     h += '<div class="dash-grid">';
     /* ТО */
     const urgent = t && (t.daysLeft <= 7 || t.kmLeft <= 500);
-    h += '<div class="dash-card' + (urgent ? ' warn' : '') + '"><div class="dc-h">🛠 Ближайшее ТО</div>';
+    h += '<div class="dash-card' + (urgent ? ' warn' : '') + '"><div class="dc-h">🛠 Ближайшее ТО</div>'
+        /* ✅ 1.10.4: пробег живёт прямо в карточке ТО — обновил километры,
+           и счётчик остатка пересчитался тут же, под полем. Раньше поле
+           было в шапке кабинета, а результат — в карточке: неудобно.
+           Показываем блок и когда ТО ещё не настроено (t === null) —
+           карточка как раз просит «укажите пробег». */
+        + '<div class="dash-km"><label for="dashKm">Пробег, км</label><div class="dash-km-row">'
+        + '<input type="number" id="dashKm" min="0" step="500" value="' + (TO.km != null ? TO.km : '') + '" placeholder="напр. 187300">'
+        + '<button class="bn p" data-action="dash-km" title="Сохранить пробег — остаток до ТО пересчитается сразу">Обновить</button>'
+        + '<button class="bn" data-action="dash-notify" title="Разрешить push-напоминания о ТО">🔔</button>'
+        + '</div></div>';
     if (t) {
         /* ✅ 1.10.1: при расчёте по одометру показываем, сколько уже проехали
            с последнего ТО; без lastKm — честно пишем, что это оценка по дате. */
@@ -778,11 +783,26 @@ function rDash() {
             + (l.km ? '<span class="dl-km">' + Number(l.km).toLocaleString('ru-RU') + ' км</span>' : '')
             + (l.cost != null ? '<span class="dl-c">' + esc(fP(l.cost, l.currency)) + '</span>' : '') + '</li>').join('') + '</ul>';
         if (years.length) {
+            /* ✅ 1.10.5: полоска расходов больше не вылезает за карточку.
+               Раньше год, заливка и сумма лежали в одном flex-ряду, и
+               width:100% у заливки считался от ширины ВСЕГО ряда — сумма
+               уезжала за границу виджета (тем сильнее, чем крупнее расходы).
+               Теперь ряд — сетка «год | трек | сумма», процент заливки
+               считается только от её дорожки, а сумма живёт в своей
+               колонке и при нехватке места сокращается многоточием. */
             h += '<div class="dc-bars">' + years.slice(-5).map(y => {
                 const tot = yearTot(y);
-                const w = Math.max(4, Math.round(tot / maxYear * 100));
-                const rub = spend[y].RUB;
-                return '<div class="dc-bar" title="' + y + ': ' + tot.toLocaleString('ru-RU') + '"><span class="dc-bar-y">' + esc(y) + '</span><span class="dc-bar-f" style="width:' + w + '%"></span><span class="dc-bar-v">' + (rub ? Math.round(rub).toLocaleString('ru-RU') + ' ₽' : tot.toLocaleString('ru-RU')) + '</span></div>';
+                const w = Math.min(100, Math.max(4, Math.round(tot / maxYear * 100)));
+                /* Сумма года — со знаком валюты; если валют несколько,
+                   показываем разбивку (иначе сумма «в кучу» без знака валюты
+                   вводит в заблуждение). Порядок валют — по алфавиту, чтобы
+                   вывод не зависел от порядка записей в журнале. */
+                const cs = Object.keys(spend[y]).sort();
+                const val = cs.map(c => fP(spend[y][c], c)).join(' + ');
+                return '<div class="dc-bar" title="' + escA(y + ': ' + val) + '">'
+                    + '<span class="dc-bar-y">' + esc(y) + '</span>'
+                    + '<span class="dc-bar-t"><i class="dc-bar-f" style="width:' + w + '%"></i></span>'
+                    + '<span class="dc-bar-v">' + esc(val) + '</span></div>';
             }).join('') + '</div>';
         }
     } else {
@@ -1997,7 +2017,7 @@ let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastKm: null, lastDate: null, interval: 15000 };
 let TO_ALL = {};
 
-let APP_VERSION = '1.10.3';
+let APP_VERSION = '1.10.5';
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;

@@ -8132,10 +8132,15 @@ body.pub .sft-btn.don {
     display: flex;
     gap: 6px;
     align-items: center;
+    /* 1.10.4: блок переехал в карточку ТО — на узкой карточке/телефоне
+       кнопка 🔔 может не влезать в ряд, переносим на следующую строку */
+    flex-wrap: wrap;
 }
 
 .dash-km-row input {
     width: 130px;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .dash-grid {
@@ -8242,30 +8247,57 @@ body.pub .sft-btn.don {
     margin-top: 4px;
 }
 
+/* ✅ 1.10.5: ряд «год | полоска | сумма» — сетка, а не flex.
+   Заливка получает процент от СВОЕЙ дорожки (minmax(40px, 1fr)),
+   поэтому физически не может вытолкнуть сумму за край карточки. */
 .dc-bar {
-    display: flex;
+    display: grid;
+    grid-template-columns: 34px minmax(40px, 1fr) minmax(0, max-content);
     align-items: center;
     gap: 6px;
     font-size: .72rem;
+    max-width: 100%;
 }
 
 .dc-bar-y {
     font-family: var(--ff-mono);
     color: var(--mu);
-    width: 34px;
-    flex-shrink: 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Дорожка: фон виден на всю ширину, заливка внутри — пропорцией года */
+.dc-bar-t {
+    position: relative;
+    display: block;
+    height: 10px;
+    border-radius: 3px;
+    background: var(--hv);
+    overflow: hidden;
+    min-width: 0;
 }
 
 .dc-bar-f {
-    height: 10px;
+    display: block;
+    height: 100%;
+    max-width: 100%;
     border-radius: 3px;
     background: linear-gradient(90deg, var(--a), var(--a-h));
-    flex-shrink: 0;
 }
 
+/* Сумма — в своей колонке: не переносится и не вылезает,
+   на совсем узкой карточке честно обрезается многоточием */
 .dc-bar-v {
     color: var(--tx);
     font-family: var(--ff-mono);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
+    min-width: 0;
+    max-width: 100%;
 }
 
 /* Голоса за аналоги */
