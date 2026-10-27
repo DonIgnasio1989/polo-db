@@ -1,0 +1,125 @@
+--- a/tools/audit-parts.js
++++ b/tools/audit-parts.js
+@@ -44,7 +44,11 @@
+     : (Array.isArray(r.inst) ? r.inst.map(x => (x && x.text) || '') : [])).filter(Boolean);
+ const label = r => '`' + (oemOf(r) || '—') + '` ' + nameOf(r);
+ 
+-const F = { A: [], B: [], C: [], D: [], E: [], F: [], G: [], H: [], I: [], J: [] };
++const F = { A: [], B: [], C: [], D: [], E: [], F: [], G: [], H: [], I: [], J: [],
++    /* Bdoc — не противоречия, а ЗАДОКУМЕНТИРОВАННЫЕ развилки моментов: строки с «⚠»,
++       где расхождение источников названо явно (правило проекта: «при расхождении
++       источников пишем оба значения и ⚠»). Выделены отдельно, чтобы не терять. */
++    Bdoc: [] };
+ 
+ /* ---------- A/B: моменты затяжки ---------- */
+ /* из справочника «Моменты затяжки» */
+@@ -54,10 +58,40 @@
+     if (m) refTorque.push({ node: String(row[0]).toLowerCase(), val: parseFloat(m[1].replace(',', '.')) });
+ });
+ /* из карточек */
++/* B/G-фикс (аудит 2026-10-27): из строки берётся ПЕРВОЕ «NN Нм», но момент
++   относится к конкретному соединению, а библиотека вешает на карточку моменты
++   РАЗНЫХ соединений (через общие блоки wheel-nuts, one-shot-fasteners и т. д.).
++   Без учёта соединения блок B выдавал 80 «противоречий» там, где их нет.
++   Поэтому:
++   · label — первые значимые слова строки, то есть ЧТО именно затягивается
++     («Прокачной штуцер», «Колёсные болты», «Гайка ступицы зад.»);
++   · discrepancy — строка сама говорит, что значения из источников расходятся
++     («⚠ Два разных значения в справочнике проекта: 45 Нм…»). По правилу проекта
++     («при расхождении источников пишем оба значения и ⚠») это НЕ противоречие
++     данных, а задокументированная развилка. */
++const STOPW = new Set(['—', '-', '–', '·', 'и', 'или', 'в', 'во', 'к', 'с', 'со', 'по', 'из', 'для', 'на', 'не', 'это', 'того', 'же', 'сам']);
++const connLabel = t => {
++    const head = String(t).replace(/^[\s⚠️🔧⚠]+/, '').split(/\d{1,3}(?:[.,]\d)?\s*(?:Нм|Nm)/i)[0];
++    const words = head.toLowerCase()
++        .replace(/\([^)]*\)/g, ' ')                      /* ссылки на источники: (Спр.Torque) */
++        .replace(/m\d+(?:[.,×x*]\d+)*/gi, ' ')           /* M12×1,5 */
++        .replace(/[«»"'`:;,.!]/g, ' ')
++        .split(/[\s/·+]+/).filter(w => w.length > 2 && !STOPW.has(w));
++    return words.slice(0, 3).join(' ') || '—';
++};
++const isDiscrepancy = t => /два разных значения|значения в справочнике|источник(?:и|а)?\s+расходятся|по\s+одному источнику|⚠\s*[A-ZА-Я]/i.test(String(t));
++
+ const cardTorque = [];
+ parts.forEach((r, i) => instOf(r).forEach(t => {
+     const m = t.match(/(\d{1,3}(?:[.,]\d)?)\s*(?:Нм|Nm)/i);
+-    if (m) cardTorque.push({ i, oem: oemOf(r), name: nameOf(r), val: parseFloat(m[1].replace(',', '.')), text: t.slice(0, 90) });
++    if (m) cardTorque.push({
++        i, oem: oemOf(r), name: nameOf(r),
++        val: parseFloat(m[1].replace(',', '.')),
++        text: t.slice(0, 90),
++        full: t,
++        label: connLabel(t),
++        discrepancy: isDiscrepancy(t)
++    });
+ }));
+ /* B: одна и та же нормализованная база OEM — разные моменты */
+ const byBase = new Map();
+@@ -71,11 +105,36 @@
+     /* шум убираем: сравниваем только записи с ОДИНАКОВЫМ названием и только
+        одиночные значения — строки вида «Верх 25, низ 60 Нм» описывают РАЗНЫЕ
+        крепёжные точки, а не противоречат друг другу */
+-    const single = list.filter(x => (x.text.match(/\d{1,3}(?:[.,]\d)?\s*(?:Нм|Nm)/gi) || []).length === 1);
+-    const names = new Set(single.map(x => x.name.toLowerCase().replace(/\s+/g, ' ')));
+-    const vals = [...new Set(single.map(x => x.val))];
+-    if (vals.length > 1 && names.size === 1 && key.length >= 6) {
+-        F.B.push({ key, vals, items: single.map(x => ({ oem: x.oem, name: x.name, val: x.val, text: x.text })) });
++    const single = list.filter(x => (x.full.match(/\d{1,3}(?:[.,]\d)?\s*(?:Нм|Nm)/gi) || []).length === 1);
++    /* строки с задокументированным расхождением источников не участвуют:
++       иначе «45 Нм» из ⚠-строки спорит с «20 Нм» из своей же карточки */
++    const clean = single.filter(x => !x.discrepancy);
++    const discrep = single.filter(x => x.discrepancy);
++    const names = new Set(clean.map(x => x.name.toLowerCase().replace(/\s+/g, ' ')));
++    /* B-фикс: противоречием считаем только разные моменты у ОДНОГО соединения.
++       Группируем по подписи соединения (label); если у группы значения расходятся —
++       это настоящая находка. Разные соединения на одной карточке больше не шумят. */
++    const byLabel = new Map();
++    clean.forEach(x => {
++        const lk = x.label;
++        if (!byLabel.has(lk)) byLabel.set(lk, []);
++        byLabel.get(lk).push(x);
++    });
++    const conflicts = [];
++    byLabel.forEach((g, lk) => {
++        const vals = [...new Set(g.map(x => x.val))];
++        if (vals.length > 1) conflicts.push({ label: lk, vals, items: g });
++    });
++    if (conflicts.length && names.size === 1 && key.length >= 6) {
++        F.B.push({
++            key,
++            vals: [...new Set(clean.map(x => x.val))],
++            items: clean.map(x => ({ oem: x.oem, name: x.name, val: x.val, label: x.label, text: x.text }))
++        });
++    }
++    /* задокументированные развилки — отдельно, чтобы их не потерять */
++    if (discrep.length && key.length >= 6) {
++        F.Bdoc.push({ key, items: discrep.map(x => ({ oem: x.oem, name: x.name, val: x.val, text: x.text })) });
+     }
+ });
+ /* A: карточка против справочника «Моменты затяжки».
+@@ -182,9 +241,14 @@
+         x.inst.forEach(t => { let m; INTERVAL_RE.lastIndex = 0; while ((m = INTERVAL_RE.exec(t))) s.add(m[0].toLowerCase().replace(/\s+/g, '')); });
+         return [...s];
+     });
+-    const flat = ivs.flat();
+-    if (new Set(flat).size > 1 && ivs.every(v => v.length)) {
+-        F.G.push({ name: list[0].name, items: list.map((x, n) => ({ oem: x.oem, iv: ivs[n].join(', ') })) });
++    /* G-фикс (аудит 2026-10-27): раньше сравнивали ОБЪЕДИНЕНИЕ токенов по всем
++       карточкам, а наборы внутри карточки несортированные — две карточки с
++       одинаковыми интервалами, но в разном порядке («200км, 100тыс.» против
++       «100тыс., 200км»), давали находку. Сравниваем канонические подписи наборов. */
++    const sigs = ivs.map(v => v.slice().sort().join('|'));
++    const uniqSigs = new Set(sigs);
++    if (uniqSigs.size > 1 && ivs.every(v => v.length)) {
++        F.G.push({ name: list[0].name, items: list.map((x, n) => ({ oem: x.oem, iv: ivs[n].slice().sort().join(', ') })) });
+     }
+ });
+ 
+@@ -230,6 +294,7 @@
+ L.push('|---|---|---|');
+ L.push('| A | момент в карточке против справочника «Моменты затяжки» | ' + F.A.length + ' |');
+ L.push('| B | разные моменты у одной базы OEM | ' + F.B.length + ' |');
++L.push('| Bdoc | задокументированные развилки моментов (строки с ⚠ — не противоречие) | ' + F.Bdoc.length + ' |');
+ L.push('| C | пары с общей базой OEM и одинаковым именем без `sup` | ' + F.C.length + ' |');
+ L.push('| D | в названии код мотора, которого нет в `engines` | ' + F.D.length + ' |');
+ L.push('| E | в названии объём/тип мотора, но `engines` пуст | ' + F.E.length + ' |');
