@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+    <meta name="theme-color" content="#0a1830">
+    <!-- Версия разметки: должна совпадать с APP_VERSION в js/app.js.
+         Лоадер добавляет её в URL скрипта (&ui=…), чтобы новый index.html
+         никогда не грузил закэшированный старый app.js. -->
+    <meta name="app-ui-ver" content="1.13.1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>VW Polo/Caddy 1995–2003 — База Мастера</title>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+       CSS грузится СИНХРОННО (обычный <link> в <head>).
+       Браузер блокирует рендер до полного применения стилей,
+       поэтому «сырой» HTML без стилей не мелькает — никакого FOUC.
+
+       Про cache-busting: ?v= не обязателен, если сервер правильно
+       отдаёт Cache-Control (no-cache / ETag). Если хочется — можно
+       вручную поднимать: href="css/app.css?v=<версия>" при релизе.
+       С 1.8.4 так и делаем — SW отдаёт CSS cache-first, без ?v= телефоны
+       жили бы со старым стилем до следующего фонового обновления.
+       ═══════════════════════════════════════════════════════════════ -->
+    <link rel="stylesheet" href="css/app.css?v=1.13.1">
+
+    <script>
+        /* ────── АВТО-КЕШБАСТИНГ ТОЛЬКО ДЛЯ JS ─────────────────────
+           app.css подключён синхронно через <link> выше — это
+           гарантирует отсутствие FOUC. Для app.js оставляем
+           динамический cache-busting: читаем appVersion из
+           data/update.json и грузим js/app.js?v=<версия>. */
+        (function () {
+            var injected = false;
+            var FALLBACK_VERSION = 'dev';
+
+            function inject(v) {
+                if (injected) return;
+                injected = true;
+                /* Привязка к версии разметки: новый index.html → новый URL
+                   скрипта → гарантированно свежий app.js (обход кэша). */
+                var meta = document.querySelector('meta[name="app-ui-ver"]');
+                var ui = meta ? (meta.getAttribute('content') || '') : '';
+                var script = document.createElement('script');
+                script.src = 'js/app.js?v=' + v + (ui ? '&ui=' + ui : '');
+                document.head.appendChild(script);
+            }
+
+            // Страховка: если update.json не ответит за 2 с — грузим fallback.
+            var safetyTimer = setTimeout(function () {
+                inject(FALLBACK_VERSION);
+            }, 2000);
+
+            try {
+                fetch('data/update.json?t=' + Date.now(), { cache: 'no-store' })
+                    .then(function (r) { return r.ok ? r.json() : null; })
+                    .then(function (m) {
+                        clearTimeout(safetyTimer);
+                        var v = (m && m.appVersion) ? String(m.appVersion) : FALLBACK_VERSION;
+                        inject(v);
+                    })
+                    .catch(function () {
+                        clearTimeout(safetyTimer);
+                        inject(FALLBACK_VERSION);
+                    });
+            } catch (e) {
+                clearTimeout(safetyTimer);
+                inject(FALLBACK_VERSION);
+            }
+        })();
+    </script>
+
+    <!-- Инлайн-фон на самый крайний случай — при синхронной загрузке
+       CSS это займёт миллисекунды, но пусть лучше тёмный фон, чем
+       белая вспышка. -->
+    <style>
+        html,
+        body {
+            margin: 0;
+            background: #0a1830;
+            color: #eef2f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+    </style>
+
+    <!-- ymGoal — заглушка. Раньше здесь была Яндекс.Метрика, убрана по просьбе пользователей. -->
+    <script>
+        window.ymGoal = function () { /* no-op */ };
+    </script>
+</head>
+
+<body class="theme-aurora">
+
+    <!-- ============ ЛИЦЕНЗИОННЫЙ ГЕЙТ ============ -->
+    <div id="licgate">
+        <div class="gate-inner">
+            <div class="gate-head">
+                <h2>📜 VW Polo/Caddy 6N — База Мастера</h2>
+                <p>Версия <span id="ver_gate">…</span> · © 2026 Игнат Ткачев · vk.com/donignasio</p>
+            </div>
+            <div class="gate-body">
+                <h4>О программе</h4>
+                <p>Неофициальный каталог запчастей и регламентов по автомобилям VW Polo/Caddy (6N1/6N2, Classic, Estate,
+                    Caddy)
+                    1995–2003 гг.</p>
+
+                <!-- METRIKA · уведомление об аналитике -->
+                <h4>📊 Аналитика</h4>
+                <p>Приложение использует Яндекс.Метрику для анализа посещаемости: собираются обезличенные данные
+                    (просмотры страниц, тип устройства, регион, поведение в интерфейсе). Персональные данные не
+                    передаются
+                    третьим лицам. Отключить аналитику можно через блокировщик рекламы.</p>
+                <!-- /METRIKA -->
+
+                <h4>⚠️ Важно</h4>
+                <p><b>Всегда сверяйте артикулы перед заказом</b> по оригинальному каталогу ETKA, у дилера или в
+                    официальном
+                    сервисе.</p>
+                <h4>Лицензия «Как есть» (AS IS)</h4>
+                <div class="lic-as">ПРОГРАММА ПРЕДОСТАВЛЯЕТСЯ «КАК ЕСТЬ» (AS IS)
+                    БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ, ЯВНЫХ ИЛИ ПОДРАЗУМЕВАЕМЫХ.
+
+                    Автор НЕ НЕСЁТ ОТВЕТСТВЕННОСТИ за любые прямые или
+                    косвенные последствия использования программы: ошибки
+                    в артикулах, ущерб автомобилю, здоровью или имуществу.</div>
+                <div class="lic-cc">Public Free License · Non-commercial use · v1.0
+                    You are free to: use, study, share (link only).
+                    Terms: attribution · no warranty · no liability · non-commercial.
+                    © 2026 Игнат Ткачев. vk.com/donignasio Some rights reserved.</div>
+                <p style="font-size:.76rem;color:var(--mu);margin-top:12px">Нажимая «Принять», вы подтверждаете, что
+                    ознакомились с условиями и используете программу на свой риск.</p>
+            </div>
+            <div class="gate-foot">
+                <button class="bn dg-btn" onclick="licDecline()">✖ Отказаться</button>
+                <button class="bn" onclick="pubEnter()" title="Открыть каталог без гаража и правок">👁 Смотреть каталог (без регистрации)</button>
+                <button class="bn ok-btn" onclick="licAccept()">✓ Принять и продолжить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ ОТКАЗ ============ -->
+    <div id="declined">
+        <div class="dbox">
+            <h1>Доступ отклонён</h1>
+            <p>Вы отказались от условий использования программы.</p>
+            <p>Программа предоставляется исключительно на условиях «как есть» (AS IS), без каких-либо гарантий.</p>
+            <p>Если передумаете — сбросьте лицензию и обновите страницу.</p>
+            <button class="bn" onclick="licReset()">🔄 Показать лицензию снова</button>
+        </div>
+    </div>
+
+    <!-- ============ САЙДБАР ============ -->
+    <button class="tbd" id="dtgl" title="Меню">☰</button>
+    <nav class="sb" id="sb">
+
+        <div class="brand">
+            <h2>VW Polo / Caddy</h2>
+            <p>6N1 · 6N2 · Classic · Estate · Caddy<br>1994–2003</p>
+        </div>
+
+        <details class="gb" id="garageBox" open>
+            <summary class="gb-header">
+                <span>🚗 Гараж <span class="gc" id="gc"></span></span>
+                <span id="vinBar" onclick="event.stopPropagation()"></span>
+            </summary>
+            <div class="gl" id="gl"></div>
+            <button class="gab" id="gab">+ Добавить VIN</button>
+        </details>
+
+        <ul class="nl" id="nl"></ul>
+
+        <div class="sft">
+            <div class="sft-btns">
+                <button class="sft-btn don" onclick="oDonate()" title="Поддержать проект">❤️</button>
+                <button class="sft-btn up" onclick="oUp()" title="История версий">📜</button>
+                <button class="sft-btn" onclick="oBug()" title="Сообщить о баге">🐛</button>
+
+                <!-- ⚙️ Меню настроек — в подвале сайдбара -->
+                <div class="ew" id="sftSettingsWrap">
+                    <button class="sft-btn" type="button" id="btnSettings" onclick="tMMenu(event)"
+                        title="Меню">⚙️</button>
+                    <div class="em" id="em">
+                        <div class="em-title">⚙️ Настройки</div>
+
+                        <details class="em-sec">
+                            <summary><span>📦 База данных</span></summary>
+                            <button onclick="tI();cEM()">📥 <span>Импорт JSON</span></button>
+                            <button onclick="eD();cEM()">📄 <span>Экспорт — JSON</span></button>
+                            <button onclick="eCSV(false);cEM()">📊 <span>CSV — все позиции</span></button>
+                            <button onclick="eCSV(true);cEM()">⭐ <span>CSV — избранное</span></button>
+                            <button onclick="eET();cEM()">🗂 <span>CSV — ETKA</span></button>
+                            <button onclick="eWCSV();cEM()">🔧 <span>CSV — мастерские</span></button>
+                        <button onclick="exportVotes();cEM()">🧑🤝‍ <span>Пак голосов за аналоги — экспорт</span></button>
+                        <button onclick="importVotes();cEM()">📥 <span>Пак голосов за аналоги — импорт</span></button>
+                        <button onclick="exportSchemes();cEM()">📐 <span>Схемы узлов — экспорт пака</span></button>
+                        <button onclick="importSchemes();cEM()">📐 <span>Схемы узлов — импорт пака</span></button>
+                            <button onclick="rD();cEM()">♻️ <span>Пересобрать БД (сброс)</span></button>
+                        </details>
+
+                        <details class="em-sec">
+                            <summary><span>🛠 Обслуживание</span></summary>
+                            <button onclick="oAM();cEM()">➕ <span>Добавить деталь</span></button>
+                            <button onclick="oLogNew();cEM()">📖 <span>Запись в журнал</span></button>
+                            <button onclick="oShopList();cEM()">🛒 <span>Список покупок на ТО</span></button>
+                            <button onclick="oTO();cEM()">🛠 <span>Настройки ТО</span></button>
+                            <button onclick="oWM();cEM()">🔧 <span>Добавить мастерскую</span></button>
+                        </details>
+
+                        <details class="em-sec">
+                            <summary><span>🎨 Интерфейс</span></summary>
+                            <button onclick="oTheme();cEM()">🎨 <span>Тема оформления</span></button>
+                            <button onclick="resetFilters();cEM()">🔄 <span>Сбросить фильтры</span></button>
+                        </details>
+
+                        <details class="em-sec">
+                            <summary><span>⚙️ Прочее</span></summary>
+                            <button onclick="oSM();cEM()">🔑 <span>VIN-API ключ</span></button>
+                            <button onclick="oProfileSoon();cEM()">👤 <span>Профиль <span
+                                        class="em-soon">скоро</span></span></button>
+                            <button onclick="oFaq();cEM()">❓ <span>Помощь — что делают кнопки</span></button>
+                            <button onclick="oBug();cEM()">🐛 <span>Сообщить о баге</span></button>
+                        </details>
+
+                        <details class="em-sec">
+                            <summary><span>ℹ️ О программе</span></summary>
+                            <button onclick="oAbout();cEM()">📜 <span>Лицензия</span></button>
+                            <button onclick="oUp();cEM()">📜 <span>История версий</span></button>
+                            <button onclick="openM('apkmo');cEM()">📱 <span>Скачать APK</span></button>
+                        </details>
+                    </div>
+                </div>
+                <!-- /⚙️ -->
+            </div>
+
+            <!-- METRIKA · публичный счётчик посещаемости -->
+            <div class="sft-stats" style="font-size:.62rem;opacity:.55;text-align:center;margin:6px 0">
+                <a href="https://metrika.yandex.ru/stat/?id=113577489" target="_blank"
+                    rel="nofollow noopener noreferrer" style="color:inherit;text-decoration:none">
+                    📊 Статистика
+                </a>
+            </div>
+            <!-- /METRIKA -->
+
+            <div class="sft-line">v<span id="ver_footer">…</span></div>
+        </div>
+    </nav>
+
+    <div class="ov" id="ov" onclick="cMM()"></div>
+
+    <!-- ============ ОСНОВНАЯ ОБЛАСТЬ ============ -->
+    <div class="mw">
+        <button id="mob" type="button" title="Меню">☰</button>
+        <header class="tb">
+            <div class="sc-wrap">
+                <div class="sc">
+                    <span class="si">🔍</span>
+                    <input type="text" class="sr" id="sr" list="searchSuggest"
+                        placeholder="OEM, деталь, аналог, заметка…">
+                    <datalist id="searchSuggest"></datalist>
+                    <button class="scl" id="scl" onclick="cS()" title="Очистить">✕</button>
+                </div>
+                <button class="bn p sc-oem-btn" onclick="oAM()" title="Добавить деталь по OEM">
+                    <span>➕</span><span class="bl">OEM</span>
+                </button>
+                <button class="bn p sc-oem-btn" onclick="oScan()" title="Сканировать VIN или штрих-код детали камерой">
+                    <span>📷</span><span class="bl">Скан</span>
+                </button>
+            </div>
+
+            <div class="tb-filters">
+                <div class="to-chip unset" id="toChip" onclick="oTO()" title="Настройки ТО — клик для редактирования"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:4px;font-size:.78rem;font-weight:700;cursor:pointer;border:1px solid var(--bd);background:var(--cd);color:var(--tx);white-space:nowrap">
+                    <span>🛠</span><span class="to-lb" id="toLbl">Настроить ТО</span><span
+                        style="opacity:.5;font-size:.7rem">✏️</span>
+                </div>
+                <button class="bn log-chip" onclick="oLogNew()" title="Запись в журнал обслуживания">
+                    <span>📖</span><span class="bl">Журнал</span>
+                </button>
+
+                <select class="fs flt mtr" id="fmtr"
+                    title="Двигатель: семейство (EA111 / EA827 / EA827-D) или код мотора">
+                    <option value="all">⚙️ Мотор: все</option>
+                </select>
+
+                <select class="fs flt trn" id="ftr"
+                    title="КПП: семейство (084 / 085 / 002…) или буквенный код (CHL, DXB…)">
+                    <option value="all">🔄 КПП: все</option>
+                </select>
+
+                <select class="fs flt bdy" id="fbdy"
+                    title="Кузов/поколение: Polo 6N1/6N2 (3д/5д), Classic (6V2), Variant (6V5), Caddy (9K/9U)">
+                    <option value="all">🚗 Кузов/поколение: все</option>
+                </select>
+
+                <select class="fs" id="sf" title="Фильтр по статусу">
+                    <option value="all">Все статусы</option>
+                    <option value="">Без статуса</option>
+                    <option value="want">🛒 Хочу купить</option>
+                    <option value="bought">📦 Куплено</option>
+                    <option value="installed">✅ Установлено</option>
+                </select>
+
+                <select class="fs" id="ss" title="Сортировка">
+                    <option value="default">Сортировка</option>
+                    <option value="oem">по OEM</option>
+                    <option value="name">по названию</option>
+                    <option value="priceAsc">цена ↑</option>
+                    <option value="priceDesc">цена ↓</option>
+                    <option value="favorite">⭐ вверху</option>
+                </select>
+
+                <label class="vt-switch" title="Плитка / Дерево">
+                    <input type="checkbox" id="viewToggle">
+                    <span class="vt-track"><span class="vt-thumb"></span></span>
+                    <span class="vt-lbl" id="vtLbl">▦ Плитка</span>
+                </label>
+
+                <button class="bn fit-only" id="fitOnlyBtn" type="button" onclick="tgFitOnly()"
+                    title="Показать только позиции, подходящие вашему VIN по всем критериям (мотор, кузов, поколение, комплектация, КПП, PR)">
+                    🎯<span class="bl"> Подходит моему VIN</span>
+                </button>
+
+                <div class="ac">
+                    <button class="bn" onclick="toggleAllDetails()" title="Развернуть/свернуть все карточки"
+                        id="tb3">⇕</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="ca" id="ca">
+            <div
+                style="display:flex;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:24px">
+                <div>
+                    <div style="font-size:2.5rem;margin-bottom:12px;opacity:.55">📦</div>
+                    <div style="font-size:.95rem;opacity:.75">Загрузка базы…</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ СКРЫТЫЕ FILE-INPUT ============ -->
+    <input type="file" id="if" accept="application/json,.json" style="display:none">
+    <input type="file" id="pf" accept="image/*" multiple style="display:none">
+
+    <!-- ============ МОДАЛКА: ДЕТАЛЬ ============ -->
+    <div class="mo" id="mo">
+        <div class="mdl" onclick="event.stopPropagation()">
+            <div class="mh">
+                <h3 id="mt">Добавить деталь</h3><button class="mc" onclick="cM()">✕</button>
+            </div>
+            <div class="mb">
+                <input type="hidden" id="f_id">
+                <div class="fr">
+                    <div class="fg"><label>Категория *</label><select id="f_cat"></select></div>
+                    <div class="fg"><label>Название *</label><input type="text" id="f_name"
+                            placeholder="Ремень ГРМ + Ролики">
+                    </div>
+                </div>
+                <div class="fg"><label>OEM / Артикул</label><input type="text" id="f_oem" placeholder="030 109 119">
+                </div>
+                <div class="fg"><label class="cbr"><input type="checkbox" id="f_ver"><span>✅ OEM подтверждён по
+                            ETKA</span></label></div>
+                <div class="fg"><label>Аналоги (через запятую)</label><input type="text" id="f_an"
+                        placeholder="INA 530 0090 10, Gates KP235"></div>
+                <div class="fr">
+                    <div class="fg"><label>PR-коды применимости</label><input type="text" id="f_prreq"
+                            placeholder="1AE, !1ZG — «!» = не ставится с этим кодом" autocomplete="off" spellcheck="false"
+                            style="text-transform:uppercase"></div>
+                    <div class="fg"><label>Заменён на (supersession)</label><input type="text" id="f_sup_oem"
+                            placeholder="Новый артикул VAG, если старый отменён"></div>
+                </div>
+                <div class="fg"><label>Доноры (через запятую)</label><input type="text" id="f_dn"
+                        placeholder="VW Lupo, Seat Arosa"></div>
+                <div class="fg"><label>Двигатели (пусто = все)</label><input type="text" id="f_eng"
+                        placeholder="AER, ALL, AEX">
+                </div>
+                <div class="fr">
+                    <div class="fg"><label>КПП — семейство (пусто = все)</label><input type="text" id="f_trn"
+                            placeholder="084, 085, 002, 020, 01M">
+                    </div>
+                    <div class="fg"><label>Кузова (пусто = все)</label><input type="text" id="f_bdy"
+                            placeholder="3d, 5d, caddy-van"></div>
+                </div>
+                <div class="fg"><label>КПП — буквенные коды (пусто = все)</label><input type="text" id="f_trnc"
+                        list="gbCodes" autocomplete="off" spellcheck="false"
+                        placeholder="CHL, DXB, FFU, DKE085 — коды с корпуса КПП / наклейки">
+                    <datalist id="gbCodes"></datalist>
+                </div>
+                <div class="fg"><label>Поколение (пусто = все)</label><input type="text" id="f_gen"
+                        placeholder="6N1, 6N2">
+                </div>
+                <div class="fg"><label>Комплектации (пусто = все)</label><input type="text" id="f_trm"
+                        placeholder="Base, CL, GL"></div>
+                <div class="fr">
+                    <div class="fg"><label>Цена</label><input type="number" id="f_pr" min="0" step="0.01"
+                            placeholder="0"></div>
+                    <div class="fg"><label>Валюта</label>
+                        <select id="f_cu">
+                            <option value="RUB">₽ RUB</option>
+                            <option value="USD">$ USD</option>
+                            <option value="EUR">€ EUR</option>
+                            <option value="BYN">Br BYN</option>
+                            <option value="KZT">₸ KZT</option>
+                            <option value="UAH">₴ UAH</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="fr">
+                    <div class="fg"><label>Статус</label>
+                        <select id="f_sts">
+                            <option value="">— нет —</option>
+                            <option value="want">🛒 Хочу купить</option>
+                            <option value="bought">📦 Куплено</option>
+                            <option value="installed">✅ Установлено</option>
+                        </select>
+                    </div>
+                    <div class="fg"><label>Избранное</label>
+                        <select id="f_fav">
+                            <option value="0">Нет</option>
+                            <option value="1">⭐ Да</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="fg"><label>Ссылка на магазин</label><input type="url" id="f_su" placeholder="https://…">
+                </div>
+                <div class="fg"><label>📝 Заметки</label><textarea id="f_notes" rows="3"></textarea></div>
+                <div class="fg" id="phg" style="display:none"><label>История цен</label>
+                    <div class="phl" id="phl"></div>
+                </div>
+                <div class="fg"><label>Фото (<span id="pCount">0</span>)</label>
+                    <div class="pa">
+                        <button type="button" class="bn" onclick="pkP()">📷 Добавить фото</button>
+                    </div>
+                    <div class="pgrid" id="pgrid"></div>
+                </div>
+                <div class="fg"><label>Инструкции</label>
+                    <div class="ie" id="ie"></div>
+                    <button type="button" class="aib" onclick="aIR()">+ Добавить строку</button>
+                </div>
+            </div>
+            <div class="mf">
+                <button class="bn" onclick="cM()">Отмена</button>
+                <button class="bn p" onclick="sPt()">💾 Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: МАСТЕРСКАЯ ============ -->
+    <div class="mo" id="wmo">
+        <div class="mdl" onclick="event.stopPropagation()">
+            <div class="mh">
+                <h3 id="wmt">Добавить мастерскую</h3><button class="mc" onclick="cWM()">✕</button>
+            </div>
+            <div class="mb">
+                <input type="hidden" id="w_id">
+                <div class="fg"><label>Название *</label><input type="text" id="w_name"></div>
+                <div class="fr">
+                    <div class="fg"><label>Телефон</label><input type="tel" id="w_ph"></div>
+                    <div class="fg"><label>Рейтинг</label>
+                        <select id="w_ra">
+                            <option value="0">— нет —</option>
+                            <option value="1">⭐</option>
+                            <option value="2">⭐⭐</option>
+                            <option value="3">⭐⭐⭐</option>
+                            <option value="4">⭐⭐⭐⭐</option>
+                            <option value="5">⭐⭐⭐⭐⭐</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="fg"><label>Адрес</label><input type="text" id="w_ad"></div>
+                <div class="fg"><label>Специализация</label><input type="text" id="w_sp"></div>
+                <div class="fg"><label>Заметка</label><textarea id="w_no" rows="3"></textarea></div>
+            </div>
+            <div class="mf">
+                <button class="bn" onclick="cWM()">Отмена</button>
+                <button class="bn p" onclick="sWsh()">💾 Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: VIN ============ -->
+    <div class="mo" id="gmo">
+        <div class="mdl" onclick="event.stopPropagation()">
+            <div class="mh">
+                <h3>Добавить VIN в гараж</h3><button class="mc" onclick="cGM()">✕</button>
+            </div>
+            <div class="mb">
+                <div class="fg"><label>VIN (17 символов)</label>
+                    <div style="display:flex;gap:6px;align-items:stretch">
+                        <input type="text" class="vi" id="g_vi" autocomplete="off" spellcheck="false">
+                        <button class="bn p" id="g_db" onclick="decG()" style="flex-shrink:0" aria-label="Декодировать VIN">🔍<span class="g-db-lbl">Декодировать</span></button>
+                    </div>
+                </div>
+                <div class="gdr" id="g_re" style="display:none"></div>
+            </div>
+            <div class="mf">
+                <button class="bn" onclick="cGM()">Отмена</button>
+                <button class="bn p" id="g_sb" onclick="sGarV()" disabled>💾 Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: VIN-API ============ -->
+    <div class="mo" id="smo">
+        <div class="mdl" onclick="event.stopPropagation()">
+            <div class="mh">
+                <h3>Настройки VIN-API</h3><button class="mc" onclick="cSM()">✕</button>
+            </div>
+            <div class="mb">
+                <div class="fg"><label>vindecoder.eu API-ключ</label><input type="text" id="s_vk"></div>
+            </div>
+            <div class="mf">
+                <button class="bn" onclick="cSM()">Отмена</button>
+                <button class="bn p" onclick="sSet()">💾 Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: О ПРОГРАММЕ ============ -->
+    <div class="mo" id="aboutmo">
+        <div class="mdl" onclick="event.stopPropagation()">
+            <div class="mh">
+                <h3>ℹ️ О программе и лицензия</h3><button class="mc" onclick="cAbout()">✕</button>
+            </div>
+            <div class="mb">
+                <div class="lic-box">
+                    <h4>VW Polo/Caddy 6N — База Мастера</h4>
+                    <p>Версия <b id="ver_about">…</b> · 2026<br>
+                        Автор: <b>DonIgnasio</b> · <a href="https://vk.com/donignasio" target="_blank"
+                            rel="noopener noreferrer" style="color:var(--a)">vk.com/donignasio</a> · <a
+                            href="mailto:donignasio@vk.com" style="color:var(--a)">donignasio@vk.com</a>· <a
+                            href="https://www.drive2.ru/users/donignasio/" target="_blank" rel="noopener noreferrer"
+                            style="color:var(--a)">Drive2</a>
+                    </p>
+                    <p>Помощь в тестировании: <b>Ivan-Snaut</b> · <a href="https://www.drive2.ru/users/ivan-snaut/"
+                            target="_blank" rel="noopener noreferrer" style="color:var(--a)">Drive2</a></p>
+                    <p>Неофициальный каталог запчастей по VW Polo/Caddy (6N1/6N2, Classic, Estate, Caddy) 1995–2003 гг.
+                    </p>
+                    <div class="lic-as">⚠️ ПРОГРАММА ПРЕДОСТАВЛЯЕТСЯ «КАК ЕСТЬ» (AS IS)
+                        БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ, ЯВНЫХ ИЛИ ПОДРАЗУМЕВАЕМЫХ.
+
+                        Автор НЕ НЕСЁТ ОТВЕТСТВЕННОСТИ за любые прямые или
+                        косвенные последствия использования программы: ошибки
+                        в артикулах, ущерб автомобилю, здоровью или имуществу.</div>
+                    <p style="margin-top:10px"><b>Всегда сверяйте артикулы перед заказом</b> по оригинальному каталогу
+                        ETKA, у
+                        дилера или в официальном сервисе.</p>
+                    <div class="lic-cc">Public Free License · Non-commercial use · v1.0
+                        You are free to: use, study, share (link only).
+                        Terms: attribution · no warranty · no liability · non-commercial.
+                        © 2026 Игнат Ткачев. Some rights reserved.</div>
+                </div>
+            </div>
+            <div class="mf">
+                <button class="bn" onclick="licReset()">🔄 Показать при след. запуске</button>
+                <button class="bn" onclick="cAbout();oFaq()">📖 Показать путеводитель</button>
+                <button class="bn" onclick="cAbout()">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: БАГ-РЕПОРТ ============ -->
+    <div class="mo" id="bugmo">
+        <div class="mdl" onclick="event.stopPropagation()">
+            <div class="mh">
+                <h3>🐛 Сообщить о баге / Обратная связь</h3><button class="mc" onclick="cBug()">✕</button>
+            </div>
+            <div class="mb">
+                <p style="margin-top:0;font-size:.86rem;line-height:1.6;color:var(--mu)">Нашли ошибку в артикуле,
+                    опечатку,
+                    зависание или есть идея по улучшению? Напишите автору.</p>
+                <a class="contact-row" href="https://vk.ru/donignasio" target="_blank" rel="noopener noreferrer">
+                    <span class="ci">💬</span>
+                    <span class="ct2"><b>Личная страница VK</b><span>vk.com/donignasio</span></span>
+                    <span style="font-size:1.1rem;color:var(--mu)">→</span>
+                </a>
+                <a class="contact-row" id="bug_mailto"
+                    href="mailto:donignasio@vk.com?subject=База%20Мастера%20-%20баг-репорт">
+                    <span class="ci">✉️</span>
+                    <span class="ct2"><b>Email</b><span>donignasio@vk.com</span></span>
+                    <span style="font-size:1.1rem;color:var(--mu)">→</span>
+                </a>
+                <div
+                    style="margin-top:14px;padding:12px;background:var(--hv);border:1px solid var(--bd);border-radius:6px;font-size:.8rem;line-height:1.6">
+                    <b style="color:var(--a)">💡 Что указать:</b>
+                    <ul style="margin:6px 0 0;padding-left:20px">
+                        <li>Версию базы (v<span id="ver_bug">…</span>)</li>
+                        <li>Что делали перед ошибкой</li>
+                        <li>Что ожидали / получили</li>
+                        <li>Скриншот, если возможно</li>
+                        <li>Модель телефона / браузер</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mf">
+                <button class="bn" onclick="cBug()">Закрыть</button>
+                <a class="bn p" href="https://vk.com/donignasio" target="_blank" rel="noopener noreferrer">💬 Написать в
+                    VK</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: ДОНАТ ============ -->
+    <div class="mo" id="donmo">
+        <div class="mdl" onclick="event.stopPropagation()">
+            <div class="mh">
+                <h3>❤️ Поддержать проект</h3><button class="mc" onclick="cDonate()">✕</button>
+            </div>
+            <div class="mb">
+                <p style="margin-top:0;font-size:.86rem;line-height:1.6;color:var(--mu)">Проект делается в свободное
+                    время на
+                    чистом энтузиазме. Любая сумма приятна и помогает развитию!</p>
+
+                <a class="don-card" href="https://pay.cloudtips.ru/p/5a2de793" target="_blank"
+                    rel="noopener noreferrer">
+                    <div class="don-icon">💚</div>
+                    <div class="don-info">
+                        <b>CloudTips</b>
+                        <span>Карта, СБП · моментально · комиссия 0% при компенсации</span>
+                    </div>
+                </a>
+
+                <a class="don-card" href="https://yoomoney.ru/to/410017195918895" target="_blank"
+                    rel="noopener noreferrer">
+                    <div class="don-icon">💳</div>
+                    <div class="don-info">
+                        <b>ЮMoney</b>
+                        <span>Кошелёк 4100 1719 5918 895 · карта, СБП, перевод</span>
+                    </div>
+                </a>
+                <button class="bn" type="button" onclick="copyYm()"
+                    style="width:100%;justify-content:center;margin:0 0 14px 0">
+                    📋 Скопировать номер кошелька ЮMoney
+                </button>
+
+                <div class="don-note">Спасибо за поддержку! ❤️</div>
+            </div>
+            <div class="mf"><button class="bn" onclick="cDonate()">Закрыть</button></div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: ПРОФИЛЬ ============ -->
+    <div class="mo" id="profmo">
+        <div class="mdl" onclick="event.stopPropagation()">
+            <div class="mh">
+                <h3>👤 Профиль пользователя</h3><button class="mc" onclick="cProfile()">✕</button>
+            </div>
+            <div class="mb">
+                <div class="prof-avatar-row">
+                    <div class="prof-avatar-big" id="prof_avatar_big">👤</div>
+                    <div class="prof-info">
+                        <div class="prof-name" id="prof_name_view">Гость</div>
+                        <div class="prof-sub" id="prof_sub_view">Локальный профиль · не синхронизируется</div>
+                    </div>
+                </div>
+                <div class="fg"><label>Имя / Ник</label><input type="text" id="pf_name" maxlength="40"
+                        placeholder="Например: Иван"></div>
+                <div class="fr">
+                    <div class="fg"><label>Email</label><input type="email" id="pf_email" placeholder="your@email.com">
+                    </div>
+                    <div class="fg"><label>Город / Гараж</label><input type="text" id="pf_city" maxlength="60"
+                            placeholder="Москва"></div>
+                </div>
+                <div class="fr">
+                    <div class="fg"><label>Инициалы (2 буквы)</label><input type="text" id="pf_ini" maxlength="2"
+                            placeholder="ИВ"></div>
+                    <div class="fg"><label>Цвет аватара</label>
+                        <div class="prof-colors" id="pf_colors"></div>
+                    </div>
+                </div>
+                <div class="fh"
+                    style="margin-top:10px;padding:10px;background:var(--hv);border:1px solid var(--bd);border-radius:4px;font-size:.75rem;line-height:1.5">
+                    ℹ️ Профиль хранится <b>только в вашем браузере</b> (localStorage) и никуда не отправляется.<br>
+                    Используется для подписи экспортируемых данных и персонализации интерфейса.
+                </div>
+            </div>
+            <div class="mf">
+                <button class="bn" onclick="cProfile()">Отмена</button>
+                <button class="bn dg-btn" onclick="resetProfile()">Сбросить</button>
+                <button class="bn p" onclick="sProfile()">💾 Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: ИСТОРИЯ ВЕРСИЙ ============ -->
+    <div class="mo" id="upmo">
+        <div class="mdl" onclick="event.stopPropagation()">
+            <div class="mh">
+                <h3>📜 История версий</h3><button class="mc" onclick="cUp()">✕</button>
+            </div>
+            <div class="mb">
+
+                <!-- Что нового -->
+                <div class="up-sec">
+                    <div class="up-sec-h">📰 Что нового</div>
+                    <div id="up_changelog" class="changelog">
+                        <div class="cl-empty">⏳ Загружаем список изменений…</div>
+                    </div>
+                </div>
+
+                <div class="up-divider"></div>
+
+                <!-- База данных -->
+                <div class="up-sec">
+                    <div class="up-sec-h">📦 База данных (каталог)</div>
+                    <div class="fg">
+                        <label>URL источника обновления (JSON)</label>
+                        <input type="url" id="up_url" placeholder="https://example.com/polo_db.json"
+                            value="data/parts.json">
+                        <div class="fh">Прямая ссылка на JSON с позициями каталога. Источник должен поддерживать CORS.
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button class="bn p" onclick="checkUpdate()">🔍 Проверить базу</button>
+                        <button class="bn" onclick="sUpUrl()">💾 Сохранить URL</button>
+                    </div>
+                    <div id="up_status" style="margin-top:14px"></div>
+                    <div class="fh" style="margin-top:10px">
+                        <b style="color:var(--a)">Как это работает:</b> приложение скачивает JSON по ссылке и предлагает
+                        добавить
+                        новые позиции (merge) или заменить базу целиком. Ваши правки (статусы, заметки, избранное) при
+                        merge
+                        сохраняются.
+                    </div>
+                </div>
+
+            </div>
+            <div class="mf"><button class="bn" onclick="cUp()">Закрыть</button></div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: ЖУРНАЛ ============ -->
+    <div class="mo" id="logmo">
+        <div class="mdl" onclick="event.stopPropagation()">
+            <div class="mh">
+                <h3 id="logmt">Запись в журнал</h3><button class="mc" onclick="cLog()">✕</button>
+            </div>
+            <div class="mb">
+                <input type="hidden" id="l_id">
+                <div class="fr">
+                    <div class="fg"><label>Дата *</label><input type="date" id="l_date"></div>
+                    <div class="fg"><label>Пробег, км</label><input type="number" id="l_km" min="0"
+                            placeholder="187300"></div>
+                </div>
+                <div class="fg"><label>Что делали *</label><input type="text" id="l_title"
+                        placeholder="Замена масла + фильтр">
+                </div>
+                <div class="fg"><label>Детали из базы (OEM через запятую)</label><input type="text" id="l_items"
+                        placeholder="030 115 561 B, G 052 162 A2"></div>
+                <div class="fr">
+                    <div class="fg"><label>Стоимость</label><input type="number" id="l_cost" min="0" step="0.01"></div>
+                    <div class="fg"><label>Валюта</label>
+                        <select id="l_cur">
+                            <option value="RUB">₽ RUB</option>
+                            <option value="USD">$ USD</option>
+                            <option value="EUR">€ EUR</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="fg"><label>Где делали</label><input type="text" id="l_shop" placeholder="СТО / сам"></div>
+                <div class="fg"><label>Заметка</label><textarea id="l_notes" rows="3"></textarea></div>
+            </div>
+            <div class="mf">
+                <button class="bn" onclick="cLog()">Отмена</button>
+                <button class="bn p" onclick="sLog()">💾 Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: ТО ============ -->
+    <div class="mo" id="tomo">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:520px">
+            <div class="mh">
+                <h3>🛠 Настройки ТО <span id="tom_car" style="font-size:.72rem;color:var(--mu);font-weight:600"></span></h3><button class="mc" onclick="cTO()">✕</button>
+            </div>
+            <div class="mb">
+                <p style="font-size:.82rem;color:var(--mu);margin-top:0">Пробег, дата и интервал ТО хранятся
+                    <b>отдельно для каждой машины</b> гаража — заполните один раз, и виджет в шапке будет
+                    подсказывать, когда ехать на ТО именно этому автомобилю.</p>
+                <div class="fr">
+                    <div class="fg"><label>Текущий пробег, км</label><input type="number" id="t_km" min="0"
+                            placeholder="189000">
+                    </div>
+                    <div class="fg"><label>Пробег на момент посл. ТО, км</label><input type="number" id="t_lastkm"
+                            min="0" placeholder="180000">
+                    </div>
+                </div>
+                <p style="font-size:.75rem;color:var(--mu);margin:-4px 0 8px">💡 Остаток до ТО = интервал −
+                    (текущий пробег − пробег на момент ТО) — обновляете пробег, счётчик пересчитывается.
+                    Без «пробега на момент ТО» остаток оценивается приблизительно по дате (~1000 км/мес).</p>
+                <div class="fr">
+                    <div class="fg"><label>Дата последнего ТО</label><input type="date" id="t_date"></div>
+                    <div class="fg"><label>Интервал ТО</label>
+                        <select id="t_interval">
+                            <option value="15000">Каждые 15 000 км / 12 мес.</option>
+                            <option value="10000">Каждые 10 000 км</option>
+                            <option value="7500">Каждые 7 500 км</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="mf">
+                <button class="bn dg-btn" onclick="resetTO()">Сбросить ТО</button>
+                <button class="bn" onclick="cTO()">Отмена</button>
+                <button class="bn p" onclick="sTO()">💾 Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: СПИСОК ПОКУПОК ============ -->
+    <div class="mo" id="shopmo">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:760px">
+            <div class="mh">
+                <h3>🛒 Список покупок на ТО</h3><button class="mc" onclick="cShop()">✕</button>
+            </div>
+            <div class="mb" id="shopBody"></div>
+            <div class="mf">
+                <span id="shopCount" class="shop-count zero">🛒 Выбрано: <b>0</b> позиций</span>
+                <button class="bn" onclick="shopClearAll()" title="Снять все галочки в списке (отметки хранятся отдельно для каждой машины)">✖ Снять отметки</button>
+                <button class="bn" onclick="cShop()">Закрыть</button>
+                <button class="bn" onclick="eShopCSV()">📊 CSV</button>
+                <button class="bn p" onclick="pShop()">🖨 Печать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: КАРТОЧКА ДЕТАЛИ ============ -->
+    <div class="mo" id="partmo">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:720px">
+            <div class="mh">
+                <h3 id="partmo_title">Деталь</h3>
+                <button class="mc" onclick="cPC()">✕</button>
+            </div>
+            <div class="mb" id="partmo_body"></div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: УТОЧНИТЬ VIN ============ -->
+    <div class="mo" id="vinmo">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:560px">
+            <div class="mh">
+                <h3>✎ Уточнить данные автомобиля</h3>
+                <button class="mc" onclick="cVIN()">✕</button>
+            </div>
+            <div class="mb">
+                <div class="fg"><label>Обозначение модели</label>
+                    <input type="text" id="v_model" placeholder="Polo (6N1) / Polo Classic (6V2) / Caddy (9K)">
+                </div>
+                <div class="fr">
+                    <div class="fg"><label>Дата производства</label><input type="date" id="v_proddate"></div>
+                    <div class="fg"><label>Модельный год</label><input type="number" id="v_year" min="1995" max="2003">
+                    </div>
+                </div>
+                <div class="fg"><label>Код двигателя (сгруппированы по семействам)</label><select
+                        id="v_engine"></select></div>
+                <div class="fh gb-hint" id="v_eng_hint"></div>
+                <div class="fr">
+                    <div class="fg"><label>КПП — семейство</label><select id="v_trans"></select></div>
+                    <div class="fg"><label>КПП — буквенный код</label>
+                        <input type="text" id="v_gearbox" list="v_gb_codes" maxlength="6" autocomplete="off"
+                            spellcheck="false" placeholder="CHL, DXB, FFU…" style="text-transform:uppercase">
+                        <datalist id="v_gb_codes"></datalist>
+                    </div>
+                </div>
+                <div class="fh gb-hint" id="v_gb_hint"></div>
+                <div class="fr">
+                    <div class="fg"><label>Код оснащения</label><input type="text" id="v_equip" placeholder="41"></div>
+                    <div class="fg"><label>Цвет кузова (Lacknr)</label>
+                        <div class="laf-wrap">
+                            <input type="text" id="v_bodycolor" placeholder="J2" maxlength="8" autocomplete="off"
+                                spellcheck="false">
+                            <span class="laf-swatch" id="v_bodycolor_sw" title="Код цвета"></span>
+                            <button type="button" class="laf-btn" id="v_bodycolor_btn"
+                                title="Выбрать цвет из справочника">🎨</button>
+                            <div class="laf-pop" id="v_bodycolor_pop"></div>
+                        </div>
+                        <div class="fh laf-hint" id="v_bodycolor_hint"></div>
+                    </div>
+                </div>
+                <div class="fg"><label>Цвет крыши</label>
+                    <div class="laf-wrap">
+                        <input type="text" id="v_roofcolor" placeholder="J2" maxlength="8" autocomplete="off"
+                            spellcheck="false">
+                        <span class="laf-swatch" id="v_roofcolor_sw" title="Код цвета"></span>
+                        <button type="button" class="laf-btn" id="v_roofcolor_btn"
+                            title="Выбрать цвет из справочника">🎨</button>
+                        <div class="laf-pop" id="v_roofcolor_pop"></div>
+                    </div>
+                    <div class="fh laf-hint" id="v_roofcolor_hint"></div>
+                </div>
+                <div class="fr">
+                    <div class="fg"><label>Поколение машины</label><select id="v_gen"></select>
+                        <div class="fh laf-hint">Подставляется по VIN, если есть 6N1/6N2; уточните вручную для 6V/9K/9U</div>
+                    </div>
+                    <div class="fg"><label>Комплектация машины</label><select id="v_trim"></select>
+                        <div class="fh laf-hint">Влияет на проверку деталей с ограничением по комплектации</div>
+                    </div>
+                </div>
+                <div class="fh"
+                    style="padding:8px 10px;background:var(--hv);border-radius:4px;font-size:.75rem;line-height:1.5">
+                    ℹ️ Эти данные не закодированы в VIN. Возьми их из ETKA, Elcats или из наклейки в багажнике /
+                    сервисной книжки. <b>Выбери двигатель — списки семейств и буквенных кодов КПП автоматически
+                        сузятся до ставившихся с этим мотором</b> (для Classic/Caddy учитывается платформа 6K:
+                    добавляются семейства 002 и 020). Буквенный код также выбит на корпусе коробки — при его вводе
+                    семейство (084 / 085 / 002) определится автоматически, а каталог отфильтруется под твою коробку.
+                </div>
+            </div>
+            <div class="mf">
+                <button class="bn" onclick="cVIN()">Отмена</button>
+                <button class="bn p" onclick="sVIN()">💾 Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: ОСНАЩЕНИЕ ПО БАЗЕ VIN (PR) ============ -->
+    <div class="mo" id="prmo">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:560px">
+            <div class="mh">
+                <h3 id="prmo_title">📋 Оснащение</h3>
+                <button class="mc" onclick="cPR()">✕</button>
+            </div>
+            <div class="mb" id="prmo_body"></div>
+            <div class="mf"><button class="bn" onclick="cPR()">Закрыть</button></div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: ТЕМА ============ -->
+    <div class="mo" id="thememmo">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:600px">
+            <div class="mh">
+                <h3>🎨 Тема оформления</h3>
+                <button class="mc" onclick="cTheme()">✕</button>
+            </div>
+            <div class="mb">
+                <p style="font-size:.82rem;color:var(--mu);margin-top:0">Выбери оформление — оно сохранится на этом
+                    устройстве.
+                </p>
+                <div class="th-grid" id="themeGrid"></div>
+            </div>
+            <div class="mf"><button class="bn" onclick="cTheme()">Закрыть</button></div>
+        </div>
+    </div>
+    <!-- ============ МОДАЛКА: FAQ / ПОМОЩЬ ============ -->
+    <div class="mo" id="faqmo">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:760px">
+            <div class="mh">
+                <h3>❓ Помощь — что делают кнопки</h3>
+                <button class="mc" onclick="cFaq()">✕</button>
+            </div>
+            <div class="mb">
+
+                <div class="faq-intro">
+                    <div class="faq-intro-h">👋 Знакомство с базой — 2 минуты</div>
+                    <p>Если вы открыли приложение впервые — пройдите этот список сверху вниз: здесь простыми
+                        словами рассказано, что делает каждая кнопка и как собрать каталог «под свою машину».
+                        Окно можно закрыть в любой момент: путеводитель всегда доступен в меню ⚙️ →
+                        «Помощь — что делают кнопки».</p>
+                    <p><b>Короткий путь мастера:</b> ① добавьте VIN машины в «Гараж» → ② нажмите «✎ Уточнить
+                        данные» и укажите код двигателя и буквенный код КПП (на наклейке в багажнике) →
+                        ③ каталог сам покажет только те детали, что подходят именно вашей машине, а фильтры в
+                        шапке позволят сузить список до семейства, кузова или поколения.</p>
+                </div>
+
+                <div class="faq-sec">
+                    <div class="faq-sec-h">🧭 Шапка приложения</div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">☰</span> Меню (гамбургер)</div>
+                        <div class="faq-a">Открывает и закрывает боковое меню: гараж, категории запчастей, мастерские и
+                            журнал. На
+                            десктопе сворачивает панель влево-вправо, на телефоне — выезжает шторкой.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">🔍</span> Поиск</div>
+                        <div class="faq-a">Ищет по <b>OEM</b>, названию, аналогам, донорам, заметкам и применимости.
+                            Несколько слов
+                            через пробел работают как «И» — найдутся только позиции, где есть все слова. Очистить —
+                            крестик справа.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">🛠 ⏱</span> Кнопка ТО</div>
+                        <div class="faq-a">Показывает остаток до следующего ТО (<b>км</b> и <b>дни</b>). Клик —
+                            открывает настройки:
+                            текущий пробег, дата последнего ТО и интервал. Цвет рамки: <b
+                                style="color:var(--ok)">зелёный</b> — запас
+                            есть, <b style="color:var(--sr)">жёлтый</b> — скоро, <b style="color:var(--dg)">красный</b>
+                            — пора.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">⚙️</span> Фильтры (мотор, кузов, КПП, статус,
+                            сортировка)</div>
+                        <div class="faq-a">Ограничивают список по параметрам. Пустое значение = «все». Активный фильтр
+                            подсвечивается цветом. Кнопка <b>«Сбросить фильтры»</b> в ⚙️-меню обнуляет всё сразу.
+                            <br><br>⚙️ <b>Мотор</b> — объединённый список: семейства ДВС (🧬 <b>EA111</b> — бензин
+                            1.0–1.6, <b>EA827</b> — бензин 1.6/1.8, <b>EA827-D</b> — дизель 1.7–1.9 D/SDI/TDI) и коды
+                            моторов, сгруппированные по семействам. Выберите «— вся семья EA111 —» для фильтра по
+                            семейству или конкретный мотор (AEX, AKV…).
+                            <br><br>🔄 <b>КПП</b> — тоже объединённый список: семейства <b>084</b> (4-ст, ранние Polo
+                            III 1994–1999), <b>085</b> (самая массовая 5-ст), <b>002</b> (5-ст, Polo Classic и Caddy),
+                            020/02K и автоматы 01M/01N, а внутри каждого семейства — буквенные коды (CHL, DXB,
+                            FFU…). Код выбит на корпусе коробки и указан на наклейке в багажнике. Фильтр по коду
+                            пропускает и детали, где указано только семейство.
+                            <br><br>🚗 <b>Кузов/поколение</b> — объединённый список: поколения Polo <b>6N1</b>
+                            (1994–1999) и <b>6N2</b> (1999–2001) раскрываются каждый в свои кузова — хэтчбек 3д и
+                            5д: можно выбрать всё поколение целиком или конкретный кузов (тогда работают оба
+                            фильтра сразу). Ниже — <b>Polo Classic</b> (6V2/6KV седан) и <b>Variant</b> (6V5/6KV
+                            универсал) на платформе 6K, а также <b>Caddy</b> Van и Kombi (9K) и Pickup (9U).
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">▦ / 🗂</span> Переключатель вида</div>
+                        <div class="faq-a"><b>Плитка</b> — карточки в сетке. <b>Дерево</b> — компактный список по
+                            группам и
+                            подгруппам ETKA. Удобно, когда нужно быстро просмотреть артикулы.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">📖</span> Журнал</div>
+                        <div class="faq-a">Записывай каждую работу: дата, пробег, что менял, сколько стоило. Потом в
+                            карточке детали
+                            появится бейдж «🔧 Меняли: …» — сразу видно, когда ставил в прошлый раз.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">➕</span> OEM (добавить деталь)</div>
+                        <div class="faq-a">Добавляет новую позицию в каталог вручную. Можно указать: категорию,
+                            название, артикул,
+                            аналоги, доноров, применимость, цену, статус, ссылку на магазин, фото и инструкции.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">⇕</span> Развернуть/свернуть</div>
+                        <div class="faq-a">Одним кликом раскрывает или закрывает блок «Подробности» у всех карточек в
+                            списке. Удобно
+                            для быстрой проверки применимости или инструкций.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">⚙️</span> Меню настроек</div>
+                        <div class="faq-a">Импорт/экспорт (JSON, CSV), обновление базы, сброс к базовому состоянию, тема
+                            оформления,
+                            VIN-API ключ, профиль, о программе и баг-репорт.</div>
+                    </div>
+                </div>
+
+                <div class="faq-sec">
+                    <div class="faq-sec-h">📇 Карточка детали — кнопки</div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">☆ / ★</span> Избранное</div>
+                        <div class="faq-a">Ставит звезду — карточка переезжает в раздел <b>⭐ Избранное</b> в сайдбаре. В
+                            карточке с
+                            избранным слева появляется золотая полоса.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">✎</span> Редактировать</div>
+                        <div class="faq-a">Открывает форму правки: можно менять цену, добавлять аналоги, обновлять
+                            статус. При смене
+                            цены в историю цен пишется новая запись — кнопка <b>📊</b> рядом со стоимостью показывает,
+                            как она
+                            менялась.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">✕</span> Удалить</div>
+                        <div class="faq-a">Удаляет позицию. После удаления внизу появится уведомление с кнопкой <b>↶
+                                Вернуть</b> —
+                            можно отменить в течение 10 секунд.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">📋</span> Копировать</div>
+                        <div class="faq-a">Копирует артикул или аналог в буфер обмена. Работает у кнопки рядом с OEM и у
+                            каждого
+                            чипа аналога.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">🛒 Exist · Autodoc · Avito</span> Магазины</div>
+                        <div class="faq-a">Открывают поиск по артикулу в Exist, Autodoc и Avito — три вкладки. Кнопка
+                            <b>🔍 Найти
+                                дешевле</b> делает то же самое одним кликом.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">🛒 📦 ✅</span> Статусы</div>
+                        <div class="faq-a"><b>Хочу</b> — добавил в план покупок. <b>Купил</b> — деталь дома.
+                            <b>Поставил</b> —
+                            установлено (при этом срабатывает небольшой праздник 🎉). Повторный клик по активной кнопке
+                            снимает
+                            статус.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">📝</span> Заметка</div>
+                        <div class="faq-a">Свободное поле для своих мыслей: «брал у Пети», «ставил сам, 2 часа»,
+                            «требует
+                            прокладку». Сохраняется автоматически при выходе из поля.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">🔒 VIN-строго</span> (чип над списком)</div>
+                        <div class="faq-a">Скрывает позиции, которые по донорам <b>не подходят</b> к твоему VIN.
+                            Работает, если в
+                            гараже выбран активный VIN.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">📂 Группы</span> (чип над списком)</div>
+                        <div class="faq-a">Собирает позиции по подкатегориям внутри выбранного раздела. Удобно, когда в
+                            категории
+                            30+ деталей.</div>
+                    </div>
+                </div>
+
+                <div class="faq-sec">
+                    <div class="faq-sec-h">🚗 Гараж и VIN</div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">+ Добавить VIN</span></div>
+                        <div class="faq-a">Открывает форму декодирования. Вводишь 17 символов → жмёшь <b>🔍
+                                Декодировать</b> →
+                            проверяешь данные → <b>💾 Сохранить</b>. VIN попадёт в гараж, а фильтры автоматически
+                            подстроятся под эту
+                            машину.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">✎ Уточнить данные</span></div>
+                        <div class="faq-a">Доступно после клика по карточке в гараже. Здесь можно вручную указать код
+                            двигателя,
+                            КПП, дату производства, цвета — эти данные не закодированы в VIN, их нужно взять из ETKA или
+                            из наклейки в
+                            багажнике.
+                            <br><br>🔤 Для КПП можно указать <b>буквенный код</b> (с корпуса коробки или наклейки) —
+                            приложение само определит семейство (084 / 085 / 002), покажет справку «с чем ставили» и
+                            подставит оба значения в фильтры каталога. Коды CHL и CHX встречаются в двух семействах
+                            (084 и 085) — в этом случае семейство лучше выбрать вручную.
+                            <br><br>⚙️ <b>Каскад «мотор → КПП»:</b> список двигателей сгруппирован по семействам
+                            (EA111, EA827, EA827-D), а при выборе мотора в списках остаются только те
+                            семейства и буквенные коды КПП, которые ставились с этим мотором (справочник по ETKA и
+                            ti-lo.de/polomagazin.de). Для Polo Classic (6V2/6KV), Variant (6V5) и Caddy (9K/9U)
+                            учитывается платформа 6K — к списку добавляются семейства 002, 020 (для Classic также
+                            02K). Справочник ориентировочный: код всегда можно ввести вручную, даже если его нет в
+                            списке.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">🎨</span> Цвет кузова — справочник</div>
+                        <div class="faq-a">В окне «✎ Уточнить данные» рядом с полем цвета появился образец и кнопка
+                            🎨 — справочник из 90+ кодов краски VAG эпохи 6N/6K/9K (Candy White B4, Tornado Red
+                            G2, Chagallblau J2…). Введите код с наклейки — увидите название и цвет; или выберите из
+                            списка с поиском. Работает и для цвета крыши.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">📋</span> Оснащение (PR)</div>
+                        <div class="faq-a">Список PR-кодов машины из базы оснащения, сгруппированный по категориям:
+                            🛞 шасси, 🛑 тормоза, 🪑 салон, 💡 оптика, ❄️ климат и т.д. Сверху — живой фильтр по
+                            коду или описанию, кнопки «Развернуть/свернуть все».
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">🛒</span> Расходники ТО</div>
+                        <div class="faq-a">Готовый список покупок на ТО под конкретный VIN: каталог фильтруется по
+                            мотору, семейству и буквенному коду КПП и кузову. В списке — <b>только настоящие
+                            расходники</b>: фильтры, жидкости и масла, ремни/ролики/ГРМ, колодки и диски, свечи,
+                            щётки — сгруппированные по разделам. Крепёж и ремонтные запчасти (суппорты,
+                            цилиндры, радиаторы, сальники…) исключены. Если нужная позиция не попала в список —
+                            переключатель <b>«🗂 Вся база под VIN»</b> покажет всё подряд. У каждой позиции —
+                            кнопки статусов 🛒/📦/✅ (пишутся прямо в карточку детали). Заголовки разделов
+                            сворачиваются кликом («⇕ Разделы» сворачивает всё сразу), состояние запоминается.
+                            Клик по позиции открывает её карточку, а кнопки <b>🔍</b> (Exist · Autodoc · Avito)
+                            и <b>☆</b> (избранное) работают прямо из списка. Кнопка «← Каталог» возвращает к
+                            общему списку.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">📱</span> QR-код</div>
+                        <div class="faq-a">QR с комплектацией машины (VIN, мотор, КПП, кузов, цвет, неделя выпуска) —
+                            генерируется <b>оффлайн</b>, без интернета. Покажите его мастеру на СТО: он отсканирует
+                            код камерой и увидит все данные. Рядом — «Скопировать» и «Поделиться».
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">📍</span> Где коды</div>
+                        <div class="faq-a">Схема расположения VIN-таблички для вашего кузова (Polo 6N — чашка
+                            амортизатора, Classic/Variant — стойка двери, Caddy — моторный щит) плюс <b>персональный
+                                пример наклейки</b> с вашими MKB/GKB/Lacknr/PR — удобно сверять с оригиналом в
+                            багажнике.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">📤</span> Экспорт карточки</div>
+                        <div class="faq-a">Карточка VIN в трёх форматах: <b>PNG</b> (рисуется оффлайн, удобно
+                            отправить в WhatsApp), <b>печать/PDF</b> (через диалог печати) и <b>текст</b> (в буфер
+                            обмена или .txt). На телефоне доступно системное меню «Поделиться».
+                        </div>
+                    </div>
+
+                                      <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">⚠️</span> Болячки (типичные проблемы)</div>
+                        <div class="faq-a">Компактная кнопка «⚠️ Болячки» в активной карточке VIN: на ней —
+                            счётчик и раскладка по серьёзности (🔴 важно / 🟡 типично / 🟢 мелочи). Клик открывает
+                            отдельное окно со списком по мотору, КПП и кузову — сгруппированным и отфильтрованным
+                            по году выпуска (например, трещина ГБЦ AEX показана только для 1994–1997).
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">▾</span> Свернуть карточку машины</div>
+                        <div class="faq-a">Шеврон справа вверху активной карточки сворачивает подробную информацию
+                            (модель, мотор, КПП, цвета) в одну компактную строку — VIN при этом остаётся активным и
+                            фильтры продолжают работать. Повторный клик разворачивает обратно; состояние запоминается.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">✕</span> Удалить VIN</div>
+                        <div class="faq-a">Кнопка в верхнем правом углу карточки машины. Убирает её из гаража вместе со
+                            всеми
+                            связанными данными.</div>
+                    </div>
+                </div>
+
+                <div class="faq-sec">
+                    <div class="faq-sec-h">🧰 Сайдбар — нижние кнопки</div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">💬</span> VK</div>
+                        <div class="faq-a">Страница автора во ВКонтакте. Туда же можно писать баг-репорты и предложения.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">✉️</span> Email</div>
+                        <div class="faq-a">Почта для связи — если удобнее письмом, чем в VK.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">❤️</span> Поддержать проект</div>
+                        <div class="faq-a">Открывает окно с реквизитами: CloudTips и ЮMoney. Любая сумма приятна, но не
+                            обязательна.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">📜</span> История версий</div>
+                        <div class="faq-a">Список изменений и обновление <b>базы</b> каталога (новые позиции с сервера).
+                            Данные гаража, избранного и журнала при этом не трогаются.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">🐛</span> Сообщить о баге</div>
+                        <div class="faq-a">Форма с готовым текстом для письма или сообщения в VK. Полезно приложить
+                            версию (указана
+                            в окне), скриншот и модель телефона.</div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-q"><span class="faq-ic">ℹ️</span> О программе</div>
+                        <div class="faq-a">Версия, лицензия «как есть», ссылки на автора. Отсюда же можно снова показать
+                            лицензию
+                            при следующем запуске.</div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="mf"><button class="bn" onclick="cFaq()">Закрыть</button></div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: СКАЧАТЬ APK ============ -->
+    <div class="mo" id="apkmo">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:480px">
+            <div class="mh">
+                <h3>📱 Скачать APK</h3>
+                <button class="mc" onclick="closeM('apkmo')">✕</button>
+            </div>
+            <div class="mb">
+                <p style="font-size:.9rem;line-height:1.7;margin:0 0 14px">
+                    Актуальная APK-версия приложения «База Мастера» — по запросу у автора.
+                    Напишите в VK или на email, укажите модель телефона и версию Android.
+                </p>
+                <a class="contact-row" href="https://vk.com/donignasio" target="_blank" rel="noopener noreferrer">
+                    <span class="ci">💬</span>
+                    <span class="ct2"><b>VK автора</b><span>vk.com/donignasio</span></span>
+                    <span style="font-size:1.1rem;color:var(--mu)">→</span>
+                </a>
+                <a class="contact-row" href="mailto:donignasio@vk.com?subject=APK%20База%20Мастера">
+                    <span class="ci">✉️</span>
+                    <span class="ct2"><b>Email</b><span>donignasio@vk.com</span></span>
+                    <span style="font-size:1.1rem;color:var(--mu)">→</span>
+                </a>
+            </div>
+            <div class="mf">
+                <button class="bn" onclick="closeM('apkmo')">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА: ПОДТВЕРЖДЕНИЕ ============ -->
+    <div class="mo" id="confirmmo">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:560px">
+            <div class="mh">
+                <h3 id="confirm_title">⚠️ Подтверждение</h3>
+                <button class="mc" onclick="cConfirm(false)">✕</button>
+            </div>
+            <div class="mb">
+                <p id="confirm_msg" style="font-size:.9rem;line-height:1.7;margin:0;white-space:pre-line"></p>
+            </div>
+            <div class="mf">
+                <button class="bn" id="confirm_export" onclick="eD()" style="margin-right:auto;display:none">📄 Экспорт
+                    JSON</button>
+                <button class="bn" id="confirm_no" onclick="cConfirm(false)">Нет</button>
+                <button class="bn dg-btn" id="confirm_yes" onclick="cConfirm(true)">Да</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ ЛАЙТБОКС / ТОСТ / КОНФЕТТИ ============ -->
+    <div class="lb2" id="lbt" onclick="cL()">
+        <img id="lbi" alt="" onclick="event.stopPropagation()">
+        <button class="lb-nav lb-prev" id="lbPrev" onclick="event.stopPropagation();lbNav(-1)" title="Назад">‹</button>
+        <button class="lb-nav lb-next" id="lbNext" onclick="event.stopPropagation();lbNav(1)" title="Вперёд">›</button>
+        <div class="lb-counter" id="lbCount" onclick="event.stopPropagation()"></div>
+        <button class="lb-close" id="lbClose" onclick="event.stopPropagation();cL()" title="Закрыть (Esc)">✕</button>
+    </div>
+    <div class="tst" id="tt"></div>
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- ============ ПЛАШКА «ЧТО НОВОГО» ============ -->
+    <div class="whatsnew" id="whatsnew"></div>
+    <!-- Модалка: типичные проблемы (болячки) -->
+    <div id="issmo" class="mo" onclick="if(event.target===this)cIss()">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:560px">
+            <div class="mh">
+                <h3 id="issmo_title">⚠️ Типичные проблемы</h3><button class="mc" onclick="cIss()">✕</button>
+            </div>
+            <div class="mb" id="issmo_body"></div>
+            <div class="mf">
+                <button class="bn" onclick="printIssueChecklist()">🖨 Чек-лист осмотра</button>
+                <button class="bn" onclick="cIss()">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка: сканер VIN / штрих-кода -->
+    <div id="scanmo" class="mo" onclick="if(event.target===this)cScan()">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:520px">
+            <div class="mh">
+                <h3>📷 Сканер: VIN или код детали</h3><button class="mc" onclick="cScan()">✕</button>
+            </div>
+            <div class="mb">
+                <div class="scan-wrap"><video id="scanVideo" muted playsinline></video>
+                    <div class="scan-frame"></div>
+                </div>
+                <div class="scan-status" id="scanStatus">Запускаю камеру…</div>
+                <div class="fg"><label>Или вставьте код вручную</label>
+                    <div style="display:flex;gap:6px">
+                        <input type="text" id="scanManual" placeholder="VIN 17 знаков или артикул / EAN" autocomplete="off"
+                            spellcheck="false">
+                        <button class="bn p" type="button"
+                            onclick="applyScan(classifyScan($('scanManual').value))">Найти</button>
+                    </div>
+                </div>
+                <div class="fh" style="padding:8px 10px;background:var(--hv);border-radius:4px;font-size:.75rem;line-height:1.5">
+                    ℹ️ Поддерживаются QR, EAN-13/8, Code-128/39 (BarcodeDetector, Chrome/Android и APK WebView).
+                    VIN со стикера считывается как текст только в ручном режиме — камерой берём QR/штрих-код.
+                </div>
+            </div>
+            <div class="mf"><button class="bn" onclick="cScan()">Закрыть</button></div>
+        </div>
+    </div>
+
+    <!-- Модалка: схема узла (фото + маркеры) -->
+    <div id="schmo" class="mo" onclick="if(event.target===this)cSch()">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:760px">
+            <div class="mh">
+                <h3 id="schmo_title">📐 Схема узла</h3><button class="mc" onclick="cSch()">✕</button>
+            </div>
+            <div class="mb" id="schmo_body"></div>
+            <div class="mf"><button class="bn" onclick="cSch()">Закрыть</button></div>
+        </div>
+    </div>
+
+    <!-- Модалка экспорта карточки VIN -->
+    <div id="expmo" class="mo" onclick="if(event.target===this)cExp()">
+        <div class="mdl" onclick="event.stopPropagation()" style="max-width:560px">
+            <div class="mh">
+                <h3>📤 Экспорт карточки VIN</h3><button class="mc" onclick="cExp()">✕</button>
+            </div>
+            <div class="mb" id="expmo_body"></div>
+        </div>
+    </div>
+
+    <!-- Модалка QR -->
+    <div id="qrmo" class="mo" onclick="if(event.target===this)closeM('qrmo')">
+        <div class="mdl">
+            <div class="mh">
+                <h3> QR-код</h3><button class="mcl" onclick="closeM('qrmo')"></button>
+            </div>
+            <div class="mb" id="qrmo_body"></div>
+        </div>
+    </div>
+
+    <!-- Модалка схемы VIN-таблички -->
+    <div id="platemmo" class="mo" onclick="if(event.target===this)closeM('platemmo')">
+        <div class="mdl">
+            <div class="mh">
+                <h3>📍 Где искать коды</h3><button class="mcl" onclick="closeM('platemmo')">✕</button>
+            </div>
+            <div class="mb" id="platemmo_body"></div>
+        </div>
+    </div>
+</body>
+
+</html>

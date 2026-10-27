@@ -2047,7 +2047,7 @@ let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastKm: null, lastDate: null, interval: 15000 };
 let TO_ALL = {};
 
-let APP_VERSION = '1.13.0'; // fallback, если update.json не загрузится
+let APP_VERSION = '1.13.1'; // fallback, если update.json не загрузится
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -2356,14 +2356,29 @@ function instEntry(x) {
     return null;
 }
 function parseInst(p) {
-    const src = Array.isArray(p.i) ? p.i : (Array.isArray(p.inst) ? p.inst : null);
-    if (!src || !src.length) return [];
-    /* плоский вариант: ["s","текст"] вместо [["s","текст"]] */
-    if (src.length === 2 && typeof src[0] === 'string' && typeof src[1] === 'string' && MI[src[0]]) {
-        const one = instEntry(src);
-        return one ? [one] : [];
+    /* Функция намеренно самодостаточна: tests/test_1106.js вырезает её
+       из исходника по маркеру «\n}\n» и выполняет в vm-песочнице вместе с
+       instEntry — внешние помощники сломают извлечение. */
+    const one = src => {
+        if (!Array.isArray(src) || !src.length) return [];
+        /* плоский вариант: ["s","текст"] вместо [["s","текст"]] */
+        if (src.length === 2 && typeof src[0] === 'string' && typeof src[1] === 'string' && MI[src[0]]) {
+            const o = instEntry(src);
+            return o ? [o] : [];
+        }
+        return src.map(instEntry).filter(Boolean);
+    };
+    const a = one(p.i), b = one(p.inst);
+    /* Раньше брали ТОЛЬКО одно поле: `i` выигрывало у `inst`. Если в записи
+       оказывались оба (например, tools/build-instructions.js до правки H3
+       дописывал `i` карточке из parts-06.json, у которой инструкции лежали
+       в `inst`), прежние инструкции молча пропадали из карточки.
+       Теперь объединяем, отбрасывая дубли по «тип + текст». */
+    if (a.length && b.length) {
+        const seen = new Set(a.map(x => x.type + '\u0000' + x.text));
+        return a.concat(b.filter(x => !seen.has(x.type + '\u0000' + x.text)));
     }
-    return src.map(instEntry).filter(Boolean);
+    return a.length ? a : b;
 }
 
 function nP(p) {

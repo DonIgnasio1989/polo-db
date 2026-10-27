@@ -1,0 +1,20 @@
+--- a/tools/instructions/32-brakes-hydraulics.json
++++ b/tools/instructions/32-brakes-hydraulics.json
+@@ -6,7 +6,7 @@
+       "id": "brake-master-cylinder",
+       "title": "Главный тормозной цилиндр (ГТЦ)",
+       "oems": ["1H0 611 019", "6N0 611 019 A", "6N0 614 019", "6N0 614 019 A", "6N1 614 019 A", "6N1 614 019 B", "1H1 611 019 C"],
+-      "use": [{ "id": "brake-bleed", "only": ["proc", "warn"] }, { "id": "battery-off", "only": ["note"] }],
++      "use": [{ "id": "brake-bleed", "only": ["warn"] }, { "id": "battery-off", "only": ["note"] }],
+       "src": ["Спр.Torque", "ОП"],
+       "tools": [
+         "Ключ для тормозных трубок (разрезной) 11 мм; головки/ключи 13/17 (гайки крепления ГТЦ к ВУТ).",
+@@ -166,7 +166,7 @@
+       "id": "abs-sensor",
+       "title": "Датчик ABS (передний/задний) и ротор",
+       "oems": ["1H0 927 803", "1H0 927 807", "6N0 927 803", "6N0 927 807", "357 614 150 EOT", "1J0 614 149"],
+-      "use": [{ "id": "abs-work", "only": ["proc", "warn", "note"] }],
++      "use": [{ "id": "abs-work", "only": ["warn", "note"] }],
+       "src": ["Спр.Torque", "restore/VCDS-LOG-ANALYSIS.md", "ОП"],
+       "tools": [
+         "Головки/Torx под болт датчика, ключи 10; щётка, очиститель, проникающая смазка.",

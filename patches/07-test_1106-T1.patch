@@ -1,0 +1,25 @@
+--- a/tests/test_1106.js
++++ b/tests/test_1106.js
+@@ -142,7 +142,21 @@
+ const nameOf = r => String(r.n || r.name || '');
+ const byOem = o => parts.find(r => oemOf(r).trim() === o);
+ 
+-t('parts.json: 4 124 записи (22 файла-источника)', () => eq(parts.length, 4124));
++/* T1 (аудит 2026-10-27): ожидание было захардкожено (4124) и устарело —
++   каталог вырос до 4 127. Теперь ожидаемое количество считается по data-src,
++   то есть проверяется ровно то, что заявлено: «бандл = сумма источников».
++   Это тот же инвариант, на котором стоит tools/build-parts.js. */
++const SRC_DIR = path.join(ROOT, 'data-src');
++const SRC_FILES = fs.existsSync(SRC_DIR)
++    ? fs.readdirSync(SRC_DIR).filter(f => /^parts-.*\.json$/.test(f)).sort()
++    : [];
++const SRC_TOTAL = SRC_FILES.reduce((s, f) =>
++    s + JSON.parse(fs.readFileSync(path.join(SRC_DIR, f), 'utf8')).length, 0);
++
++t('parts.json = сумма ' + SRC_FILES.length + ' файлов-источников data-src', () => {
++    okTrue(SRC_FILES.length > 0, 'в data-src нет parts-*.json');
++    eq(parts.length, SRC_TOTAL);
++});
+ t('parts.json: нет мусорных «аналогов»', () => {
+     const bad = parts.filter(r => (r.a || r.analogs || []).some(x => /\b(universeel|universal|used part|repro|refurbished)\b/i.test(String(x))));
+     eq(bad.length, 0, 'найдено ' + bad.length + ': ' + bad.slice(0, 3).map(r => oemOf(r)).join(', '));

@@ -1,0 +1,20 @@
+--- a/tools/migrate-1.13.0.js
++++ b/tools/migrate-1.13.0.js
+@@ -272,7 +272,16 @@
+     byFile[f].forEach(x => md.push('- `#' + x.idx + '` **' + x.rule + '** `' + (x.oem || '—') + '` — ' + x.text));
+     md.push('');
+ });
+-if (!DRY) {
++/* H4 (аудит 2026-10-27): миграция идемпотентна — на уже мигрированном data-src
++   она делает 0 правок. Раньше отчёты перезаписывались безусловно, и повторный
++   прогон (а «памятка» предписывает гонять миграции подряд каждый релиз) стирал
++   историю: data-fixes-*.json обнулялся, DATA-FIXES-*.md сжимался в ~70 раз.
++   Теперь нулевой прогон пишет отдельный *.noop.md и историю не трогает. */
++if (!DRY && !touchedRecs && !log.length) {
++    fs.writeFileSync(path.join(OUT, 'DATA-FIXES-1.13.0.noop.md'), md.join('\n'), 'utf8');
++    console.log('правок не было (data-src уже мигрирован) — история НЕ перезаписана;');
++    console.log('   просмотрочный отчёт: restore/DATA-FIXES-1.13.0.noop.md');
++} else if (!DRY) {
+     fs.writeFileSync(path.join(OUT, 'DATA-FIXES-1.13.0.md'), md.join('\n'), 'utf8');
+     fs.writeFileSync(path.join(OUT, 'data-fixes-1.13.0.json'), JSON.stringify({ generated: new Date().toISOString(), perRule, touchedFiles, touchedRecs, log }, null, 1), 'utf8');
+ }

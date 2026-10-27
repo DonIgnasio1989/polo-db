@@ -1,0 +1,20 @@
+--- a/index.html
++++ b/index.html
+@@ -8,7 +8,7 @@
+     <!-- Версия разметки: должна совпадать с APP_VERSION в js/app.js.
+          Лоадер добавляет её в URL скрипта (&ui=…), чтобы новый index.html
+          никогда не грузил закэшированный старый app.js. -->
+-    <meta name="app-ui-ver" content="1.13.0">
++    <meta name="app-ui-ver" content="1.13.1">
+     <meta name="apple-mobile-web-app-capable" content="yes">
+     <title>VW Polo/Caddy 1995–2003 — База Мастера</title>
+ 
+@@ -23,7 +23,7 @@
+        С 1.8.4 так и делаем — SW отдаёт CSS cache-first, без ?v= телефоны
+        жили бы со старым стилем до следующего фонового обновления.
+        ═══════════════════════════════════════════════════════════════ -->
+-    <link rel="stylesheet" href="css/app.css?v=1.13.0">
++    <link rel="stylesheet" href="css/app.css?v=1.13.1">
+ 
+     <script>
+         /* ────── АВТО-КЕШБАСТИНГ ТОЛЬКО ДЛЯ JS ─────────────────────
