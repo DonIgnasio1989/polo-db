@@ -1,0 +1,14 @@
+diff --git a/sw.js b/sw.js
+index 92a1a6e..6c53c97 100644
+--- a/sw.js
++++ b/sw.js
+@@ -7,7 +7,8 @@
+    Кэш один: bm-cache-v2; устаревшие версии удаляются при activate.
+    ============================================================ */
+ const CACHE = 'bm-cache-v2';
+-const SHELL = ['./', './index.html', './css/app.css', './data/update.json'];
++const SHELL = ['./', './index.html', './css/app.css', './data/update.json',
++    './manifest.webmanifest'];
+ 
+ self.addEventListener('install', e => {
+     e.waitUntil(

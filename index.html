@@ -26,13 +26,48 @@
     <!-- Версия разметки: должна совпадать с APP_VERSION в js/app.js.
          Лоадер добавляет её в URL скрипта (&ui=…), чтобы новый index.html
          никогда не грузил закэшированный старый app.js. -->
-    <meta name="app-ui-ver" content="1.13.1">
+    <meta name="app-ui-ver" content="1.13.3">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Каталог запчастей VW Polo 6N и Caddy 9K (1994-2003) — База Мастера</title>
     <meta name="description"
         content="Бесплатный офлайн-каталог оригинальных запчастей, VIN-дешифратор, PR-коды и регламенты ТО для VW Polo 6N1/6N2, Classic, Variant и Caddy 9K/9U. Работает без интернета.">
     <meta name="keywords"
         content="запчасти VW Polo 6N, каталог Polo 6KV, Caddy 9K запчасти, VIN декодер Поло, оригинальные номера VAG, регламент ТО Polo">
+
+    <!-- ═══════════════════════════════════════════════════════════════
+       SEO-РАЗМЕТКА ДЛЯ ПОИСКОВИКОВ И СОЦСЕТЕЙ (canonical + OG + Twitter).
+       Базовый URL взят из JSON-LD выше (https://donignasio1989.github.io).
+       Если сайт ляжет в подкаталог (…github.io/repo/) — править в четырёх
+       местах: canonical, og:url, og:image, twitter:image.
+       robots.txt и sitemap.xml лежат на сервере отдельно — сюда не дублируем.
+       ═══════════════════════════════════════════════════════════════ -->
+    <link rel="canonical" href="https://donignasio1989.github.io/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="База Мастера">
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:url" content="https://donignasio1989.github.io/">
+    <meta property="og:title"
+        content="Каталог запчастей VW Polo 6N и Caddy 9K (1994-2003) — База Мастера">
+    <meta property="og:description"
+        content="Бесплатный офлайн-каталог оригинальных запчастей, VIN-дешифратор, PR-коды и регламенты ТО для VW Polo 6N1/6N2, Classic, Variant и Caddy 9K/9U. Работает без интернета.">
+    <meta property="og:image" content="https://donignasio1989.github.io/icons/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="База Мастера — каталог запчастей VW Polo 6N и Caddy 9K">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title"
+        content="Каталог запчастей VW Polo 6N и Caddy 9K (1994-2003) — База Мастера">
+    <meta name="twitter:description"
+        content="Бесплатный офлайн-каталог оригинальных запчастей, VIN-дешифратор, PR-коды и регламенты ТО для VW Polo 6N1/6N2, Classic, Variant и Caddy 9K/9U.">
+    <meta name="twitter:image" content="https://donignasio1989.github.io/icons/og-image.png">
+
+    <!-- Иконки и манифест PWA — теперь статические файлы (раньше js/app.js
+         собирал их в blob на лету). iPWA() оставляет blob-вариант только как
+         фолбэк, если разметка пришла без link[rel=manifest]. -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" sizes="any">
+    <link rel="icon" href="icons/favicon.ico" sizes="48x48">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
     <!-- ═══════════════════════════════════════════════════════════════
        CSS грузится СИНХРОННО (обычный <link> в <head>).
@@ -45,7 +80,7 @@
        С 1.8.4 так и делаем — SW отдаёт CSS cache-first, без ?v= телефоны
        жили бы со старым стилем до следующего фонового обновления.
        ═══════════════════════════════════════════════════════════════ -->
-    <link rel="stylesheet" href="css/app.css?v=1.13.1">
+    <link rel="stylesheet" href="css/app.css?v=1.13.3">
 
     <script>
         /* ────── АВТО-КЕШБАСТИНГ ТОЛЬКО ДЛЯ JS ─────────────────────

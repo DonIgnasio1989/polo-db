@@ -1,0 +1,384 @@
+--- /dev/null
++++ b/tools/check-engines.js
+@@ -0,0 +1,381 @@
++#!/usr/bin/env node
++/* ============================================================
++   tools/check-engines.js — сверка справочника ENGINES (js/app.js)
++   с внешними эталонными данными и каталогом data-src.
++   ------------------------------------------------------------
++   Зачем: в раунде обследования volkswagenclub.net (см. отчёт
++   «ОТЧЁТ.md» и «СВЕРКА-ДВИГАТЕЛЕЙ.md» в корне проекта) нашлись
++   расхождения между нашей таблицей ENGINES и базой двигателей
++   сайта. Этот инструмент держит эталонную таблицу REF (данные,
++   вычитанные из карточек engine_detail.php и выдержки ETKA-
++   таблицы «1950 2015 vw engine codes») и каждый прогон честно
++   пересчитывает сверку заново — если ENGINES изменится, отчёт
++   изменится вместе с ним. Файлы НЕ меняет (как audit-parts.js).
++
++   Источники эталонов (первоисточники, которые цитирует сайт):
++     • ms-motorservice.com/MediaAssets/2295355_ks_50003929_web.pdf
++       (каталог KS 50003929; в REF помечен «KS стр.NNNN») —
++       считан через карточки volkswagenclub.net 2026-10-30;
++     • opendata.astra.admin.ch — швейцарские типовые одобрения
++       (TAS);
++     • manual_download.php?id=5557 — «1950 2015 vw engine codes»,
++       выдержка ETKA-таблицы (строки вида «код кВт л.с. объём
++       цилиндры старт финиш модель примечание»);
++     • наш собственный каталог data-src (ETKA-происхождения):
++       поле engines карточек — для блока «сироты».
++
++   Блоки отчёта:
++     S  сверка совпала (OK; ROUND — расхождение на округление
++        кВт→л.с.; LABEL — различается только маркировка впрыска)
++     R  содержательные расхождения (MISMATCH) + статус адьюдикации
++     A  применимость: ставился ли мотор на 6N/6N2/6V/6K/9K/9U
++        (по данным сайта), и согласуется ли это с нашим ENGINES
++     O  «сироты»: коды ENGINES, которые не упоминает поле engines
++        ни одной карточки data-src (мёртвый вес в справочнике)
++     N  наши коды без внешних данных (карточка сайта не прочитана —
++        план добора см. ОТЧЁТ.md §9.1)
++     X  коды сайта, которых нет у нас (кандидаты и верно отсутствующие)
++
++   Адьюдикация спорных кодов (по заданию владельца «б,в» от 2026-10-30)
++   хранится в VERDICTS и печатается в отчёте дословно; статус
++   «требует ETKA» означает: данные в js/app.js НЕ правятся до
++   подтверждения по ETKA (правило проекта «ничего не выдумывать»).
++
++   Запуск:  node tools/check-engines.js [--json] [--strict]
++   Отчёт:   restore/ENGINES-CHECK.md + restore/engines-check.json
++   --strict: exit 1, если есть расхождение без закрытого вердикта
++   ============================================================ */
++'use strict';
++const fs = require('fs');
++const path = require('path');
++const vm = require('vm');
++
++const ROOT = path.join(__dirname, '..');
++const ARGS = process.argv.slice(2);
++
++/* ---------- 1. ENGINES из js/app.js (полные значения) ---------- */
++const appSrc = fs.readFileSync(path.join(ROOT, 'js', 'app.js'), 'utf8');
++const engStart = appSrc.indexOf('const ENGINES = {');
++if (engStart < 0) { console.error('check-engines: не найден const ENGINES в js/app.js'); process.exit(2); }
++const engBlock = appSrc.slice(engStart, appSrc.indexOf('\n};', engStart) + 2);
++const ENGINES = vm.runInNewContext('(' + engBlock.replace(/^const ENGINES = /, '').replace(/;\s*$/, '') + ')');
++
++/* ---------- 2. Эталонная таблица REF (volkswagenclub.net, чтение 2026-10-30) ----------
++   Поля: id — номер карточки engine_detail.php (null = данных карточки нет,
++   строка только из выдержки ETKA-таблицы id=5557); fuel P/D; ccm; kw; ps;
++   apps — дословные строки «документированного применения» из карточки
++   (источник: KS 50003929, страницы указаны); etka — строка(-и) ETKA-таблицы
++   id=5557 (формат «МОДЕЛЬ MM/YY→MM/YY примечание»); src — первоисточники.
++   Пустые apps = карточка не прочитана (не «применимости нет»!).          */
++const KS = 'ms-motorservice KS 50003929';
++const REF = [
++    { code: '1F', id: 31, fuel: 'P', ccm: 1595, kw: 55, ps: 75, nm: 125, comp: '9:1', bs: '81×77.4',
++      apps: ['Caddy II Typ 9K (9K9B 11.95→05.97, 9K9A 11.95→05.97)', 'Polo III 6N/6N2 (6V2 Classic 11.95→09.97)', 'Passat 08.88→07.90'],
++      etka: ['CADDY 11/95→05/97', 'CADDY F.. 09/96→05/97', 'POLO 11/95→09/97', 'POLO AZ.,GH. 10/94→04/96', 'POLO RP. 10/94→04/96'],
++      src: KS + ' стр.2350, 2408, 2428 + TAS; id=5557 стр.1' },
++    { code: '1Y', id: null, fuel: 'D', ccm: 1896, kw: 47, ps: 64, nm: null, comp: null, bs: null,
++      apps: [], etka: ['CADDY 11/95→06/03 DIESEL', 'CADDY RA. от 10/05 DIESEL', 'POLO RA. 01/96→10/96 DIESEL', 'POLO RA. от 10/05 DIESEL'],
++      src: 'id=5557 стр.1 (ETKA-таблица)' },
++    { code: '1Z', id: 38, fuel: 'D', ccm: 1896, kw: 66, ps: 90, nm: 202, comp: '19.5:1', bs: '79.5×95.5',
++      apps: ['Golf III Van (1H1) 08.91→09.97 (KS стр.2432)', 'Passat B3/B4 (3A2) 10.93→07.96 (KS стр.2387)', 'Passat B3/B4 Variant (3A5) 10.93→07.96 (KS стр.2388)'],
++      etka: ['CADDY 10/96→09/00 TDI'],
++      src: KS + ' + TAS (opendata.astra.admin.ch); id=5557 стр.1' },
++    { code: '1W', id: null, fuel: 'D', ccm: 1400, kw: 35, ps: 48, nm: null, comp: null, bs: null,
++      apps: [], etka: ['POLO 10/90→07/94 DIESEL'],
++      src: 'id=5557 стр.1 (ETKA-таблица)' },
++    { code: '2G', id: 41, fuel: 'P', ccm: 1272, kw: 40, ps: null, nm: null, comp: '9:1', bs: '75×72',
++      apps: ['Polo 86C (вне охвата каталога)'], etka: [], src: KS },
++    { code: 'AAV', id: 50, fuel: 'P', ccm: 1272, kw: 40, ps: null, nm: null, comp: '9.2:1', bs: '75×72',
++      apps: ['Polo 86C (вне охвата каталога)'], etka: [], src: KS },
++    { code: 'AAK', id: 47, fuel: 'P', ccm: 1043, kw: 33, ps: null, nm: null, comp: '9.5:1', bs: '75×59',
++      apps: ['Polo 86C (вне охвата каталога)'], etka: [], src: KS },
++    { code: 'AAU', id: 49, fuel: 'P', ccm: 1043, kw: 33, ps: null, nm: null, comp: '10:1', bs: '75×59',
++      apps: ['Polo 86C (вне охвата каталога)'], etka: [], src: KS },
++    { code: 'ACM', id: 57, fuel: 'P', ccm: 1043, kw: 33, ps: null, nm: null, comp: '10:1', bs: '75×59',
++      apps: ['Polo 86C (вне охвата каталога)'], etka: [], src: KS },
++    { code: 'ACR', id: 58, fuel: 'P', ccm: 1595, kw: 53, ps: null, nm: null, comp: null, bs: null,
++      apps: ['требует проверки применимости (вне охвата каталога)'], etka: [], src: KS },
++    { code: 'ABU', id: 54, fuel: 'P', ccm: 1598, kw: 55, ps: 75, nm: 126, comp: '9.3:1', bs: '76.5×86.9',
++      apps: ['Golf III (1H1) 09.92→09.94 (KS стр.2359)', 'Vento (1H2) 09.92→09.94 (KS стр.2426)'],
++      etka: [], src: KS + ' стр.2359, 2426 + volkswagen-newsroom.com (motor-versions-golf-3)' },
++    { code: 'ADX', id: 64, fuel: 'P', ccm: 1296, kw: 40, ps: 54, nm: null, comp: '10:1', bs: '76.5×70.5',
++      apps: ['Polo III 6N/6N2 (6N1) 10.94→04.97 (KS стр.2407)'],
++      etka: [], src: KS + ' стр.2407' },
++    { code: 'AEA', id: 66, fuel: 'P', ccm: 1598, kw: 55, ps: 75, nm: 126, comp: '9.8:1', bs: '76.5×86.9',
++      apps: ['Golf III (1H1) 10.94→06.95 (KS стр.2359)', 'Polo III 6N/6N2 (6N1) 10.94→10.99 и 08.95→10.99 (KS стр.2407)', 'Vento (1H2) 10.94→06.95 (KS стр.2426)'],
++      etka: [], src: KS + ' стр.2359, 2407, 2426' },
++    { code: 'AEE', id: 67, fuel: 'P', ccm: 1598, kw: 55, ps: 75, nm: 126, comp: '9.8:1', bs: '76.5×86.9',
++      apps: [], etka: [], src: KS + ' (карточка id=67; applicability не прочитана)' },
++    { code: 'AEF', id: 68, fuel: 'D', ccm: 1896, kw: 47, ps: 64, nm: 124, comp: '22.5:1', bs: '79.5×95.5',
++      siteLabel: '1.9 D',
++      apps: ['Caddy II Pickup (9U7) 06.96→12.00 (KS стр.2350)', 'Polo III 6N/6N2 (6N2) 10.99→09.01 (KS стр.2402)', 'Polo III 6N/6N2 (6N1) 10.94→10.99 (KS стр.2407)'],
++      etka: [], src: KS + ' стр.2350, 2402, 2407 + workshop-manuals.com (Polo Mk3 diesel engine data)' },
++    { code: 'AEH', id: 69, fuel: 'P', ccm: 1595, kw: 74, ps: 100, nm: 145, comp: '10.2:1', bs: '81×77.4',
++      apps: [], etka: [], src: KS + ' (карточка id=69; applicability не прочитана)' },
++    { code: 'AEK', id: 70, fuel: 'P', ccm: 1595, kw: 74, ps: 101, nm: 140, comp: '10.3:1', bs: '81×77.4',
++      apps: ['Golf III (1H1) 07.95→12.95 (KS стр.2359)', 'Golf III Cabriolet (1E7) 10.94→12.95 (KS стр.2360)', 'Golf III Variant (1H5) 07.94→12.95 (KS стр.2361)',
++             'Passat B3/B4 (3A2) 10.94→12.95 (KS стр.2386)', 'Passat B3/B4 Variant (3A5) 07.94→12.95 (KS стр.2387)', 'Vento (1H2) 10.94→12.95 (KS стр.2426)'],
++      etka: [], src: KS + ' стр.2359-2361, 2386-2387, 2426 + volkswagen-newsroom.com' },
++    { code: 'AEP', id: 71, fuel: 'P', ccm: 1984, kw: 79, ps: null, nm: null, comp: '10.4:1', bs: '82.5×92.8',
++      apps: ['2.0 GL — к 6N/9K не относится'], etka: [], src: KS },
++    { code: 'AER', id: 72, fuel: 'P', ccm: 999, kw: 37, ps: 50, nm: null, comp: null, bs: null,
++      apps: [], etka: [], src: KS + ' (карточка id=72)' }
++];
++
++/* ---------- 3. Адьюдикация спорных кодов (задание «в», 2026-10-30) ----------
++   status: «требует ETKA» = правка js/app.js ЗАПРЕЩЕНА до подтверждения;
++   «закрыто…» = расхождение снято, данные не меняются;
++   «кандидат…» = решение по добавлению кода в ENGINES.                    */
++const VERDICTS = {
++    'ABU': {
++        status: 'требует ETKA',
++        text: 'Самое серьёзное расхождение. У нас ABU = 1.4/60 л.с., по KS 50003929 '
++            + '(стр.2359, 2426; карточка id=54) ABU = 1.6 (1598 см³), 55 кВт/75 л.с., 126 Нм, 9.3:1, '
++            + 'и ставился ТОЛЬКО на Golf III (1H1) и Vento (1H2) в 09.92→09.94 — на Polo 6N/6N2 и Caddy 9K/9U '
++            + 'не ставился никогда. То есть расходятся и характеристики, и сам факт присутствия кода в нашем '
++            + 'каталожном охвате. Смягчающее: ABU — единственный код-«сирота» (0 упоминаний в поле engines '
++            + 'всех 4127 карточек data-src), на подбор деталей он не влияет; виден только в списке моторов '
++            + 'VIN-гаража, в семействе EA111, в ENGINE_GEARBOX и KNOWN_ISSUES (_ISS_14_8V). '
++            + '⚠ Гипотеза (не проверена): в нашу таблицу ABU мог попасть опечаткой вместо ABD (1.4 8V 60 л.с., '
++            + 'ставился на 6N) — подтвердить или опровергнуть может только ETKA. '
++            + 'РЕШЕНИЕ: данные НЕ править; после сверки с ETKA — либо удалить ABU из всех 5 структур app.js '
++            + '(строки ENGINES, note+codes EA111, ENGINE_GEARBOX, KNOWN_ISSUES), либо исправить на 1.6/75 с '
++            + 'пометкой «донорский код Golf III/Vento». Оба варианта подготовлены в СВЕРКА-ДВИГАТЕЛЕЙ.md §2.'
++    },
++    'ADX': {
++        status: 'закрыто (округление)',
++        text: 'Расхождения по сути нет: и наши «55 л.с.», и «54 PS» на сайте — это один и тот же мотор 1.3 '
++            + '(1296 см³) мощностью 40 кВт. 40 кВт = 54.4 л.с.: сайт округлил вниз (54), VW в заводском '
++            + 'обозначении модификации — вверх («Polo 55 1.3», так мотор значится в прайс-листах и '
++            + 'каталогах запчастей; подтверждено поиском 2026-10-30). Наше значение 55 л.с. соответствует '
++            + 'заводскому обозначению — оставлено без изменений. Применяемость подтверждена: Polo III 6N/6N2 '
++            + '(6N1) 10.94→04.97, KS стр.2407. Момент на сайте не дóложен (пусто) — обогащать нечем.'
++    },
++    'AEF': {
++        status: 'закрыто (маркировка)',
++        text: 'Характеристики совпадают полностью: 1896 см³, 47 кВт/64 л.с. Различается только маркировка '
++            + 'впрыска: сайт называет мотор «1.9 D 47 kW» (общее обозначение атмосферного дизеля, тип впрыска '
++            + 'карточка не фиксирует), у нас — «1.9 SDI». Наше значение опирается на карточки собственного '
++            + 'каталога ETKA-происхождения: `028 100 090 KX` «Двигатель в сборе с ГБЦ (1.9 SDI, 47 кВт)» '
++            + 'engines:["AEF"] и `028 100 103 LX` «Блок цилиндров (1.9 SDI)» engines:["AEF"] — всего AEF '
++            + 'упоминают 194 карточки. По правилу проекта (К <артикул> — допустимый источник) оставлено '
++            + '«1.9 SDI». Бонус сверки: получены точные интервалы применяемости — Polo 6N1 10.94→10.99 '
++            + '(KS стр.2407), Polo 6N2 10.99→09.01 (стр.2402), Caddy 9U Pickup 06.96→12.00 (стр.2350).'
++    },
++    'AEA': {
++        status: 'закрыто (подтверждено)',
++        text: 'Сомнение прошлого раунда («в литературе AEA иногда указывается как 1.6 74 кВт — нет ли второй '
++            + 'карточки») снято: карточка id=66 однозначна — 1598 см³, 55 кВт/75 л.с., 126 Нм @2600, 9.8:1. '
++            + 'Наше 1.6/75 подтверждено. Применяемость: Polo III 6N1 10.94→10.99 и 08.95→10.99 (KS стр.2407), '
++            + 'плюс Golf III/Vento до 06.95.'
++    },
++    '1Z': {
++        status: 'кандидат — конфликт источников, НЕ добавлен',
++        text: 'Два источника сайта противоречат друг другу: карточка id=38 (KS 50003929) даёт применение '
++            + 'только Golf III Van 08.91→09.97 и Passat B3/B4 10.93→07.96, а выдержка ETKA-таблицы '
++            + '(id=5557 стр.1) содержит строку «1Z 66 90 1,90 4 10/96 09/00 CADDY TDI». Проверка по '
++            + 'vin-dump невозможна в принципе: VIN не кодирует двигатель (vD() в app.js отдаёт весь список '
++            + 'ENGINES; в 13 359 VIN дампа мотор не зашит — вхождение «1ZZ» это часть WV1ZZZ9K…). '
++            + 'В data-src код 1Z не упоминает ни одна карточка — добавление создаст второго «сироту» '
++            + '(см. блок O и прецедент ABU). РЕШЕНИЕ: не добавлять; вернуться, если (а) ETKA подтвердит '
++            + '1Z на Caddy 9K и (б) в каталоге появятся карточки с этим кодом. Характеристики для будущего '
++            + 'добавления: 1.9 TDI, 66 кВт/90 л.с. @4000, 202 Нм @1900, 19.5:1, 79.5×95.5, семейство EA827.'
++    },
++    'AEK': {
++        status: 'кандидат отклонён',
++        text: 'Карточка id=70: 1595 см³, 74 кВт/101 л.с. @5800, 140 Нм @3500, 10.3:1. Документированное '
++            + 'применение — только Golf III (1H1/1E7/1H5), Passat B3/B4, Vento, все интервалы заканчиваются '
++            + '12.95. На Polo 6N/6N2, Polo Classic 6V и Caddy 9K/9U не ставился. В ENGINES не добавляем; '
++            + 'в data-src код не встречается (проверено).'
++    }
++};
++
++/* Каталогное окно проекта: Polo 6N с 10.94, Caddy 9K по 06.03 (9U по 12.00+). */
++const WINDOW_START = 1994 + 9 / 12;   /* 10.94 — старт 6N */
++const yy2year = (yy) => (yy >= 80 ? 1900 + yy : 2000 + yy);
++const dec = (mm, yy) => yy2year(yy) + (mm - 1) / 12;
++/* Все интервалы строки: «MM.YY→MM.YY», «MM/YY→MM/YY», открытые «от MM.YY» */
++function intervalsOf(s) {
++    const out = [];
++    const re = /(\d{2})[./](\d{2})\s*(?:→|->)\s*(?:(\d{2})[./](\d{2}))?|от\s*(\d{2})[./](\d{2})/g;
++    let m;
++    while ((m = re.exec(s))) {
++        if (m[5] !== undefined) out.push({ start: dec(+m[5], +m[6]), end: null });
++        else out.push({ start: dec(+m[1], +m[2]), end: m[3] !== undefined ? dec(+m[3], +m[4]) : null });
++    }
++    return out;
++}
++const SCOPE_RE = /(polo|caddy|6n|6v|6k|9k|9u)/i;
++/* Применяемость в окне каталога по массиву строк:
++   null — строк нет вовсе (карточка не прочитана),
++   false — применение известно, но наших платформ в окне каталога нет
++           (Golf/Vento/Passat/86C и т.п. — «вне охвата» тоже сюда),
++   true  — есть строка с 6N/6V/9K/9U/Polo/Caddy, оканчивающаяся не раньше 10.94. */
++function scopeIn(strings) {
++    if (!strings || !strings.length) return null;
++    let seen = false;
++    strings.forEach(s => {
++        if (/вне охвата|не относится/i.test(s)) return;
++        if (!SCOPE_RE.test(s)) return;
++        const iv = intervalsOf(s);
++        if (iv.length === 0 || iv.some(x => x.end === null || x.end >= WINDOW_START)) seen = true;
++    });
++    return seen;
++}
++
++/* ---------- 4. Карточки data-src: сколько раз каждый код упомянут в engines ---------- */
++const cardRefs = Object.create(null);
++const DS = path.join(ROOT, 'data-src');
++if (fs.existsSync(DS)) {
++    fs.readdirSync(DS).filter(f => /^parts-\d+.*\.json$/.test(f)).sort().forEach(f => {
++        let arr;
++        try { arr = JSON.parse(fs.readFileSync(path.join(DS, f), 'utf8')); } catch (e) { return; }
++        (Array.isArray(arr) ? arr : []).forEach(r => {
++            (Array.isArray(r.engines) ? r.engines : []).forEach(c => { cardRefs[c] = (cardRefs[c] || 0) + 1; });
++        });
++    });
++} else {
++    console.error('check-engines: нет data-src — блок O (сироты) будет пропущен');
++}
++
++/* ---------- 5. Сверка ---------- */
++const ourV = e => parseFloat(String(e.v).replace(',', '.'));
++const kwToPs = kw => Math.round(kw * 1.3596);
++const F = { S: [], R: [], A: [], O: [], N: [], X: [] };
++const refCodes = new Set(REF.map(r => r.code));
++
++REF.forEach(r => {
++    const e = ENGINES[r.code];
++    const verdict = VERDICTS[r.code];
++    /* --- блоки S/R: характеристики (только для кодов, которые у нас есть) --- */
++    if (e) {
++        const refPs = r.ps != null ? r.ps : (r.kw != null ? kwToPs(r.kw) : null);
++        const ours = { v: e.v, hp: e.hp, f: e.f, inj: e.inj || '—' };
++        const site = {
++            v: r.ccm != null ? (r.ccm / 1000).toFixed(1) : '—',
++            hp: refPs != null ? refPs + (r.ps == null ? ' (из кВт)' : '') : '—', f: r.fuel
++        };
++        const problems = [];
++        if (r.fuel && e.f !== r.fuel) problems.push('топливо: у нас ' + e.f + ', сайт ' + r.fuel);
++        if (r.ccm != null && Math.abs(ourV(e) - r.ccm / 1000) > 0.06)
++            problems.push('объём: у нас ' + e.v + ' (' + Math.round(ourV(e) * 1000) + ' см³), сайт ' + r.ccm + ' см³');
++        const hpDiff = refPs != null ? Math.abs(e.hp - refPs) : null;
++        const kwDiff = r.kw != null ? Math.abs(e.hp - kwToPs(r.kw)) : null;
++        if (hpDiff != null && hpDiff > 1)
++            problems.push('мощность: у нас ' + e.hp + ' л.с., сайт ' + refPs + ' л.с.' + (r.kw != null ? ' (' + r.kw + ' кВт)' : ''));
++        let cls = 'OK';
++        if (problems.length) cls = 'MISMATCH';
++        else if (hpDiff === 1 || kwDiff === 1) cls = 'ROUND';
++        const ourLbl = String(e.v) + (e.inj && String(e.v).indexOf(String(e.inj).split(' ')[0]) < 0 ? ' ' + e.inj : '');
++        const labelNote = r.siteLabel && ourLbl.replace(/\s/g, '').toUpperCase() !== r.siteLabel.replace(/\s/g, '').toUpperCase()
++            ? 'у нас «' + ourLbl + '», сайт маркирует «' + r.siteLabel + '»' : null;
++        const item = { code: r.code, id: r.id, cls, ours, site, kw: r.kw, nm: r.nm, comp: r.comp, bs: r.bs, problems, labelNote, src: r.src };
++        if (cls === 'MISMATCH') {
++            item.status = verdict ? verdict.status : 'НОВОЕ РАСХОЖДЕНИЕ — адьюдикации нет';
++            item.verdict = verdict ? verdict.text : '⚠ Инструмент обнаружил расхождение, для которого в VERDICTS нет записи. Добавьте адьюдикацию (СВЕРКА-ДВИГАТЕЛЕЙ.md).';
++            F.R.push(item);
++        } else {
++            if (verdict && !/закрыто|подтверждено/.test(verdict.status)) { item.status = verdict.status; item.verdict = verdict.text; }
++            else if (verdict) { item.status = verdict.status; }
++            F.S.push(item);
++        }
++    }
++    /* --- блок A: применяемость --- */
++    const ksIn = scopeIn(r.apps);
++    const etkaIn = scopeIn(r.etka);
++    let aCls, aWhy;
++    if (ksIn === null && etkaIn === null) { aCls = 'Н/Д'; aWhy = 'карточка не прочитана / нет строк ETKA'; }
++    else if (ksIn !== null && etkaIn !== null && ksIn !== etkaIn) { aCls = 'CONFLICT'; aWhy = 'KS-применяемость и ETKA-таблица противоречат друг другу'; }
++    else if (ksIn === true || etkaIn === true) { aCls = 'IN'; aWhy = 'ставился на 6N/6N2/6V/9K/9U в окне каталога'; }
++    else { aCls = 'OUT'; aWhy = 'по данным сайта к 6N/9K не относится (или закончился до 10.94)'; }
++    const inOurs = !!ENGINES[r.code];
++    let flag = '—';
++    if (aCls === 'OUT' && inOurs) flag = '⚠ ВНЕ ОХВАТА, НО ЕСТЬ В ENGINES';
++    else if ((aCls === 'IN' || aCls === 'CONFLICT') && !inOurs) flag = 'в охвате, но нет в ENGINES (кандидат)';
++    F.A.push({ code: r.code, id: r.id, cls: aCls, why: aWhy, inOurs, flag, apps: (r.apps || []).concat((r.etka || []).map(s => 'ETKA: ' + s)), verdict: verdict && (aCls === 'OUT' || aCls === 'CONFLICT' || flag !== '—') ? verdict.text : null, status: verdict ? verdict.status : null });
++    /* --- блок X: коды сайта, которых нет у нас --- */
++    if (!inOurs) F.X.push({ code: r.code, id: r.id, cls: aCls, site: r.ccm != null ? (r.ccm / 1000).toFixed(1) + ' / ' + (r.kw != null ? r.kw + ' кВт' : '—') : '—', status: verdict ? verdict.status : null, verdict: verdict ? verdict.text : null, why: aWhy });
++});
++
++/* --- блок O: сироты --- */
++if (fs.existsSync(DS)) {
++    Object.keys(ENGINES).forEach(c => {
++        if (!cardRefs[c]) F.O.push({ code: c, refs: 0, verdict: VERDICTS[c] ? VERDICTS[c].text : null, status: VERDICTS[c] ? VERDICTS[c].status : null });
++    });
++}
++/* --- блок N: наши коды без внешних данных --- */
++Object.keys(ENGINES).forEach(c => {
++    if (!refCodes.has(c)) F.N.push({ code: c, v: ENGINES[c].v, hp: ENGINES[c].hp, f: ENGINES[c].f });
++});
++
++/* ---------- 6. Отчёт ---------- */
++const L = [];
++L.push('# ENGINES-CHECK — сверка справочника двигателей');
++L.push('');
++L.push('Сгенерировано: ' + new Date().toISOString() + ' · `node tools/check-engines.js`');
++L.push('');
++L.push('Источники эталонов: карточки `engine_detail.php` volkswagenclub.net (чтение 2026-10-30; цитируют '
++    + KS + ' постранично и TAS opendata.astra.admin.ch) и выдержка ETKA-таблицы «1950 2015 vw engine codes» '
++    + '(id=5557, стр.1). Адьюдикация спорных кодов — «СВЕРКА-ДВИГАТЕЛЕЙ.md» (корень проекта).');
++L.push('');
++L.push('| Блок | Что проверяет | Найдено |');
++L.push('|---|---|---|');
++L.push('| S | характеристики совпали (OK / ROUND-округление / LABEL-маркировка) | ' + F.S.length + ' |');
++L.push('| R | содержательные расхождения с сайтом | ' + F.R.length + ' |');
++L.push('| A | применяемость к 6N/6N2/6V/6K/9K/9U | ' + F.A.length + ' |');
++L.push('| O | «сироты» ENGINES (0 карточек в data-src) | ' + F.O.length + ' |');
++L.push('| N | наши коды без внешних данных (карточка не прочитана) | ' + F.N.length + ' |');
++L.push('| X | коды сайта, которых нет у нас | ' + F.X.length + ' |');
++L.push('');
++L.push('ENGINES в js/app.js: **' + Object.keys(ENGINES).length + '** кодов. В поле `engines` карточек data-src упомянуто **'
++    + Object.keys(cardRefs).length + '** кодов.');
++L.push('');
++
++function sect(title, arr, fmt) {
++    L.push('## ' + title + ' (' + arr.length + ')');
++    L.push('');
++    if (!arr.length) { L.push('_Нет._'); L.push(''); return; }
++    arr.forEach(x => L.push(fmt(x)));
++    L.push('');
++}
++sect('S. Сверка совпала', F.S, x => '- `' + x.code + '` **' + x.cls + '** — у нас ' + x.ours.v + ' / ' + x.ours.hp
++    + ' л.с. / ' + x.ours.f + '; сайт ' + x.site.v + ' / ' + x.site.hp + ' л.с.' + (x.kw != null ? ' (' + x.kw + ' кВт)' : '')
++    + (x.nm ? ', ' + x.nm + ' Нм' : '') + (x.labelNote ? '; LABEL: ' + x.labelNote : '')
++    + (x.status ? ' — **' + x.status + '**' : ''));
++sect('R. Содержательные расхождения', F.R, x => '- `' + x.code + '` **MISMATCH** — ' + x.problems.join('; ')
++    + '. Статус: **' + x.status + '**.\n  ' + (x.verdict || '').split('\n').join('\n  '));
++sect('A. Применяемость (по данным сайта)', F.A, x => '- `' + x.code + '` [' + x.cls + '] ' + x.why
++    + (x.inOurs ? ' · есть в ENGINES' : ' · НЕТ в ENGINES') + (x.flag !== '—' ? ' — **' + x.flag + '**' : '')
++    + (x.apps.length ? '\n  - ' + x.apps.join('\n  - ') : '')
++    + (x.verdict ? '\n  - Вердикт (**' + x.status + '**): ' + x.verdict : ''));
++sect('O. «Сироты»: коды ENGINES без упоминаний в data-src', F.O, x => '- `' + x.code + '` — 0 карточек'
++    + (x.status ? ' — **' + x.status + '**' : '') + (x.verdict ? '\n  ' + x.verdict : ''));
++sect('X. Коды сайта, которых нет у нас', F.X, x => '- `' + x.code + '` [' + x.cls + '] ' + x.site
++    + (x.status ? ' — **' + x.status + '**' : ' — ' + x.why) + (x.verdict ? '\n  ' + x.verdict : ''));
++sect('N. Наши коды без внешних данных (план добора — ОТЧЁТ.md §9.1)', F.N, x => '- `' + x.code + '` ' + x.v + ' / ' + x.hp + ' л.с. / ' + x.f);
++
++const OUT = path.join(ROOT, 'restore');
++if (!fs.existsSync(OUT)) fs.mkdirSync(OUT, { recursive: true });
++fs.writeFileSync(path.join(OUT, 'ENGINES-CHECK.md'), L.join('\n'), 'utf8');
++const json = {
++    generated: new Date().toISOString(),
++    enginesTotal: Object.keys(ENGINES).length,
++    counts: Object.fromEntries(Object.entries(F).map(([k, v]) => [k, v.length])),
++    findings: F
++};
++fs.writeFileSync(path.join(OUT, 'engines-check.json'), JSON.stringify(json, null, 1), 'utf8');
++
++/* ---------- 7. Консоль / коды возврата ---------- */
++if (ARGS.includes('--json')) console.log(JSON.stringify({ counts: json.counts, enginesTotal: json.enginesTotal }));
++else {
++    console.log('ENGINES: ' + Object.keys(ENGINES).length + ' кодов, эталонов REF: ' + REF.length);
++    Object.entries(F).forEach(([k, v]) => console.log('  ' + k + ': ' + String(v.length).padStart(4)));
++    const unresolved = F.R.filter(x => !/закрыто|подтверждено|отклонён/.test(x.status || ''));
++    unresolved.forEach(x => console.log('  ⚠ ' + x.code + ': ' + x.status));
++    console.log('отчёт: restore/ENGINES-CHECK.md');
++}
++if (ARGS.includes('--strict')) {
++    const bad = F.R.filter(x => !/^закрыто/.test(x.status || ''))
++        .concat(F.A.filter(x => x.flag.startsWith('⚠') && !/^закрыто/.test(x.status || '')));
++    if (bad.length) { console.error('strict: ' + bad.length + ' незакрытых расхождений: ' + bad.map(x => x.code).join(', ')); process.exit(1); }
++}

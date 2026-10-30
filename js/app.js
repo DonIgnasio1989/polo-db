@@ -49,25 +49,45 @@ let CATS = BASE_CATS.slice();
    euro — экокласс (цифра; пусто = нет достоверных данных).
    ⚠ Исправлено в 1.8.0: ASV — это 1.9 TDI 110 л.с. (был ошибочно SDI). */
 const ENGINES = {
-    'AER': { v: '1.0', hp: 50, f: 'P', inj: 'MPI' }, 'ALL': { v: '1.0', hp: 50, f: 'P', inj: 'MPI' }, 'AEV': { v: '1.0', hp: 50, f: 'P', inj: 'MPI' },
+    'AER': { v: '1.0', hp: 50, f: 'P', inj: 'MPI' }, 'ALL': { v: '1.0', hp: 50, f: 'P', inj: 'MPI' },
+    /* 1.13.2: AEV 50→45 — ETKA-таблица 03.08.2015 «AEV 33 45 1,05 POLO 10/94-06/96»,
+       Elsa «AEV 1043 33(44) Monomotron», KS 50003929 стр.2406/2443; 50 л.с. — это
+       поздние 1.0 (999 см³/37 кВт): AER/ALD/ALL/ANV/AUC. СВЕРКА-ДВИГАТЕЛЕЙ.md §11.3. */
+    'AEV': { v: '1.0', hp: 45, f: 'P', inj: 'MPI' },
     'ALD': { v: '1.0', hp: 50, f: 'P', inj: 'MPI' }, 'ANV': { v: '1.0', hp: 50, f: 'P', inj: 'MPI' }, 'AUC': { v: '1.0', hp: 50, f: 'P', inj: 'MPI' },
     'AEX': { v: '1.4', hp: 60, f: 'P', inj: 'MPI', ecu: 'Siemens Simos 2P', euro: '2' },
     'APQ': { v: '1.4', hp: 60, f: 'P', inj: 'MPI', ecu: 'Siemens Simos 2P', euro: '2' },
     'AKV': { v: '1.4', hp: 60, f: 'P', inj: 'MPI', ecu: 'Siemens Simos 2P', euro: '2' },
-    'ANX': { v: '1.4', hp: 60, f: 'P', inj: 'MPI', ecu: 'Siemens Simos 2P', euro: '2' },
+    /* 1.13.2: ANX 60→54 — ETKA «ANX 40 54 1,40 POLO 07/95-12/99» (+ «POLO \"A.\"» —
+       Австрия), Elsa «ANX 1389 40(54) MPI», Wikipedia «ANX; Austrian market only»,
+       KS стр.2401/2408; в сводную карточку «1.4 44 кВт» код попал у составителя
+       каталога ошибочно. §10.4 (пересмотрено), §11.3. */
+    'ANX': { v: '1.4', hp: 54, f: 'P', inj: 'MPI', ecu: 'Siemens Simos 2P', euro: '2' },
     'AKK': { v: '1.4', hp: 60, f: 'P', inj: 'MPI', ecu: 'Siemens Simos 2P', euro: '2' },
     'ANW': { v: '1.4', hp: 60, f: 'P', inj: 'MPI', ecu: 'Siemens Simos 2P', euro: '2' },
     'AUD': { v: '1.4', hp: 60, f: 'P', inj: 'MPI', ecu: 'Siemens Simos 2P', euro: '2' },
     'APE': { v: '1.4 16V', hp: 75, f: 'P', inj: 'MPI' }, 'AUA': { v: '1.4 16V', hp: 75, f: 'P', inj: 'MPI' },
     'AEE': { v: '1.6', hp: 75, f: 'P', inj: 'MPI', euro: '2' }, 'ALM': { v: '1.6', hp: 75, f: 'P', inj: 'MPI', euro: '2' },
-    'AUR': { v: '1.6', hp: 75, f: 'P', inj: 'MPI', euro: '2' },
+    /* 1.13.2: AUR 75→100 — ETKA «AUR 74 100 1,60 POLO 03/00-09/01», Wikipedia EA827
+       (1.6 74 кВт/101 PS, 145 Нм — AEH; AKL; APF; AUR), clubvw (74 кВт); поздний 1.6
+       для Polo Classic/Variant, родственный AEH/AKL. §11.3. */
+    'AUR': { v: '1.6', hp: 100, f: 'P', inj: 'MPI', euro: '2' },
     'AFT': { v: '1.6', hp: 100, f: 'P', inj: 'MPI', euro: '2' },
     '1F': { v: '1.6', hp: 75, f: 'P', inj: 'MPI', ecu: 'Bosch Digifant' },
+    /* 1.13.2: ADZ оставлен как донорский код Golf III/Vento 1.8 (ETKA-таблица
+       03.08.2015 — только GOLF/VENTO/DERBY(+SEAT), строк POLO/CADDY нет) — в data-src
+       10 общих карточек включают ADZ в списки engines (термостат 030 121 113 и др.):
+       удаление кода ломало бы совместимость при загрузке (nP() отбрасывает неизвестные
+       коды) — прецедент AEH, комментарий 1.10.6. §11.4. */
     'ADZ': { v: '1.8', hp: 90, f: 'P', inj: 'MPI', ecu: 'Bosch Digifant' },
     'AKW': { v: '1.7 SDI', hp: 60, f: 'D', inj: 'SDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
-    'AHB': { v: '1.7 SDI', hp: 60, f: 'D', inj: 'SDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
+    /* 1.13.2: AHB 60→57 — ETKA «AHB 42 57 1,70 CADDY 07/96-09/00», Elsa «AHB 1715
+       42(57) VEP», KS стр.2350/2428; 60 л.с. (44 кВт) — это AKU/AKW. §11.3. */
+    'AHB': { v: '1.7 SDI', hp: 57, f: 'D', inj: 'SDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
     'AEY': { v: '1.9 SDI', hp: 64, f: 'D', inj: 'SDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
-    'AGP': { v: '1.9 D', hp: 68, f: 'D', inj: 'D (мех. ТНВД)' },
+    /* 1.13.2: AGP — заводская маркировка «1.9 SDI» (KS 50003929 стр.2347/2362-2363/
+       2408/2413/2443 «AGP 1.9 SDI 50 kW»; 68 л.с. без изменений). §11.3. */
+    'AGP': { v: '1.9 SDI', hp: 68, f: 'D', inj: 'SDI' },
     'AQM': { v: '1.9 SDI', hp: 68, f: 'D', inj: 'SDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
     'AYQ': { v: '1.9 SDI', hp: 64, f: 'D', inj: 'SDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
     'ASV': { v: '1.9 TDI', hp: 110, f: 'D', inj: 'TDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
@@ -75,23 +95,55 @@ const ENGINES = {
     'AFN': { v: '1.9 TDI', hp: 110, f: 'D', inj: 'TDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
     'AHU': { v: '1.9 TDI', hp: 90, f: 'D', inj: 'TDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
     'ALE': { v: '1.9 TDI', hp: 90, f: 'D', inj: 'TDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
+    /* 1.13.3: AGR/ALH — 1.9 TDI 90, и они В ОХВАТЕ каталога, а не только донорские.
+       ETKA-таблица 03.08.2015 (зеркала slideshare 201329802, fr.scribd 849891594,
+       es.scribd 714578221): «AGR 66 90 1,90 4 10/99-09/01 POLO TDI» и «ALH 66 90 1,90 4
+       10/99-09/01 POLO TDI» — это Polo 6N2 1.9 TDI 90; плюс «ALH 66 90 1,90 4
+       09/00-06/03 CADDY TDI» — Caddy 9K. Вне охвата у них только Golf IV/Bora/Jetta
+       (ETKA «BORA 09/98-05/05», «GOLF 10/97-…»; Wikipedia «Golf (1J): AGR/ALH
+       10/97-05/06»; KS id=90/id=120 — лишь Golf IV/Bora). Формулировка 1.13.2
+       «строк POLO/CADDY нет» была верна только для карточек KS — исправлено в 1.13.3
+       (§13.2, §13.4); значения 66 кВт/90 л.с./210 Нм не менялись. В data-src по 6
+       общих карточек (d: Golf IV, Bora, Passat B5) — коды оставлены и как донорские
+       (прецедент 1.10.6: nP() отбрасывает неизвестные коды). §11.4, §13. */
     'AGR': { v: '1.9 TDI', hp: 90, f: 'D', inj: 'TDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
     'ALH': { v: '1.9 TDI', hp: 90, f: 'D', inj: 'TDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
     'ADX': { v: '1.3', hp: 55, f: 'P', inj: 'MPI' }, 'AEA': { v: '1.6', hp: 75, f: 'P', inj: 'MPI', euro: '2' },
     'AHS': { v: '1.6', hp: 75, f: 'P', inj: 'MPI', euro: '2' },
     'AFH': { v: '1.4 16V', hp: 100, f: 'P', inj: 'MPI' }, 'AJV': { v: '1.6 16V', hp: 120, f: 'P', inj: 'MPI' },
     'AHW': { v: '1.4 16V', hp: 75, f: 'P', inj: 'MPI' },
-    'AKL': { v: '1.6', hp: 100, f: 'P', inj: 'MPI', euro: '2' }, 'AHT': { v: '1.4', hp: 75, f: 'P', inj: 'MPI', euro: '2' },
-    'ABU': { v: '1.4', hp: 60, f: 'P', inj: 'MPI' },
-    'AKQ': { v: '1.4 16V', hp: 75, f: 'P', inj: 'MPI' }, 'AFK': { v: '1.4 16V', hp: 75, f: 'P', inj: 'MPI' },
-    'ANM': { v: '1.4 16V', hp: 75, f: 'P', inj: 'MPI' },
-    'AKU': { v: '1.7 SDI', hp: 57, f: 'D', inj: 'SDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
+    'AKL': { v: '1.6', hp: 100, f: 'P', inj: 'MPI', euro: '2' },
+    /* 1.13.2: AHT исправлен — это Lupo 1.0/50 (ETKA «AHT 37 50 1,00 LUPO 10/98-05/00»,
+       Elsa «AHT 996 37(50) MPI», KS стр.2381 — 997 см³, 72×61.2), а не поло́вский 1.4/75;
+       оставлен как донорский код (в data-src 4 общие карточки). ABU УДАЛЁН: «сирота»
+       (0 карточек data-src), наше «1.4/60» не подтверждал ни один источник, а внешние
+       (KS стр.2359/2426, clubvw) дают ABU = Golf III/Vento 1.6/75 — вне охвата и без
+       опоры в каталоге. §11.4, §11.5. */
+    'AHT': { v: '1.0', hp: 50, f: 'P', inj: 'MPI', ecu: 'Siemens Simos 2P', euro: '2' },
+    /* 1.13.2: AKQ — донорский код Bora/Golf IV/Lupo 1.4 16V (ETKA «AKQ 55 75 1,40 BORA
+       16V 10/98-04/01»; строк POLO/CADDY нет; в data-src 39 общих карточек) — оставлен,
+       характеристики верны. AFK исправлен 75→100: ETKA «AFK 74 100 1,40 LUPO 05/99-05/03 /
+       POLO 07/99-09/01 16V», Elsa «AFK 1390 74(100) MPI», KS стр.2382/2401 + TAS; 75 л.с.
+       (55 кВт) — это APE/AUA/AHW/AKQ. ANM — донорский код Lupo 1.4 16V 101 л.с. (KS
+       стр.2382, 74 кВт/101 л.с.; значение 1.13.2 исправлено 75→100 — тот же мотор Lupo,
+       что AFK, округление как у AFK/AFH). §11.3, §11.4. */
+    'AKQ': { v: '1.4 16V', hp: 75, f: 'P', inj: 'MPI' },
+    'AFK': { v: '1.4 16V', hp: 100, f: 'P', inj: 'MPI' },
+    'ANM': { v: '1.4 16V', hp: 100, f: 'P', inj: 'MPI' },
+    /* 1.13.2: AKU 57→60 — ETKA «AKU 44 60 1,70 POLO/LUPO SDI», Elsa «AKU 1716 44(59)
+       VEP», KS стр.2382/2402/2407 (Polo 6N1 08.97→10.99, 6N2 10.99→09.01, Lupo); наш
+       К `028 100 034 J` «(1.7 SDI, 44 кВт)» согласен. 57 л.с. (42 кВт) — это AHG/AHB.
+       §11.3. */
+    'AKU': { v: '1.7 SDI', hp: 60, f: 'D', inj: 'SDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
     'AHG': { v: '1.7 SDI', hp: 57, f: 'D', inj: 'SDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
     'AGD': { v: '1.9 SDI', hp: 64, f: 'D', inj: 'SDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
     'AEF': { v: '1.9 SDI', hp: 64, f: 'D', inj: 'SDI', ecu: 'Bosch EDC (ТНВД VE)', euro: '2' },
     /* Коды семейства SEAT/R3, встречаются в каталоге доноров и 6N2:
-       AKP 1.4 8V 60, AHV 1.6 8V 75, AMF 1.4 TDI R3 75 — сверены по кросс-справочникам */
-    'AKP': { v: '1.4', hp: 60, f: 'P', inj: 'MPI', ecu: 'Siemens Simos 2P', euro: '2' },
+       AKP 1.4 8V 54, AHV 1.6 8V 75, AMF 1.4 TDI R3 75.
+       1.13.2: AKP 60→54 — ETKA «AKP 40 54 1,40 POLO 10/99-09/01», Elsa «AKP 1389
+       40(54) MPI», KS стр.2401/2412 (Polo 6N2, Variant 6V5); прежняя пометка «сверено
+       по кросс-справочникам» не подтвердилась. §10.4 (пересмотрено), §11.3. */
+    'AKP': { v: '1.4', hp: 54, f: 'P', inj: 'MPI', ecu: 'Siemens Simos 2P', euro: '2' },
     'AHV': { v: '1.6', hp: 75, f: 'P', inj: 'MPI', euro: '2' },
     'AMF': { v: '1.4 TDI', hp: 75, f: 'D', inj: 'TDI (насос-форсунки)', ecu: 'Bosch EDC15', euro: '3' },
     /* 1.10.6: донорский код Golf IV/Bora. Встречается в применимости пружин
@@ -114,8 +166,8 @@ const ENGINE_FAMILIES = {
     'EA111': {
         label: 'EA111 — бензин R4 1.0–1.6 (8V/16V)',
         fuel: 'P',
-        note: 'Малолитражная бензиновая серия для платформы A0: Polo 6N/6N2, Lupo, Seat Arosa/Ibiza, Caddy, Golf. Сюда входят 1.0 50 (AER/ALL/AEV/ALD/ANV/AUC), 1.3 55 (ADX), 1.4 8V 60–75 (ABU/AEX/APQ/AKV/ANX/AKK/ANW/AUD/AHT), 1.4 16V 75–100 (AHW/AKQ/AFK/ANM/APE/AUA/AFH), 1.6 75–100 (AEA/AHS/AEE/ALM/AUR/AFT/AKL, плюс донорский AEH от Golf IV/Bora) и GTI 1.6 16V 120 (AJV). Основа бензиновой линейки Polo III.',
-        codes: ['AER', 'ALL', 'AEV', 'ALD', 'ANV', 'AUC', 'ADX', 'ABU', 'AEX', 'APQ', 'AKV', 'ANX', 'AKK', 'ANW', 'AUD', 'AHT', 'AHW', 'AKQ', 'AFK', 'ANM', 'APE', 'AUA', 'AFH', 'AEA', 'AHS', 'AEE', 'ALM', 'AUR', 'AFT', 'AKL', 'AEH', 'AJV', 'AKP', 'AHV']
+        note: 'Малолитражная бензиновая серия для платформы A0: Polo 6N/6N2, Lupo, Seat Arosa/Ibiza, Caddy, Golf. Сюда входят 1.0 50 (AER/ALL/ALD/ANV/AUC), 1.05 45 (AEV), 1.3 55 (ADX), 1.4 8V 54–60 (ANX/AKP — 54, AEX/APQ/AKV/AKK/ANW/AUD — 60; плюс донорский код Lupo AHT 1.0/50), 1.4 16V 75–100 (AHW/AKQ/APE/AUA — 75, AFK/AFH/ANM — 100; AKQ/ANM — донорские коды Bora/Golf IV и Lupo), 1.6 75–100 (AEA/AHS/AEE/ALM — 75, AUR/AFT/AKL — 100, плюс донорский AEH от Golf IV/Bora) и GTI 1.6 16V 120 (AJV). Основа бензиновой линейки Polo III. (1.13.2: мощности AEV/ANX/AKP/AFK/AUR исправлены по ETKA/Elsa/KS; «сирота» ABU удалён — СВЕРКА-ДВИГАТЕЛЕЙ.md §11.3–§11.5. 1.13.3: уточнена применяемость дизельных AGR/ALH — см. ноту EA827-D и §13.)',
+        codes: ['AER', 'ALL', 'AEV', 'ALD', 'ANV', 'AUC', 'ADX', 'AEX', 'APQ', 'AKV', 'ANX', 'AKK', 'ANW', 'AUD', 'AHT', 'AHW', 'AKQ', 'AFK', 'ANM', 'APE', 'AUA', 'AFH', 'AEA', 'AHS', 'AEE', 'ALM', 'AUR', 'AFT', 'AKL', 'AEH', 'AJV', 'AKP', 'AHV']
     },
     'EA827': {
         label: 'EA827 — бензин R4 1.6/1.8',
@@ -126,7 +178,7 @@ const ENGINE_FAMILIES = {
     'EA827-D': {
         label: 'EA827-D — дизель R4 1.7–1.9 (D/SDI/TDI)',
         fuel: 'D',
-        note: 'Дизельные R4 на архитектуре EA827 («1.9 R4»): 1.7 SDI 57–60 (AKU/AHG/AKW/AHB), 1.9 D/SDI 64–68 (1Y, AEY/AYQ/AGD/AEF, AGP/AQM), 1.9 TDI 90–110 (AHU/ALE/AGR/ALH, AFN/ASV). Ставились на Polo 6N, Classic, Variant и Caddy; славятся огромным ресурсом.',
+        note: 'Дизельные R4 на архитектуре EA827 («1.9 R4»): 1.7 SDI 57–60 (AHG/AHB — 57, AKU/AKW — 60; 1.13.2: AKU/AHB исправлены по ETKA-таблице 03.08.2015 и Elsa), 1.9 D/SDI 64–68 (1Y — 1.9 D; AEY/AYQ/AGD/AEF/AGP — SDI 64–68; AQM — SDI 68), 1.9 TDI 90–110 (AHU/ALE — 90, AGR/ALH — 90: по ETKA-таблице 03.08.2015 ставились и на Polo 6N2 10/99-09/01, ALH также на Caddy 9K 09/00-06/03; в data-src они пришли из общих карточек Golf IV/Bora — 1.13.3, §13.2, AFN/ASV — 110). Ставились на Polo 6N, Classic, Variant и Caddy; славятся огромным ресурсом.',
         codes: ['AKU', 'AHG', 'AKW', 'AHB', '1Y', 'AEY', 'AYQ', 'AGD', 'AEF', 'AGP', 'AQM', 'ASV', 'AHU', 'ALE', 'AGR', 'ALH', 'AFN']
     },
     'R3-TDI': {
@@ -235,7 +287,6 @@ const ENGINE_GEARBOX = {
     'AUC': { fams: ['085'], codes: ['FDY', 'FFD'] },
     // ── Бензин 1.3 / 1.4 ──
     'ADX': { fams: ['084', '085'], codes: ['CJC', 'CWU', 'DCJ', 'DXK'] },
-    'ABU': { fams: ['084', '085'], codes: [] },
     'AEX': { fams: ['084', '085'], codes: ['DDH', 'DHB', 'DKF', 'DQW', 'DXP'] },
     'APQ': { fams: ['085'], codes: [] },
     'AKV': { fams: ['085'], codes: ['DXP'] },   // 1.10.6: DXP подтверждён записью WVWZZZ6NZXY406408 (vin-db.patch.json)
@@ -545,10 +596,10 @@ const _ISS_TDI90 = [
     { year: 'all', issue: 'Течь сальника распредвала', severity: 'low' }
 ];
 const KNOWN_ISSUES = {
-    /* бензин EA111 */
+    /* бензин EA111 (1.13.2: «сирота» ABU удалён из справочника — §11.5) */
     'AER': _ISS_10, 'ALL': _ISS_10, 'AEV': _ISS_10, 'ALD': _ISS_10, 'ANV': _ISS_10, 'AUC': _ISS_10,
     'AEX': _ISS_14_8V, 'APQ': _ISS_14_8V, 'AKV': _ISS_14_8V, 'ANX': _ISS_14_8V,
-    'AKK': _ISS_14_8V, 'ANW': _ISS_14_8V, 'AUD': _ISS_14_8V, 'AHT': _ISS_14_8V, 'ABU': _ISS_14_8V, 'AKP': _ISS_14_8V,
+    'AKK': _ISS_14_8V, 'ANW': _ISS_14_8V, 'AUD': _ISS_14_8V, 'AHT': _ISS_14_8V, 'AKP': _ISS_14_8V,
     'APE': _ISS_14_16V, 'AUA': _ISS_14_16V, 'AHW': _ISS_14_16V, 'AKQ': _ISS_14_16V,
     'AFK': _ISS_14_16V, 'ANM': _ISS_14_16V, 'AFH': _ISS_14_16V,
     'AEE': _ISS_16, 'ALM': _ISS_16, 'AUR': _ISS_16, 'AEA': _ISS_16, 'AHS': _ISS_16, 'AHV': _ISS_16,
@@ -2047,7 +2098,7 @@ let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastKm: null, lastDate: null, interval: 15000 };
 let TO_ALL = {};
 
-let APP_VERSION = '1.13.1'; // fallback, если update.json не загрузится
+let APP_VERSION = '1.13.3'; // fallback, если update.json не загрузится
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -6674,30 +6725,37 @@ function copyYm() {
 /* ============ PWA ============ */
 function iPWA() {
     try {
-        const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="96" fill="#001e50"/><text x="256" y="320" font-family="Arial" font-size="200" font-weight="bold" fill="#00b0f0" text-anchor="middle">VW</text></svg>';
-        const ic = 'data:image/svg+xml;base64,' + btoa(svg);
-        const mf = {
-            name: 'VW Polo/Caddy 6N — База Мастера', short_name: 'Polo 6N',
-            description: 'Каталог запчастей 1995-2003',
-            start_url: location.href.split('#')[0], scope: '.',
-            display: 'standalone', orientation: 'portrait-primary',
-            background_color: '#0a1830', theme_color: '#0a1830', lang: 'ru',
-            icons: [
-                { src: ic, sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
-                { src: ic, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
-            ]
-        };
-        const blob = new Blob([JSON.stringify(mf)], { type: 'application/manifest+json' });
-        const url = URL.createObjectURL(blob);
-        const l = document.createElement('link');
-        l.rel = 'manifest'; l.href = url;
-        document.head.appendChild(l);
-        const ai = document.createElement('link');
-        ai.rel = 'apple-touch-icon'; ai.href = ic;
-        document.head.appendChild(ai);
-        const fav = document.createElement('link');
-        fav.rel = 'icon'; fav.href = ic;
-        document.head.appendChild(fav);
+        /* С 1.13.1 манифест и иконки — статические файлы: manifest.webmanifest
+           и icons/* объявлены прямо в index.html (кэшируются SW как обычные
+           ресурсы, видны до загрузки app.js). Blob-вариант ниже оставляем
+           только как фолбэк: если разметка пришла без link[rel=manifest]
+           (например, старый index.html из кэша). */
+        if (!document.querySelector('link[rel="manifest"]')) {
+            const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="96" fill="#001e50"/><text x="256" y="320" font-family="Arial" font-size="200" font-weight="bold" fill="#00b0f0" text-anchor="middle">VW</text></svg>';
+            const ic = 'data:image/svg+xml;base64,' + btoa(svg);
+            const mf = {
+                name: 'VW Polo/Caddy 6N — База Мастера', short_name: 'Polo 6N',
+                description: 'Каталог запчастей 1995-2003',
+                start_url: location.href.split('#')[0], scope: '.',
+                display: 'standalone', orientation: 'portrait-primary',
+                background_color: '#0a1830', theme_color: '#0a1830', lang: 'ru',
+                icons: [
+                    { src: ic, sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
+                    { src: ic, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+                ]
+            };
+            const blob = new Blob([JSON.stringify(mf)], { type: 'application/manifest+json' });
+            const url = URL.createObjectURL(blob);
+            const l = document.createElement('link');
+            l.rel = 'manifest'; l.href = url;
+            document.head.appendChild(l);
+            const ai = document.createElement('link');
+            ai.rel = 'apple-touch-icon'; ai.href = ic;
+            document.head.appendChild(ai);
+            const fav = document.createElement('link');
+            fav.rel = 'icon'; fav.href = ic;
+            document.head.appendChild(fav);
+        }
     } catch (e) { }
     /* Оффлайн: Service Worker кэширует оболочку и данные (см. sw.js) */
     try {
