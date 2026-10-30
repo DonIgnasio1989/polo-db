@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
     <meta name="theme-color" content="#0a1830">
     <!-- Версия разметки: должна совпадать с APP_VERSION в js/app.js.
          Лоадер добавляет её в URL скрипта (&ui=…), чтобы новый index.html
@@ -25,6 +26,21 @@
        ═══════════════════════════════════════════════════════════════ -->
     <link rel="stylesheet" href="css/app.css?v=1.13.1">
 
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "База Мастера: Каталог запчастей VW Polo 6N и Caddy",
+  "url": "https://donignasio1989.github.io/polo-db/",
+  "description": "Офлайн каталог оригинальных запчастей, VIN-дешифратор и регламенты ТО для VW Polo 6N и Caddy 9K/9U.",
+  "applicationCategory": "AutoApplication",
+  "operatingSystem": "Any (Web, Android)",
+  "author": {
+    "@type": "Person",
+    "name": "Игнат Ткачев"
+  }
+}
+</script>
     <script>
         /* ────── АВТО-КЕШБАСТИНГ ТОЛЬКО ДЛЯ JS ─────────────────────
            app.css подключён синхронно через <link> выше — это
@@ -133,7 +149,8 @@
             </div>
             <div class="gate-foot">
                 <button class="bn dg-btn" onclick="licDecline()">✖ Отказаться</button>
-                <button class="bn" onclick="pubEnter()" title="Открыть каталог без гаража и правок">👁 Смотреть каталог (без регистрации)</button>
+                <button class="bn" onclick="pubEnter()" title="Открыть каталог без гаража и правок">👁 Смотреть каталог
+                    (без регистрации)</button>
                 <button class="bn ok-btn" onclick="licAccept()">✓ Принять и продолжить</button>
             </div>
         </div>
@@ -191,10 +208,12 @@
                             <button onclick="eCSV(true);cEM()">⭐ <span>CSV — избранное</span></button>
                             <button onclick="eET();cEM()">🗂 <span>CSV — ETKA</span></button>
                             <button onclick="eWCSV();cEM()">🔧 <span>CSV — мастерские</span></button>
-                        <button onclick="exportVotes();cEM()">🧑🤝‍ <span>Пак голосов за аналоги — экспорт</span></button>
-                        <button onclick="importVotes();cEM()">📥 <span>Пак голосов за аналоги — импорт</span></button>
-                        <button onclick="exportSchemes();cEM()">📐 <span>Схемы узлов — экспорт пака</span></button>
-                        <button onclick="importSchemes();cEM()">📐 <span>Схемы узлов — импорт пака</span></button>
+                            <button onclick="exportVotes();cEM()">🧑🤝‍ <span>Пак голосов за аналоги —
+                                    экспорт</span></button>
+                            <button onclick="importVotes();cEM()">📥 <span>Пак голосов за аналоги —
+                                    импорт</span></button>
+                            <button onclick="exportSchemes();cEM()">📐 <span>Схемы узлов — экспорт пака</span></button>
+                            <button onclick="importSchemes();cEM()">📐 <span>Схемы узлов — импорт пака</span></button>
                             <button onclick="rD();cEM()">♻️ <span>Пересобрать БД (сброс)</span></button>
                         </details>
 
@@ -365,8 +384,8 @@
                         placeholder="INA 530 0090 10, Gates KP235"></div>
                 <div class="fr">
                     <div class="fg"><label>PR-коды применимости</label><input type="text" id="f_prreq"
-                            placeholder="1AE, !1ZG — «!» = не ставится с этим кодом" autocomplete="off" spellcheck="false"
-                            style="text-transform:uppercase"></div>
+                            placeholder="1AE, !1ZG — «!» = не ставится с этим кодом" autocomplete="off"
+                            spellcheck="false" style="text-transform:uppercase"></div>
                     <div class="fg"><label>Заменён на (supersession)</label><input type="text" id="f_sup_oem"
                             placeholder="Новый артикул VAG, если старый отменён"></div>
                 </div>
@@ -489,7 +508,8 @@
                 <div class="fg"><label>VIN (17 символов)</label>
                     <div style="display:flex;gap:6px;align-items:stretch">
                         <input type="text" class="vi" id="g_vi" autocomplete="off" spellcheck="false">
-                        <button class="bn p" id="g_db" onclick="decG()" style="flex-shrink:0" aria-label="Декодировать VIN">🔍<span class="g-db-lbl">Декодировать</span></button>
+                        <button class="bn p" id="g_db" onclick="decG()" style="flex-shrink:0"
+                            aria-label="Декодировать VIN">🔍<span class="g-db-lbl">Декодировать</span></button>
                     </div>
                 </div>
                 <div class="gdr" id="g_re" style="display:none"></div>
@@ -772,12 +792,14 @@
     <div class="mo" id="tomo">
         <div class="mdl" onclick="event.stopPropagation()" style="max-width:520px">
             <div class="mh">
-                <h3>🛠 Настройки ТО <span id="tom_car" style="font-size:.72rem;color:var(--mu);font-weight:600"></span></h3><button class="mc" onclick="cTO()">✕</button>
+                <h3>🛠 Настройки ТО <span id="tom_car" style="font-size:.72rem;color:var(--mu);font-weight:600"></span>
+                </h3><button class="mc" onclick="cTO()">✕</button>
             </div>
             <div class="mb">
                 <p style="font-size:.82rem;color:var(--mu);margin-top:0">Пробег, дата и интервал ТО хранятся
                     <b>отдельно для каждой машины</b> гаража — заполните один раз, и виджет в шапке будет
-                    подсказывать, когда ехать на ТО именно этому автомобилю.</p>
+                    подсказывать, когда ехать на ТО именно этому автомобилю.
+                </p>
                 <div class="fr">
                     <div class="fg"><label>Текущий пробег, км</label><input type="number" id="t_km" min="0"
                             placeholder="189000">
@@ -817,7 +839,9 @@
             <div class="mb" id="shopBody"></div>
             <div class="mf">
                 <span id="shopCount" class="shop-count zero">🛒 Выбрано: <b>0</b> позиций</span>
-                <button class="bn" onclick="shopClearAll()" title="Снять все галочки в списке (отметки хранятся отдельно для каждой машины)">✖ Снять отметки</button>
+                <button class="bn" onclick="shopClearAll()"
+                    title="Снять все галочки в списке (отметки хранятся отдельно для каждой машины)">✖ Снять
+                    отметки</button>
                 <button class="bn" onclick="cShop()">Закрыть</button>
                 <button class="bn" onclick="eShopCSV()">📊 CSV</button>
                 <button class="bn p" onclick="pShop()">🖨 Печать</button>
@@ -891,7 +915,8 @@
                 </div>
                 <div class="fr">
                     <div class="fg"><label>Поколение машины</label><select id="v_gen"></select>
-                        <div class="fh laf-hint">Подставляется по VIN, если есть 6N1/6N2; уточните вручную для 6V/9K/9U</div>
+                        <div class="fh laf-hint">Подставляется по VIN, если есть 6N1/6N2; уточните вручную для 6V/9K/9U
+                        </div>
                     </div>
                     <div class="fg"><label>Комплектация машины</label><select id="v_trim"></select>
                         <div class="fh laf-hint">Влияет на проверку деталей с ограничением по комплектации</div>
@@ -1176,7 +1201,7 @@
                         <div class="faq-q"><span class="faq-ic">🛒</span> Расходники ТО</div>
                         <div class="faq-a">Готовый список покупок на ТО под конкретный VIN: каталог фильтруется по
                             мотору, семейству и буквенному коду КПП и кузову. В списке — <b>только настоящие
-                            расходники</b>: фильтры, жидкости и масла, ремни/ролики/ГРМ, колодки и диски, свечи,
+                                расходники</b>: фильтры, жидкости и масла, ремни/ролики/ГРМ, колодки и диски, свечи,
                             щётки — сгруппированные по разделам. Крепёж и ремонтные запчасти (суппорты,
                             цилиндры, радиаторы, сальники…) исключены. Если нужная позиция не попала в список —
                             переключатель <b>«🗂 Вся база под VIN»</b> покажет всё подряд. У каждой позиции —
@@ -1213,7 +1238,7 @@
                         </div>
                     </div>
 
-                                      <div class="faq-item">
+                    <div class="faq-item">
                         <div class="faq-q"><span class="faq-ic">⚠️</span> Болячки (типичные проблемы)</div>
                         <div class="faq-a">Компактная кнопка «⚠️ Болячки» в активной карточке VIN: на ней —
                             счётчик и раскладка по серьёзности (🔴 важно / 🟡 типично / 🟢 мелочи). Клик открывает
@@ -1373,13 +1398,14 @@
                 <div class="scan-status" id="scanStatus">Запускаю камеру…</div>
                 <div class="fg"><label>Или вставьте код вручную</label>
                     <div style="display:flex;gap:6px">
-                        <input type="text" id="scanManual" placeholder="VIN 17 знаков или артикул / EAN" autocomplete="off"
-                            spellcheck="false">
+                        <input type="text" id="scanManual" placeholder="VIN 17 знаков или артикул / EAN"
+                            autocomplete="off" spellcheck="false">
                         <button class="bn p" type="button"
                             onclick="applyScan(classifyScan($('scanManual').value))">Найти</button>
                     </div>
                 </div>
-                <div class="fh" style="padding:8px 10px;background:var(--hv);border-radius:4px;font-size:.75rem;line-height:1.5">
+                <div class="fh"
+                    style="padding:8px 10px;background:var(--hv);border-radius:4px;font-size:.75rem;line-height:1.5">
                     ℹ️ Поддерживаются QR, EAN-13/8, Code-128/39 (BarcodeDetector, Chrome/Android и APK WebView).
                     VIN со стикера считывается как текст только в ручном режиме — камерой берём QR/штрих-код.
                 </div>
