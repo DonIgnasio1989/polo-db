@@ -2,12 +2,14 @@
 
 Дата: 2026-10-27 · версия приложения: **1.13.1**
 
-Результат — `project/dist/`: **13 файлов, 3.80 МБ**, готово к выкладке на сервер.
+Результат — `project/dist/`: **21 файл, 4.0 МБ**, готово к выкладке на сервер.
+(13 файлов приложения + `manifest.webmanifest` + 7 файлов в `icons/` — статика PWA и OG-превью.)
 (Объём вырос с промежуточных 3.37 МБ после дозагрузки библиотеки: `parts.json` теперь
 несёт 11 564 строки инструкций вместо 9 029 — см. раздел 6.)
-Смоук-тест пройден: локальный HTTP-сервер на `dist/`, все 14 URL, которые запрашивает
-приложение, отдают `200`; 4 отсутствующих отдают `404`, и код их обрабатывает штатно
-(`vinDbLoad()` и фолбэк каталога обёрнуты в try/catch с проверкой `r.ok`).
+Смоук-тест пройден: локальный HTTP-сервер на `dist/`, все **22 URL**, которые запрашивает
+приложение (включая манифест и иконки), отдают `200`; 6 отсутствующих отдают `404`, и код их
+обрабатывает штатно (`vinDbLoad()` и фолбэк каталога обёрнуты в try/catch с проверкой `r.ok`).
+`robots.txt` и `sitemap.xml` в dist не входят намеренно — они лежат на вашем сервере.
 
 **Ничего из вашего не удалено**: `uploads/` (87 файлов) не изменён, полное дерево лежит
 в `project/`, `dist/` — отдельная папка.
@@ -29,14 +31,14 @@
 | `vin-dump/` | 4 | 0.54 МБ | ❌ нет |
 | Документы в корне | 4 | 0.05 МБ | ❌ нет |
 | **Вся загрузка** | **87** | **8.49 МБ** | |
-| **`dist/` фактически** | **13** | **3.80 МБ** | |
+| **`dist/` фактически** | **21** | **4.0 МБ** | |
 
 ⚠ Важно не перепутать две вещи:
 
 - **8.49 → 3.37 МБ** — это «вся загрузка против поставки». Но значительная часть загрузки
   (`restore/` 2.94 МБ, `data-src/` 1.33 МБ, `vin-dump/` 0.54 МБ) и так никогда не выкладывалась
   на сервер — это материалы разработки.
-- **Честная цифра облегчения деплоя: ~6.4 → 3.80 МБ**. Из рантайм-набора загрузки убраны
+- **Честная цифра облегчения деплоя: ~6.4 → 4.0 МБ**. Из рантайм-набора загрузки убраны
   3 файла (`parts.full.json` 2.40 МБ, `vin-db.filtered-only.json` 0.23 МБ, `vin-db.example.json` 1 КБ).
 - При этом сам `data/parts.json` **вырос** с 0.89 до 2.83 МБ — но это не раздувание,
   а результат слияния полной библиотеки инструкций (2 285 → 11 564 строки). Без слияния
@@ -105,9 +107,11 @@ cp project/data/vin-db.example.json dist/data/      # демо оснащени�
 ## 5. Состав `dist/`
 
 ```
-dist/                                  3.80 МБ
-├── index.html                        92.2 КБ   meta[app-ui-ver]=1.13.1, app.css?v=1.13.1
-├── sw.js                              2.6 КБ   CACHE='bm-cache-v2', SHELL=[./, index.html, css/app.css, data/update.json]
+dist/                                  4.0 МБ
+├── index.html                        98.3 КБ   SEO: JSON-LD WebApplication, google/yandex verification, title/description/keywords, canonical + OG + Twitter Card, ссылки на манифест и иконки; meta[app-ui-ver]=1.13.1, app.css?v=1.13.1
+├── manifest.webmanifest               0.9 КБ   статический манифест PWA (те же поля, что собирал blob в js/app.js)
+├── sw.js                              2.7 КБ   CACHE='bm-cache-v2', SHELL=[./, index.html, css/app.css, data/update.json, manifest.webmanifest]
+├── icons/                            78.5 КБ   icon.svg · favicon.ico (16/32/48) · apple-touch-icon.png (180) · icon-192.png · icon-512.png · maskable-512.png · og-image.png (1200×630)
 ├── js/app.js                        499.8 КБ   APP_VERSION='1.13.1', parseInst() объединяет i и inst
 ├── css/app.css                      181.8 КБ
 └── data/
@@ -128,6 +132,7 @@ dist/                                  3.80 МБ
 |---|---|
 | `data/vin-db.json` | `vinDbLoad()` получает не-`ok` → пробует `vin-db.example.json` → тоже не-`ok` → `VINDB.map` остаётся пустым. Модалка «📋 Оснащение» показывает «Данных об оснащении нет». **Так и задумано**: боевая база живёт на вашем сервере, архив не должен её затирать |
 | `data/vin-db.patch.json` | Есть в dist. Грузится **всегда** и имеет приоритет над основной базой |
+| `robots.txt`, `sitemap.xml` | В dist **не входят** по решению владельца (файлы уже на сервере). `index.html` на них не ссылается — отсутствие в dist ничего не ломает |
 | `data/parts.demo.json` | Не запрашивается, пока есть `parts.json` |
 | `data/parts-01…05-*.json` | Запрашиваются только модалкой «Обновление базы» (`checkUpdate()`) для сравнения «что изменилось». Отдадут 404 — модалка покажет пустое сравнение, каталог при этом работает |
 
@@ -177,12 +182,13 @@ node tools/dedup.js --src data-src --out restore --apply
 node tools/audit-parts.js
 node tools/validate-data.js                          # 0 ошибок
 
-rm -rf dist && mkdir -p dist/js dist/css dist/data
-cp index.html sw.js dist/
+rm -rf dist && mkdir -p dist/js dist/css dist/data dist/icons
+cp index.html sw.js manifest.webmanifest dist/
 cp js/app.js dist/js/ && cp css/app.css dist/css/
+cp icons/* dist/icons/                          # статика PWA и OG-превью
 for f in update.json parts.json categories.json sections.json analogs.json \
          workshops.json pr-codes.json pr-codes-ru.json vin-db.patch.json; do
     cp data/$f dist/data/
 done
-du -sh dist && find dist -type f | wc -l             # ~3.8M, 13 файлов
+du -sh dist && find dist -type f | wc -l             # ~4.0M, 21 файл
 ```

@@ -1,6 +1,8 @@
+diff --git a/js/app.js b/js/app.js
+index afdea5c..9048067 100644
 --- a/js/app.js
 +++ b/js/app.js
-@@ -2047,7 +2047,7 @@
+@@ -2047,7 +2047,7 @@ let CUSTOM = { categories: [], sections: {} };
  let TO = { km: null, lastKm: null, lastDate: null, interval: 15000 };
  let TO_ALL = {};
  
@@ -9,7 +11,7 @@
  let licAppReady = false;
  let edId = null, ewId = null, pPh = null, pPhCl = false;
  let useIDB = true, vk = '', pGV = null, dbr = null;
-@@ -2356,14 +2356,29 @@
+@@ -2356,14 +2356,29 @@ function instEntry(x) {
      return null;
  }
  function parseInst(p) {
@@ -46,3 +48,65 @@
  }
  
  function nP(p) {
+@@ -6659,30 +6674,37 @@ function copyYm() {
+ /* ============ PWA ============ */
+ function iPWA() {
+     try {
+-        const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="96" fill="#001e50"/><text x="256" y="320" font-family="Arial" font-size="200" font-weight="bold" fill="#00b0f0" text-anchor="middle">VW</text></svg>';
+-        const ic = 'data:image/svg+xml;base64,' + btoa(svg);
+-        const mf = {
+-            name: 'VW Polo/Caddy 6N — База Мастера', short_name: 'Polo 6N',
+-            description: 'Каталог запчастей 1995-2003',
+-            start_url: location.href.split('#')[0], scope: '.',
+-            display: 'standalone', orientation: 'portrait-primary',
+-            background_color: '#0a1830', theme_color: '#0a1830', lang: 'ru',
+-            icons: [
+-                { src: ic, sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
+-                { src: ic, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+-            ]
+-        };
+-        const blob = new Blob([JSON.stringify(mf)], { type: 'application/manifest+json' });
+-        const url = URL.createObjectURL(blob);
+-        const l = document.createElement('link');
+-        l.rel = 'manifest'; l.href = url;
+-        document.head.appendChild(l);
+-        const ai = document.createElement('link');
+-        ai.rel = 'apple-touch-icon'; ai.href = ic;
+-        document.head.appendChild(ai);
+-        const fav = document.createElement('link');
+-        fav.rel = 'icon'; fav.href = ic;
+-        document.head.appendChild(fav);
++        /* С 1.13.1 манифест и иконки — статические файлы: manifest.webmanifest
++           и icons/* объявлены прямо в index.html (кэшируются SW как обычные
++           ресурсы, видны до загрузки app.js). Blob-вариант ниже оставляем
++           только как фолбэк: если разметка пришла без link[rel=manifest]
++           (например, старый index.html из кэша). */
++        if (!document.querySelector('link[rel="manifest"]')) {
++            const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="96" fill="#001e50"/><text x="256" y="320" font-family="Arial" font-size="200" font-weight="bold" fill="#00b0f0" text-anchor="middle">VW</text></svg>';
++            const ic = 'data:image/svg+xml;base64,' + btoa(svg);
++            const mf = {
++                name: 'VW Polo/Caddy 6N — База Мастера', short_name: 'Polo 6N',
++                description: 'Каталог запчастей 1995-2003',
++                start_url: location.href.split('#')[0], scope: '.',
++                display: 'standalone', orientation: 'portrait-primary',
++                background_color: '#0a1830', theme_color: '#0a1830', lang: 'ru',
++                icons: [
++                    { src: ic, sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
++                    { src: ic, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
++                ]
++            };
++            const blob = new Blob([JSON.stringify(mf)], { type: 'application/manifest+json' });
++            const url = URL.createObjectURL(blob);
++            const l = document.createElement('link');
++            l.rel = 'manifest'; l.href = url;
++            document.head.appendChild(l);
++            const ai = document.createElement('link');
++            ai.rel = 'apple-touch-icon'; ai.href = ic;
++            document.head.appendChild(ai);
++            const fav = document.createElement('link');
++            fav.rel = 'icon'; fav.href = ic;
++            document.head.appendChild(fav);
++        }
+     } catch (e) { }
+     /* Оффлайн: Service Worker кэширует оболочку и данные (см. sw.js) */
+     try {

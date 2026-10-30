@@ -151,10 +151,21 @@ t('в Diagnostics нет дублей кодов', () => {
     eq(dup.length, 0, 'дубли: ' + dup.join(', '));
     okTrue(seen.size >= 90, 'кодов маловато: ' + seen.size);
 });
-t('коды OBD имеют формат Pxxxx и отсортированы', () => {
-    const codes = SECS.Diagnostics.rows.map(r => r[0]).filter(c => c !== '—');
-    codes.forEach(c => okTrue(/^P\d{4}$/.test(c), 'неверный формат: ' + c));
-    eq(codes.join(','), codes.slice().sort().join(','), 'коды не отсортированы');
+t('коды диагнозов: OBD в формате Pxxxx, VAG в формате «NN · NNNNN», каждая группа отсортирована', () => {
+    /* T2 (аудит 2026-10-27): в раздел добавлены VAG-коды из restore/VCDS-LOG-ANALYSIS.md
+       (формат «01 · 00528» = блок · код), их 6 из 112 строк. Прежняя проверка
+       /^P\d{4}$/ для всех строк на них падала. Группы проверяются раздельно,
+       потому что строки в файле перемешаны (VAG-код стоит рядом со «своим» P-кодом),
+       а сортировка соблюдена внутри каждой группы. */
+    const codes = SECS.Diagnostics.rows.map(r => String(r[0])).filter(c => c !== '—');
+    const obd = codes.filter(c => /^P\d{4}$/.test(c));
+    const vag = codes.filter(c => /^\d{2} · \d{5}$/.test(c));
+    const rest = codes.filter(c => !/^P\d{4}$/.test(c) && !/^\d{2} · \d{5}$/.test(c));
+    eq(rest.length, 0, 'неизвестный формат кода: ' + rest.slice(0, 3).join(', '));
+    okTrue(obd.length >= 90, 'OBD-кодов маловато: ' + obd.length);
+    okTrue(vag.length >= 1, 'VAG-кодов нет вовсе');
+    eq(obd.join(','), obd.slice().sort().join(','), 'OBD-коды не отсортированы');
+    eq(vag.join(','), vag.slice().sort().join(','), 'VAG-коды не отсортированы');
 });
 t('исправлена расшифровка P1143 (не лямбда, а расчёт нагрузки)', () => {
     const r = SECS.Diagnostics.rows.find(x => x[0] === 'P1143');
@@ -390,10 +401,15 @@ t('Wheels: давление 3.4 бар для гружёного Caddy видн�
     okTrue(row, 'нет строки 195/65 R15');
     okTrue(/3\.4/.test(row[2]), 'нет 3.4 бар: ' + row[2]);
 });
-t('Diagnostics: 5 колонок, симптомы и ссылки у большинства кодов', () => {
-    eq(SECS.Diagnostics.cols.length, 5);
+t('Diagnostics: 6 колонок, симптомы и ссылки у большинства кодов', () => {
+    /* T4 (аудит 2026-10-27): раздел вырос шестой колонкой «Блок / примечание»
+       (в ней — блок VAG из логов VCDS). Индексы прежние: «Детали каталога» всё
+       ещё cols[4]/r[4], так что проверка ссылок не съехала. */
+    eq(SECS.Diagnostics.cols.length, 6);
     eq(SECS.Diagnostics.cols[2], 'Симптомы / причина');
     eq(SECS.Diagnostics.cols[4], 'Детали каталога');
+    eq(SECS.Diagnostics.cols[5], 'Блок / примечание');
+    okTrue(SECS.Diagnostics.rows.every(r => r.length === 6), 'есть строки не из 6 ячеек');
     const withLinks = SECS.Diagnostics.rows.filter(r => r[4]).length;
     okTrue(withLinks >= 60, 'строк со ссылками на каталог: ' + withLinks);
     const withSym = SECS.Diagnostics.rows.filter(r => /MIL|глохнет|троит|расход|обороты|перегрев|мигает/i.test(r[2])).length;
