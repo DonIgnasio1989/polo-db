@@ -2,14 +2,25 @@
 
 Дата: 2026-10-27 · версия приложения: **1.13.1**
 
-Результат — `project/dist/`: **21 файл, 4.0 МБ**, готово к выкладке на сервер.
+> **Обновлено 2026-10-30 (SEO-пакет):** `dist/` теперь **23 файла, 3.99 МБ** — добавлены
+> `sitemap.xml` (316 URL) и `robots.txt`, оба собираются `tools/build-sitemap.py`.
+> В `index.html` исправлены `canonical`, `og:url`, `og:image`, `twitter:image` и `url` в
+> JSON-LD: стоял корень `https://donignasio1989.github.io/` (это 404), стал боевой адрес
+> `https://donignasio1989.github.io/polo-db/`. Версия приложения **не менялась** — 1.13.3
+> во всех пяти местах (иначе упал бы тест `test_1106.js` «версия синхронна в 5 местах»).
+> Подробности — `seo/README-SEO.md`.
+
+Результат — `project/dist/`: **21 файл, 4.0 МБ**, готово к выкладке на сервер
+(**с 2026-10-30 — 23 файла, 3.99 МБ**: добавлены `sitemap.xml` и `robots.txt`).
 (13 файлов приложения + `manifest.webmanifest` + 7 файлов в `icons/` — статика PWA и OG-превью.)
 (Объём вырос с промежуточных 3.37 МБ после дозагрузки библиотеки: `parts.json` теперь
 несёт 11 564 строки инструкций вместо 9 029 — см. раздел 6.)
 Смоук-тест пройден: локальный HTTP-сервер на `dist/`, все **22 URL**, которые запрашивает
 приложение (включая манифест и иконки), отдают `200`; 6 отсутствующих отдают `404`, и код их
 обрабатывает штатно (`vinDbLoad()` и фолбэк каталога обёрнуты в try/catch с проверкой `r.ok`).
-`robots.txt` и `sitemap.xml` в dist не входят намеренно — они лежат на вашем сервере.
+`robots.txt` и `sitemap.xml` раньше в dist не входили (лежали на сервере) — **с 2026-10-30
+входят**: собраны `tools/build-sitemap.py` и положены в корень `dist/`, чтобы поставка была
+самодостаточной. Патч для живого репозитория — `repo-patches/36-repo-live-seo.patch`.
 
 **Ничего из вашего не удалено**: `uploads/` (87 файлов) не изменён, полное дерево лежит
 в `project/`, `dist/` — отдельная папка.
@@ -31,7 +42,7 @@
 | `vin-dump/` | 4 | 0.54 МБ | ❌ нет |
 | Документы в корне | 4 | 0.05 МБ | ❌ нет |
 | **Вся загрузка** | **87** | **8.49 МБ** | |
-| **`dist/` фактически** | **21** | **4.0 МБ** | |
+| **`dist/` фактически** | **21** → **23** | **4.0 МБ** → **3.99 МБ** | |
 
 ⚠ Важно не перепутать две вещи:
 
@@ -112,6 +123,8 @@ dist/                                  4.0 МБ
 ├── manifest.webmanifest               0.9 КБ   статический манифест PWA (те же поля, что собирал blob в js/app.js)
 ├── sw.js                              2.7 КБ   CACHE='bm-cache-v2', SHELL=[./, index.html, css/app.css, data/update.json, manifest.webmanifest]
 ├── icons/                            78.5 КБ   icon.svg · favicon.ico (16/32/48) · apple-touch-icon.png (180) · icon-192.png · icon-512.png · maskable-512.png · og-image.png (1200×630)
+├── sitemap.xml                      98.5 КБ   316 URL: главная + 20 категорий + 10 справочных разделов + 285 подкатегорий; собирается tools/build-sitemap.py
+├── robots.txt                        1.4 КБ   Allow: / + Sitemap: + Disallow для материалов разработки и дампа VIN
 ├── js/app.js                        499.8 КБ   APP_VERSION='1.13.1', parseInst() объединяет i и inst
 ├── css/app.css                      181.8 КБ
 └── data/
@@ -132,7 +145,7 @@ dist/                                  4.0 МБ
 |---|---|
 | `data/vin-db.json` | `vinDbLoad()` получает не-`ok` → пробует `vin-db.example.json` → тоже не-`ok` → `VINDB.map` остаётся пустым. Модалка «📋 Оснащение» показывает «Данных об оснащении нет». **Так и задумано**: боевая база живёт на вашем сервере, архив не должен её затирать |
 | `data/vin-db.patch.json` | Есть в dist. Грузится **всегда** и имеет приоритет над основной базой |
-| `robots.txt`, `sitemap.xml` | В dist **не входят** по решению владельца (файлы уже на сервере). `index.html` на них не ссылается — отсутствие в dist ничего не ломает |
+| `robots.txt`, `sitemap.xml` | **С 2026-10-30 входят в dist** (23 файла). На сервере они уже были — минимальные: sitemap c одним URL и robots c `Allow: /`. Новая версия заменяет обе: 316 URL и закрытые от обхода материалы разработки. `index.html` на них не ссылается, приложение от них не зависит |
 | `data/parts.demo.json` | Не запрашивается, пока есть `parts.json` |
 | `data/parts-01…05-*.json` | Запрашиваются только модалкой «Обновление базы» (`checkUpdate()`) для сравнения «что изменилось». Отдадут 404 — модалка покажет пустое сравнение, каталог при этом работает |
 
@@ -186,9 +199,10 @@ rm -rf dist && mkdir -p dist/js dist/css dist/data dist/icons
 cp index.html sw.js manifest.webmanifest dist/
 cp js/app.js dist/js/ && cp css/app.css dist/css/
 cp icons/* dist/icons/                          # статика PWA и OG-превью
+python3 tools/build-sitemap.py --out dist       # sitemap.xml + robots.txt (316 URL)
 for f in update.json parts.json categories.json sections.json analogs.json \
          workshops.json pr-codes.json pr-codes-ru.json vin-db.patch.json; do
     cp data/$f dist/data/
 done
-du -sh dist && find dist -type f | wc -l             # ~4.0M, 21 файл
+du -sh dist && find dist -type f | wc -l             # ~4.0M, 23 файла
 ```
