@@ -36,21 +36,23 @@
 
     <!-- ═══════════════════════════════════════════════════════════════
        SEO-РАЗМЕТКА ДЛЯ ПОИСКОВИКОВ И СОЦСЕТЕЙ (canonical + OG + Twitter).
-       Базовый URL взят из JSON-LD выше (https://donignasio1989.github.io).
-       Если сайт ляжет в подкаталог (…github.io/repo/) — править в четырёх
-       местах: canonical, og:url, og:image, twitter:image.
-       robots.txt и sitemap.xml лежат на сервере отдельно — сюда не дублируем.
+       Базовый URL сайта: https://donignasio1989.github.io/polo-db/ (GitHub Pages,
+       репозиторий DonIgnasio1989/polo-db). При переезде править в пяти местах:
+       canonical, og:url, og:image, twitter:image и url в JSON-LD выше.
+       robots.txt и sitemap.xml лежат в корне репозитория; оба собираются
+       tools/build-sitemap.py (316 URL: главная, 20 категорий, 10 справочных
+       разделов, 285 подкатегорий — из data/parts.json и data/sections.json).
        ═══════════════════════════════════════════════════════════════ -->
-    <link rel="canonical" href="https://donignasio1989.github.io/">
+    <link rel="canonical" href="https://donignasio1989.github.io/polo-db/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="База Мастера">
     <meta property="og:locale" content="ru_RU">
-    <meta property="og:url" content="https://donignasio1989.github.io/">
+    <meta property="og:url" content="https://donignasio1989.github.io/polo-db/">
     <meta property="og:title"
         content="Каталог запчастей VW Polo 6N и Caddy 9K (1994-2003) — База Мастера">
     <meta property="og:description"
         content="Бесплатный офлайн-каталог оригинальных запчастей, VIN-дешифратор, PR-коды и регламенты ТО для VW Polo 6N1/6N2, Classic, Variant и Caddy 9K/9U. Работает без интернета.">
-    <meta property="og:image" content="https://donignasio1989.github.io/icons/og-image.png">
+    <meta property="og:image" content="https://donignasio1989.github.io/polo-db/icons/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="База Мастера — каталог запчастей VW Polo 6N и Caddy 9K">
@@ -59,7 +61,7 @@
         content="Каталог запчастей VW Polo 6N и Caddy 9K (1994-2003) — База Мастера">
     <meta name="twitter:description"
         content="Бесплатный офлайн-каталог оригинальных запчастей, VIN-дешифратор, PR-коды и регламенты ТО для VW Polo 6N1/6N2, Classic, Variant и Caddy 9K/9U.">
-    <meta name="twitter:image" content="https://donignasio1989.github.io/icons/og-image.png">
+    <meta name="twitter:image" content="https://donignasio1989.github.io/polo-db/icons/og-image.png">
 
     <!-- Иконки и манифест PWA — теперь статические файлы (раньше js/app.js
          собирал их в blob на лету). iPWA() оставляет blob-вариант только как
