@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <!-- База Мастера · собрано build-sitemap.py, не править руками -->
-  <!-- base: https://donignasio1989.github.io/polo-db/ · URL: 316 · lastmod: 2026-10-30 -->
+  <!-- Р‘Р°Р·Р° РњР°СЃС‚РµСЂР° В· СЃРѕР±СЂР°РЅРѕ build-sitemap.py, РЅРµ РїСЂР°РІРёС‚СЊ СЂСѓРєР°РјРё -->
+  <!-- base: https://donignasio1989.github.io/polo-db/ В· URL: 316 В· lastmod: 2026-10-30 -->
   <url>
     <loc>https://donignasio1989.github.io/polo-db/</loc>
     <lastmod>2026-10-30</lastmod>
@@ -10,2214 +10,2214 @@
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://donignasio1989.github.io/polo-db/icons/og-image.png</image:loc>
-      <image:title>База Мастера — каталог запчастей VW Polo 6N и Caddy 9K</image:title>
-      <image:caption>Офлайн-каталог оригинальных запчастей, VIN-дешифратор и регламенты ТО</image:caption>
+      <image:title>Р‘Р°Р·Р° РњР°СЃС‚РµСЂР° вЂ” РєР°С‚Р°Р»РѕРі Р·Р°РїС‡Р°СЃС‚РµР№ VW Polo 6N Рё Caddy 9K</image:title>
+      <image:caption>РћС„Р»Р°Р№РЅ-РєР°С‚Р°Р»РѕРі РѕСЂРёРіРёРЅР°Р»СЊРЅС‹С… Р·Р°РїС‡Р°СЃС‚РµР№, VIN-РґРµС€РёС„СЂР°С‚РѕСЂ Рё СЂРµРіР»Р°РјРµРЅС‚С‹ РўРћ</image:caption>
     </image:image>
-    <!-- главная · 4127 карточек каталога -->
+    <!-- РіР»Р°РІРЅР°СЏ В· 4127 РєР°СЂС‚РѕС‡РµРє РєР°С‚Р°Р»РѕРіР° -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Maintenance</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Maintenance (Регламент ТО) · 27 карточек -->
+    <!-- Maintenance (Р РµРіР»Р°РјРµРЅС‚ РўРћ) В· 27 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/RoadKit</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- RoadKit (С собой в дорогу) · 14 карточек -->
+    <!-- RoadKit (РЎ СЃРѕР±РѕР№ РІ РґРѕСЂРѕРіСѓ) В· 14 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Engine (Двигатель) · 612 карточек -->
+    <!-- Engine (Р”РІРёРіР°С‚РµР»СЊ) В· 612 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Cooling (Охлаждение) · 117 карточек -->
+    <!-- Cooling (РћС…Р»Р°Р¶РґРµРЅРёРµ) В· 117 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Ignition</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Ignition (Зажигание) · 14 карточек -->
+    <!-- Ignition (Р—Р°Р¶РёРіР°РЅРёРµ) В· 14 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Fuel</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Fuel (Топливная система) · 72 карточек -->
+    <!-- Fuel (РўРѕРїР»РёРІРЅР°СЏ СЃРёСЃС‚РµРјР°) В· 72 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Exhaust</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Exhaust (Выпуск ОГ) · 91 карточек -->
+    <!-- Exhaust (Р’С‹РїСѓСЃРє РћР“) В· 91 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Transmission (Трансмиссия) · 577 карточек -->
+    <!-- Transmission (РўСЂР°РЅСЃРјРёСЃСЃРёСЏ) В· 577 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Suspension</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Suspension (Подвеска) · 96 карточек -->
+    <!-- Suspension (РџРѕРґРІРµСЃРєР°) В· 96 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Steering</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Steering (Рулевое управление) · 152 карточек -->
+    <!-- Steering (Р СѓР»РµРІРѕРµ СѓРїСЂР°РІР»РµРЅРёРµ) В· 152 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Brakes</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Brakes (Тормозная система) · 256 карточек -->
+    <!-- Brakes (РўРѕСЂРјРѕР·РЅР°СЏ СЃРёСЃС‚РµРјР°) В· 256 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/RearAxle</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- RearAxle (Задняя ось) · 83 карточек -->
+    <!-- RearAxle (Р—Р°РґРЅСЏСЏ РѕСЃСЊ) В· 83 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Controls</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Controls (Приводы управления) · 124 карточек -->
+    <!-- Controls (РџСЂРёРІРѕРґС‹ СѓРїСЂР°РІР»РµРЅРёСЏ) В· 124 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Body (Кузов) · 427 карточек -->
+    <!-- Body (РљСѓР·РѕРІ) В· 427 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Interior (Салон) · 403 карточек -->
+    <!-- Interior (РЎР°Р»РѕРЅ) В· 403 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Electrical (Электрика) · 816 карточек -->
+    <!-- Electrical (Р­Р»РµРєС‚СЂРёРєР°) В· 816 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Bulbs</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Bulbs (Освещение) · 13 карточек -->
+    <!-- Bulbs (РћСЃРІРµС‰РµРЅРёРµ) В· 13 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Heating</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Heating (Отопление / Климат) · 167 карточек -->
+    <!-- Heating (РћС‚РѕРїР»РµРЅРёРµ / РљР»РёРјР°С‚) В· 167 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Fluids</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Fluids (Жидкости) · 25 карточек -->
+    <!-- Fluids (Р–РёРґРєРѕСЃС‚Рё) В· 25 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Tires</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <!-- Tires (Шины и давление) · 41 карточек -->
+    <!-- Tires (РЁРёРЅС‹ Рё РґР°РІР»РµРЅРёРµ) В· 41 РєР°СЂС‚РѕС‡РµРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Torque</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <!-- Torque — Моменты затяжки · 97 строк -->
+    <!-- Torque вЂ” РњРѕРјРµРЅС‚С‹ Р·Р°С‚СЏР¶РєРё В· 97 СЃС‚СЂРѕРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Diagnostics</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <!-- Diagnostics — Диагностика — коды OBD-II и VAG · 112 строк -->
+    <!-- Diagnostics вЂ” Р”РёР°РіРЅРѕСЃС‚РёРєР° вЂ” РєРѕРґС‹ OBD-II Рё VAG В· 112 СЃС‚СЂРѕРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Lamps</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <!-- Lamps — Лампы и цоколи · 16 строк -->
+    <!-- Lamps вЂ” Р›Р°РјРїС‹ Рё С†РѕРєРѕР»Рё В· 16 СЃС‚СЂРѕРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/FluidSpecs</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <!-- FluidSpecs — Жидкости и объёмы · 17 строк -->
+    <!-- FluidSpecs вЂ” Р–РёРґРєРѕСЃС‚Рё Рё РѕР±СЉС‘РјС‹ В· 17 СЃС‚СЂРѕРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Wheels</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <!-- Wheels — Колёса и шины · 26 строк -->
+    <!-- Wheels вЂ” РљРѕР»С‘СЃР° Рё С€РёРЅС‹ В· 26 СЃС‚СЂРѕРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Wiring</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <!-- Wiring — Электросхемы Polo 6N/6N2 · 12 строк -->
+    <!-- Wiring вЂ” Р­Р»РµРєС‚СЂРѕСЃС…РµРјС‹ Polo 6N/6N2 В· 12 СЃС‚СЂРѕРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/WiringFuses</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <!-- WiringFuses — Предохранители 6N1 (блок на 22 места) · 27 строк -->
+    <!-- WiringFuses вЂ” РџСЂРµРґРѕС…СЂР°РЅРёС‚РµР»Рё 6N1 (Р±Р»РѕРє РЅР° 22 РјРµСЃС‚Р°) В· 27 СЃС‚СЂРѕРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/WiringRelays</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <!-- WiringRelays — Реле 6N1 (пластина над блоком предохранителей) · 26 строк -->
+    <!-- WiringRelays вЂ” Р РµР»Рµ 6N1 (РїР»Р°СЃС‚РёРЅР° РЅР°Рґ Р±Р»РѕРєРѕРј РїСЂРµРґРѕС…СЂР°РЅРёС‚РµР»РµР№) В· 26 СЃС‚СЂРѕРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/WiringRef</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <!-- WiringRef — Провода, клеммы, разъёмы (обозначения VAG/DIN) · 38 строк -->
+    <!-- WiringRef вЂ” РџСЂРѕРІРѕРґР°, РєР»РµРјРјС‹, СЂР°Р·СЉС‘РјС‹ (РѕР±РѕР·РЅР°С‡РµРЅРёСЏ VAG/DIN) В· 38 СЃС‚СЂРѕРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/WiringPins</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <!-- WiringPins — Разъёмы и пины (проверенное + ссылки на обсуждения) · 19 строк -->
+    <!-- WiringPins вЂ” Р Р°Р·СЉС‘РјС‹ Рё РїРёРЅС‹ (РїСЂРѕРІРµСЂРµРЅРЅРѕРµ + СЃСЃС‹Р»РєРё РЅР° РѕР±СЃСѓР¶РґРµРЅРёСЏ) В· 19 СЃС‚СЂРѕРє -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Maintenance/%D0%96%D0%B8%D0%B4%D0%BA%D0%BE%D1%81%D1%82%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Maintenance / Жидкости · 2 -->
+    <!-- Maintenance / Р–РёРґРєРѕСЃС‚Рё В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Maintenance/%D0%9F%D1%80%D0%BE%D0%BA%D0%B0%D1%87%D0%BA%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Maintenance / Прокачка · 1 -->
+    <!-- Maintenance / РџСЂРѕРєР°С‡РєР° В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Maintenance/%D0%A0%D0%B5%D0%B3%D0%BB%D0%B0%D0%BC%D0%B5%D0%BD%D1%82</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Maintenance / Регламент · 5 -->
+    <!-- Maintenance / Р РµРіР»Р°РјРµРЅС‚ В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Maintenance/%D0%A1%D1%82%D0%B5%D0%BA%D0%BB%D0%BE%D0%BE%D1%87%D0%B8%D1%81%D1%82%D0%B8%D1%82%D0%B5%D0%BB%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Maintenance / Стеклоочиститель · 1 -->
+    <!-- Maintenance / РЎС‚РµРєР»РѕРѕС‡РёСЃС‚РёС‚РµР»СЊ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Maintenance/%D0%A2%D0%BE%D0%BF%D0%BB%D0%B8%D0%B2%D0%BE</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Maintenance / Топливо · 1 -->
+    <!-- Maintenance / РўРѕРїР»РёРІРѕ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Maintenance/%D0%A4%D0%B8%D0%BB%D1%8C%D1%82%D1%80%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Maintenance / Фильтры · 3 -->
+    <!-- Maintenance / Р¤РёР»СЊС‚СЂС‹ В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Maintenance/%D0%A8%D0%B8%D0%BD%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Maintenance / Шины · 10 -->
+    <!-- Maintenance / РЁРёРЅС‹ В· 10 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/RoadKit/%D0%90%D0%B2%D0%B0%D1%80%D0%B8%D0%B9%D0%BD%D1%8B%D0%B9%20%D0%BD%D0%B0%D0%B1%D0%BE%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- RoadKit / Аварийный набор · 12 -->
+    <!-- RoadKit / РђРІР°СЂРёР№РЅС‹Р№ РЅР°Р±РѕСЂ В· 12 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/EGR%20%D0%B8%20%D0%B2%D0%B0%D0%BA%D1%83%D1%83%D0%BC</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / EGR и вакуум · 44 -->
+    <!-- Engine / EGR Рё РІР°РєСѓСѓРј В· 44 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%91%D0%BB%D0%BE%D0%BA%20%D1%86%D0%B8%D0%BB%D0%B8%D0%BD%D0%B4%D1%80%D0%BE%D0%B2%20%D0%B2%20%D1%81%D0%B1%D0%BE%D1%80%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Блок цилиндров в сборе · 16 -->
+    <!-- Engine / Р‘Р»РѕРє С†РёР»РёРЅРґСЂРѕРІ РІ СЃР±РѕСЂРµ В· 16 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%91%D0%BB%D0%BE%D0%BA%20%D1%86%D0%B8%D0%BB%D0%B8%D0%BD%D0%B4%D1%80%D0%BE%D0%B2%20%D0%B8%20%D0%BF%D0%BE%D1%80%D1%88%D0%BD%D0%B5%D0%B2%D0%B0%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Блок цилиндров и поршневая · 9 -->
+    <!-- Engine / Р‘Р»РѕРє С†РёР»РёРЅРґСЂРѕРІ Рё РїРѕСЂС€РЅРµРІР°СЏ В· 9 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%91%D0%BB%D0%BE%D0%BA%20%D1%86%D0%B8%D0%BB%D0%B8%D0%BD%D0%B4%D1%80%D0%BE%D0%B2%20%E2%80%94%20%D0%B4%D0%B5%D1%82%D0%B0%D0%BB%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Блок цилиндров — детали · 30 -->
+    <!-- Engine / Р‘Р»РѕРє С†РёР»РёРЅРґСЂРѕРІ вЂ” РґРµС‚Р°Р»Рё В· 30 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%92%D0%BE%D0%B7%D0%B4%D1%83%D1%85%20%D0%B8%20%D1%82%D0%BE%D0%BF%D0%BB%D0%B8%D0%B2%D0%BE</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Воздух и топливо · 186 -->
+    <!-- Engine / Р’РѕР·РґСѓС… Рё С‚РѕРїР»РёРІРѕ В· 186 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%93%D0%91%D0%A6</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / ГБЦ · 1 -->
+    <!-- Engine / Р“Р‘Р¦ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%93%D0%91%D0%A6%20%D0%B8%20%D0%BA%D0%BB%D0%B0%D0%BF%D0%B0%D0%BD%D0%BD%D1%8B%D0%B9%20%D0%BC%D0%B5%D1%85%D0%B0%D0%BD%D0%B8%D0%B7%D0%BC</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / ГБЦ и клапанный механизм · 6 -->
+    <!-- Engine / Р“Р‘Р¦ Рё РєР»Р°РїР°РЅРЅС‹Р№ РјРµС…Р°РЅРёР·Рј В· 6 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%93%D0%91%D0%A6%20%D0%B8%20%D0%BA%D0%BB%D0%B0%D0%BF%D0%B0%D0%BD%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / ГБЦ и клапаны · 20 -->
+    <!-- Engine / Р“Р‘Р¦ Рё РєР»Р°РїР°РЅС‹ В· 20 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%93%D0%A0%D0%9C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / ГРМ · 9 -->
+    <!-- Engine / Р“Р Рњ В· 9 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%93%D0%A0%D0%9C%20%2F%20%D0%A0%D0%B5%D0%BC%D0%BD%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / ГРМ / Ремни · 1 -->
+    <!-- Engine / Р“Р Рњ / Р РµРјРЅРё В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%93%D0%A0%D0%9C%20%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B2%D0%BE%D0%B4%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / ГРМ и приводы · 5 -->
+    <!-- Engine / Р“Р Рњ Рё РїСЂРёРІРѕРґС‹ В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%93%D0%B8%D0%B4%D1%80%D0%BE%D1%83%D1%81%D0%B8%D0%BB%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%20%D1%80%D1%83%D0%BB%D1%8F%20%28%D0%BE%D0%BF%D1%86%D0%B8%D1%8F%29</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Гидроусилитель руля (опция) · 2 -->
+    <!-- Engine / Р“РёРґСЂРѕСѓСЃРёР»РёС‚РµР»СЊ СЂСѓР»СЏ (РѕРїС†РёСЏ) В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%94%D0%B2%D0%B8%D0%B3%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%20%D0%B2%20%D1%81%D0%B1%D0%BE%D1%80%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Двигатель в сборе · 20 -->
+    <!-- Engine / Р”РІРёРіР°С‚РµР»СЊ РІ СЃР±РѕСЂРµ В· 20 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%94%D0%B2%D0%B8%D0%B3%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%20%D0%B2%20%D1%81%D0%B1%D0%BE%D1%80%D0%B5%20%D0%B8%20%D0%B1%D0%BB%D0%BE%D0%BA%20%D1%86%D0%B8%D0%BB%D0%B8%D0%BD%D0%B4%D1%80%D0%BE%D0%B2</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Двигатель в сборе и блок цилиндров · 22 -->
+    <!-- Engine / Р”РІРёРіР°С‚РµР»СЊ РІ СЃР±РѕСЂРµ Рё Р±Р»РѕРє С†РёР»РёРЅРґСЂРѕРІ В· 22 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%9A%D0%BB%D0%B0%D0%BF%D0%B0%D0%BD%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Клапаны · 1 -->
+    <!-- Engine / РљР»Р°РїР°РЅС‹ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%9A%D1%80%D0%B5%D0%BF%D1%91%D0%B6</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Крепёж · 1 -->
+    <!-- Engine / РљСЂРµРїС‘Р¶ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%9A%D1%80%D0%B5%D0%BF%D1%91%D0%B6%20%D0%B8%20%D0%BF%D1%80%D0%BE%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Крепёж и прокладки · 7 -->
+    <!-- Engine / РљСЂРµРїС‘Р¶ Рё РїСЂРѕРєР»Р°РґРєРё В· 7 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%9D%D0%B0%D0%B2%D0%B5%D1%81%D0%BD%D0%BE%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Навесное · 5 -->
+    <!-- Engine / РќР°РІРµСЃРЅРѕРµ В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%9D%D0%B0%D0%B2%D0%B5%D1%81%D0%BD%D0%BE%D0%B5%20%D0%BE%D0%B1%D0%BE%D1%80%D1%83%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Навесное оборудование · 11 -->
+    <!-- Engine / РќР°РІРµСЃРЅРѕРµ РѕР±РѕСЂСѓРґРѕРІР°РЅРёРµ В· 11 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%9D%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D1%8F%D1%8E%D1%89%D0%B8%D0%B5%20%D0%B2%D1%82%D1%83%D0%BB%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Направляющие втулки · 1 -->
+    <!-- Engine / РќР°РїСЂР°РІР»СЏСЋС‰РёРµ РІС‚СѓР»РєРё В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%9E%D0%BF%D0%BE%D1%80%D1%8B%20%D0%B4%D0%B2%D0%B8%D0%B3%D0%B0%D1%82%D0%B5%D0%BB%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Опоры двигателя · 3 -->
+    <!-- Engine / РћРїРѕСЂС‹ РґРІРёРіР°С‚РµР»СЏ В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%9E%D0%BF%D0%BE%D1%80%D1%8B%20%D0%B8%20%D1%81%D1%86%D0%B5%D0%BF%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Опоры и сцепление · 38 -->
+    <!-- Engine / РћРїРѕСЂС‹ Рё СЃС†РµРїР»РµРЅРёРµ В· 38 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%9F%D1%80%D0%BE%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Прокладки · 3 -->
+    <!-- Engine / РџСЂРѕРєР»Р°РґРєРё В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%9F%D1%80%D1%83%D0%B6%D0%B8%D0%BD%D1%8B%20%D0%B8%20%D1%82%D0%B0%D1%80%D0%B5%D0%BB%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Пружины и тарелки · 1 -->
+    <!-- Engine / РџСЂСѓР¶РёРЅС‹ Рё С‚Р°СЂРµР»РєРё В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%A0%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B2%D0%B0%D0%BB</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Распредвал · 1 -->
+    <!-- Engine / Р Р°СЃРїСЂРµРґРІР°Р» В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%A1%D0%B0%D0%BB%D1%8C%D0%BD%D0%B8%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Сальники · 3 -->
+    <!-- Engine / РЎР°Р»СЊРЅРёРєРё В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%A1%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0%20%D0%B2%D0%BF%D1%80%D1%8B%D1%81%D0%BA%D0%B0%20%D0%B8%20%D0%B7%D0%B0%D0%B6%D0%B8%D0%B3%D0%B0%D0%BD%D0%B8%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Система впрыска и зажигания · 10 -->
+    <!-- Engine / РЎРёСЃС‚РµРјР° РІРїСЂС‹СЃРєР° Рё Р·Р°Р¶РёРіР°РЅРёСЏ В· 10 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%A1%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0%20%D0%B7%D0%B0%D0%B6%D0%B8%D0%B3%D0%B0%D0%BD%D0%B8%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Система зажигания · 1 -->
+    <!-- Engine / РЎРёСЃС‚РµРјР° Р·Р°Р¶РёРіР°РЅРёСЏ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%A1%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0%20%D0%BE%D1%85%D0%BB%D0%B0%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Система охлаждения · 7 -->
+    <!-- Engine / РЎРёСЃС‚РµРјР° РѕС…Р»Р°Р¶РґРµРЅРёСЏ В· 7 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%A1%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0%20%D1%81%D0%BC%D0%B0%D0%B7%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Система смазки · 5 -->
+    <!-- Engine / РЎРёСЃС‚РµРјР° СЃРјР°Р·РєРё В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%A1%D0%BC%D0%B0%D0%B7%D0%BA%D0%B0%20%D0%B8%20%D0%BE%D1%85%D0%BB%D0%B0%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Смазка и охлаждение · 108 -->
+    <!-- Engine / РЎРјР°Р·РєР° Рё РѕС…Р»Р°Р¶РґРµРЅРёРµ В· 108 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%A4%D0%B8%D0%BB%D1%8C%D1%82%D1%80%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Фильтры · 1 -->
+    <!-- Engine / Р¤РёР»СЊС‚СЂС‹ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Engine/%D0%A8%D0%B0%D1%82%D1%83%D0%BD%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Engine / Шатуны · 2 -->
+    <!-- Engine / РЁР°С‚СѓРЅС‹ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling/%D0%92%D0%B5%D0%BD%D1%82%D0%B8%D0%BB%D1%8F%D1%82%D0%BE%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Cooling / Вентилятор · 26 -->
+    <!-- Cooling / Р’РµРЅС‚РёР»СЏС‚РѕСЂ В· 26 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling/%D0%94%D0%B0%D1%82%D1%87%D0%B8%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Cooling / Датчики · 1 -->
+    <!-- Cooling / Р”Р°С‚С‡РёРєРё В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling/%D0%9A%D0%BE%D0%BD%D0%B4%D0%B8%D1%86%D0%B8%D0%BE%D0%BD%D0%B5%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Cooling / Кондиционер · 56 -->
+    <!-- Cooling / РљРѕРЅРґРёС†РёРѕРЅРµСЂ В· 56 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling/%D0%9F%D0%B0%D1%82%D1%80%D1%83%D0%B1%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Cooling / Патрубки · 2 -->
+    <!-- Cooling / РџР°С‚СЂСѓР±РєРё В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling/%D0%9F%D0%BE%D0%BC%D0%BF%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Cooling / Помпа · 5 -->
+    <!-- Cooling / РџРѕРјРїР° В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling/%D0%A0%D0%B0%D0%B4%D0%B8%D0%B0%D1%82%D0%BE%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Cooling / Радиатор · 1 -->
+    <!-- Cooling / Р Р°РґРёР°С‚РѕСЂ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling/%D0%A0%D0%B0%D0%B4%D0%B8%D0%B0%D1%82%D0%BE%D1%80%20%2F%20%D0%A2%D0%B5%D1%80%D0%BC%D0%BE%D1%81%D1%82%D0%B0%D1%82</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Cooling / Радиатор / Термостат · 1 -->
+    <!-- Cooling / Р Р°РґРёР°С‚РѕСЂ / РўРµСЂРјРѕСЃС‚Р°С‚ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling/%D0%A0%D0%B0%D1%81%D1%88%D0%B8%D1%80%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D0%B1%D0%B0%D1%87%D0%BE%D0%BA</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Cooling / Расширительный бачок · 5 -->
+    <!-- Cooling / Р Р°СЃС€РёСЂРёС‚РµР»СЊРЅС‹Р№ Р±Р°С‡РѕРє В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling/%D0%A1%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0%20%D0%BE%D1%85%D0%BB%D0%B0%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Cooling / Система охлаждения · 2 -->
+    <!-- Cooling / РЎРёСЃС‚РµРјР° РѕС…Р»Р°Р¶РґРµРЅРёСЏ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling/%D0%A2%D0%B5%D1%80%D0%BC%D0%BE%D1%81%D1%82%D0%B0%D1%82%20%2F%20%D0%9F%D0%BE%D0%BC%D0%BF%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Cooling / Термостат / Помпа · 1 -->
+    <!-- Cooling / РўРµСЂРјРѕСЃС‚Р°С‚ / РџРѕРјРїР° В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling/%D0%A2%D1%80%D1%83%D0%B1%D0%BE%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Cooling / Трубопроводы · 4 -->
+    <!-- Cooling / РўСЂСѓР±РѕРїСЂРѕРІРѕРґС‹ В· 4 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling/%D0%A4%D0%B8%D1%82%D0%B8%D0%BD%D0%B3%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Cooling / Фитинги · 1 -->
+    <!-- Cooling / Р¤РёС‚РёРЅРіРё В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling/%D0%A5%D0%BE%D0%BC%D1%83%D1%82%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Cooling / Хомуты · 1 -->
+    <!-- Cooling / РҐРѕРјСѓС‚С‹ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Cooling/%D0%A8%D0%BB%D0%B0%D0%BD%D0%B3%D0%B8%20%D0%9E%D0%96</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Cooling / Шланги ОЖ · 7 -->
+    <!-- Cooling / РЁР»Р°РЅРіРё РћР– В· 7 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Ignition/%D0%94%D0%B0%D1%82%D1%87%D0%B8%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Ignition / Датчики · 6 -->
+    <!-- Ignition / Р”Р°С‚С‡РёРєРё В· 6 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Ignition/%D0%9A%D0%B0%D1%82%D1%83%D1%88%D0%BA%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Ignition / Катушка · 1 -->
+    <!-- Ignition / РљР°С‚СѓС€РєР° В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Ignition/%D0%9F%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Ignition / Провода · 1 -->
+    <!-- Ignition / РџСЂРѕРІРѕРґР° В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Ignition/%D0%A1%D0%B2%D0%B5%D1%87%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Ignition / Свечи · 4 -->
+    <!-- Ignition / РЎРІРµС‡Рё В· 4 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Ignition/%D0%A2%D1%80%D0%B0%D0%BC%D0%B1%D0%BB%D1%91%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Ignition / Трамблёр · 2 -->
+    <!-- Ignition / РўСЂР°РјР±Р»С‘СЂ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Fuel/%D0%91%D0%B0%D0%BA%20%2F%20%D0%9D%D0%B0%D1%81%D0%BE%D1%81</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Fuel / Бак / Насос · 27 -->
+    <!-- Fuel / Р‘Р°Рє / РќР°СЃРѕСЃ В· 27 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Fuel/%D0%94%D0%B0%D1%82%D1%87%D0%B8%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Fuel / Датчики · 1 -->
+    <!-- Fuel / Р”Р°С‚С‡РёРєРё В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Fuel/%D0%A2%D0%BE%D0%BF%D0%BB%D0%B8%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Fuel / Топливопроводы · 30 -->
+    <!-- Fuel / РўРѕРїР»РёРІРѕРїСЂРѕРІРѕРґС‹ В· 30 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Fuel/%D0%A4%D0%B8%D0%BB%D1%8C%D1%82%D1%80%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Fuel / Фильтры · 5 -->
+    <!-- Fuel / Р¤РёР»СЊС‚СЂС‹ В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Fuel/%D0%A4%D0%BE%D1%80%D1%81%D1%83%D0%BD%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Fuel / Форсунки · 2 -->
+    <!-- Fuel / Р¤РѕСЂСЃСѓРЅРєРё В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Fuel/%D0%AD%D0%BA%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Fuel / Экология · 7 -->
+    <!-- Fuel / Р­РєРѕР»РѕРіРёСЏ В· 7 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Exhaust/%D0%92%D1%8B%D0%BF%D1%83%D1%81%D0%BA%D0%BD%D0%BE%D0%B9%20%D0%BA%D0%BE%D0%BB%D0%BB%D0%B5%D0%BA%D1%82%D0%BE%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Exhaust / Выпускной коллектор · 27 -->
+    <!-- Exhaust / Р’С‹РїСѓСЃРєРЅРѕР№ РєРѕР»Р»РµРєС‚РѕСЂ В· 27 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Exhaust/%D0%92%D1%8B%D1%85%D0%BB%D0%BE%D0%BF%D0%BD%D0%B0%D1%8F%20%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Exhaust / Выхлопная система · 4 -->
+    <!-- Exhaust / Р’С‹С…Р»РѕРїРЅР°СЏ СЃРёСЃС‚РµРјР° В· 4 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Exhaust/%D0%93%D0%BB%D1%83%D1%88%D0%B8%D1%82%D0%B5%D0%BB%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Exhaust / Глушитель · 28 -->
+    <!-- Exhaust / Р“Р»СѓС€РёС‚РµР»СЊ В· 28 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Exhaust/%D0%9A%D1%80%D0%B5%D0%BF%D1%91%D0%B6</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Exhaust / Крепёж · 14 -->
+    <!-- Exhaust / РљСЂРµРїС‘Р¶ В· 14 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Exhaust/%D0%9D%D0%B5%D0%B9%D1%82%D1%80%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Exhaust / Нейтрализатор · 1 -->
+    <!-- Exhaust / РќРµР№С‚СЂР°Р»РёР·Р°С‚РѕСЂ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Exhaust/%D0%9F%D1%80%D0%B8%D1%91%D0%BC%D0%BD%D0%B0%D1%8F%20%D1%82%D1%80%D1%83%D0%B1%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Exhaust / Приёмная труба · 13 -->
+    <!-- Exhaust / РџСЂРёС‘РјРЅР°СЏ С‚СЂСѓР±Р° В· 13 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Exhaust/%D0%A3%D0%BF%D0%BB%D0%BE%D1%82%D0%BD%D0%B8%D1%82%D0%B5%D0%BB%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Exhaust / Уплотнители · 4 -->
+    <!-- Exhaust / РЈРїР»РѕС‚РЅРёС‚РµР»Рё В· 4 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%90%D0%9A%D0%9F%D0%9F%2001M%20%E2%80%94%20%D0%91%D0%BB%D0%BE%D0%BA%20%D0%BA%D0%BB%D0%B0%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / АКПП 01M — Блок клапанов · 6 -->
+    <!-- Transmission / РђРљРџРџ 01M вЂ” Р‘Р»РѕРє РєР»Р°РїР°РЅРѕРІ В· 6 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%90%D0%9A%D0%9F%D0%9F%2001M%20%E2%80%94%20%D0%92%D0%B0%D0%BB%D1%8B%20%D0%B8%20%D1%88%D0%B5%D1%81%D1%82%D0%B5%D1%80%D0%BD%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / АКПП 01M — Валы и шестерни · 26 -->
+    <!-- Transmission / РђРљРџРџ 01M вЂ” Р’Р°Р»С‹ Рё С€РµСЃС‚РµСЂРЅРё В· 26 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%90%D0%9A%D0%9F%D0%9F%2001M%20%E2%80%94%20%D0%93%D0%B8%D0%B4%D1%80%D0%BE%D1%82%D1%80%D0%B0%D0%BD%D1%81%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%82%D0%BE%D1%80%20%D0%B8%20%D0%B2%D0%BE%D0%B4%D0%B8%D0%BB%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / АКПП 01M — Гидротрансформатор и водила · 42 -->
+    <!-- Transmission / РђРљРџРџ 01M вЂ” Р“РёРґСЂРѕС‚СЂР°РЅСЃС„РѕСЂРјР°С‚РѕСЂ Рё РІРѕРґРёР»Р° В· 42 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%90%D0%9A%D0%9F%D0%9F%2001M%20%E2%80%94%20%D0%9A%D0%BE%D1%80%D0%BF%D1%83%D1%81%20%D0%B8%20%D0%BF%D0%BE%D0%B4%D0%B4%D0%BE%D0%BD</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / АКПП 01M — Корпус и поддон · 33 -->
+    <!-- Transmission / РђРљРџРџ 01M вЂ” РљРѕСЂРїСѓСЃ Рё РїРѕРґРґРѕРЅ В· 33 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%90%D0%9A%D0%9F%D0%9F%2001M%20%E2%80%94%20%D0%9C%D0%B0%D1%81%D0%BB%D1%8F%D0%BD%D1%8B%D0%B9%20%D0%BD%D0%B0%D1%81%D0%BE%D1%81%20%D0%B8%20%D1%88%D1%82%D0%BE%D0%BA</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / АКПП 01M — Масляный насос и шток · 19 -->
+    <!-- Transmission / РђРљРџРџ 01M вЂ” РњР°СЃР»СЏРЅС‹Р№ РЅР°СЃРѕСЃ Рё С€С‚РѕРє В· 19 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%90%D0%9A%D0%9F%D0%9F%2001M%20%E2%80%94%20%D0%A4%D1%80%D0%B8%D0%BA%D1%86%D0%B8%D0%BE%D0%BD%D1%8B%20%D0%B8%20%D0%BC%D1%83%D1%84%D1%82%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / АКПП 01M — Фрикционы и муфты · 52 -->
+    <!-- Transmission / РђРљРџРџ 01M вЂ” Р¤СЂРёРєС†РёРѕРЅС‹ Рё РјСѓС„С‚С‹ В· 52 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%92%D0%B0%D0%BB%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Валы · 2 -->
+    <!-- Transmission / Р’Р°Р»С‹ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%92%D1%82%D0%BE%D1%80%D0%B8%D1%87%D0%BD%D1%8B%D0%B9%20%D0%B2%D0%B0%D0%BB</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Вторичный вал · 1 -->
+    <!-- Transmission / Р’С‚РѕСЂРёС‡РЅС‹Р№ РІР°Р» В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%94%D0%B8%D1%84%D1%84%D0%B5%D1%80%D0%B5%D0%BD%D1%86%D0%B8%D0%B0%D0%BB</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Дифференциал · 47 -->
+    <!-- Transmission / Р”РёС„С„РµСЂРµРЅС†РёР°Р» В· 47 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%9A%D0%9F%D0%9F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / КПП · 1 -->
+    <!-- Transmission / РљРџРџ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%9A%D0%9F%D0%9F%20%2F%20%D0%9C%D0%B0%D1%81%D0%BB%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / КПП / Масла · 2 -->
+    <!-- Transmission / РљРџРџ / РњР°СЃР»Р° В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%9A%D0%BE%D0%BB%D1%8C%D1%86%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Кольца · 2 -->
+    <!-- Transmission / РљРѕР»СЊС†Р° В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%9A%D1%80%D0%B5%D0%BF%D1%91%D0%B6</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Крепёж · 2 -->
+    <!-- Transmission / РљСЂРµРїС‘Р¶ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%9A%D1%80%D0%B5%D0%BF%D1%91%D0%B6%20%D0%9A%D0%9F%D0%9F%20%D0%BA%20%D0%B4%D0%B2%D0%B8%D0%B3%D0%B0%D1%82%D0%B5%D0%BB%D1%8E</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Крепёж КПП к двигателю · 18 -->
+    <!-- Transmission / РљСЂРµРїС‘Р¶ РљРџРџ Рє РґРІРёРіР°С‚РµР»СЋ В· 18 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%9A%D1%83%D0%BB%D0%B8%D1%81%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Кулиса · 152 -->
+    <!-- Transmission / РљСѓР»РёСЃР° В· 152 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%9C%D0%9A%D0%9F%D0%9F%20085%20%E2%80%94%20%D0%92%D0%B0%D0%BB%D1%8B%20%D0%B8%20%D1%88%D0%B5%D1%81%D1%82%D0%B5%D1%80%D0%BD%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / МКПП 085 — Валы и шестерни · 49 -->
+    <!-- Transmission / РњРљРџРџ 085 вЂ” Р’Р°Р»С‹ Рё С€РµСЃС‚РµСЂРЅРё В· 49 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%9C%D0%9A%D0%9F%D0%9F%20085%20%E2%80%94%20%D0%9A%D0%B0%D1%80%D1%82%D0%B5%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / МКПП 085 — Картер · 25 -->
+    <!-- Transmission / РњРљРџРџ 085 вЂ” РљР°СЂС‚РµСЂ В· 25 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%9C%D0%9A%D0%9F%D0%9F%20085%20%E2%80%94%20%D0%9C%D0%B5%D1%85%D0%B0%D0%BD%D0%B8%D0%B7%D0%BC%20%D0%BF%D0%B5%D1%80%D0%B5%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%BD%D0%B8%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / МКПП 085 — Механизм переключения · 24 -->
+    <!-- Transmission / РњРљРџРџ 085 вЂ” РњРµС…Р°РЅРёР·Рј РїРµСЂРµРєР»СЋС‡РµРЅРёСЏ В· 24 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%9C%D0%9A%D0%9F%D0%9F%20085%20%E2%80%94%20%D0%A1%D0%B8%D0%BD%D1%85%D1%80%D0%BE%D0%BD%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / МКПП 085 — Синхронизаторы · 13 -->
+    <!-- Transmission / РњРљРџРџ 085 вЂ” РЎРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂС‹ В· 13 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%9F%D0%B5%D1%80%D0%B2%D0%B8%D1%87%D0%BD%D1%8B%D0%B9%20%D0%B2%D0%B0%D0%BB</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Первичный вал · 2 -->
+    <!-- Transmission / РџРµСЂРІРёС‡РЅС‹Р№ РІР°Р» В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%9F%D1%80%D0%B8%D0%B2%D0%BE%D0%B4%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Приводы · 4 -->
+    <!-- Transmission / РџСЂРёРІРѕРґС‹ В· 4 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%9F%D1%80%D0%B8%D0%B2%D0%BE%D0%B4%D1%8B%20%D0%B8%20%D0%A8%D0%A0%D0%A3%D0%A1</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Приводы и ШРУС · 39 -->
+    <!-- Transmission / РџСЂРёРІРѕРґС‹ Рё РЁР РЈРЎ В· 39 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%9F%D1%80%D0%BE%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Прокладки · 1 -->
+    <!-- Transmission / РџСЂРѕРєР»Р°РґРєРё В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%A1%D1%82%D0%BE%D0%BF%D0%BE%D1%80%D0%BD%D1%8B%D0%B5%20%D0%BA%D0%BE%D0%BB%D1%8C%D1%86%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Стопорные кольца · 1 -->
+    <!-- Transmission / РЎС‚РѕРїРѕСЂРЅС‹Рµ РєРѕР»СЊС†Р° В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%A1%D1%86%D0%B5%D0%BF%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Сцепление · 6 -->
+    <!-- Transmission / РЎС†РµРїР»РµРЅРёРµ В· 6 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%A2%D1%8F%D0%B3%D0%B8%20%D0%B8%20%D1%88%D0%B0%D1%80%D0%BD%D0%B8%D1%80%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Тяги и шарниры · 6 -->
+    <!-- Transmission / РўСЏРіРё Рё С€Р°СЂРЅРёСЂС‹ В· 6 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Transmission/%D0%A8%D1%82%D0%BE%D0%BA%20%D0%BF%D0%B5%D1%80%D0%B5%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%BD%D0%B8%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Transmission / Шток переключения · 1 -->
+    <!-- Transmission / РЁС‚РѕРє РїРµСЂРµРєР»СЋС‡РµРЅРёСЏ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Suspension/%D0%91%D0%BE%D0%BB%D1%82%D1%8B%20%D0%B8%20%D0%B3%D0%B0%D0%B9%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Suspension / Болты и гайки · 2 -->
+    <!-- Suspension / Р‘РѕР»С‚С‹ Рё РіР°Р№РєРё В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Suspension/%D0%97%D0%B0%D0%B4%D0%BD%D1%8F%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Suspension / Задняя · 1 -->
+    <!-- Suspension / Р—Р°РґРЅСЏСЏ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Suspension/%D0%97%D0%B0%D0%B4%D0%BD%D1%8F%D1%8F%20%D0%BF%D0%BE%D0%B4%D0%B2%D0%B5%D1%81%D0%BA%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Suspension / Задняя подвеска · 3 -->
+    <!-- Suspension / Р—Р°РґРЅСЏСЏ РїРѕРґРІРµСЃРєР° В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Suspension/%D0%9A%D1%80%D0%B5%D0%BF%D1%91%D0%B6%20%D0%BF%D0%BE%D0%B4%D0%B2%D0%B5%D1%81%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Suspension / Крепёж подвески · 15 -->
+    <!-- Suspension / РљСЂРµРїС‘Р¶ РїРѕРґРІРµСЃРєРё В· 15 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Suspension/%D0%9F%D0%B5%D1%80%D0%B5%D0%B4%D0%BD%D1%8F%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Suspension / Передняя · 6 -->
+    <!-- Suspension / РџРµСЂРµРґРЅСЏСЏ В· 6 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Suspension/%D0%9F%D0%B5%D1%80%D0%B5%D0%B4%D0%BD%D1%8F%D1%8F%20%D0%BF%D0%BE%D0%B4%D0%B2%D0%B5%D1%81%D0%BA%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Suspension / Передняя подвеска · 49 -->
+    <!-- Suspension / РџРµСЂРµРґРЅСЏСЏ РїРѕРґРІРµСЃРєР° В· 49 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Suspension/%D0%A0%D1%8B%D1%87%D0%B0%D0%B3%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Suspension / Рычаги · 1 -->
+    <!-- Suspension / Р С‹С‡Р°РіРё В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Suspension/%D0%A1%D1%82%D0%B0%D0%B1%D0%B8%D0%BB%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Suspension / Стабилизатор · 1 -->
+    <!-- Suspension / РЎС‚Р°Р±РёР»РёР·Р°С‚РѕСЂ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Suspension/%D0%A1%D1%82%D1%83%D0%BF%D0%B8%D1%86%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Suspension / Ступица · 7 -->
+    <!-- Suspension / РЎС‚СѓРїРёС†Р° В· 7 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Suspension/%D0%A8%D0%A0%D0%A3%D0%A1</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Suspension / ШРУС · 2 -->
+    <!-- Suspension / РЁР РЈРЎ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Steering/%D0%93%D0%A3%D0%A0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Steering / ГУР · 65 -->
+    <!-- Steering / Р“РЈР  В· 65 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Steering/%D0%9A%D1%80%D0%B5%D0%BF%D1%91%D0%B6%20%D0%BF%D0%BE%D0%B4%D0%B2%D0%B5%D1%81%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Steering / Крепёж подвески · 11 -->
+    <!-- Steering / РљСЂРµРїС‘Р¶ РїРѕРґРІРµСЃРєРё В· 11 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Steering/%D0%A0%D0%B5%D0%B9%D0%BA%D0%B0%20%D0%B8%20%D1%82%D1%8F%D0%B3%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Steering / Рейка и тяги · 50 -->
+    <!-- Steering / Р РµР№РєР° Рё С‚СЏРіРё В· 50 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Steering/%D0%A0%D1%83%D0%BB%D0%B5%D0%B2%D0%BE%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Steering / Рулевое · 5 -->
+    <!-- Steering / Р СѓР»РµРІРѕРµ В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Steering/%D0%A0%D1%83%D0%BB%D0%B5%D0%B2%D0%BE%D0%B5%20%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Steering / Рулевое управление · 3 -->
+    <!-- Steering / Р СѓР»РµРІРѕРµ СѓРїСЂР°РІР»РµРЅРёРµ В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Steering/%D0%A0%D1%83%D0%BB%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Steering / Руль · 17 -->
+    <!-- Steering / Р СѓР»СЊ В· 17 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Brakes/ABS</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Brakes / ABS · 19 -->
+    <!-- Brakes / ABS В· 19 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Brakes/%D0%93%D0%A2%D0%A6</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Brakes / ГТЦ · 2 -->
+    <!-- Brakes / Р“РўР¦ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Brakes/%D0%93%D0%A2%D0%A6%20%D0%B8%20%D0%92%D0%A3%D0%A2</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Brakes / ГТЦ и ВУТ · 54 -->
+    <!-- Brakes / Р“РўР¦ Рё Р’РЈРў В· 54 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Brakes/%D0%97%D0%B0%D0%B4%D0%BD%D0%B8%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Brakes / Задние · 3 -->
+    <!-- Brakes / Р—Р°РґРЅРёРµ В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Brakes/%D0%97%D0%B0%D0%B4%D0%BD%D0%B8%D0%B5%20%D1%82%D0%BE%D1%80%D0%BC%D0%BE%D0%B7%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Brakes / Задние тормоза · 52 -->
+    <!-- Brakes / Р—Р°РґРЅРёРµ С‚РѕСЂРјРѕР·Р° В· 52 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Brakes/%D0%9F%D0%B5%D1%80%D0%B5%D0%B4%D0%BD%D0%B8%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Brakes / Передние · 5 -->
+    <!-- Brakes / РџРµСЂРµРґРЅРёРµ В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Brakes/%D0%9F%D0%B5%D1%80%D0%B5%D0%B4%D0%BD%D0%B8%D0%B5%20%D1%82%D0%BE%D1%80%D0%BC%D0%BE%D0%B7%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Brakes / Передние тормоза · 40 -->
+    <!-- Brakes / РџРµСЂРµРґРЅРёРµ С‚РѕСЂРјРѕР·Р° В· 40 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Brakes/%D0%9F%D0%B5%D1%80%D0%B5%D0%B4%D0%BD%D0%B8%D0%B9%20%D1%81%D1%83%D0%BF%D0%BF%D0%BE%D1%80%D1%82</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Brakes / Передний суппорт · 2 -->
+    <!-- Brakes / РџРµСЂРµРґРЅРёР№ СЃСѓРїРїРѕСЂС‚ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Brakes/%D0%A2%D0%BE%D1%80%D0%BC%D0%BE%D0%B7%D0%BD%D0%B0%D1%8F%20%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0%20%D1%81%20ABS</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Brakes / Тормозная система с ABS · 3 -->
+    <!-- Brakes / РўРѕСЂРјРѕР·РЅР°СЏ СЃРёСЃС‚РµРјР° СЃ ABS В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Brakes/%D0%A2%D1%80%D0%BE%D1%81%D1%8B%20%2F%20%D0%A8%D0%BB%D0%B0%D0%BD%D0%B3%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Brakes / Тросы / Шланги · 32 -->
+    <!-- Brakes / РўСЂРѕСЃС‹ / РЁР»Р°РЅРіРё В· 32 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Brakes/%D0%A2%D1%80%D1%83%D0%B1%D0%BA%D0%B8%20%D0%B8%20%D1%88%D1%82%D1%83%D1%86%D0%B5%D1%80%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Brakes / Трубки и штуцеры · 1 -->
+    <!-- Brakes / РўСЂСѓР±РєРё Рё С€С‚СѓС†РµСЂС‹ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Brakes/%D0%A8%D0%BB%D0%B0%D0%BD%D0%B3%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Brakes / Шланги · 1 -->
+    <!-- Brakes / РЁР»Р°РЅРіРё В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Brakes/%D0%A8%D0%BB%D0%B0%D0%BD%D0%B3%D0%B8%20%D0%B8%20%D1%82%D1%80%D1%83%D0%B1%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Brakes / Шланги и трубки · 33 -->
+    <!-- Brakes / РЁР»Р°РЅРіРё Рё С‚СЂСѓР±РєРё В· 33 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/RearAxle/%D0%90%D0%BC%D0%BE%D1%80%D1%82%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- RearAxle / Амортизаторы · 21 -->
+    <!-- RearAxle / РђРјРѕСЂС‚РёР·Р°С‚РѕСЂС‹ В· 21 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/RearAxle/%D0%91%D0%B0%D0%BB%D0%BA%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- RearAxle / Балка · 4 -->
+    <!-- RearAxle / Р‘Р°Р»РєР° В· 4 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/RearAxle/%D0%91%D0%B0%D1%80%D0%B0%D0%B1%D0%B0%D0%BD%D1%8B%20%2F%20%D0%9A%D0%BE%D0%BB%D0%BE%D0%B4%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- RearAxle / Барабаны / Колодки · 7 -->
+    <!-- RearAxle / Р‘Р°СЂР°Р±Р°РЅС‹ / РљРѕР»РѕРґРєРё В· 7 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/RearAxle/%D0%9A%D1%80%D0%B5%D0%BF%D1%91%D0%B6</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- RearAxle / Крепёж · 10 -->
+    <!-- RearAxle / РљСЂРµРїС‘Р¶ В· 10 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/RearAxle/%D0%9F%D1%80%D1%83%D0%B6%D0%B8%D0%BD%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- RearAxle / Пружины · 3 -->
+    <!-- RearAxle / РџСЂСѓР¶РёРЅС‹ В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/RearAxle/%D0%A0%D0%B0%D0%B7%D0%BD%D0%BE%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- RearAxle / Разное · 5 -->
+    <!-- RearAxle / Р Р°Р·РЅРѕРµ В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/RearAxle/%D0%A0%D0%B5%D0%BC%D0%BA%D0%BE%D0%BC%D0%BF%D0%BB%D0%B5%D0%BA%D1%82</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- RearAxle / Ремкомплект · 1 -->
+    <!-- RearAxle / Р РµРјРєРѕРјРїР»РµРєС‚ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/RearAxle/%D0%A1%D1%82%D1%83%D0%BF%D0%B8%D1%86%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- RearAxle / Ступица · 16 -->
+    <!-- RearAxle / РЎС‚СѓРїРёС†Р° В· 16 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/RearAxle/%D0%A2%D1%80%D0%BE%D1%81%D1%8B%20%2F%20%D0%A8%D0%BB%D0%B0%D0%BD%D0%B3%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- RearAxle / Тросы / Шланги · 16 -->
+    <!-- RearAxle / РўСЂРѕСЃС‹ / РЁР»Р°РЅРіРё В· 16 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Controls/%D0%92%D1%8B%D0%BA%D0%BB%D1%8E%D1%87%D0%B0%D1%82%D0%B5%D0%BB%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Controls / Выключатель · 2 -->
+    <!-- Controls / Р’С‹РєР»СЋС‡Р°С‚РµР»СЊ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Controls/%D0%9A%D1%80%D0%BE%D0%BD%D1%88%D1%82%D0%B5%D0%B9%D0%BD%20%D0%BF%D0%B5%D0%B4%D0%B0%D0%BB%D0%B5%D0%B9</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Controls / Кронштейн педалей · 8 -->
+    <!-- Controls / РљСЂРѕРЅС€С‚РµР№РЅ РїРµРґР°Р»РµР№ В· 8 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Controls/%D0%9A%D1%83%D0%BB%D0%B8%D1%81%D0%B0%20%D0%9A%D0%9F%D0%9F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Controls / Кулиса КПП · 2 -->
+    <!-- Controls / РљСѓР»РёСЃР° РљРџРџ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Controls/%D0%9F%D0%B5%D0%B4%D0%B0%D0%BB%D1%8C%20%D0%B3%D0%B0%D0%B7%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Controls / Педаль газа · 43 -->
+    <!-- Controls / РџРµРґР°Р»СЊ РіР°Р·Р° В· 43 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Controls/%D0%9F%D0%B5%D0%B4%D0%B0%D0%BB%D1%8C%20%D1%81%D1%86%D0%B5%D0%BF%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Controls / Педаль сцепления · 33 -->
+    <!-- Controls / РџРµРґР°Р»СЊ СЃС†РµРїР»РµРЅРёСЏ В· 33 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Controls/%D0%A2%D1%80%D0%BE%D1%81%20%D0%9A%D0%9F%D0%9F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Controls / Трос КПП · 1 -->
+    <!-- Controls / РўСЂРѕСЃ РљРџРџ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Controls/%D0%A2%D1%80%D0%BE%D1%81%20%D0%B3%D0%B0%D0%B7%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Controls / Трос газа · 25 -->
+    <!-- Controls / РўСЂРѕСЃ РіР°Р·Р° В· 25 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Controls/%D0%A2%D1%80%D0%BE%D1%81%20%D1%81%D1%86%D0%B5%D0%BF%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Controls / Трос сцепления · 10 -->
+    <!-- Controls / РўСЂРѕСЃ СЃС†РµРїР»РµРЅРёСЏ В· 10 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%91%D0%B0%D0%BC%D0%BF%D0%B5%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Бампер · 1 -->
+    <!-- Body / Р‘Р°РјРїРµСЂ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%91%D0%BE%D0%BA%D0%BE%D0%B2%D0%B0%D1%8F%20%D1%87%D0%B0%D1%81%D1%82%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Боковая часть · 1 -->
+    <!-- Body / Р‘РѕРєРѕРІР°СЏ С‡Р°СЃС‚СЊ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%92%D0%90%D0%97-%D1%81%D0%BE%D0%B2%D0%BC%D0%B5%D1%81%D1%82%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / ВАЗ-совместимость · 25 -->
+    <!-- Body / Р’РђР—-СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚СЊ В· 25 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%94%D0%B2%D0%B5%D1%80%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Двери · 5 -->
+    <!-- Body / Р”РІРµСЂРё В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%97%D0%B0%D0%B4%D0%BD%D1%8F%D1%8F%20%D1%87%D0%B0%D1%81%D1%82%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Задняя часть · 7 -->
+    <!-- Body / Р—Р°РґРЅСЏСЏ С‡Р°СЃС‚СЊ В· 7 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%97%D0%B0%D0%BC%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Замки · 26 -->
+    <!-- Body / Р—Р°РјРєРё В· 26 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%97%D0%B5%D1%80%D0%BA%D0%B0%D0%BB%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Зеркала · 2 -->
+    <!-- Body / Р—РµСЂРєР°Р»Р° В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9A%D0%B0%D0%BF%D0%BE%D1%82</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Капот · 34 -->
+    <!-- Body / РљР°РїРѕС‚ В· 34 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9A%D0%B0%D0%BF%D0%BE%D1%82%20%2F%20%D0%94%D0%B2%D0%B5%D1%80%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Капот / Двери · 1 -->
+    <!-- Body / РљР°РїРѕС‚ / Р”РІРµСЂРё В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9A%D0%BB%D1%8E%D1%87%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Ключи · 9 -->
+    <!-- Body / РљР»СЋС‡Рё В· 9 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9A%D0%BE%D1%80%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%20%D1%84%D0%B0%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Корректор фар · 1 -->
+    <!-- Body / РљРѕСЂСЂРµРєС‚РѕСЂ С„Р°СЂ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9A%D1%80%D0%B5%D0%BF%D1%91%D0%B6</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Крепёж · 17 -->
+    <!-- Body / РљСЂРµРїС‘Р¶ В· 17 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9A%D1%80%D1%8B%D0%BB%D0%BE</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Крыло · 2 -->
+    <!-- Body / РљСЂС‹Р»Рѕ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9A%D1%80%D1%8B%D0%BB%D1%8C%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Крылья · 1 -->
+    <!-- Body / РљСЂС‹Р»СЊСЏ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9A%D1%80%D1%8B%D1%88%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Крыша · 8 -->
+    <!-- Body / РљСЂС‹С€Р° В· 8 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9A%D1%80%D1%8B%D1%88%D0%BA%D0%B0%20%D0%B1%D0%B0%D0%B3%D0%B0%D0%B6%D0%BD%D0%B8%D0%BA%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Крышка багажника · 48 -->
+    <!-- Body / РљСЂС‹С€РєР° Р±Р°РіР°Р¶РЅРёРєР° В· 48 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9A%D1%83%D0%B7%D0%BE%D0%B2%D0%BD%D1%8B%D0%B5%20%D1%8D%D0%BB%D0%B5%D0%BC%D0%B5%D0%BD%D1%82%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Кузовные элементы · 2 -->
+    <!-- Body / РљСѓР·РѕРІРЅС‹Рµ СЌР»РµРјРµРЅС‚С‹ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9B%D1%8E%D0%BA%20%28%D1%81%D0%B4%D0%B2%D0%B8%D0%B6%D0%BD%D0%BE%D0%B9%20%D0%B2%D0%B5%D1%80%D1%85%29</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Люк (сдвижной верх) · 6 -->
+    <!-- Body / Р›СЋРє (СЃРґРІРёР¶РЅРѕР№ РІРµСЂС…) В· 6 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9C%D0%BE%D0%BB%D0%B4%D0%B8%D0%BD%D0%B3%D0%B8%20%D0%B8%20%D0%BD%D0%B0%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Молдинги и накладки · 30 -->
+    <!-- Body / РњРѕР»РґРёРЅРіРё Рё РЅР°РєР»Р°РґРєРё В· 30 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9D%D0%B0%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Накладки · 4 -->
+    <!-- Body / РќР°РєР»Р°РґРєРё В· 4 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9D%D0%B0%D1%80%D1%83%D0%B6%D0%BD%D1%8B%D0%B5%20%D0%BF%D0%B0%D0%BD%D0%B5%D0%BB%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Наружные панели · 3 -->
+    <!-- Body / РќР°СЂСѓР¶РЅС‹Рµ РїР°РЅРµР»Рё В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9E%D0%B1%D0%B2%D0%B5%D1%81%20GTI</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Обвес GTI · 6 -->
+    <!-- Body / РћР±РІРµСЃ GTI В· 6 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9F%D0%B5%D1%80%D0%B5%D0%B4%D0%BD%D1%8F%D1%8F%20%D1%87%D0%B0%D1%81%D1%82%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Передняя часть · 8 -->
+    <!-- Body / РџРµСЂРµРґРЅСЏСЏ С‡Р°СЃС‚СЊ В· 8 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9F%D0%BE%D0%B4%D0%BA%D1%80%D1%8B%D0%BB%D0%BE%D0%BA</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Подкрылок · 6 -->
+    <!-- Body / РџРѕРґРєСЂС‹Р»РѕРє В· 6 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%9F%D0%BE%D0%BB%20%D0%B1%D0%B0%D0%B3%D0%B0%D0%B6%D0%BD%D0%B8%D0%BA%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Пол багажника · 17 -->
+    <!-- Body / РџРѕР» Р±Р°РіР°Р¶РЅРёРєР° В· 17 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%A0%D0%B5%D1%88%D1%91%D1%82%D0%BA%D0%B0%20%D1%80%D0%B0%D0%B4%D0%B8%D0%B0%D1%82%D0%BE%D1%80%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Решётка радиатора · 16 -->
+    <!-- Body / Р РµС€С‘С‚РєР° СЂР°РґРёР°С‚РѕСЂР° В· 16 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%A0%D1%83%D1%87%D0%BA%D0%B8%20%D0%B8%20%D0%B7%D0%B0%D0%BC%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Ручки и замки · 8 -->
+    <!-- Body / Р СѓС‡РєРё Рё Р·Р°РјРєРё В· 8 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%A1%D1%82%D0%B5%D0%BA%D0%BB%D0%BE%D0%BF%D0%BE%D0%B4%D1%8A%D1%91%D0%BC%D0%BD%D0%B8%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Стеклоподъёмники · 25 -->
+    <!-- Body / РЎС‚РµРєР»РѕРїРѕРґСЉС‘РјРЅРёРєРё В· 25 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%A1%D1%82%D1%91%D0%BA%D0%BB%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Стёкла · 60 -->
+    <!-- Body / РЎС‚С‘РєР»Р° В· 60 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%A2%D1%8E%D0%BD%D0%B8%D0%BD%D0%B3%2F%D0%B0%D0%BA%D1%81%D0%B5%D1%81%D1%81%D1%83%D0%B0%D1%80%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Тюнинг/аксессуары · 1 -->
+    <!-- Body / РўСЋРЅРёРЅРі/Р°РєСЃРµСЃСЃСѓР°СЂС‹ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%A3%D0%BF%D0%BB%D0%BE%D1%82%D0%BD%D0%B8%D1%82%D0%B5%D0%BB%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Уплотнители · 11 -->
+    <!-- Body / РЈРїР»РѕС‚РЅРёС‚РµР»Рё В· 11 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%A8%D1%83%D0%BC%D0%BE%D0%B8%D0%B7%D0%BE%D0%BB%D1%8F%D1%86%D0%B8%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Шумоизоляция · 8 -->
+    <!-- Body / РЁСѓРјРѕРёР·РѕР»СЏС†РёСЏ В· 8 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%AD%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5%20%D0%B7%D0%B5%D1%80%D0%BA%D0%B0%D0%BB%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Электрические зеркала · 2 -->
+    <!-- Body / Р­Р»РµРєС‚СЂРёС‡РµСЃРєРёРµ Р·РµСЂРєР°Р»Р° В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Body/%D0%AD%D0%BC%D0%B1%D0%BB%D0%B5%D0%BC%D1%8B%20%D0%B8%20%D1%88%D0%B8%D0%BB%D1%8C%D0%B4%D0%B8%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Body / Эмблемы и шильдики · 15 -->
+    <!-- Body / Р­РјР±Р»РµРјС‹ Рё С€РёР»СЊРґРёРєРё В· 15 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%90%D0%BA%D1%81%D0%B5%D1%81%D1%81%D1%83%D0%B0%D1%80%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Аксессуары · 3 -->
+    <!-- Interior / РђРєСЃРµСЃСЃСѓР°СЂС‹ В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%91%D0%B0%D1%80%D0%B4%D0%B0%D1%87%D0%BE%D0%BA%20%D0%B8%20%D0%B2%D0%B5%D1%89%D0%B5%D0%B2%D1%8B%D0%B5%20%D1%8F%D1%89%D0%B8%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Бардачок и вещевые ящики · 2 -->
+    <!-- Interior / Р‘Р°СЂРґР°С‡РѕРє Рё РІРµС‰РµРІС‹Рµ СЏС‰РёРєРё В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%91%D0%B5%D0%B7%D0%BE%D0%BF%D0%B0%D1%81%D0%BD%D0%BE%D1%81%D1%82%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Безопасность · 1 -->
+    <!-- Interior / Р‘РµР·РѕРїР°СЃРЅРѕСЃС‚СЊ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%92%D1%8B%D0%BA%D0%BB%D1%8E%D1%87%D0%B0%D1%82%D0%B5%D0%BB%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Выключатели · 1 -->
+    <!-- Interior / Р’С‹РєР»СЋС‡Р°С‚РµР»Рё В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9A%D0%B0%D1%80%D0%BA%D0%B0%D1%81%20%D0%B8%20%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D1%8F%D1%8E%D1%89%D0%B8%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Каркас и направляющие · 3 -->
+    <!-- Interior / РљР°СЂРєР°СЃ Рё РЅР°РїСЂР°РІР»СЏСЋС‰РёРµ В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9A%D0%BE%D0%BD%D1%81%D0%BE%D0%BB%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Консоль · 2 -->
+    <!-- Interior / РљРѕРЅСЃРѕР»СЊ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9A%D1%80%D0%B5%D0%BF%D1%91%D0%B6%20%D0%B8%20%D0%B4%D0%B5%D0%BA%D0%BE%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Крепёж и декор · 2 -->
+    <!-- Interior / РљСЂРµРїС‘Р¶ Рё РґРµРєРѕСЂ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9A%D1%80%D0%B5%D0%BF%D1%91%D0%B6%20%D1%81%D0%B8%D0%B4%D0%B5%D0%BD%D0%B8%D0%B9</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Крепёж сидений · 21 -->
+    <!-- Interior / РљСЂРµРїС‘Р¶ СЃРёРґРµРЅРёР№ В· 21 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9D%D0%B0%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Накладки · 17 -->
+    <!-- Interior / РќР°РєР»Р°РґРєРё В· 17 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9D%D0%B0%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B8%20%D0%B8%20%D0%BA%D0%BE%D0%BD%D1%81%D0%BE%D0%BB%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Накладки и консоль · 6 -->
+    <!-- Interior / РќР°РєР»Р°РґРєРё Рё РєРѕРЅСЃРѕР»СЊ В· 6 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9E%D0%B1%D0%B8%D0%B2%D0%BA%D0%B0%20%D0%B8%20%D0%BD%D0%B0%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Обивка и накладки · 2 -->
+    <!-- Interior / РћР±РёРІРєР° Рё РЅР°РєР»Р°РґРєРё В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9E%D0%B1%D0%B8%D0%B2%D0%BA%D0%B0%20%D0%BF%D0%BE%D1%82%D0%BE%D0%BB%D0%BA%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Обивка потолка · 1 -->
+    <!-- Interior / РћР±РёРІРєР° РїРѕС‚РѕР»РєР° В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9E%D0%B1%D0%B8%D0%B2%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Обивки · 122 -->
+    <!-- Interior / РћР±РёРІРєРё В· 122 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9E%D0%B1%D1%88%D0%B8%D0%B2%D0%BA%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Обшивка · 2 -->
+    <!-- Interior / РћР±С€РёРІРєР° В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9E%D0%B1%D1%88%D0%B8%D0%B2%D0%BA%D0%B0%20%D0%B4%D0%B2%D0%B5%D1%80%D0%B5%D0%B9</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Обшивка дверей · 4 -->
+    <!-- Interior / РћР±С€РёРІРєР° РґРІРµСЂРµР№ В· 4 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9E%D1%81%D0%B2%D0%B5%D1%89%D0%B5%D0%BD%D0%B8%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Освещение · 3 -->
+    <!-- Interior / РћСЃРІРµС‰РµРЅРёРµ В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9F%D0%B0%D0%BD%D0%B5%D0%BB%D1%8C%20%D0%BF%D1%80%D0%B8%D0%B1%D0%BE%D1%80%D0%BE%D0%B2</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Панель приборов · 60 -->
+    <!-- Interior / РџР°РЅРµР»СЊ РїСЂРёР±РѕСЂРѕРІ В· 60 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9F%D0%B5%D0%BF%D0%B5%D0%BB%D1%8C%D0%BD%D0%B8%D1%86%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Пепельница · 4 -->
+    <!-- Interior / РџРµРїРµР»СЊРЅРёС†Р° В· 4 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9F%D0%B5%D1%82%D0%BB%D0%B8%20%D0%B8%20%D0%BA%D1%80%D0%B5%D0%BF%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Петли и крепления · 2 -->
+    <!-- Interior / РџРµС‚Р»Рё Рё РєСЂРµРїР»РµРЅРёСЏ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9F%D0%BB%D0%B0%D1%84%D0%BE%D0%BD%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Плафоны · 3 -->
+    <!-- Interior / РџР»Р°С„РѕРЅС‹ В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9F%D0%BE%D0%B4%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BD%D0%B8%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Подголовники · 9 -->
+    <!-- Interior / РџРѕРґРіРѕР»РѕРІРЅРёРєРё В· 9 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9F%D0%BE%D1%82%D0%BE%D0%BB%D0%BE%D0%BA</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Потолок · 1 -->
+    <!-- Interior / РџРѕС‚РѕР»РѕРє В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%9F%D1%80%D0%BE%D1%87%D0%B5%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Прочее · 1 -->
+    <!-- Interior / РџСЂРѕС‡РµРµ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%A0%D1%83%D0%BB%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Руль · 1 -->
+    <!-- Interior / Р СѓР»СЊ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%A0%D1%83%D1%87%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Ручки · 1 -->
+    <!-- Interior / Р СѓС‡РєРё В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%A0%D1%83%D1%87%D0%BA%D0%B8%20%D0%B8%20%D0%B7%D0%B0%D0%BC%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Ручки и замки · 4 -->
+    <!-- Interior / Р СѓС‡РєРё Рё Р·Р°РјРєРё В· 4 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%A1%D0%B8%D0%B4%D0%B5%D0%BD%D1%8C%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Сиденья · 1 -->
+    <!-- Interior / РЎРёРґРµРЅСЊСЏ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%A1%D0%B8%D0%B4%D0%B5%D0%BD%D1%8C%D1%8F%20%D0%B7%D0%B0%D0%B4%D0%BD%D0%B8%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Сиденья задние · 9 -->
+    <!-- Interior / РЎРёРґРµРЅСЊСЏ Р·Р°РґРЅРёРµ В· 9 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%A1%D0%B8%D0%B4%D0%B5%D0%BD%D1%8C%D1%8F%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B4%D0%BD%D0%B8%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Сиденья передние · 11 -->
+    <!-- Interior / РЎРёРґРµРЅСЊСЏ РїРµСЂРµРґРЅРёРµ В· 11 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%A1%D0%B8%D0%B4%D0%B5%D0%BD%D1%8C%D1%8F%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B4%D0%BD%D0%B8%D0%B5%20Recaro</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Сиденья передние Recaro · 33 -->
+    <!-- Interior / РЎРёРґРµРЅСЊСЏ РїРµСЂРµРґРЅРёРµ Recaro В· 33 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%A1%D0%BF%D0%B8%D0%BD%D0%BA%D0%B8%20%D0%B7%D0%B0%D0%B4%D0%BD%D0%B8%D1%85%20%D1%81%D0%B8%D0%B4%D0%B5%D0%BD%D0%B8%D0%B9</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Спинки задних сидений · 20 -->
+    <!-- Interior / РЎРїРёРЅРєРё Р·Р°РґРЅРёС… СЃРёРґРµРЅРёР№ В· 20 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%A1%D0%BF%D0%B8%D0%BD%D0%BA%D0%B8%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B4%D0%BD%D0%B8%D1%85%20%D1%81%D0%B8%D0%B4%D0%B5%D0%BD%D0%B8%D0%B9</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Спинки передних сидений · 42 -->
+    <!-- Interior / РЎРїРёРЅРєРё РїРµСЂРµРґРЅРёС… СЃРёРґРµРЅРёР№ В· 42 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%A1%D1%82%D1%91%D0%BA%D0%BB%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Стёкла · 1 -->
+    <!-- Interior / РЎС‚С‘РєР»Р° В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Interior/%D0%A4%D0%B8%D0%BB%D1%8C%D1%82%D1%80%20%D1%81%D0%B0%D0%BB%D0%BE%D0%BD%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Interior / Фильтр салона · 1 -->
+    <!-- Interior / Р¤РёР»СЊС‚СЂ СЃР°Р»РѕРЅР° В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%91%D0%BE%D1%80%D1%82%D0%BE%D0%B2%D0%BE%D0%B9%20%D0%BA%D0%BE%D0%BC%D0%BF%D1%8C%D1%8E%D1%82%D0%B5%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Бортовой компьютер · 2 -->
+    <!-- Electrical / Р‘РѕСЂС‚РѕРІРѕР№ РєРѕРјРїСЊСЋС‚РµСЂ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%92%D1%82%D1%83%D0%BB%D0%BA%D0%B8%20%D0%B8%20%D0%B7%D0%B0%D0%B3%D0%BB%D1%83%D1%88%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Втулки и заглушки · 13 -->
+    <!-- Electrical / Р’С‚СѓР»РєРё Рё Р·Р°РіР»СѓС€РєРё В· 13 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%93%D0%B5%D0%BD%D0%B5%D1%80%D0%B0%D1%82%D0%BE%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Генератор · 1 -->
+    <!-- Electrical / Р“РµРЅРµСЂР°С‚РѕСЂ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%93%D0%B5%D0%BD%D0%B5%D1%80%D0%B0%D1%82%D0%BE%D1%80%20%2F%20%D0%A1%D1%82%D0%B0%D1%80%D1%82%D0%B5%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Генератор / Стартер · 1 -->
+    <!-- Electrical / Р“РµРЅРµСЂР°С‚РѕСЂ / РЎС‚Р°СЂС‚РµСЂ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%93%D0%B5%D0%BD%D0%B5%D1%80%D0%B0%D1%82%D0%BE%D1%80%20%D0%B8%20%D1%81%D1%82%D0%B0%D1%80%D1%82%D0%B5%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Генератор и стартер · 2 -->
+    <!-- Electrical / Р“РµРЅРµСЂР°С‚РѕСЂ Рё СЃС‚Р°СЂС‚РµСЂ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%94%D0%B0%D1%82%D1%87%D0%B8%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Датчики · 4 -->
+    <!-- Electrical / Р”Р°С‚С‡РёРєРё В· 4 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%94%D0%B8%D0%BD%D0%B0%D0%BC%D0%B8%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Динамики · 2 -->
+    <!-- Electrical / Р”РёРЅР°РјРёРєРё В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов · 90 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ В· 90 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%20ABS</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов ABS · 19 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ ABS В· 19 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%20%D0%90%D0%9A%D0%91%20%D0%B8%20%D1%81%D1%82%D0%B0%D1%80%D1%82%D0%B5%D1%80%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов АКБ и стартера · 30 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ РђРљР‘ Рё СЃС‚Р°СЂС‚РµСЂР° В· 30 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%20%D0%B3%D0%B5%D0%BD%D0%B5%D1%80%D0%B0%D1%82%D0%BE%D1%80%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов генератора · 21 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ РіРµРЅРµСЂР°С‚РѕСЂР° В· 21 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%20%D0%B4%D0%B2%D0%B5%D1%80%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов двери · 17 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ РґРІРµСЂРё В· 17 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%20%D0%B4%D0%B2%D0%B5%D1%80%D0%B8%20%D0%B1%D0%B0%D0%B3%D0%B0%D0%B6%D0%BD%D0%B8%D0%BA%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов двери багажника · 11 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ РґРІРµСЂРё Р±Р°РіР°Р¶РЅРёРєР° В· 11 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%20%D0%B4%D0%B2%D0%B8%D0%B3%D0%B0%D1%82%D0%B5%D0%BB%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов двигателя · 49 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ РґРІРёРіР°С‚РµР»СЏ В· 49 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%20%D0%B7%D0%B0%D0%B4%D0%BD%D0%B5%D0%B9%20%D1%87%D0%B0%D1%81%D1%82%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов задней части · 3 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ Р·Р°РґРЅРµР№ С‡Р°СЃС‚Рё В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%20%D0%BA%D0%BB%D0%B8%D0%BC%D0%B0%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B9%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов климатической установки · 5 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ РєР»РёРјР°С‚РёС‡РµСЃРєРѕР№ СѓСЃС‚Р°РЅРѕРІРєРё В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%20%D0%BE%D1%81%D0%B2%D0%B5%D1%89%D0%B5%D0%BD%D0%B8%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов освещения · 15 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ РѕСЃРІРµС‰РµРЅРёСЏ В· 15 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B4%D0%BD%D0%B5%D0%B9%20%D0%BF%D0%B0%D0%BD%D0%B5%D0%BB%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов передней панели · 21 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ РїРµСЂРµРґРЅРµР№ РїР°РЅРµР»Рё В· 21 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%20%D0%BF%D0%BE%D0%B4%D1%83%D1%88%D0%B5%D0%BA%20%D0%B1%D0%B5%D0%B7%D0%BE%D0%BF%D0%B0%D1%81%D0%BD%D0%BE%D1%81%D1%82%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов подушек безопасности · 10 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ РїРѕРґСѓС€РµРє Р±РµР·РѕРїР°СЃРЅРѕСЃС‚Рё В· 10 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%20%D0%BF%D1%80%D0%B8%D0%B1%D0%BE%D1%80%D0%BE%D0%B2</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов приборов · 10 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ РїСЂРёР±РѕСЂРѕРІ В· 10 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%20%D1%81%D0%B0%D0%BB%D0%BE%D0%BD%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов салона · 142 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ СЃР°Р»РѕРЅР° В· 142 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%96%D0%B3%D1%83%D1%82%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%20%D1%86%D0%B5%D0%BD%D1%82%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE%20%D0%B7%D0%B0%D0%BC%D0%BA%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Жгуты проводов центрального замка · 7 -->
+    <!-- Electrical / Р–РіСѓС‚С‹ РїСЂРѕРІРѕРґРѕРІ С†РµРЅС‚СЂР°Р»СЊРЅРѕРіРѕ Р·Р°РјРєР° В· 7 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%97%D0%B0%D0%BC%D0%BE%D0%BA</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Замок · 1 -->
+    <!-- Electrical / Р—Р°РјРѕРє В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%98%D0%BC%D0%BC%D0%BE%D0%B1%D0%B8%D0%BB%D0%B0%D0%B9%D0%B7%D0%B5%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Иммобилайзер · 1 -->
+    <!-- Electrical / РРјРјРѕР±РёР»Р°Р№Р·РµСЂ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9A%D0%B0%D0%B1%D0%B5%D0%BB%D0%B8-%D0%B0%D0%B4%D0%B0%D0%BF%D1%82%D0%B5%D1%80%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Кабели-адаптеры · 16 -->
+    <!-- Electrical / РљР°Р±РµР»Рё-Р°РґР°РїС‚РµСЂС‹ В· 16 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9A%D0%B0%D0%B1%D0%B5%D0%BB%D1%8C-%D0%B0%D0%B4%D0%B0%D0%BF%D1%82%D0%B5%D1%80%20%D0%B2%D0%B5%D1%80%D1%85%D0%BD%D0%B5%D0%B3%D0%BE%20%D1%81%D1%82%D0%BE%D0%BF-%D1%81%D0%B8%D0%B3%D0%BD%D0%B0%D0%BB%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Кабель-адаптер верхнего стоп-сигнала · 2 -->
+    <!-- Electrical / РљР°Р±РµР»СЊ-Р°РґР°РїС‚РµСЂ РІРµСЂС…РЅРµРіРѕ СЃС‚РѕРї-СЃРёРіРЅР°Р»Р° В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9A%D0%B0%D0%BD%D0%B0%D0%BB%D1%8B%20%D0%B4%D0%BB%D1%8F%20%D0%BA%D0%B0%D0%B1%D0%B5%D0%BB%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Каналы для кабеля · 5 -->
+    <!-- Electrical / РљР°РЅР°Р»С‹ РґР»СЏ РєР°Р±РµР»СЏ В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9A%D0%BE%D1%80%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%20%D1%84%D0%B0%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Корректор фар · 1 -->
+    <!-- Electrical / РљРѕСЂСЂРµРєС‚РѕСЂ С„Р°СЂ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9C%D0%B0%D0%B3%D0%BD%D0%B8%D1%82%D0%BE%D0%BB%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Магнитола · 2 -->
+    <!-- Electrical / РњР°РіРЅРёС‚РѕР»Р° В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9E%D0%B1%D0%BE%D0%B3%D1%80%D0%B5%D0%B2%20%D1%81%D1%82%D1%91%D0%BA%D0%BE%D0%BB</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Обогрев стёкол · 1 -->
+    <!-- Electrical / РћР±РѕРіСЂРµРІ СЃС‚С‘РєРѕР» В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9E%D0%BC%D1%8B%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%20%D1%81%D1%82%D1%91%D0%BA%D0%BE%D0%BB</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Омыватель стёкол · 5 -->
+    <!-- Electrical / РћРјС‹РІР°С‚РµР»СЊ СЃС‚С‘РєРѕР» В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9E%D0%BC%D1%8B%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%20%D1%84%D0%B0%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Омыватель фар · 21 -->
+    <!-- Electrical / РћРјС‹РІР°С‚РµР»СЊ С„Р°СЂ В· 21 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9E%D1%81%D0%B2%D0%B5%D1%89%D0%B5%D0%BD%D0%B8%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Освещение · 1 -->
+    <!-- Electrical / РћСЃРІРµС‰РµРЅРёРµ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9F%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Питание · 2 -->
+    <!-- Electrical / РџРёС‚Р°РЅРёРµ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9F%D0%BE%D0%B4%D0%BE%D0%B3%D1%80%D0%B5%D0%B2%20%D1%81%D0%B8%D0%B4%D0%B5%D0%BD%D0%B8%D0%B9</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Подогрев сидений · 10 -->
+    <!-- Electrical / РџРѕРґРѕРіСЂРµРІ СЃРёРґРµРЅРёР№ В· 10 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9F%D0%BE%D0%B4%D1%83%D1%88%D0%BA%D0%B8%20%D0%B1%D0%B5%D0%B7%D0%BE%D0%BF%D0%B0%D1%81%D0%BD%D0%BE%D1%81%D1%82%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Подушки безопасности · 4 -->
+    <!-- Electrical / РџРѕРґСѓС€РєРё Р±РµР·РѕРїР°СЃРЅРѕСЃС‚Рё В· 4 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9F%D1%80%D0%B8%D0%B1%D0%BE%D1%80%D0%BD%D0%B0%D1%8F%20%D0%BF%D0%B0%D0%BD%D0%B5%D0%BB%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Приборная панель · 2 -->
+    <!-- Electrical / РџСЂРёР±РѕСЂРЅР°СЏ РїР°РЅРµР»СЊ В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9F%D1%80%D0%B8%D0%BA%D1%83%D1%80%D0%B8%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Прикуриватель · 1 -->
+    <!-- Electrical / РџСЂРёРєСѓСЂРёРІР°С‚РµР»СЊ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%9F%D1%80%D0%BE%D1%82%D0%B8%D0%B2%D0%BE%D1%82%D1%83%D0%BC%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5%20%D1%84%D0%B0%D1%80%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Противотуманные фары · 5 -->
+    <!-- Electrical / РџСЂРѕС‚РёРІРѕС‚СѓРјР°РЅРЅС‹Рµ С„Р°СЂС‹ В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%A0%D0%B0%D0%B7%D1%8A%D1%91%D0%BC%D1%8B%20%D0%B8%20%D0%BA%D0%BE%D0%BB%D0%BF%D0%B0%D1%87%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Разъёмы и колпачки · 195 -->
+    <!-- Electrical / Р Р°Р·СЉС‘РјС‹ Рё РєРѕР»РїР°С‡РєРё В· 195 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%A0%D0%B5%D0%BB%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Реле · 1 -->
+    <!-- Electrical / Р РµР»Рµ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%A0%D0%B5%D0%BB%D0%B5%20%D0%B8%20%D0%B1%D0%BB%D0%BE%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Реле и блоки · 19 -->
+    <!-- Electrical / Р РµР»Рµ Рё Р±Р»РѕРєРё В· 19 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%A0%D0%B5%D0%BB%D0%B5%20%D0%B8%20%D0%BF%D1%80%D0%B5%D0%B4%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D0%B8%D1%82%D0%B5%D0%BB%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Реле и предохранители · 3 -->
+    <!-- Electrical / Р РµР»Рµ Рё РїСЂРµРґРѕС…СЂР°РЅРёС‚РµР»Рё В· 3 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%A1%D0%B8%D0%B3%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Сигнализация · 1 -->
+    <!-- Electrical / РЎРёРіРЅР°Р»РёР·Р°С†РёСЏ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%A1%D1%82%D0%B0%D1%80%D1%82%D0%B5%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Стартер · 1 -->
+    <!-- Electrical / РЎС‚Р°СЂС‚РµСЂ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%A1%D1%82%D0%B5%D0%BA%D0%BB%D0%BE%D0%BE%D1%87%D0%B8%D1%81%D1%82%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%20%D0%B7%D0%B0%D0%B4%D0%BD%D0%B5%D0%B3%D0%BE%20%D1%81%D1%82%D0%B5%D0%BA%D0%BB%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Стеклоочиститель заднего стекла · 16 -->
+    <!-- Electrical / РЎС‚РµРєР»РѕРѕС‡РёСЃС‚РёС‚РµР»СЊ Р·Р°РґРЅРµРіРѕ СЃС‚РµРєР»Р° В· 16 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%A1%D1%82%D0%B5%D0%BA%D0%BB%D0%BE%D0%BF%D0%BE%D0%B4%D1%8A%D1%91%D0%BC%D0%BD%D0%B8%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Стеклоподъёмники · 2 -->
+    <!-- Electrical / РЎС‚РµРєР»РѕРїРѕРґСЉС‘РјРЅРёРєРё В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Electrical/%D0%A6%D0%B5%D0%BD%D1%82%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D0%B7%D0%B0%D0%BC%D0%BE%D0%BA</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Electrical / Центральный замок · 4 -->
+    <!-- Electrical / Р¦РµРЅС‚СЂР°Р»СЊРЅС‹Р№ Р·Р°РјРѕРє В· 4 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Bulbs/%D0%9E%D0%BF%D1%82%D0%B8%D0%BA%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Bulbs / Оптика · 5 -->
+    <!-- Bulbs / РћРїС‚РёРєР° В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Bulbs/%D0%9E%D1%81%D0%B2%D0%B5%D1%89%D0%B5%D0%BD%D0%B8%D0%B5</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Bulbs / Освещение · 8 -->
+    <!-- Bulbs / РћСЃРІРµС‰РµРЅРёРµ В· 8 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Heating/%D0%92%D0%B0%D0%BA%D1%83%D1%83%D0%BC%D0%BD%D1%8B%D0%B9%20%D1%80%D0%B5%D1%81%D0%B8%D0%B2%D0%B5%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Heating / Вакуумный ресивер · 7 -->
+    <!-- Heating / Р’Р°РєСѓСѓРјРЅС‹Р№ СЂРµСЃРёРІРµСЂ В· 7 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Heating/%D0%92%D0%BE%D0%B7%D0%B4%D1%83%D1%85%D0%BE%D0%B2%D0%BE%D0%B4%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Heating / Воздуховоды · 49 -->
+    <!-- Heating / Р’РѕР·РґСѓС…РѕРІРѕРґС‹ В· 49 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Heating/%D0%9C%D0%BE%D1%82%D0%BE%D1%80%D1%87%D0%B8%D0%BA</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Heating / Моторчик · 1 -->
+    <!-- Heating / РњРѕС‚РѕСЂС‡РёРє В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Heating/%D0%9E%D1%82%D0%BE%D0%BF%D0%B8%D1%82%D0%B5%D0%BB%D1%8C</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Heating / Отопитель · 26 -->
+    <!-- Heating / РћС‚РѕРїРёС‚РµР»СЊ В· 26 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Heating/%D0%A0%D0%B0%D0%B4%D0%B8%D0%B0%D1%82%D0%BE%D1%80%20%D0%BF%D0%B5%D1%87%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Heating / Радиатор печки · 1 -->
+    <!-- Heating / Р Р°РґРёР°С‚РѕСЂ РїРµС‡РєРё В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Heating/%D0%A0%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%20%D0%B2%D0%BE%D0%B7%D0%B4%D1%83%D1%85%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Heating / Распределитель воздуха · 33 -->
+    <!-- Heating / Р Р°СЃРїСЂРµРґРµР»РёС‚РµР»СЊ РІРѕР·РґСѓС…Р° В· 33 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Heating/%D0%A0%D0%B5%D0%B3%D1%83%D0%BB%D1%8F%D1%82%D0%BE%D1%80%20%D0%BE%D1%82%D0%BE%D0%BF%D0%B8%D1%82%D0%B5%D0%BB%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Heating / Регулятор отопителя · 18 -->
+    <!-- Heating / Р РµРіСѓР»СЏС‚РѕСЂ РѕС‚РѕРїРёС‚РµР»СЏ В· 18 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Heating/%D0%A0%D0%B5%D0%B7%D0%B8%D1%81%D1%82%D0%BE%D1%80</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Heating / Резистор · 1 -->
+    <!-- Heating / Р РµР·РёСЃС‚РѕСЂ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Heating/%D0%A2%D0%B5%D0%BF%D0%BB%D0%BE%D0%BE%D0%B1%D0%BC%D0%B5%D0%BD%D0%BD%D0%B8%D0%BA</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Heating / Теплообменник · 5 -->
+    <!-- Heating / РўРµРїР»РѕРѕР±РјРµРЅРЅРёРє В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Heating/%D0%A4%D0%B8%D0%BB%D1%8C%D1%82%D1%80%20%D1%81%D0%B0%D0%BB%D0%BE%D0%BD%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Heating / Фильтр салона · 11 -->
+    <!-- Heating / Р¤РёР»СЊС‚СЂ СЃР°Р»РѕРЅР° В· 11 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Heating/%D0%A8%D0%BB%D0%B0%D0%BD%D0%B3%D0%B8%20%D0%9E%D0%96</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Heating / Шланги ОЖ · 13 -->
+    <!-- Heating / РЁР»Р°РЅРіРё РћР– В· 13 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Fluids/%D0%90%D0%BD%D1%82%D0%B8%D1%84%D1%80%D0%B8%D0%B7</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Fluids / Антифриз · 4 -->
+    <!-- Fluids / РђРЅС‚РёС„СЂРёР· В· 4 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Fluids/%D0%93%D0%B8%D0%B4%D1%80%D0%BE%D1%83%D1%81%D0%B8%D0%BB%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%20%D1%80%D1%83%D0%BB%D1%8F</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Fluids / Гидроусилитель руля · 1 -->
+    <!-- Fluids / Р“РёРґСЂРѕСѓСЃРёР»РёС‚РµР»СЊ СЂСѓР»СЏ В· 1 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Fluids/%D0%9C%D0%BE%D1%82%D0%BE%D1%80%D0%BD%D1%8B%D0%B5%20%D0%BC%D0%B0%D1%81%D0%BB%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Fluids / Моторные масла · 2 -->
+    <!-- Fluids / РњРѕС‚РѕСЂРЅС‹Рµ РјР°СЃР»Р° В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Fluids/%D0%9E%D0%BC%D1%8B%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%20%D1%81%D1%82%D1%91%D0%BA%D0%BE%D0%BB</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Fluids / Омыватель стёкол · 14 -->
+    <!-- Fluids / РћРјС‹РІР°С‚РµР»СЊ СЃС‚С‘РєРѕР» В· 14 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Fluids/%D0%A1%D0%BC%D0%B0%D0%B7%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Fluids / Смазки · 2 -->
+    <!-- Fluids / РЎРјР°Р·РєРё В· 2 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Tires/%D0%90%D0%BB%D1%8E%D0%BC%D0%B8%D0%BD%D0%B8%D0%B5%D0%B2%D1%8B%D0%B5%20%D0%B4%D0%B8%D1%81%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Tires / Алюминиевые диски · 5 -->
+    <!-- Tires / РђР»СЋРјРёРЅРёРµРІС‹Рµ РґРёСЃРєРё В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Tires/%D0%91%D0%B0%D0%BB%D0%B0%D0%BD%D1%81%D0%B8%D1%80%D0%BE%D0%B2%D0%BE%D1%87%D0%BD%D1%8B%D0%B5%20%D0%B3%D1%80%D1%83%D0%B7%D1%8B</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Tires / Балансировочные грузы · 18 -->
+    <!-- Tires / Р‘Р°Р»Р°РЅСЃРёСЂРѕРІРѕС‡РЅС‹Рµ РіСЂСѓР·С‹ В· 18 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Tires/%D0%9A%D0%BE%D0%BB%D0%BF%D0%B0%D0%BA%D0%B8%20%D0%B8%20%D0%BA%D1%80%D0%B5%D0%BF%D1%91%D0%B6</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Tires / Колпаки и крепёж · 12 -->
+    <!-- Tires / РљРѕР»РїР°РєРё Рё РєСЂРµРїС‘Р¶ В· 12 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Tires/%D0%A1%D1%82%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B5%20%D0%B4%D0%B8%D1%81%D0%BA%D0%B8</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Tires / Стальные диски · 5 -->
+    <!-- Tires / РЎС‚Р°Р»СЊРЅС‹Рµ РґРёСЃРєРё В· 5 -->
   </url>
   <url>
     <loc>https://donignasio1989.github.io/polo-db/#/cat/Tires/%D0%A8%D0%B8%D0%BD%D1%8B%20%E2%80%94%20%D0%A1%D0%B2%D0%BE%D0%B4%D0%BD%D0%B0%D1%8F%20%D1%82%D0%B0%D0%B1%D0%BB%D0%B8%D1%86%D0%B0</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <!-- Tires / Шины — Сводная таблица · 1 -->
+    <!-- Tires / РЁРёРЅС‹ вЂ” РЎРІРѕРґРЅР°СЏ С‚Р°Р±Р»РёС†Р° В· 1 -->
   </url>
 </urlset>

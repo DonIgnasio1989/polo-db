@@ -1,28 +1,20 @@
 # База Мастера — robots.txt
-# Сгенерирован tools/build-sitemap.py 2026-10-30. Пути заданы от корня сайта
-# (/polo-db), поэтому при переносе на другой домен правки не нужны —
-# достаточно пересобрать sitemap с новым --base.
 
 User-agent: *
-Allow: /polo-db/
-Allow: /polo-db/icons/
-Disallow: /polo-db/data-src/
-Disallow: /polo-db/merged-data-src/
-Disallow: /polo-db/patches/
-Disallow: /polo-db/restore/
-Disallow: /polo-db/tests/
-Disallow: /polo-db/tools/
-Disallow: /polo-db/vin-dump/
-Disallow: /polo-db/volkswagenclub-net/
-Disallow: /polo-db/data/vin-db.json
-Disallow: /polo-db/data/vin-db.jsonl
-Disallow: /polo-db/data/filtered-vins.txt
-Disallow: /polo-db/data/filtered-files.txt
-# /data/ НЕ закрыт целиком намеренно: parts.json, categories.json,
-# sections.json, update.json и прочие грузятся самим приложением —
-# блокировка сломала бы офлайн-каталог на проде. Точечно закрыт только
-# дамп VIN (data/vin-db.json и исходники к нему).
-# ⚠ Disallow запрещает роботу ОБХОД, но не доступ по прямой ссылке.
+Allow: https://donignasio1989.github.io/polo-db/
+Allow: https://donignasio1989.github.io/polo-db/icons/
+Disallow: https://donignasio1989.github.io/polo-db/data-src/
+Disallow: https://donignasio1989.github.io/polo-db/merged-data-src/
+Disallow: https://donignasio1989.github.io/polo-db/patches/
+Disallow: https://donignasio1989.github.io/polo-db/restore/
+Disallow: https://donignasio1989.github.io/polo-db/tests/
+Disallow: https://donignasio1989.github.io/polo-db/tools/
+Disallow: https://donignasio1989.github.io/polo-db/vin-dump/
+Disallow: https://donignasio1989.github.io/polo-db/volkswagenclub-net/
+Disallow: https://donignasio1989.github.io/polo-db/data/vin-db.json
+Disallow: https://donignasio1989.github.io/polo-db/data/vin-db.jsonl
+Disallow: https://donignasio1989.github.io/polo-db/data/filtered-vins.txt
+Disallow: https://donignasio1989.github.io/polo-db/data/filtered-files.txt
 
 Sitemap: https://donignasio1989.github.io/polo-db/sitemap.xml
 Host: donignasio1989.github.io
