@@ -1,3 +1,4 @@
+
 /* ============================================================
    VW Polo / Caddy 6N — База Мастера · Redesign v22 (clean)
    ============================================================ */
@@ -8561,4 +8562,120 @@ label,
     .sr {
         line-height: 1.2 !important;
     }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   1.14.0 · ОБЛАКО (js/cloud.js): индикатор синхронизации в подвале
+   сайдбара + внутренности модалки «Облако и синхронизация».
+   Формы переиспользуют базовые классы .bn/.fg/.fh/.mo/.mdl.
+   ═══════════════════════════════════════════════════════════════ */
+.sft-btn.cloud {
+    position: relative;
+}
+
+.cdot {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #6c757d;
+    box-shadow: 0 0 0 1.5px rgba(0, 0, 0, .35);
+    pointer-events: none;
+}
+
+.cdot.ok { background: #2ecc71; }
+.cdot.dirty { background: #f5a623; }
+.cdot.sync { background: #00b0f0; animation: cdpulse .9s ease-in-out infinite; }
+.cdot.err { background: #e74c3c; }
+.cdot.anon,
+.cdot.off { background: #6c757d; }
+
+@keyframes cdpulse {
+    50% { opacity: .3; }
+}
+
+/* ── Модалка облака ── */
+.cloud-form .cloud-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.cloud-form .cloud-tabs .bn {
+    flex: 1;
+}
+
+.cl-err {
+    min-height: 1.2em;
+    color: var(--dg, #e74c3c);
+    font-size: .8rem;
+    margin: 6px 0;
+    white-space: pre-wrap;
+}
+
+.cl-submit {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.cloud-what {
+    margin-top: 14px;
+    padding: 10px 12px;
+    background: var(--hv);
+    border: 1px solid var(--bd);
+    border-radius: var(--r-md, 10px);
+    font-size: .78rem;
+    line-height: 1.55;
+}
+
+.cloud-what ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+}
+
+.cloud-what li {
+    margin: 4px 0;
+}
+
+.cloud-off {
+    padding: 6px 2px;
+    font-size: .85rem;
+    line-height: 1.6;
+}
+
+.cloud-ok .cloud-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 14px 0 4px;
+}
+
+.cl-st {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .8rem;
+    font-weight: 600;
+}
+
+.cl-st::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6c757d;
+}
+
+.cl-st.ok::before { background: #2ecc71; }
+.cl-st.dirty::before { background: #f5a623; }
+.cl-st.sync::before { background: #00b0f0; animation: cdpulse .9s ease-in-out infinite; }
+.cl-st.err::before { background: #e74c3c; }
+
+.cl-when {
+    display: block;
+    margin-top: 4px;
+    font-size: .7rem;
+    color: var(--mu);
 }
