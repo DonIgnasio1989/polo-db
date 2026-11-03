@@ -23,8 +23,8 @@
    (Dashboard → Project Settings → API). Ключ anon публичный —
    безопасность обеспечивает RLS (см. schema.sql).            */
 const CLOUD_CONFIG = {
-    url: '',       // например: 'https://abcdefgh.supabase.co'
-    anonKey: ''    // например: 'eyJhbGciOi…'
+    url: 'https://lzhqikgxrtofrrprvjix.supabase.co',       // например: 'https://abcdefgh.supabase.co'
+    anonKey: 'sb_publishable_3mvmyHfgqi8g8f6j0Yonjg_T8XyDpa2'   // например: 'eyJhbGciOi…'
 };
 
 window.Cloud = (function () {
