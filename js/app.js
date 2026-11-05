@@ -912,7 +912,6 @@ function setVote(p, a, dir) {
     if (v.my === 'bad') v.bad = (v.bad || 0) + 1;
     all[k] = v;
     try { localStorage.setItem(VOTEKEY, JSON.stringify(all)); } catch (e) { }
-    cloudMark('votes');
     return v;
 }
 function exportVotes() {
@@ -941,7 +940,6 @@ function importVotes() {
                     all[k] = cur; n++;
                 });
                 try { localStorage.setItem(VOTEKEY, JSON.stringify(all)); } catch (e) { }
-                cloudMark('votes');
                 toast('Импортировано голосов: ' + n, 'success');
                 if (partmoId) oPC(partmoId);
                 rC();
@@ -1284,7 +1282,7 @@ function schAll() { try { const o = JSON.parse(localStorage.getItem(SCH_KEY) || 
 function schGet(key) { const v = schAll()[key]; return v && Array.isArray(v.photos) ? v : { photos: [], marks: [] }; }
 function schSet(key, val) {
     const all = schAll(); all[key] = val;
-    try { localStorage.setItem(SCH_KEY, JSON.stringify(all)); cloudMark('schemes'); return true; }
+    try { localStorage.setItem(SCH_KEY, JSON.stringify(all)); return true; }
     catch (e) { toast('Хранилище переполнено — удалите часть фото', 'danger'); return false; }
 }
 function oScheme(cat, sub) {
@@ -1390,7 +1388,7 @@ function mergeSchemes(base, inc) {
     return out;
 }
 function schSetAll(all) {
-    try { localStorage.setItem(SCH_KEY, JSON.stringify(all)); cloudMark('schemes'); return true; }
+    try { localStorage.setItem(SCH_KEY, JSON.stringify(all)); return true; }
     catch (e) { toast('Хранилище переполнено — пак импортирован не полностью', 'danger'); return false; }
 }
 function exportSchemes() {
@@ -2100,7 +2098,7 @@ let CUSTOM = { categories: [], sections: {} };
 let TO = { km: null, lastKm: null, lastDate: null, interval: 15000 };
 let TO_ALL = {};
 
-let APP_VERSION = '1.14.0'; // fallback, если update.json не загрузится
+let APP_VERSION = '1.13.3'; // fallback, если update.json не загрузится
 let licAppReady = false;
 let edId = null, ewId = null, pPh = null, pPhCl = false;
 let useIDB = true, vk = '', pGV = null, dbr = null;
@@ -2346,10 +2344,7 @@ const iAll = async s => {
         r.onerror = () => rej(r.error);
     });
 };
-/* ── 1.14.0: какой вид данных затрагивает запись в IndexedDB-хранилище ── */
-const _cloudKindOfStore = s => s === SP ? 'parts' : s === SW ? 'workshops' : s === 'logs' ? 'logs' : '';
 const iPut = async (s, i) => {
-    cloudMark(_cloudKindOfStore(s));
     const db = await oDB();
     return new Promise((res, rej) => {
         const tx = db.transaction(s, 'readwrite');
@@ -2359,7 +2354,6 @@ const iPut = async (s, i) => {
     });
 };
 const iMany = async (s, arr) => {
-    cloudMark(_cloudKindOfStore(s));
     const db = await oDB();
     return new Promise((res, rej) => {
         const tx = db.transaction(s, 'readwrite');
@@ -2370,7 +2364,6 @@ const iMany = async (s, arr) => {
     });
 };
 const iDel = async (s, id) => {
-    cloudMark(_cloudKindOfStore(s));
     const db = await oDB();
     return new Promise((res, rej) => {
         const tx = db.transaction(s, 'readwrite');
@@ -2380,7 +2373,6 @@ const iDel = async (s, id) => {
     });
 };
 const iClr = async s => {
-    cloudMark(_cloudKindOfStore(s));
     const db = await oDB();
     return new Promise((res, rej) => {
         const tx = db.transaction(s, 'readwrite');
@@ -2678,7 +2670,7 @@ function lG() {
         }
     } catch (e) { }
 }
-const sG = () => { try { localStorage.setItem(GK, JSON.stringify(G)); } catch (e) { } cloudMark('garage'); };
+const sG = () => { try { localStorage.setItem(GK, JSON.stringify(G)); } catch (e) { } };
 
 function lMeta() {
     try {
@@ -2713,13 +2705,12 @@ function lMeta() {
         }
     } catch (e) { }
 }
-function sMeta() { try { localStorage.setItem(METAKEY, JSON.stringify(CUSTOM)); } catch (e) { } cloudMark('meta'); }
+function sMeta() { try { localStorage.setItem(METAKEY, JSON.stringify(CUSTOM)); } catch (e) { } }
 function resetMeta() {
     CATS = BASE_CATS.slice();
     EK = Object.assign({}, BASE_EK);
     CUSTOM = { categories: [], sections: {} };
     try { localStorage.removeItem(METAKEY); } catch (e) { }
-    cloudMark('meta');
 }
 
 function lProfile() {
@@ -2737,7 +2728,7 @@ function lProfile() {
         }
     } catch (e) { }
 }
-function sProfileStorage() { try { localStorage.setItem(PROFKEY, JSON.stringify(USER)); } catch (e) { } cloudMark('profile'); }
+function sProfileStorage() { try { localStorage.setItem(PROFKEY, JSON.stringify(USER)); } catch (e) { } }
 
 function lU() {
     try {
@@ -2762,30 +2753,15 @@ const sD = () => {
         try { localStorage.setItem(PK, JSON.stringify(D)); }
         catch (e) { toast('Хранилище переполнено', 'danger'); }
     }
-    cloudMark('parts');
 };
 const sLogs = () => {
     if (useIDB) iMany('logs', LOG).catch(() => { });
     else { try { localStorage.setItem(LOGKEY, JSON.stringify(LOG)); } catch (e) { } }
-    cloudMark('logs');
 };
 const sWk = () => {
     if (useIDB) iMany(SW, W).catch(() => { });
-    else { try { localStorage.setItem(WK, JSON.stringify(W)); } catch (e) { } cloudMark('workshops'); }
+    else { try { localStorage.setItem(WK, JSON.stringify(W)); } catch (e) { } }
 };
-
-/* ── 1.14.0: ХУК ОБЛАЧНОЙ СИНХРОНИЗАЦИИ ──
-   cloud.js (js/cloud.js) загружается после app.js и подписывается на
-   изменения данных: cloudMark(kind) помечает вид данных «грязным» и
-   debounce-отправляет его на сервер (Supabase), если пользователь вошёл.
-   Без облака/без входа — no-op, поведение приложения прежнее.
-   Виды: garage, to, logs, shop, profile, parts, workshops, schemes,
-   votes, meta. */
-const CLOUD_KINDS = new Set(['garage', 'to', 'logs', 'shop', 'profile', 'parts', 'workshops', 'schemes', 'votes', 'meta']);
-function cloudMark(kind) {
-    if (!kind || !CLOUD_KINDS.has(kind)) return;
-    try { if (window.Cloud) Cloud.markDirty(kind); } catch (e) { }
-}
 
 function lLS() {
     try {
@@ -2864,7 +2840,6 @@ function lTO() {
 /* Запись карты TO_ALL в localStorage «как есть» (без commit текущего TO). */
 function _toPersist() {
     try { localStorage.setItem(TOKEY, JSON.stringify({ byVin: TO_ALL })); } catch (e) { }
-    cloudMark('to');
 }
 /* Сохраняет ТЕКУЩИЙ TO в карту под активным ключом и пишет всю карту.
    Пустые значения (сброс) удаляют запись ключа — карта не зарастает. */
@@ -3967,7 +3942,6 @@ function _mergeCats(cats) {
 }
 function _mergeSections(secs) {
     if (!secs || typeof secs !== 'object' || Array.isArray(secs)) return;
-    if (window.Cloud) { try { Cloud.noteServerSections(secs); } catch (e) { } }
     for (const sid of Object.keys(secs)) {
         const srv = secs[sid];
         if (!srv || typeof srv !== 'object') continue;
@@ -3999,7 +3973,6 @@ function _mergeSections(secs) {
 }
 async function _mergeWorkshops(wss) {
     if (!Array.isArray(wss) || !wss.length) return;
-    if (window.Cloud) { try { Cloud.noteServerWorkshops(wss); } catch (e) { } }
     const normalized = wss.map(nW).filter(Boolean);
     const existingIds = new Set(W.map(w => w.id));
     const existingNames = new Set(W.map(w => (w.name || '').toLowerCase()));
@@ -4139,10 +4112,6 @@ async function lAll() {
         // 5. Нормализация + дедупликация всего серверного массива
         const normalized = serverParts.map(nP).filter(Boolean);
         const deduped = _dedupeParts(normalized);
-        /* 1.14.0: облако запоминает, какие позиции пришли из справочных
-           data-файлов — всё, чего в этом наборе нет, считается
-           пользовательским и синхронизируется через Supabase. */
-        if (window.Cloud) { try { Cloud.setServerParts(deduped); } catch (e) { } }
         console.log('[lAll] files:' + files.length + ' · raw:' + serverParts.length +
             ' · after dedupe:' + deduped.length +
             ' · ' + Math.round(performance.now() - t0) + 'ms');
@@ -4200,18 +4169,6 @@ async function lAll() {
        списка покупок восстанавливаются устойчивыми ключами «oem|название». */
     lTO(); lShopAll(); await lLogs();
     try { vk = localStorage.getItem(VK) || ''; } catch (e) { }
-
-    /* ── 1.14.0: ОБЛАКО ──
-       Если пользователь вошёл (Supabase-сессия в localStorage) — до
-       первой отрисовки забираем с сервера личные данные (гараж, ТО,
-       журнал, список покупок, профиль, статусы/избранное) и общие
-       (правки каталога, добавленные позиции, сервисы, схемы, голоса,
-       разделы), мержим с локальными и отправляем накопившийся офлайн.
-       Без облака/без входа — мгновенный no-op. */
-    if (window.Cloud) {
-        try { await Cloud.afterBoot(); }
-        catch (e) { console.warn('[cloud] afterBoot', e); }
-    }
 }
 
 /* ============ ТЕМА ============ */
@@ -6529,7 +6486,6 @@ function sShopPick() {
     const key = toKey();
     if (keys.length) SHOP_ALL[key] = keys; else delete SHOP_ALL[key];
     try { localStorage.setItem(SHPKEY, JSON.stringify({ byVin: SHOP_ALL })); } catch (e) { }
-    cloudMark('shop');
 }
 function shopClearAll() {
     if (!shopPick.size) { toast('Отметок нет', 'info'); return; }
@@ -7614,9 +7570,6 @@ async function init() {
     // Диплинк из URL (#/part/…, #/cat/…, #/vin/…, #/maint/…)
     routeHash();
     _hashReady = true;
-    /* 1.14.0: флаг для js/cloud.js — если облачный модуль загрузился
-       позже завершения init(), он выполнит «догоняющую» синхронизацию. */
-    window._bmInited = true;
 }
 /* ====== НОВЫЕ КНОПКИ КАРТОЧКИ VIN ======
    Расходники под VIN: мотор + КПП (семейство и буквенный код) + кузов.
