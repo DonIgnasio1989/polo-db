@@ -8468,3 +8468,18 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         QRGen = qrcode;
     }
 })();
+/* ============================================================
+☁️ CLOUD SYNC LOADER · подключает js/cloud.js рядом с app.js
+Вставлено в конец app.js — index.html править не требуется.
+============================================================ */
+(function () {
+  if (window.__bmCloudLoader) return;
+  window.__bmCloudLoader = true;
+  var cur = document.currentScript;
+  var base = (cur && cur.src) ? cur.src.replace(/[^/]*$/, '') : 'js/';
+  var s = document.createElement('script');
+  s.src = base + 'cloud.js?v=' + Date.now();
+  s.async = false;
+  s.onerror = function () { console.warn('[cloud] не найден файл ' + s.src); };
+  document.head.appendChild(s);
+})();
