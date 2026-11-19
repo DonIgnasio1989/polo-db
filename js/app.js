@@ -8483,3 +8483,356 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   s.onerror = function () { console.warn('[cloud] не найден файл ' + s.src); };
   document.head.appendChild(s);
 })();
+/* ============================================================
+🖨🛒 «Моя машина» → Покупки: выбор позиций + печать / CSV / текст
+Дописывается в конец js/app.js. Прежний блок печати перекрывается.
+Отметки живут в SHOP_ALL под ключом __purch__<VIN> — отдельно для
+каждой машины и синхронизируются облаком как settings.shop.
+============================================================ */
+(function () {
+'use strict';
+if (typeof rDash !== 'function') return;
+if (!window.__rDashBase) window.__rDashBase = rDash;
+rDash = function () {
+  window.__rDashBase.apply(this, arguments);
+  try { purchDecorate(); } catch (e) { console.warn('[purch]', e); }
+};
+
+/* ---------- стили (один раз) ---------- */
+if (!document.getElementById('purchStyle')) {
+  const st = document.createElement('style');
+  st.id = 'purchStyle';
+  st.textContent =
+    '.purch-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap}'
+    + '.purch-mini{padding:3px 9px;font-size:.68rem;border:1px solid var(--bd);border-radius:var(--r-pill);'
+    + 'background:var(--cd-2);color:var(--tx);cursor:pointer;font-family:inherit;font-weight:600;transition:all var(--tr-fast)}'
+    + '.purch-mini:hover{border-color:var(--a);color:var(--a)}'
+    + '.purch-cnt{margin-left:auto;font-size:.7rem;color:var(--mu);font-family:var(--ff-mono)}'
+    + '.purch-sum{font-size:.72rem;color:var(--a);font-weight:700;font-family:var(--ff-mono)}'
+    + '.purch-list{max-height:236px;overflow-y:auto;border:1px solid var(--bd);border-radius:var(--r-sm);background:var(--hv)}'
+    + '.purch-gr{display:flex;align-items:center;gap:7px;padding:6px 9px;font-size:.72rem;font-weight:700;'
+    + 'color:var(--tx);background:var(--cd-2);position:sticky;top:0;z-index:1;cursor:pointer;border-bottom:1px solid var(--bd)}'
+    + '.purch-gr span{color:var(--mu);font-weight:500}'
+    + '.purch-row{display:grid;grid-template-columns:18px auto 1fr auto;gap:7px;align-items:center;'
+    + 'padding:5px 9px;border-bottom:1px solid var(--bd);cursor:pointer;font-size:.74rem}'
+    + '.purch-row:last-child{border-bottom:none}'
+    + '.purch-row:hover{background:color-mix(in srgb,var(--a) 8%,transparent)}'
+    + '.purch-row.off{opacity:.5}'
+    + '.purch-cb,.purch-gr input{width:15px;height:15px;accent-color:var(--a);cursor:pointer;margin:0;flex-shrink:0}'
+    + '.purch-nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx)}'
+    + '.purch-pr{font-family:var(--ff-mono);font-size:.7rem;color:var(--mu);white-space:nowrap}'
+    + '.purch-empty{padding:12px;font-size:.76rem;color:var(--mu);text-align:center;line-height:1.5}'
+    + '@media(max-width:900px){.purch-list{max-height:200px}.purch-row{font-size:.72rem}}';
+  document.head.appendChild(st);
+}
+
+/* ---------- данные и отметки ---------- */
+const selKey = () => '__purch__' + toKey();
+const selRead = () => { const a = SHOP_ALL[selKey()]; return Array.isArray(a) ? a.slice() : null; };
+function selWrite(keys) {
+  SHOP_ALL[selKey()] = keys;
+  try { localStorage.setItem(SHPKEY, JSON.stringify({ byVin: SHOP_ALL })); } catch (e) { }
+}
+function purchItems() {
+  const byCat = (a, b) =>
+    String(catL(a.cat)).localeCompare(String(catL(b.cat)), 'ru')
+    || String(a.oem || '').localeCompare(String(b.oem || ''));
+  return {
+    want: D.filter(p => p.status === 'want').sort(byCat),
+    bought: D.filter(p => p.status === 'bought').sort(byCat)
+  };
+}
+function purchState() {
+  const { want, bought } = purchItems();
+  const all = want.concat(bought);
+  const stored = selRead();
+  const keys = stored == null ? new Set(all.map(pickKeyOf)) : new Set(stored);
+  return { want, bought, all, keys, sel: all.filter(p => keys.has(pickKeyOf(p))) };
+}
+function sumsByCur(arr) {
+  const m = {};
+  arr.forEach(p => {
+    if (p.price == null || !isFinite(Number(p.price))) return;
+    const c = p.currency || 'RUB';
+    m[c] = (m[c] || 0) + Number(p.price);
+  });
+  return m;
+}
+const sumLine = m => Object.keys(m).sort().map(c => fP(m[c], c)).join(' + ');
+const noSel = () => toast('Ничего не отмечено — поставьте галочки в списке покупок', 'info');
+
+/* ---------- отрисовка карточки ---------- */
+function purchDecorate() {
+  const ar = document.getElementById('ca');
+  if (!ar) return;
+  let card = null;
+  ar.querySelectorAll('.dash-card').forEach(c => {
+    const h = c.querySelector('.dc-h');
+    if (h && h.textContent.indexOf('Покупки') >= 0) card = c;
+  });
+  if (!card) return;
+
+  /* убираем следы прежней версии и старый список из 5 строк */
+  card.querySelectorAll('.purch-btns,.purch-bar,.purch-list,.purch-sum,.dash-log').forEach(n => n.remove());
+  card.querySelectorAll('.dc-sub').forEach(n => {
+    if (/^показаны \d+ из/.test(n.textContent.trim())) n.remove();
+  });
+
+  const s = purchState();
+  if (!s.all.length) {
+    const e = document.createElement('div');
+    e.className = 'purch-empty';
+    e.innerHTML = 'Список пуст. Отметьте детали в каталоге статусом 🛒 Хочу или 📦 Куплено — они появятся здесь с галочками.';
+    card.appendChild(e);
+    return;
+  }
+
+  const bar = document.createElement('div');
+  bar.className = 'purch-bar';
+  bar.innerHTML =
+    '<button type="button" class="purch-mini" data-purch-all="1">☑ Все</button>'
+    + '<button type="button" class="purch-mini" data-purch-all="0">☐ Снять</button>'
+    + '<span class="purch-cnt"></span>';
+  card.appendChild(bar);
+
+  const list = document.createElement('div');
+  list.className = 'purch-list';
+  let h = '';
+  const group = (gid, title, arr) => {
+    if (!arr.length) return '';
+    let g = '<label class="purch-gr"><input type="checkbox" data-purch-gr="' + gid + '">'
+      + esc(title) + ' <span>(' + arr.length + ')</span></label>';
+    arr.forEach(p => {
+      const k = pickKeyOf(p);
+      g += '<div class="purch-row' + (s.keys.has(k) ? '' : ' off') + '" data-purch-row="1">'
+        + '<input type="checkbox" class="purch-cb" data-purch-g="' + gid + '" data-purch-key="' + escA(k) + '"' + (s.keys.has(k) ? ' checked' : '') + '>'
+        + '<button type="button" class="dl-link" data-action="dash-part" data-id="' + escA(p.id) + '" title="Открыть карточку детали">' + esc(p.oem || '—') + '</button>'
+        + '<span class="purch-nm" title="' + escA(p.name || '') + '">' + esc(p.name || '') + '</span>'
+        + '<span class="purch-pr">' + esc(p.price != null ? fP(p.price, p.currency) : '') + '</span>'
+        + '</div>';
+    });
+    return g;
+  };
+  h += group('want', '🛒 Хочу купить', s.want);
+  h += group('bought', '📦 Куплено', s.bought);
+  list.innerHTML = h;
+  card.appendChild(list);
+
+  const sum = document.createElement('div');
+  sum.className = 'purch-sum';
+  card.appendChild(sum);
+
+  const box = document.createElement('div');
+  box.className = 'dash-btns purch-btns';
+  box.innerHTML =
+    '<button type="button" class="bn p" data-purch="print" title="Печать или PDF — только отмеченные позиции">🖨 Печать</button>'
+    + '<button type="button" class="bn" data-purch="csv" title="Выгрузить отмеченное в CSV">📊 CSV</button>'
+    + '<button type="button" class="bn" data-purch="text" title="Скопировать отмеченное текстом">📋 Текст</button>';
+  card.appendChild(box);
+
+  /* --- события --- */
+  const commit = () => {
+    const keys = [];
+    card.querySelectorAll('.purch-cb').forEach(c => { if (c.checked) keys.push(c.dataset.purchKey); });
+    selWrite(keys);
+    purchSync(card);
+  };
+  card.querySelectorAll('.purch-cb').forEach(cb => cb.addEventListener('change', commit));
+  card.querySelectorAll('[data-purch-gr]').forEach(gb => gb.addEventListener('change', () => {
+    card.querySelectorAll('.purch-cb[data-purch-g="' + gb.dataset.purchGr + '"]').forEach(c => { c.checked = gb.checked; });
+    commit();
+  }));
+  card.querySelectorAll('.purch-row').forEach(row => row.addEventListener('click', e => {
+    if (e.target.closest('button') || e.target.tagName === 'INPUT') return;
+    const cb = row.querySelector('.purch-cb');
+    cb.checked = !cb.checked;
+    commit();
+  }));
+  card.querySelectorAll('[data-purch-all]').forEach(b => b.addEventListener('click', () => {
+    const on = b.dataset.purchAll === '1';
+    card.querySelectorAll('.purch-cb').forEach(c => { c.checked = on; });
+    commit();
+  }));
+  box.querySelectorAll('[data-purch]').forEach(b => b.addEventListener('click', e => {
+    e.stopPropagation();
+    const k = b.dataset.purch;
+    if (k === 'print') printPurchases();
+    else if (k === 'csv') exportPurchasesCSV();
+    else copyPurchasesText();
+  }));
+
+  purchSync(card);
+}
+
+/* счётчики, суммы, состояние групповых чекбоксов, подписи кнопок */
+function purchSync(card) {
+  const s = purchState();
+  const cnt = card.querySelector('.purch-cnt');
+  if (cnt) cnt.textContent = 'выбрано ' + s.sel.length + ' из ' + s.all.length;
+  const sum = card.querySelector('.purch-sum');
+  if (sum) { const l = sumLine(sumsByCur(s.sel)); sum.textContent = l ? 'Σ ' + l : ''; }
+  card.querySelectorAll('.purch-row').forEach(r => {
+    const cb = r.querySelector('.purch-cb');
+    if (cb) r.classList.toggle('off', !cb.checked);
+  });
+  ['want', 'bought'].forEach(g => {
+    const gb = card.querySelector('[data-purch-gr="' + g + '"]');
+    if (!gb) return;
+    const cbs = Array.from(card.querySelectorAll('.purch-cb[data-purch-g="' + g + '"]'));
+    const on = cbs.filter(c => c.checked).length;
+    gb.checked = on > 0 && on === cbs.length;
+    gb.indeterminate = on > 0 && on < cbs.length;
+  });
+  const n = s.sel.length ? ' (' + s.sel.length + ')' : '';
+  const pb = card.querySelector('[data-purch="print"]'); if (pb) pb.textContent = '🖨 Печать' + n;
+  const cb2 = card.querySelector('[data-purch="csv"]'); if (cb2) cb2.textContent = '📊 CSV' + n;
+  const tb = card.querySelector('[data-purch="text"]'); if (tb) tb.textContent = '📋 Текст' + n;
+}
+
+/* ---------- сводка о машине ---------- */
+function carBits(av) {
+  const bits = [];
+  if (!av) return bits;
+  if (av.brand || av.model) bits.push([av.brand, av.model].filter(Boolean).join(' '));
+  if (av.year) bits.push(av.year + ' г.');
+  if (av.engineCode) bits.push('мотор ' + av.engineCode);
+  if (av.gearboxCode || av.transCode) bits.push('КПП ' + (av.gearboxCode || av.transCode));
+  if (av.prodDate) bits.push('выпуск ' + av.prodDate);
+  return bits;
+}
+const selGroups = () => {
+  const s = purchState();
+  return {
+    want: s.want.filter(p => s.keys.has(pickKeyOf(p))),
+    bought: s.bought.filter(p => s.keys.has(pickKeyOf(p))),
+    total: s.all.length,
+    count: s.sel.length
+  };
+};
+
+/* ---------- ПЕЧАТЬ ---------- */
+function printPurchases() {
+  const g = selGroups();
+  if (!g.count) return noSel();
+  const av = gAV();
+  const w = window.open('', '_blank');
+  if (!w) { toast('Браузер заблокировал всплывающее окно — разрешите его для этого сайта', 'danger'); return; }
+
+  const css = '<style>'
+    + 'body{font-family:Arial,Helvetica,sans-serif;color:#000;padding:20px;max-width:840px;margin:0 auto}'
+    + 'h1{font-size:18px;margin:0 0 12px}'
+    + 'h2{font-size:14px;margin:18px 0 8px;color:#004b8f;border-bottom:1px solid #ccc;padding-bottom:3px}'
+    + 'table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px}'
+    + 'th,td{border:1px solid #ccc;padding:6px 8px;text-align:left;vertical-align:top}'
+    + 'th{background:#f0f0f0}tr{page-break-inside:avoid}'
+    + '.vinbox{border:2px solid #000;padding:10px 14px;margin:10px 0 14px}'
+    + '.vinlab{font-size:11px;font-weight:700;letter-spacing:2px;color:#555}'
+    + '.vincode{font-family:Consolas,"Courier New",monospace;font-size:22px;font-weight:700;letter-spacing:2px}'
+    + '.vincar{font-size:12px;margin-top:4px}'
+    + '.meta{font-size:12px;color:#666;margin:0 0 10px}'
+    + '.oem{font-family:Consolas,monospace;white-space:nowrap}'
+    + '.nm{font-weight:700}.note{font-size:11px;color:#666;font-style:italic;margin-top:2px}'
+    + '.an{font-size:11px;color:#555}.price{white-space:nowrap;text-align:right;font-weight:700}'
+    + '.sum{font-size:12px;margin:4px 0 0;padding:6px 8px;background:#f7f7f7;border:1px solid #ddd}'
+    + '.box{display:inline-block;width:12px;height:12px;border:1.5px solid #333}'
+    + '.lines{margin-top:18px;font-size:11px;color:#888}'
+    + '.foot{margin-top:14px;font-size:10px;color:#777;border-top:1px solid #ddd;padding-top:6px}'
+    + '@media print{@page{margin:15mm}body{padding:0}}'
+    + '</style>';
+
+  const section = (title, arr, sumTitle) => {
+    if (!arr.length) return '';
+    let s = '<h2>' + esc(title) + ' (' + arr.length + ')</h2><table><tr>'
+      + '<th style="width:28px">OK</th><th style="width:148px">OEM</th><th>Наименование</th>'
+      + '<th style="width:108px">Категория</th><th style="width:168px">Аналоги</th>'
+      + '<th style="width:92px">Цена</th></tr>';
+    arr.forEach(p => {
+      s += '<tr><td><span class="box"></span></td>'
+        + '<td class="oem">' + esc(p.oem || '—') + '</td>'
+        + '<td><div class="nm">' + esc(p.name || '') + '</div>'
+        + (p.notes ? '<div class="note">' + esc(p.notes) + '</div>' : '') + '</td>'
+        + '<td>' + esc(catL(p.cat)) + '</td>'
+        + '<td class="an">' + esc((p.analogs || []).slice(0, 3).join(', ')) + '</td>'
+        + '<td class="price">' + esc(p.price != null ? fP(p.price, p.currency) : '—') + '</td></tr>';
+    });
+    s += '</table>';
+    const line = sumLine(sumsByCur(arr));
+    s += '<div class="sum">' + esc(sumTitle) + ': <b>' + arr.length + '</b> ' + pluralPos(arr.length)
+      + (line ? ' · ' + esc(line) : ' · цены не указаны') + '</div>';
+    return s;
+  };
+
+  let h = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Список покупок — База Мастера</title>'
+    + css + '</head><body><h1>🛒 Список покупок — VW Polo/Caddy 6N</h1>';
+  if (av && av.vin) {
+    const bits = carBits(av);
+    h += '<div class="vinbox"><div class="vinlab">VIN</div>'
+      + '<div class="vincode">' + esc(String(av.vin).toUpperCase()) + '</div>'
+      + (bits.length ? '<div class="vincar">' + esc(bits.join(' · ')) + '</div>' : '') + '</div>';
+  } else {
+    h += '<div style="border:1px dashed #999;padding:8px 12px;margin:10px 0 14px;font-size:12px;color:#666">'
+      + 'VIN не указан — выберите машину в гараже, чтобы продавец мог проверить применяемость.</div>';
+  }
+  h += '<p class="meta">Дата: ' + new Date().toLocaleDateString('ru-RU')
+    + (TO.km != null ? ' · Пробег: ' + Number(TO.km).toLocaleString('ru-RU') + ' км' : '')
+    + ' · Отмечено ' + g.count + ' из ' + g.total + '</p>';
+  h += section('🛒 Хочу купить', g.want, 'План покупок');
+  h += section('📦 Куплено', g.bought, 'Уже куплено');
+  h += '<div class="lines">Заметки: ............................................................................................................................</div>';
+  h += '<div class="foot">База Мастера v' + esc(APP_VERSION) + ' · сформировано '
+    + new Date().toLocaleString('ru-RU') + ' · артикулы сверяйте по ETKA перед заказом</div>';
+  h += '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script></body></html>';
+  w.document.write(h);
+  w.document.close();
+  window.ymGoal && window.ymGoal('purchase_list_printed', { items: g.count });
+}
+
+/* ---------- CSV ---------- */
+function exportPurchasesCSV() {
+  const g = selGroups();
+  if (!g.count) return noSel();
+  const H = ['Статус', 'OEM', 'Название', 'Категория', 'Аналоги', 'Цена', 'Валюта', 'Магазин', 'Заметки'];
+  const row = (p, st) => [
+    st, p.oem || '', p.name || '', catL(p.cat), (p.analogs || []).join('; '),
+    p.price != null ? p.price : '', p.currency || '', p.shopUrl || '', p.notes || ''
+  ];
+  const rows = g.want.map(p => row(p, 'Хочу купить')).concat(g.bought.map(p => row(p, 'Куплено')));
+  const csv = '\ufeff' + [H].concat(rows).map(r => r.map(csvE).join(',')).join('\r\n');
+  dl('purchases_' + new Date().toISOString().slice(0, 10) + '.csv', csv, 'text/csv;charset=utf-8');
+  toast('CSV: ' + rows.length + ' ' + pluralPos(rows.length), 'success');
+  window.ymGoal && window.ymGoal('purchase_list_csv', { items: rows.length });
+}
+
+/* ---------- ТЕКСТ ---------- */
+function copyPurchasesText() {
+  const g = selGroups();
+  if (!g.count) return noSel();
+  const av = gAV();
+  const L = ['СПИСОК ПОКУПОК — VW Polo/Caddy 6N'];
+  if (av && av.vin) L.push('VIN: ' + String(av.vin).toUpperCase());
+  const bits = carBits(av);
+  if (bits.length) L.push(bits.join(' · '));
+  if (TO.km != null) L.push('Пробег: ' + Number(TO.km).toLocaleString('ru-RU') + ' км');
+  L.push('Дата: ' + new Date().toLocaleDateString('ru-RU'), 'Отмечено ' + g.count + ' из ' + g.total, '');
+  const block = (title, arr, sumTitle) => {
+    if (!arr.length) return;
+    L.push(title + ' (' + arr.length + '):');
+    arr.forEach((p, i) => {
+      L.push('  ' + (i + 1) + '. ' + (p.oem || '—') + ' — ' + (p.name || '')
+        + (p.price != null ? ' — ' + fP(p.price, p.currency) : ''));
+      if ((p.analogs || []).length) L.push('     аналоги: ' + p.analogs.slice(0, 3).join(', '));
+    });
+    const line = sumLine(sumsByCur(arr));
+    L.push('  ' + sumTitle + ': ' + arr.length + ' ' + pluralPos(arr.length) + (line ? ' · ' + line : ''), '');
+  };
+  block('🛒 ХОЧУ КУПИТЬ', g.want, 'Итого план');
+  block('📦 КУПЛЕНО', g.bought, 'Итого куплено');
+  L.push('База Мастера v' + APP_VERSION);
+  const text = L.join('\n');
+  const done = () => toast('📋 Скопировано: ' + g.count + ' ' + pluralPos(g.count), 'success');
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done).catch(() => fC(text, done));
+  else fC(text, done);
+}
+
+window.printPurchases = printPurchases;
+})();
